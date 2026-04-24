@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import './Dialog.css'
 
@@ -38,6 +38,7 @@ function Dialog({
   }, [content])
 
   const totalPages = pages.length
+  const isFirstPage = currentPage === 0
   const isLastPage = currentPage >= totalPages - 1
 
   useEffect(() => {
@@ -52,16 +53,27 @@ function Dialog({
       if (e.key === 'Escape' && maskClosable) {
         onClose?.()
       }
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
         if (!isLastPage) {
           setCurrentPage((p) => Math.min(p + 1, totalPages - 1))
+        }
+      }
+      if (e.key === 'ArrowLeft') {
+        if (!isFirstPage) {
+          setCurrentPage((p) => Math.max(p - 1, 0))
         }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, isLastPage, totalPages, maskClosable, onClose])
+  }, [open, isFirstPage, isLastPage, totalPages, maskClosable, onClose])
+
+  const handlePrev = useCallback(() => {
+    if (!isFirstPage) {
+      setCurrentPage((p) => Math.max(p - 1, 0))
+    }
+  }, [isFirstPage])
 
   const handleNext = useCallback(() => {
     if (!isLastPage) {
@@ -121,11 +133,19 @@ function Dialog({
             )}
 
             <div className="stardew-dialog__pagination">
+              <button
+                className="stardew-dialog__nav-btn"
+                onClick={handlePrev}
+                disabled={isFirstPage}
+                title={isFirstPage ? '已是第一页' : '上一页'}
+              >
+                <ChevronUp size={18} />
+              </button>
               <span className="stardew-dialog__page-indicator">
                 {currentPage + 1} / {totalPages}
               </span>
               <button
-                className="stardew-dialog__next-btn"
+                className="stardew-dialog__nav-btn"
                 onClick={handleNext}
                 disabled={isLastPage}
                 title={isLastPage ? '已是最后一页' : '下一页'}

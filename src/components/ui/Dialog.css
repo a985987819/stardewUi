@@ -56,6 +56,7 @@
   justify-content: space-between;
   margin-top: 16px;
   gap: 12px;
+  min-height: 40px;
 }
 
 .stardew-dialog__actions {
@@ -74,13 +75,14 @@
   gap: 8px;
   font-size: 0.9em;
   color: var(--color-text-secondary);
+  margin-left: auto;
 }
 
 .stardew-dialog__page-indicator {
   white-space: nowrap;
 }
 
-.stardew-dialog__next-btn {
+.stardew-dialog__nav-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,17 +96,17 @@
   cursor: pointer;
 }
 
-.stardew-dialog__next-btn:hover {
+.stardew-dialog__nav-btn:hover {
   transform: translate(-1px, -1px);
   box-shadow: var(--shadow-pixel);
 }
 
-.stardew-dialog__next-btn:active {
+.stardew-dialog__nav-btn:active {
   transform: translate(1px, 1px);
   box-shadow: none;
 }
 
-.stardew-dialog__next-btn:disabled {
+.stardew-dialog__nav-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none;

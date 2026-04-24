@@ -1,11 +1,24 @@
 import { classNames } from '../../utils/classNames'
 import './Card.css'
 
+export type CardColor = 
+  | 'night-village'
+  | 'forest-farm'
+  | 'wooden-cabin'
+  | 'lake-night'
+  | 'flower-festival'
+  | 'mine-starry'
+  | 'farmland'
+  | 'orchard-grass'
+  | 'workshop-ore'
+  | 'night-celebration'
+
 interface CardProps {
   title?: string
   children: React.ReactNode
   variant?: 'default' | 'outlined' | 'elevated'
   size?: 'small' | 'medium' | 'large'
+  color?: CardColor
   className?: string
   headerExtra?: React.ReactNode
   footer?: React.ReactNode
@@ -18,6 +31,7 @@ function Card({
   children,
   variant = 'default',
   size = 'medium',
+  color,
   className = '',
   headerExtra,
   footer,
@@ -28,6 +42,7 @@ function Card({
     'stardew-card',
     `stardew-card--${variant}`,
     `stardew-card--${size}`,
+    color && `stardew-card--color-${color}`,
     hoverable && 'stardew-card--hoverable',
     onClick && 'stardew-card--clickable',
     className

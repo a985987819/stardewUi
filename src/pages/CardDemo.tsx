@@ -1,7 +1,7 @@
 import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
-import { Card } from '../components/ui/Card'
+import { Card, type CardColor } from '../components/ui/Card'
 
 const cardApiData = [
   {
@@ -21,6 +21,12 @@ const cardApiData = [
     description: '卡片尺寸',
     type: "'small' | 'medium' | 'large'",
     default: "'medium'",
+  },
+  {
+    property: 'color',
+    description: '卡片配色主题',
+    type: "CardColor",
+    default: '-',
   },
   {
     property: 'hoverable',
@@ -53,6 +59,19 @@ const cardApiData = [
     default: '-',
     required: true,
   },
+]
+
+const colorOptions: { value: CardColor; label: string; desc: string }[] = [
+  { value: 'night-village', label: '夜晚村庄', desc: '深紫灰 + 米黄' },
+  { value: 'forest-farm', label: '森林农田', desc: '森林绿 + 浅米白' },
+  { value: 'wooden-cabin', label: '木屋农舍', desc: '棕褐色 + 浅杏色' },
+  { value: 'lake-night', label: '湖泊夜空', desc: '深蓝灰 + 浅青蓝' },
+  { value: 'flower-festival', label: '花田节日', desc: '葡萄紫 + 浅粉' },
+  { value: 'mine-starry', label: '矿洞星空', desc: '靛蓝 + 白色' },
+  { value: 'farmland', label: '农田耕作', desc: '泥土棕 + 奶油色' },
+  { value: 'orchard-grass', label: '果树草地', desc: '深绿 + 浅绿白' },
+  { value: 'workshop-ore', label: '工坊矿石', desc: '石灰蓝灰 + 亮黄' },
+  { value: 'night-celebration', label: '夜晚节庆', desc: '深蓝 + 浅蓝灰' },
 ]
 
 const basicCode = `<Card title="基础卡片">
@@ -99,6 +118,14 @@ const sizeCode = `<Card size="small" title="小卡片">
   大尺寸卡片
 </Card>`
 
+const colorCode = `<Card color="night-village" title="夜晚村庄">
+  深紫灰背景配米黄色文字
+</Card>
+
+<Card color="forest-farm" title="森林农田">
+  森林绿背景配浅米白文字
+</Card>`
+
 const metaCode = `<Card>
   <Card.Meta 
     title="卡片元信息" 
@@ -129,6 +156,16 @@ function CardDemo() {
           <Card variant="elevated" title="悬浮卡片" style={{ flex: 1, minWidth: '200px' }}>
             带有更大阴影的悬浮效果卡片
           </Card>
+        </div>
+      </ComponentDemo>
+
+      <ComponentDemo title="配色主题" description="10种星露谷风格配色方案" code={colorCode}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+          {colorOptions.map((option) => (
+            <Card key={option.value} color={option.value} title={option.label}>
+              {option.desc}
+            </Card>
+          ))}
         </div>
       </ComponentDemo>
 
