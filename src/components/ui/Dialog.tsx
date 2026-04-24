@@ -58,8 +58,9 @@ function Dialog({
 
   useEffect(() => {
     setKey((k) => k + 1)
-    setTitleComplete(!title || !typewriter)
-  }, [currentPage, title, typewriter])
+    // 只有第一页时标题使用打字机效果，后续页面直接显示完整标题
+    setTitleComplete(!title || !typewriter || !isFirstPage)
+  }, [currentPage, title, typewriter, isFirstPage])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

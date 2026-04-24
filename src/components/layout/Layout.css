@@ -9,7 +9,7 @@
 }
 
 .doc-content {
-  @apply max-w-[900px] mx-auto py-10 px-12;
+  @apply max-w-[1200px] mx-auto py-10 px-12;
 }
 
 @media (max-width: 1024px) {
