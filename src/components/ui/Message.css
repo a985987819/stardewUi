@@ -1,0 +1,154 @@
+.stardew-message-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.stardew-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 4px solid;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  min-width: 200px;
+  max-width: 400px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.2s steps(3);
+}
+
+.stardew-message--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Normal - 米黄 + 深紫灰 */
+.stardew-message--normal {
+  background: #F5E6CC;
+  border-color: #3A2E39;
+  color: #3A2E39;
+}
+
+.stardew-message--normal .stardew-message__close {
+  color: #3A2E39;
+}
+
+.stardew-message--normal .stardew-message__close:hover {
+  background: rgba(58, 46, 57, 0.1);
+}
+
+/* Info - 浅青蓝 + 深蓝灰 */
+.stardew-message--info {
+  background: #E0F7FA;
+  border-color: #2E4057;
+  color: #2E4057;
+}
+
+.stardew-message--info .stardew-message__icon {
+  color: #2E4057;
+}
+
+.stardew-message--info .stardew-message__close {
+  color: #2E4057;
+}
+
+.stardew-message--info .stardew-message__close:hover {
+  background: rgba(46, 64, 87, 0.1);
+}
+
+/* Success - 浅绿白 + 深绿 */
+.stardew-message--success {
+  background: #E6F2D9;
+  border-color: #2F5233;
+  color: #2F5233;
+}
+
+.stardew-message--success .stardew-message__icon {
+  color: #2F5233;
+}
+
+.stardew-message--success .stardew-message__close {
+  color: #2F5233;
+}
+
+.stardew-message--success .stardew-message__close:hover {
+  background: rgba(47, 82, 51, 0.1);
+}
+
+/* Warning - 奶油黄 + 泥土棕 */
+.stardew-message--warning {
+  background: #FFF2D5;
+  border-color: #6B4226;
+  color: #6B4226;
+}
+
+.stardew-message--warning .stardew-message__icon {
+  color: #6B4226;
+}
+
+.stardew-message--warning .stardew-message__close {
+  color: #6B4226;
+}
+
+.stardew-message--warning .stardew-message__close:hover {
+  background: rgba(107, 66, 38, 0.1);
+}
+
+/* Error - 浅粉红 + 葡萄紫 */
+.stardew-message--error {
+  background: #FFD1E3;
+  border-color: #5C3A57;
+  color: #5C3A57;
+}
+
+.stardew-message--error .stardew-message__icon {
+  color: #5C3A57;
+}
+
+.stardew-message--error .stardew-message__close {
+  color: #5C3A57;
+}
+
+.stardew-message--error .stardew-message__close:hover {
+  background: rgba(92, 58, 87, 0.1);
+}
+
+.stardew-message__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stardew-message__content {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.stardew-message__close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.1s steps(2);
+}
+
+.stardew-message__close:active {
+  transform: translate(1px, 1px);
+}

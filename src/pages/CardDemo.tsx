@@ -24,8 +24,14 @@ const cardApiData = [
   },
   {
     property: 'color',
-    description: '卡片配色主题',
+    description: '卡片配色主题，可选值见 CardColor 类型',
     type: "CardColor",
+    default: '-',
+  },
+  {
+    property: 'CardColor',
+    description: '配色主题类型，包含10种星露谷风格配色',
+    type: "'night-village' | 'forest-farm' | 'wooden-cabin' | 'lake-night' | 'flower-festival' | 'mine-starry' | 'farmland' | 'orchard-grass' | 'workshop-ore' | 'night-celebration'",
     default: '-',
   },
   {

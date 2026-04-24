@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react'
+import { useCallback, MouseEvent } from 'react'
+import { message } from '../ui/Message'
 import './ApiTable.css'
 
 interface ApiColumn {
@@ -24,24 +25,65 @@ interface ApiTableProps {
 }
 
 function ApiTable({ title = 'API', data }: ApiTableProps) {
-  const [copiedProperty, setCopiedProperty] = useState<string | null>(null)
-
   const columns = [
     { title: '属性', dataIndex: 'property', width: 150 },
     { title: '说明', dataIndex: 'description' },
-    { title: '类型', dataIndex: 'type', width: 180 },
+    { title: '类型', dataIndex: 'type', width: 280 },
     { title: '默认值', dataIndex: 'default', width: 120 },
   ]
 
-  const handleCopy = useCallback(async (text: string, property: string) => {
+  const handleCopy = useCallback(async (e: MouseEvent<HTMLElement>) => {
+    const target = e.target as HTMLElement
+    const textToCopy = target.textContent || ''
+
+    if (!textToCopy.trim()) return
+
+    // 清理文本，移除可能的前后空格和分隔符
+    const cleanText = textToCopy.replace(/^\s*[|\s]\s*|\s*[|\s]\s*$/g, '').trim()
+    if (!cleanText) return
+
     try {
-      await navigator.clipboard.writeText(text)
-      setCopiedProperty(property)
-      setTimeout(() => setCopiedProperty(null), 1500)
+      await navigator.clipboard.writeText(cleanText)
+      message.success(`已复制: ${cleanText}`)
     } catch (err) {
       console.error('复制失败:', err)
+      message.error('复制失败')
     }
   }, [])
+
+  // 将类型值拆分成多个可点击的部分
+  const renderTypeValue = (value: string) => {
+    // 如果包含 | 分隔符，则拆分成多个部分
+    if (value.includes('|')) {
+      const parts = value.split('|')
+      return (
+        <>
+          {parts.map((part, index) => (
+            <span key={index}>
+              <span
+                className="api-table-copyable api-table-type-part"
+                onClick={handleCopy}
+                title="点击复制"
+              >
+                {part.trim()}
+              </span>
+              {index < parts.length - 1 && <span className="api-table-type-separator"> | </span>}
+            </span>
+          ))}
+        </>
+      )
+    }
+
+    return (
+      <span
+        className="api-table-copyable"
+        onClick={handleCopy}
+        title="点击复制"
+      >
+        {value}
+      </span>
+    )
+  }
 
   const renderCell = (column: ApiColumn, record: ApiTableData) => {
     const value = record[column.dataIndex as keyof ApiTableData]
@@ -50,26 +92,17 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
       return (
         <code
           className="api-table-name api-table-copyable"
-          onClick={() => handleCopy(String(value), String(value))}
+          onClick={handleCopy}
           title="点击复制"
         >
           {value}
           {record.required && <span className="api-table-required">*</span>}
-          {copiedProperty === value && <span className="api-table-copied">已复制</span>}
         </code>
       )
     }
 
     if (column.dataIndex === 'type') {
-      return (
-        <code
-          className="api-table-copyable"
-          onClick={() => handleCopy(String(value), `type-${value}`)}
-          title="点击复制"
-        >
-          {value}
-        </code>
-      )
+      return renderTypeValue(String(value))
     }
 
     if (column.dataIndex === 'default') {
@@ -77,7 +110,7 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
       return (
         <code
           className="api-table-copyable"
-          onClick={() => handleCopy(String(value), `default-${value}`)}
+          onClick={handleCopy}
           title="点击复制"
         >
           {value}
