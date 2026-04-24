@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import Typewriter from './Typewriter'
 import './Dialog.css'
 
 export interface DialogAction {
@@ -17,6 +18,8 @@ export interface DialogProps {
   name?: string
   actions?: DialogAction[] | null
   maskClosable?: boolean
+  typewriter?: boolean
+  typewriterSpeed?: number
   onClose?: () => void
 }
 
@@ -28,9 +31,12 @@ function Dialog({
   name,
   actions,
   maskClosable = true,
+  typewriter = true,
+  typewriterSpeed = 30,
   onClose,
 }: DialogProps) {
   const [currentPage, setCurrentPage] = useState(0)
+  const [key, setKey] = useState(0)
 
   const pages = useMemo(() => {
     if (Array.isArray(content)) return content
@@ -44,8 +50,13 @@ function Dialog({
   useEffect(() => {
     if (open) {
       setCurrentPage(0)
+      setKey((k) => k + 1)
     }
   }, [open])
+
+  useEffect(() => {
+    setKey((k) => k + 1)
+  }, [currentPage])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -107,10 +118,22 @@ function Dialog({
     >
       <div className="stardew-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="stardew-dialog__left">
-          {title && <h3 className="stardew-dialog__title">{title}</h3>}
+          {title && (
+            <h3 className="stardew-dialog__title">
+              {typewriter ? (
+                <Typewriter text={title} speed={typewriterSpeed} key={`title-${key}`} />
+              ) : (
+                title
+              )}
+            </h3>
+          )}
 
           <div className="stardew-dialog__content">
-            {pages[currentPage]}
+            {typewriter ? (
+              <Typewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${key}`} />
+            ) : (
+              pages[currentPage]
+            )}
           </div>
 
           <div className="stardew-dialog__footer">

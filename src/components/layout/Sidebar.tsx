@@ -25,6 +25,7 @@ const menuItems: MenuItem[] = [
       { path: '/components/button', label: 'Button 按钮' },
       { path: '/components/card', label: 'Card 卡片' },
       { path: '/components/dialog', label: 'Dialog 弹窗' },
+      { path: '/components/typewriter', label: 'Typewriter 打字机' },
     ],
   },
 ]

@@ -51,6 +51,18 @@ const dialogApiData = [
     default: 'true',
   },
   {
+    property: 'typewriter',
+    description: '是否启用打字机效果',
+    type: 'boolean',
+    default: 'true',
+  },
+  {
+    property: 'typewriterSpeed',
+    description: '打字机速度（毫秒/字符）',
+    type: 'number',
+    default: '30',
+  },
+  {
     property: 'onClose',
     description: '关闭回调',
     type: '() => void',
@@ -108,11 +120,22 @@ const noActionsCode = `const [open, setOpen] = useState(false)
   onClose={() => setOpen(false)}
 />`
 
+const noTypewriterCode = `const [open, setOpen] = useState(false)
+
+<Dialog
+  open={open}
+  title="无打字机效果"
+  content="这段文字会直接显示，没有打字机动画效果。"
+  typewriter={false}
+  onClose={() => setOpen(false)}
+/>`
+
 function DialogDemo() {
   const [basicOpen, setBasicOpen] = useState(false)
   const [paginationOpen, setPaginationOpen] = useState(false)
   const [customOpen, setCustomOpen] = useState(false)
   const [noActionOpen, setNoActionOpen] = useState(false)
+  const [noTypewriterOpen, setNoTypewriterOpen] = useState(false)
 
   const handleSell = () => {
     alert('物品已出售！')
@@ -122,16 +145,16 @@ function DialogDemo() {
   return (
     <ComponentPage
       title="Dialog 弹窗"
-      description="星露谷风格的对话弹窗组件，支持分页内容和自定义操作按钮。"
+      description="星露谷风格的对话弹窗组件，支持分页内容和打字机效果。"
     >
-      <ComponentDemo title="基础用法" description="最简单的弹窗用法" code={basicCode}>
+      <ComponentDemo title="基础用法" description="最简单的弹窗用法，带打字机效果" code={basicCode}>
         <button className="demo-button demo-button-primary" onClick={() => setBasicOpen(true)}>
           打开基础弹窗
         </button>
         <Dialog
           open={basicOpen}
           title="欢迎来到星露谷"
-          content="你好，我是新来的农夫！这里真是个美丽的地方。"
+          content="你好，我是新来的农夫！这里真是个美丽的地方。点击文字可以快速显示全部内容。"
           image="https://stardewvalleywiki.com/mediawiki/images/2/28/Abigail.png"
           name="农夫"
           onClose={() => setBasicOpen(false)}
@@ -146,9 +169,9 @@ function DialogDemo() {
           open={paginationOpen}
           title="任务对话"
           content={[
-            '你好！我是村里的铁匠。',
-            '我听说你在农场工作得很努力。',
-            '如果你需要升级工具，可以来找我！',
+            '你好！我是村里的铁匠克林特。',
+            '我听说你在农场工作得很努力，这很不错！',
+            '如果你需要升级工具，随时可以来找我！我会给你优惠的。',
           ]}
           image="https://stardewvalleywiki.com/mediawiki/images/6/6e/Clint.png"
           name="克林特"
@@ -187,6 +210,19 @@ function DialogDemo() {
           actions={null}
           maskClosable={true}
           onClose={() => setNoActionOpen(false)}
+        />
+      </ComponentDemo>
+
+      <ComponentDemo title="禁用打字机" description="直接显示内容，无打字动画" code={noTypewriterCode}>
+        <button className="demo-button demo-button-primary" onClick={() => setNoTypewriterOpen(true)}>
+          打开无打字机弹窗
+        </button>
+        <Dialog
+          open={noTypewriterOpen}
+          title="无打字机效果"
+          content="这段文字会直接显示，没有打字机动画效果。适用于需要快速展示内容的场景。"
+          onClose={() => setNoTypewriterOpen(false)}
+          typewriter={false}
         />
       </ComponentDemo>
 
