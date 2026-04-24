@@ -1,0 +1,84 @@
+﻿.nine-slice-button {
+  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium cursor-pointer;
+  position: relative;
+  overflow: hidden;
+  border: none;
+  color: var(--color-text);
+  box-shadow: var(--shadow-pixel-sm);
+  background: transparent;
+}
+
+.nine-slice-button__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.nine-slice-button__canvas {
+  display: block;
+}
+
+.nine-slice-button__content {
+  position: relative;
+  z-index: 1;
+}
+
+.nine-slice-button:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel);
+}
+
+.nine-slice-button:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.nine-slice-button--primary {
+  color: var(--color-text-light);
+  filter: saturate(1.1) brightness(1.03);
+}
+
+.nine-slice-button--dashed .nine-slice-button__bg {
+  opacity: 0.92;
+}
+
+.nine-slice-button--text {
+  background: transparent;
+  box-shadow: none;
+}
+
+.nine-slice-button--text:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  transform: none;
+}
+
+.nine-slice-button--link {
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-primary);
+}
+
+.nine-slice-button--link:hover:not(:disabled) {
+  color: var(--color-primary-dark);
+  transform: none;
+}
+
+.nine-slice-button--small {
+  @apply px-3 py-1 text-xs;
+}
+
+.nine-slice-button--large {
+  @apply px-6 py-3 text-base;
+}
+
+.nine-slice-button--block {
+  @apply block w-full;
+}
+
+.nine-slice-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

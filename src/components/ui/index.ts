@@ -1,6 +1,6 @@
 export { Card, CardImage, CardMeta } from './Card'
-export { default as Card } from './Card'
 export { default as Dialog } from './Dialog'
 export { default as Typewriter } from './Typewriter'
-export { message, default as message } from './Message'
+export { message } from './Message'
 export type { MessageType, MessageProps } from './Message'
+export { default as NineSliceButton } from './NineSliceButton'

@@ -70,3 +70,7 @@
   transform: none;
   box-shadow: none;
 }
+
+.demo-multi-buttons {
+  @apply flex flex-wrap gap-3;
+}
