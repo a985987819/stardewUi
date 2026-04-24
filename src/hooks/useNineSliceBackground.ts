@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { drawNineSlice, type NineSliceInsets } from '../utils/nineSliceCanvas'
+import { calculateNineSliceLayout, drawNineSlice, type NineSliceInsets } from '../utils/nineSliceCanvas'
 
 type HTMLImageWithSize = HTMLImageElement & {
   naturalWidth: number
@@ -111,9 +111,26 @@ export const useNineSliceBackground = ({
     ctx.clearRect(0, 0, targetWidth, targetHeight)
     ctx.imageSmoothingEnabled = imageSmoothingEnabled
 
+    const scaledInsets = {
+      top: insets.top * dpr,
+      right: insets.right * dpr,
+      bottom: insets.bottom * dpr,
+      left: insets.left * dpr,
+    }
+
     if (backgroundColor) {
-      ctx.fillStyle = backgroundColor
-      ctx.fillRect(0, 0, targetWidth, targetHeight)
+      const layout = calculateNineSliceLayout({
+        targetWidth,
+        targetHeight,
+        sourceWidth: image.width,
+        sourceHeight: image.height,
+        insets: scaledInsets,
+      })
+
+      if (layout.dstCenterWidth > 0 && layout.dstCenterHeight > 0) {
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(layout.dstLeft, layout.dstTop, layout.dstCenterWidth, layout.dstCenterHeight)
+      }
     }
 
     drawNineSlice(ctx, {
@@ -122,12 +139,7 @@ export const useNineSliceBackground = ({
       sourceHeight: image.height,
       targetWidth,
       targetHeight,
-      insets: {
-        top: insets.top * dpr,
-        right: insets.right * dpr,
-        bottom: insets.bottom * dpr,
-        left: insets.left * dpr,
-      },
+      insets: scaledInsets,
       clearBeforeDraw: false,
     })
   }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])

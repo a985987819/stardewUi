@@ -1,0 +1,39 @@
+.stardew-popup {
+  position: relative;
+  display: inline-flex;
+}
+
+.stardew-popup__trigger {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+
+.stardew-popup__bubble-wrap {
+  position: absolute;
+  z-index: 5;
+}
+
+.stardew-popup__bubble {
+  min-width: 220px;
+  max-width: 320px;
+  color: #2f3440;
+}
+
+.stardew-popup__title {
+  margin-bottom: 8px;
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.stardew-popup__content {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.stardew-popup__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}

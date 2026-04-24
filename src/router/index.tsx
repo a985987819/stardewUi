@@ -6,6 +6,7 @@ import Components from '../pages/Components'
 import ButtonDemo from '../pages/ButtonDemo'
 import CardDemo from '../pages/CardDemo'
 import DialogDemo from '../pages/DialogDemo'
+import PopupDemo from '../pages/PopupDemo'
 import TypewriterDemo from '../pages/TypewriterDemo'
 import MessageDemo from '../pages/MessageDemo'
 
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
       { path: 'components/button', element: <ButtonDemo /> },
       { path: 'components/card', element: <CardDemo /> },
       { path: 'components/dialog', element: <DialogDemo /> },
+      { path: 'components/popup', element: <PopupDemo /> },
       { path: 'components/typewriter', element: <TypewriterDemo /> },
       { path: 'components/message', element: <MessageDemo /> },
     ],

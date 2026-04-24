@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, Book, Box, Layers } from 'lucide-react'
+import { ChevronDown, Book, Box } from 'lucide-react'
 import './Sidebar.css'
 import { classNames } from '../../utils/classNames'
 
@@ -24,7 +24,8 @@ const menuItems: MenuItem[] = [
     children: [
       { path: '/components/button', label: 'Button 按钮' },
       { path: '/components/card', label: 'Card 卡片' },
-      { path: '/components/dialog', label: 'Dialog 弹窗' },
+      { path: '/components/dialog', label: 'Dialog 对话框' },
+      { path: '/components/popup', label: 'Popup 气泡弹窗' },
       { path: '/components/typewriter', label: 'Typewriter 打字机' },
       { path: '/components/message', label: 'Message 消息提示' },
     ],
@@ -36,19 +37,14 @@ function Sidebar() {
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
 
   const toggleExpand = (path: string) => {
-    setExpandedKeys((prev) =>
-      prev.includes(path)
-        ? prev.filter((key) => key !== path)
-        : [...prev, path]
-    )
+    setExpandedKeys((prev) => (prev.includes(path) ? prev.filter((key) => key !== path) : [...prev, path]))
   }
 
   const isExpanded = (path: string) => expandedKeys.includes(path)
-
   const isActive = (path: string) => location.pathname.startsWith(path)
 
   const renderMenuItem = (item: MenuItem, level: number = 0) => {
-    const hasChildren = item.children && item.children.length > 0
+    const hasChildren = Boolean(item.children?.length)
     const expanded = isExpanded(item.path)
     const active = isActive(item.path)
 
@@ -56,48 +52,35 @@ function Sidebar() {
       <div key={item.path} className="doc-sidebar-item">
         <NavLink
           to={item.path}
-          className={classNames(
-            'doc-sidebar-link',
-            active && 'is-active',
-            `level-${level}`
-          )}
-          onClick={(e) => {
+          className={classNames('doc-sidebar-link', active && 'is-active', `level-${level}`)}
+          onClick={(event) => {
             if (hasChildren) {
-              e.preventDefault()
+              event.preventDefault()
               toggleExpand(item.path)
             }
           }}
         >
-          {item.icon && (
-            <span className="doc-sidebar-icon">{item.icon}</span>
-          )}
+          {item.icon ? <span className="doc-sidebar-icon">{item.icon}</span> : null}
           <span className="doc-sidebar-text">{item.label}</span>
-          {hasChildren && (
-            <span
-              className={classNames(
-                'doc-sidebar-arrow',
-                expanded && 'is-expanded'
-              )}
-            >
+          {hasChildren ? (
+            <span className={classNames('doc-sidebar-arrow', expanded && 'is-expanded')}>
               <ChevronDown size={16} />
             </span>
-          )}
+          ) : null}
         </NavLink>
 
-        {hasChildren && expanded && (
+        {hasChildren && expanded ? (
           <div className="doc-sidebar-children">
             {item.children!.map((child) => renderMenuItem(child, level + 1))}
           </div>
-        )}
+        ) : null}
       </div>
     )
   }
 
   return (
     <aside className="doc-sidebar">
-      <nav className="doc-sidebar-nav">
-        {menuItems.map((item) => renderMenuItem(item))}
-      </nav>
+      <nav className="doc-sidebar-nav">{menuItems.map((item) => renderMenuItem(item))}</nav>
     </aside>
   )
 }

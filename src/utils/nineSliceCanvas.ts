@@ -15,6 +15,21 @@ export type NineSliceDrawOptions = {
   clearBeforeDraw?: boolean
 }
 
+export type NineSliceLayout = {
+  srcLeft: number
+  srcRight: number
+  srcTop: number
+  srcBottom: number
+  srcCenterWidth: number
+  srcCenterHeight: number
+  dstLeft: number
+  dstRight: number
+  dstTop: number
+  dstBottom: number
+  dstCenterWidth: number
+  dstCenterHeight: number
+}
+
 const clampNonNegative = (value: number) => (value < 0 ? 0 : value)
 
 const clampInsets = (
@@ -63,6 +78,49 @@ const drawPatch = (
   ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh)
 }
 
+export const calculateNineSliceLayout = ({
+  targetWidth,
+  targetHeight,
+  sourceWidth,
+  sourceHeight,
+  insets,
+}: Omit<NineSliceDrawOptions, 'image' | 'clearBeforeDraw'>): NineSliceLayout => {
+  const safeInsets = clampInsets(insets, sourceWidth, sourceHeight)
+
+  const srcLeft = safeInsets.left
+  const srcRight = safeInsets.right
+  const srcTop = safeInsets.top
+  const srcBottom = safeInsets.bottom
+
+  const srcCenterWidth = Math.max(0, sourceWidth - srcLeft - srcRight)
+  const srcCenterHeight = Math.max(0, sourceHeight - srcTop - srcBottom)
+
+  const targetHorizontalScale =
+    srcLeft + srcRight > 0 ? Math.min(1, targetWidth / (srcLeft + srcRight)) : 1
+  const targetVerticalScale =
+    srcTop + srcBottom > 0 ? Math.min(1, targetHeight / (srcTop + srcBottom)) : 1
+
+  const dstLeft = srcLeft * targetHorizontalScale
+  const dstRight = srcRight * targetHorizontalScale
+  const dstTop = srcTop * targetVerticalScale
+  const dstBottom = srcBottom * targetVerticalScale
+
+  return {
+    srcLeft,
+    srcRight,
+    srcTop,
+    srcBottom,
+    srcCenterWidth,
+    srcCenterHeight,
+    dstLeft,
+    dstRight,
+    dstTop,
+    dstBottom,
+    dstCenterWidth: Math.max(0, targetWidth - dstLeft - dstRight),
+    dstCenterHeight: Math.max(0, targetHeight - dstTop - dstBottom),
+  }
+}
+
 export const drawNineSlice = (
   ctx: CanvasRenderingContext2D,
   options: NineSliceDrawOptions
@@ -85,28 +143,26 @@ export const drawNineSlice = (
     ctx.clearRect(0, 0, targetWidth, targetHeight)
   }
 
-  const safeInsets = clampInsets(insets, sourceWidth, sourceHeight)
-
-  const srcLeft = safeInsets.left
-  const srcRight = safeInsets.right
-  const srcTop = safeInsets.top
-  const srcBottom = safeInsets.bottom
-
-  const srcCenterWidth = Math.max(0, sourceWidth - srcLeft - srcRight)
-  const srcCenterHeight = Math.max(0, sourceHeight - srcTop - srcBottom)
-
-  const targetHorizontalScale =
-    srcLeft + srcRight > 0 ? Math.min(1, targetWidth / (srcLeft + srcRight)) : 1
-  const targetVerticalScale =
-    srcTop + srcBottom > 0 ? Math.min(1, targetHeight / (srcTop + srcBottom)) : 1
-
-  const dstLeft = srcLeft * targetHorizontalScale
-  const dstRight = srcRight * targetHorizontalScale
-  const dstTop = srcTop * targetVerticalScale
-  const dstBottom = srcBottom * targetVerticalScale
-
-  const dstCenterWidth = Math.max(0, targetWidth - dstLeft - dstRight)
-  const dstCenterHeight = Math.max(0, targetHeight - dstTop - dstBottom)
+  const {
+    srcLeft,
+    srcRight,
+    srcTop,
+    srcBottom,
+    srcCenterWidth,
+    srcCenterHeight,
+    dstLeft,
+    dstRight,
+    dstTop,
+    dstBottom,
+    dstCenterWidth,
+    dstCenterHeight,
+  } = calculateNineSliceLayout({
+    targetWidth,
+    targetHeight,
+    sourceWidth,
+    sourceHeight,
+    insets,
+  })
 
   drawPatch(ctx, image, 0, 0, srcLeft, srcTop, 0, 0, dstLeft, dstTop)
   drawPatch(
@@ -208,4 +264,3 @@ export const drawNineSlice = (
     dstCenterHeight
   )
 }
-

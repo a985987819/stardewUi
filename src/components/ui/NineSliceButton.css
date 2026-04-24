@@ -6,7 +6,7 @@
   color: var(--color-text);
   box-shadow: var(--shadow-pixel-sm);
   background: transparent;
-  padding: 0.5rem 1rem;
+  padding: 15px;
 }
 
 .nine-slice-button__bg {
@@ -80,12 +80,10 @@
 
 .nine-slice-button--small {
   @apply text-xs;
-  padding: 0.35rem 0.75rem;
 }
 
 .nine-slice-button--large {
   @apply text-base;
-  padding: 0.75rem 1.25rem;
 }
 
 .nine-slice-button--block {
