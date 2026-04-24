@@ -77,3 +77,34 @@
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
+
+.api-table-copyable {
+  cursor: copy;
+  user-select: none;
+  position: relative;
+}
+
+.api-table-copyable:hover {
+  opacity: 0.8;
+}
+
+.api-table-copyable:active {
+  transform: scale(0.98);
+}
+
+.api-table-copied {
+  @apply ml-2 text-xs;
+  color: var(--color-success);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react'
 import './ApiTable.css'
 
 interface ApiColumn {
@@ -23,6 +24,8 @@ interface ApiTableProps {
 }
 
 function ApiTable({ title = 'API', data }: ApiTableProps) {
+  const [copiedProperty, setCopiedProperty] = useState<string | null>(null)
+
   const columns = [
     { title: '属性', dataIndex: 'property', width: 150 },
     { title: '说明', dataIndex: 'description' },
@@ -30,24 +33,56 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     { title: '默认值', dataIndex: 'default', width: 120 },
   ]
 
+  const handleCopy = useCallback(async (text: string, property: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedProperty(property)
+      setTimeout(() => setCopiedProperty(null), 1500)
+    } catch (err) {
+      console.error('复制失败:', err)
+    }
+  }, [])
+
   const renderCell = (column: ApiColumn, record: ApiTableData) => {
     const value = record[column.dataIndex as keyof ApiTableData]
 
     if (column.dataIndex === 'property') {
       return (
-        <code className="api-table-name">
+        <code
+          className="api-table-name api-table-copyable"
+          onClick={() => handleCopy(String(value), String(value))}
+          title="点击复制"
+        >
           {value}
           {record.required && <span className="api-table-required">*</span>}
+          {copiedProperty === value && <span className="api-table-copied">已复制</span>}
         </code>
       )
     }
 
     if (column.dataIndex === 'type') {
-      return <code>{value}</code>
+      return (
+        <code
+          className="api-table-copyable"
+          onClick={() => handleCopy(String(value), `type-${value}`)}
+          title="点击复制"
+        >
+          {value}
+        </code>
+      )
     }
 
     if (column.dataIndex === 'default') {
-      return value ? <code>{value}</code> : <span className="api-table-empty">-</span>
+      if (!value) return <span className="api-table-empty">-</span>
+      return (
+        <code
+          className="api-table-copyable"
+          onClick={() => handleCopy(String(value), `default-${value}`)}
+          title="点击复制"
+        >
+          {value}
+        </code>
+      )
     }
 
     return value

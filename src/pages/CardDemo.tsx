@@ -160,10 +160,13 @@ function CardDemo() {
       </ComponentDemo>
 
       <ComponentDemo title="配色主题" description="10种星露谷风格配色方案" code={colorCode}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
           {colorOptions.map((option) => (
-            <Card key={option.value} color={option.value} title={option.label}>
-              {option.desc}
+            <Card key={option.value} color={option.value} size="small">
+              <div style={{ textAlign: 'center', padding: '8px 0' }}>
+                <div style={{ fontWeight: 'normal', marginBottom: '4px' }}>{option.label}</div>
+                <div style={{ fontSize: '12px', opacity: 0.85 }}>{option.desc}</div>
+              </div>
             </Card>
           ))}
         </div>

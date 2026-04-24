@@ -60,18 +60,34 @@
 
 @media (max-width: 768px) {
   .doc-header-nav {
-    @apply fixed flex-col p-4 gap-4;
+    position: fixed;
     top: 60px;
     left: 0;
     right: 0;
-    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    background: var(--color-bg-secondary);
     border-bottom: 4px solid var(--color-border-dark);
     transform: translateY(-100%);
     opacity: 0;
+    visibility: hidden;
+    transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 99;
   }
 
   .doc-header-nav.is-open {
-    @apply translate-y-0 opacity-100;
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .doc-header-nav-item {
+    padding: 12px 16px;
+    text-align: center;
+    border: 3px solid var(--color-border-dark);
+    background: var(--color-bg-card);
   }
 
   .doc-header-menu-btn {
