@@ -16,7 +16,7 @@ const typewriterApiData = [
     property: 'speed',
     description: '打字速度（毫秒/字符）',
     type: 'number',
-    default: '50',
+    default: '100',
   },
   {
     property: 'startDelay',
@@ -40,17 +40,12 @@ const typewriterApiData = [
 
 const basicCode = `<Typewriter text="你好，欢迎来到星露谷！" />`
 
-const speedCode = `<Typewriter text="快速打字效果" speed={20} />
-<Typewriter text="慢速打字效果" speed={100} />`
+const speedCode = `<Typewriter text="快速打字效果" speed={50} />
+<Typewriter text="慢速打字效果" speed={150} />`
 
 const delayCode = `<Typewriter 
   text="延迟1秒后开始打字" 
   startDelay={1000} 
-/>`
-
-const callbackCode = `<Typewriter 
-  text="打字完成后触发回调" 
-  onComplete={() => alert('打字完成！')}
 />`
 
 function TypewriterDemo() {
@@ -75,16 +70,16 @@ function TypewriterDemo() {
       <ComponentDemo title="不同速度" description="自定义打字速度" code={speedCode}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="typewriter-demo-box">
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>快速 (20ms):</div>
-            <Typewriter text="这是快速打字效果，每个字符间隔20毫秒。" speed={20} key={`fast-${key}`} />
+            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>快速 (50ms):</div>
+            <Typewriter text="这是快速打字效果，每个字符间隔50毫秒。" speed={50} key={`fast-${key}`} />
           </div>
           <div className="typewriter-demo-box">
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>默认 (50ms):</div>
-            <Typewriter text="这是默认打字速度，每个字符间隔50毫秒。" speed={50} key={`default-${key}`} />
+            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>默认 (100ms):</div>
+            <Typewriter text="这是默认打字速度，每个字符间隔100毫秒。" speed={100} key={`default-${key}`} />
           </div>
           <div className="typewriter-demo-box">
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>慢速 (100ms):</div>
-            <Typewriter text="这是慢速打字效果，每个字符间隔100毫秒。" speed={100} key={`slow-${key}`} />
+            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>慢速 (150ms):</div>
+            <Typewriter text="这是慢速打字效果，每个字符间隔150毫秒。" speed={150} key={`slow-${key}`} />
           </div>
         </div>
         <button className="demo-button demo-button-primary" onClick={restart} style={{ marginTop: '12px' }}>
@@ -94,23 +89,10 @@ function TypewriterDemo() {
 
       <ComponentDemo title="延迟开始" description="设置开始打字前的延迟时间" code={delayCode}>
         <div className="typewriter-demo-box">
-          <Typewriter 
-            text="这段文字会在1秒后开始逐字出现..." 
-            startDelay={1000} 
-            key={`delay-${key}`} 
-          />
-        </div>
-        <button className="demo-button demo-button-primary" onClick={restart} style={{ marginTop: '12px' }}>
-          重新播放
-        </button>
-      </ComponentDemo>
-
-      <ComponentDemo title="完成回调" description="打字完成后触发回调函数" code={callbackCode}>
-        <div className="typewriter-demo-box">
-          <Typewriter 
-            text="打字完成后会弹出一个提示框..." 
-            onComplete={() => alert('打字完成！')}
-            key={`callback-${key}`} 
+          <Typewriter
+            text="这段文字会在1秒后开始逐字出现..."
+            startDelay={1000}
+            key={`delay-${key}`}
           />
         </div>
         <button className="demo-button demo-button-primary" onClick={restart} style={{ marginTop: '12px' }}>

@@ -32,11 +32,12 @@ function Dialog({
   actions,
   maskClosable = true,
   typewriter = true,
-  typewriterSpeed = 30,
+  typewriterSpeed = 100,
   onClose,
 }: DialogProps) {
   const [currentPage, setCurrentPage] = useState(0)
   const [key, setKey] = useState(0)
+  const [titleComplete, setTitleComplete] = useState(false)
 
   const pages = useMemo(() => {
     if (Array.isArray(content)) return content
@@ -50,13 +51,15 @@ function Dialog({
   useEffect(() => {
     if (open) {
       setCurrentPage(0)
+      setTitleComplete(!title || !typewriter)
       setKey((k) => k + 1)
     }
-  }, [open])
+  }, [open, title, typewriter])
 
   useEffect(() => {
     setKey((k) => k + 1)
-  }, [currentPage])
+    setTitleComplete(!title || !typewriter)
+  }, [currentPage, title, typewriter])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -98,6 +101,10 @@ function Dialog({
     }
   }, [maskClosable, onClose])
 
+  const handleTitleComplete = useCallback(() => {
+    setTitleComplete(true)
+  }, [])
+
   const defaultActions: DialogAction[] = [
     { label: '确认', variant: 'primary', onClick: onClose },
     { label: '取消', variant: 'default', onClick: onClose },
@@ -121,7 +128,12 @@ function Dialog({
           {title && (
             <h3 className="stardew-dialog__title">
               {typewriter ? (
-                <Typewriter text={title} speed={typewriterSpeed} key={`title-${key}`} />
+                <Typewriter
+                  text={title}
+                  speed={typewriterSpeed}
+                  key={`title-${key}`}
+                  onComplete={handleTitleComplete}
+                />
               ) : (
                 title
               )}
@@ -130,7 +142,11 @@ function Dialog({
 
           <div className="stardew-dialog__content">
             {typewriter ? (
-              <Typewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${key}`} />
+              titleComplete ? (
+                <Typewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${key}`} />
+              ) : (
+                <span style={{ opacity: 0 }}>等待标题完成...</span>
+              )
             ) : (
               pages[currentPage]
             )}

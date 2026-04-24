@@ -11,7 +11,7 @@ export interface TypewriterProps {
 
 function Typewriter({
   text,
-  speed = 50,
+  speed = 100,
   className = '',
   onComplete,
   startDelay = 0,
