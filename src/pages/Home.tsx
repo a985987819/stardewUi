@@ -6,12 +6,6 @@ function Home() {
   return (
     <div className="home">
       <section className="home-hero">
-        <div className="home-hero-decoration">
-          <div className="home-circle home-circle-1" />
-          <div className="home-circle home-circle-2" />
-          <div className="home-circle home-circle-3" />
-        </div>
-
         <div className="home-hero-content">
           <h1 className="home-title">
             StardewValley UI

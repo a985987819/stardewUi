@@ -1,42 +1,50 @@
 .demo-button {
-  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border cursor-pointer transition-all duration-200;
-  background: var(--color-bg);
+  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium cursor-pointer;
+  background: var(--color-bg-card);
   color: var(--color-text);
-  border-color: var(--color-border);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel-sm);
 }
 
 .demo-button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel);
+}
+
+.demo-button:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 
 .demo-button-primary {
-  @apply text-white;
   background: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.demo-button-primary:hover {
-  @apply text-white;
-  background: var(--color-primary-dark);
+  color: var(--color-text-light);
   border-color: var(--color-primary-dark);
 }
 
+.demo-button-primary:hover {
+  background: var(--color-primary-light);
+}
+
 .demo-button-dashed {
-  @apply border-dashed;
+  border-style: dashed;
+  border-width: 3px;
 }
 
 .demo-button-text {
-  @apply border-none bg-transparent;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .demo-button-text:hover {
   background: var(--color-bg-hover);
-  color: var(--color-primary);
 }
 
 .demo-button-link {
-  @apply border-none bg-transparent;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   color: var(--color-primary);
 }
 
@@ -57,5 +65,8 @@
 }
 
 .demo-button:disabled {
-  @apply opacity-50 cursor-not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }

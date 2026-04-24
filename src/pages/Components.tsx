@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MousePointer, ChevronRight } from 'lucide-react'
+import { MousePointer, Square, ChevronRight } from 'lucide-react'
 import './Components.css'
 
 const components = [
@@ -8,6 +8,12 @@ const components = [
     title: 'Button 按钮',
     description: '用于触发操作的按钮组件',
     icon: <MousePointer size={20} />,
+  },
+  {
+    path: '/components/card',
+    title: 'Card 卡片',
+    description: '星露谷风格的卡片组件',
+    icon: <Square size={20} />,
   },
 ]
 

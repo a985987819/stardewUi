@@ -1,8 +1,7 @@
 .doc-header {
   @apply fixed top-0 left-0 right-0 h-[60px] z-[100];
-  background: var(--color-bg-header);
-  border-bottom: 1px solid var(--color-border);
-  backdrop-filter: blur(8px);
+  background: var(--color-bg-secondary);
+  border-bottom: 4px solid var(--color-border-dark);
 }
 
 .doc-header-container {
@@ -15,10 +14,7 @@
 }
 
 .doc-header-logo-text {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
 }
 
 .doc-header-nav {
@@ -26,16 +22,21 @@
 }
 
 .doc-header-nav-item {
-  @apply no-underline text-sm font-medium transition-colors duration-200;
+  @apply no-underline text-sm font-medium;
   color: var(--color-text-secondary);
+  padding: 4px 8px;
+  border: 2px solid transparent;
 }
 
 .doc-header-nav-item:hover {
-  color: var(--color-primary);
+  color: var(--color-text);
+  background: var(--color-bg-hover);
 }
 
 .doc-header-nav-item.is-active {
   color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
 }
 
 .doc-header-actions {
@@ -43,12 +44,13 @@
 }
 
 .doc-header-github {
-  @apply transition-colors duration-200;
   color: var(--color-text-secondary);
+  padding: 4px;
 }
 
 .doc-header-github:hover {
   color: var(--color-text);
+  background: var(--color-bg-hover);
 }
 
 .doc-header-menu-btn {
@@ -63,9 +65,9 @@
     left: 0;
     right: 0;
     background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 4px solid var(--color-border-dark);
     transform: translateY(-100%);
-    @apply opacity-0 transition-all duration-300;
+    opacity: 0;
   }
 
   .doc-header-nav.is-open {

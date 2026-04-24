@@ -1,7 +1,7 @@
 .doc-sidebar {
   @apply fixed top-[60px] left-0 bottom-0 w-[260px] overflow-y-auto py-6;
   background: var(--color-bg-sidebar);
-  border-right: 1px solid var(--color-border);
+  border-right: 4px solid var(--color-border-dark);
 }
 
 .doc-sidebar-nav {
@@ -13,8 +13,9 @@
 }
 
 .doc-sidebar-link {
-  @apply flex items-center gap-2 py-2 px-6 no-underline text-sm transition-all duration-200 cursor-pointer;
+  @apply flex items-center gap-2 py-2 px-6 no-underline text-sm cursor-pointer;
   color: var(--color-text-secondary);
+  border-left: 4px solid transparent;
 }
 
 .doc-sidebar-link:hover {
@@ -25,6 +26,7 @@
 .doc-sidebar-link.is-active {
   color: var(--color-primary);
   background: var(--color-primary-bg);
+  border-left-color: var(--color-primary);
 }
 
 .doc-sidebar-link.level-1 {
@@ -54,7 +56,7 @@
 
 @media (max-width: 1024px) {
   .doc-sidebar {
-    @apply -translate-x-full transition-transform duration-300 z-[90];
+    @apply -translate-x-full z-[90];
   }
 
   .doc-sidebar.is-open {

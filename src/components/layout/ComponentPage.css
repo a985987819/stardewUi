@@ -4,10 +4,12 @@
 
 .component-page-header {
   @apply mb-10;
+  padding-bottom: 16px;
+  border-bottom: 4px solid var(--color-border-dark);
 }
 
 .component-page-title {
-  @apply text-[32px] font-bold m-0 mb-3;
+  @apply text-2xl font-semibold m-0 mb-3;
   color: var(--color-text);
 }
 
@@ -22,5 +24,5 @@
 
 .component-page-api {
   @apply mt-12 pt-8;
-  border-top: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-border-dark);
 }

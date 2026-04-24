@@ -23,8 +23,8 @@ const menuItems: MenuItem[] = [
     icon: <Box size={18} />,
     children: [
       { path: '/components/button', label: 'Button 按钮' },
-      { path: '/components/input', label: 'Input 输入框' },
-      { path: '/components/select', label: 'Select 选择器' },
+      { path: '/components/card', label: 'Card 卡片' },
+      { path: '/components/dialog', label: 'Dialog 弹窗' },
     ],
   },
 ]

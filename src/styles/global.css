@@ -4,51 +4,86 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Stardew';
+  src: url('../assets/fonts/BoutiqueBitmap9x9_1.93.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --color-primary: #6366f1;
-  --color-primary-rgb: 99, 102, 241;
-  --color-primary-dark: #4f46e5;
-  --color-primary-bg: rgba(99, 102, 241, 0.1);
-  --color-secondary: #8b5cf6;
-  --color-secondary-rgb: 139, 92, 246;
-  --color-secondary-dark: #7c3aed;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
+  --color-primary: #5a8c4a;
+  --color-primary-rgb: 90, 140, 74;
+  --color-primary-dark: #4a7a3a;
+  --color-primary-light: #6a9c5a;
+  --color-primary-bg: rgba(90, 140, 74, 0.15);
 
-  --color-bg: #ffffff;
-  --color-bg-header: rgba(255, 255, 255, 0.9);
-  --color-bg-sidebar: #fafafa;
-  --color-bg-hover: #f5f5f5;
-  --color-bg-code: #1e1e1e;
-  --color-bg-code-header: #2d2d2d;
-  --color-bg-code-lines: #252525;
+  --color-secondary: #8b6914;
+  --color-secondary-rgb: 139, 105, 20;
+  --color-secondary-dark: #7a5a10;
+  --color-secondary-light: #9c7a1a;
 
-  --color-text: #1f2937;
-  --color-text-secondary: #6b7280;
-  --color-text-tertiary: #9ca3af;
+  --color-accent: #c45c3e;
+  --color-accent-rgb: 196, 92, 62;
 
-  --color-border: #e5e7eb;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  --color-success: #5a8c4a;
+  --color-warning: #d4a520;
+  --color-danger: #c45c3e;
+  --color-info: #5a8cb4;
+
+  --color-bg: #f4e4c1;
+  --color-bg-secondary: #e8d4a8;
+  --color-bg-header: rgba(244, 228, 193, 0.95);
+  --color-bg-sidebar: #f0e0bc;
+  --color-bg-card: #faf0dc;
+  --color-bg-hover: #e8d4a8;
+  --color-bg-code: #2d2418;
+  --color-bg-code-header: #3d3428;
+  --color-bg-code-lines: #352c20;
+
+  --color-text: #3d2b1f;
+  --color-text-secondary: #5a4a3a;
+  --color-text-tertiary: #8a7a6a;
+  --color-text-light: #faf0dc;
+
+  --color-border: #b8a070;
+  --color-border-dark: #8a7040;
+  --color-border-light: #d4c090;
+
+  --font-pixel: 'Stardew', monospace;
+  --font-sans: 'Stardew', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Stardew', 'SF Mono', Monaco, Consolas, monospace;
+
+  --shadow-pixel: 4px 4px 0px rgba(0, 0, 0, 0.15);
+  --shadow-pixel-sm: 2px 2px 0px rgba(0, 0, 0, 0.1);
+  --shadow-pixel-lg: 6px 6px 0px rgba(0, 0, 0, 0.2);
+  --shadow-inset: inset 2px 2px 0px rgba(255, 255, 255, 0.3), inset -2px -2px 0px rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #0f0f0f;
-    --color-bg-header: rgba(15, 15, 15, 0.9);
-    --color-bg-sidebar: #171717;
-    --color-bg-hover: #262626;
-    --color-bg-code: #1e1e1e;
-    --color-bg-code-header: #2d2d2d;
-    --color-bg-code-lines: #252525;
+    --color-bg: #1a1410;
+    --color-bg-secondary: #2a2420;
+    --color-bg-header: rgba(26, 20, 16, 0.95);
+    --color-bg-sidebar: #201a16;
+    --color-bg-card: #2a2420;
+    --color-bg-hover: #3a3430;
+    --color-bg-code: #1a1410;
+    --color-bg-code-header: #2a2420;
+    --color-bg-code-lines: #201a16;
 
-    --color-text: #f9fafb;
-    --color-text-secondary: #9ca3af;
-    --color-text-tertiary: #6b7280;
+    --color-text: #f4e4c1;
+    --color-text-secondary: #c4b4a1;
+    --color-text-tertiary: #948474;
 
-    --color-border: #262626;
+    --color-border: #5a4a3a;
+    --color-border-dark: #3a2a1a;
+    --color-border-light: #7a6a5a;
+
+    --shadow-pixel: 4px 4px 0px rgba(0, 0, 0, 0.4);
+    --shadow-pixel-sm: 2px 2px 0px rgba(0, 0, 0, 0.3);
+    --shadow-pixel-lg: 6px 6px 0px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -56,19 +91,22 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 html {
   font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-pixel);
   background: var(--color-bg);
   color: var(--color-text);
-  line-height: 1.5;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 }
 
 a {
@@ -77,32 +115,37 @@ a {
 }
 
 button {
-  font-family: inherit;
+  font-family: var(--font-pixel);
 }
 
-code {
+code, pre {
   font-family: var(--font-mono);
 }
 
 ::selection {
   background: var(--color-primary);
-  color: white;
+  color: var(--color-text-light);
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-border);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 4px;
+  border: 2px solid var(--color-border-dark);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-tertiary);
+  background: var(--color-border-dark);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--color-bg-secondary);
 }

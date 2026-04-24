@@ -4,6 +4,8 @@ import Home from '../pages/Home'
 import Guide from '../pages/Guide'
 import Components from '../pages/Components'
 import ButtonDemo from '../pages/ButtonDemo'
+import CardDemo from '../pages/CardDemo'
+import DialogDemo from '../pages/DialogDemo'
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +16,8 @@ export const router = createBrowserRouter([
       { path: 'guide', element: <Guide /> },
       { path: 'components', element: <Components /> },
       { path: 'components/button', element: <ButtonDemo /> },
+      { path: 'components/card', element: <CardDemo /> },
+      { path: 'components/dialog', element: <DialogDemo /> },
     ],
   },
   {
