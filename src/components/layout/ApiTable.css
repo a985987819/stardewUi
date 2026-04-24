@@ -1,0 +1,76 @@
+.api-table-wrapper {
+  @apply mt-8;
+}
+
+.api-table-title {
+  @apply text-xl font-semibold mb-4;
+  color: var(--color-text);
+}
+
+.api-table {
+  @apply w-full border-collapse rounded-lg overflow-hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.api-table thead {
+  background: var(--color-bg-header);
+}
+
+.api-table th {
+  @apply px-4 py-3 text-left text-[13px] font-semibold;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.api-table-row {
+  @apply transition-colors duration-200;
+}
+
+.api-table-row:hover {
+  background: var(--color-bg-hover);
+}
+
+.api-table-cell {
+  @apply px-4 py-3 text-sm;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.api-table-row:last-child .api-table-cell {
+  @apply border-b-0;
+}
+
+.api-table-cell code {
+  @apply px-1.5 py-0.5 rounded text-[13px];
+  background: var(--color-bg-code);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+}
+
+.api-table-name {
+  @apply font-medium;
+}
+
+.api-table-required {
+  @apply ml-0.5;
+  color: var(--color-danger);
+}
+
+.api-table-type code {
+  color: var(--color-secondary);
+}
+
+.api-table-empty {
+  color: var(--color-text-tertiary);
+}
+
+.api-table-badge {
+  @apply inline-block px-2 py-0.5 text-xs rounded;
+  background: var(--color-bg-code);
+  color: var(--color-text-secondary);
+}
+
+.api-table-badge.is-required {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}

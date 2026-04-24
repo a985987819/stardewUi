@@ -1,0 +1,64 @@
+.components-page {
+  @apply max-w-full;
+}
+
+.components-header {
+  @apply mb-10;
+}
+
+.components-header h1 {
+  @apply text-[32px] font-bold m-0 mb-3;
+  color: var(--color-text);
+}
+
+.components-header p {
+  @apply text-base mb-0;
+  color: var(--color-text-secondary);
+}
+
+.components-grid {
+  @apply grid grid-cols-2 gap-5;
+}
+
+.components-card {
+  @apply flex items-center gap-4 p-5 rounded-xl border no-underline transition-all duration-200;
+  background: var(--color-bg);
+  border-color: var(--color-border);
+}
+
+.components-card:hover {
+  @apply -translate-y-0.5;
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.components-card-icon {
+  @apply flex items-center justify-center w-12 h-12 rounded-[10px] flex-shrink-0;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.components-card-content {
+  @apply flex-1;
+}
+
+.components-card-content h3 {
+  @apply text-base font-semibold m-0 mb-1;
+  color: var(--color-text);
+}
+
+.components-card-content p {
+  @apply text-[13px] mb-0;
+  color: var(--color-text-secondary);
+}
+
+.components-card-arrow {
+  @apply flex-shrink-0;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .components-grid {
+    @apply grid-cols-1;
+  }
+}

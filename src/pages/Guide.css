@@ -1,0 +1,26 @@
+.guide-section {
+  @apply mb-10;
+}
+
+.guide-section h2 {
+  @apply text-2xl font-semibold m-0 mb-4;
+  color: var(--color-text);
+}
+
+.guide-section p {
+  @apply text-[15px] mb-4 leading-relaxed;
+  color: var(--color-text-secondary);
+}
+
+.guide-section ul {
+  @apply my-4 pl-6;
+}
+
+.guide-section li {
+  @apply text-[15px] mb-2 leading-relaxed;
+  color: var(--color-text-secondary);
+}
+
+.guide-section .code-block {
+  @apply my-4;
+}

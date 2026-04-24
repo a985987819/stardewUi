@@ -1,0 +1,26 @@
+.component-page {
+  @apply max-w-full;
+}
+
+.component-page-header {
+  @apply mb-10;
+}
+
+.component-page-title {
+  @apply text-[32px] font-bold m-0 mb-3;
+  color: var(--color-text);
+}
+
+.component-page-desc {
+  @apply text-base mb-0 leading-relaxed;
+  color: var(--color-text-secondary);
+}
+
+.component-page-content {
+  @apply flex flex-col gap-8;
+}
+
+.component-page-api {
+  @apply mt-12 pt-8;
+  border-top: 1px solid var(--color-border);
+}

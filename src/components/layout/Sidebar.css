@@ -1,0 +1,63 @@
+.doc-sidebar {
+  @apply fixed top-[60px] left-0 bottom-0 w-[260px] overflow-y-auto py-6;
+  background: var(--color-bg-sidebar);
+  border-right: 1px solid var(--color-border);
+}
+
+.doc-sidebar-nav {
+  @apply flex flex-col gap-1;
+}
+
+.doc-sidebar-item {
+  @apply relative;
+}
+
+.doc-sidebar-link {
+  @apply flex items-center gap-2 py-2 px-6 no-underline text-sm transition-all duration-200 cursor-pointer;
+  color: var(--color-text-secondary);
+}
+
+.doc-sidebar-link:hover {
+  color: var(--color-text);
+  background: var(--color-bg-hover);
+}
+
+.doc-sidebar-link.is-active {
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.doc-sidebar-link.level-1 {
+  @apply pl-10 text-[13px];
+}
+
+.doc-sidebar-link.level-2 {
+  @apply pl-14 text-xs;
+}
+
+.doc-sidebar-icon {
+  @apply flex items-center justify-center w-[18px] h-[18px];
+}
+
+.doc-sidebar-text {
+  @apply flex-1;
+}
+
+.doc-sidebar-arrow {
+  @apply flex items-center;
+  color: var(--color-text-tertiary);
+}
+
+.doc-sidebar-children {
+  @apply flex flex-col;
+}
+
+@media (max-width: 1024px) {
+  .doc-sidebar {
+    @apply -translate-x-full transition-transform duration-300 z-[90];
+  }
+
+  .doc-sidebar.is-open {
+    @apply translate-x-0;
+  }
+}

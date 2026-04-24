@@ -1,0 +1,78 @@
+.doc-header {
+  @apply fixed top-0 left-0 right-0 h-[60px] z-[100];
+  background: var(--color-bg-header);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(8px);
+}
+
+.doc-header-container {
+  @apply max-w-[1400px] mx-auto h-full flex items-center justify-between px-6;
+}
+
+.doc-header-logo {
+  @apply flex items-center gap-2 no-underline font-semibold text-lg;
+  color: var(--color-text);
+}
+
+.doc-header-logo-text {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.doc-header-nav {
+  @apply flex items-center gap-8;
+}
+
+.doc-header-nav-item {
+  @apply no-underline text-sm font-medium transition-colors duration-200;
+  color: var(--color-text-secondary);
+}
+
+.doc-header-nav-item:hover {
+  color: var(--color-primary);
+}
+
+.doc-header-nav-item.is-active {
+  color: var(--color-primary);
+}
+
+.doc-header-actions {
+  @apply flex items-center gap-4;
+}
+
+.doc-header-github {
+  @apply transition-colors duration-200;
+  color: var(--color-text-secondary);
+}
+
+.doc-header-github:hover {
+  color: var(--color-text);
+}
+
+.doc-header-menu-btn {
+  @apply hidden bg-transparent border-none cursor-pointer p-1;
+  color: var(--color-text);
+}
+
+@media (max-width: 768px) {
+  .doc-header-nav {
+    @apply fixed flex-col p-4 gap-4;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    transform: translateY(-100%);
+    @apply opacity-0 transition-all duration-300;
+  }
+
+  .doc-header-nav.is-open {
+    @apply translate-y-0 opacity-100;
+  }
+
+  .doc-header-menu-btn {
+    @apply block;
+  }
+}

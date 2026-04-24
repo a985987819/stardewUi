@@ -1,0 +1,23 @@
+.doc-layout {
+  @apply min-h-screen;
+  background: var(--color-bg);
+}
+
+.doc-main {
+  @apply pt-[60px] min-h-screen;
+  margin-left: 260px;
+}
+
+.doc-content {
+  @apply max-w-[900px] mx-auto py-10 px-12;
+}
+
+@media (max-width: 1024px) {
+  .doc-main {
+    @apply ml-0;
+  }
+
+  .doc-content {
+    @apply p-6;
+  }
+}

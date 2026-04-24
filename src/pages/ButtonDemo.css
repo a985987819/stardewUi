@@ -1,0 +1,61 @@
+.demo-button {
+  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border cursor-pointer transition-all duration-200;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.demo-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.demo-button-primary {
+  @apply text-white;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.demo-button-primary:hover {
+  @apply text-white;
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.demo-button-dashed {
+  @apply border-dashed;
+}
+
+.demo-button-text {
+  @apply border-none bg-transparent;
+}
+
+.demo-button-text:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-primary);
+}
+
+.demo-button-link {
+  @apply border-none bg-transparent;
+  color: var(--color-primary);
+}
+
+.demo-button-link:hover {
+  color: var(--color-primary-dark);
+}
+
+.demo-button-small {
+  @apply px-3 py-1 text-xs;
+}
+
+.demo-button-large {
+  @apply px-6 py-3 text-base;
+}
+
+.demo-button-block {
+  @apply block w-full;
+}
+
+.demo-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}

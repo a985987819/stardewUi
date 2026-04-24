@@ -1,0 +1,51 @@
+.code-block {
+  @apply overflow-hidden rounded-lg border;
+  background: var(--color-bg-code);
+  border-color: var(--color-border);
+}
+
+.code-block-header {
+  @apply flex items-center justify-between px-4 py-2;
+  background: var(--color-bg-code-header);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.code-block-language {
+  @apply text-xs font-medium uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.code-block-copy {
+  @apply flex items-center gap-1 bg-transparent border-none text-xs cursor-pointer px-2 py-1 rounded transition-all duration-200;
+  color: var(--color-text-secondary);
+}
+
+.code-block-copy:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+
+.code-block-content {
+  @apply flex overflow-x-auto;
+}
+
+.code-block-lines {
+  @apply flex flex-col py-4 select-none;
+  background: var(--color-bg-code-lines);
+  border-right: 1px solid var(--color-border);
+}
+
+.code-block-line-number {
+  @apply px-3 text-[13px] leading-relaxed;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+}
+
+.code-block-pre {
+  @apply flex-1 m-0 p-4 overflow-x-auto;
+}
+
+.code-block-pre code {
+  @apply text-[13px] leading-relaxed;
+  font-family: var(--font-mono);
+}
