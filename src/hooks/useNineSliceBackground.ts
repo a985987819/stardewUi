@@ -20,6 +20,7 @@ export type NineSliceBackgroundOptions = {
   imageRendering?: CSSProperties['imageRendering']
   zIndex?: number
   autoRedraw?: boolean
+  backgroundColor?: string
 }
 
 const imageCache = new Map<string, Promise<LoadedImage>>()
@@ -63,6 +64,7 @@ export const useNineSliceBackground = ({
   imageRendering = 'pixelated',
   zIndex = 0,
   autoRedraw = true,
+  backgroundColor,
 }: NineSliceBackgroundOptions) => {
   const hostRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -109,6 +111,11 @@ export const useNineSliceBackground = ({
     ctx.clearRect(0, 0, targetWidth, targetHeight)
     ctx.imageSmoothingEnabled = imageSmoothingEnabled
 
+    if (backgroundColor) {
+      ctx.fillStyle = backgroundColor
+      ctx.fillRect(0, 0, targetWidth, targetHeight)
+    }
+
     drawNineSlice(ctx, {
       image: image.element,
       sourceWidth: image.width,
@@ -123,7 +130,7 @@ export const useNineSliceBackground = ({
       },
       clearBeforeDraw: false,
     })
-  }, [imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
+  }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
 
   useEffect(() => {
     let cancelled = false
