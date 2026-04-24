@@ -80,6 +80,17 @@ const colorOptions: { value: CardColor; label: string; desc: string }[] = [
   { value: 'night-celebration', label: '夜晚节庆', desc: '深蓝 + 浅蓝灰' },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'variant', title: '卡片变体', level: 1 },
+  { id: 'color', title: '配色主题', level: 1 },
+  { id: 'hoverable', title: '悬停效果', level: 1 },
+  { id: 'size', title: '卡片尺寸', level: 1 },
+  { id: 'footer', title: '带底部操作', level: 1 },
+  { id: 'meta', title: '元信息', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `<Card title="基础卡片">
   这是一个基础的星露谷风格卡片组件。
 </Card>`
@@ -144,14 +155,15 @@ function CardDemo() {
     <ComponentPage
       title="Card 卡片"
       description="星露谷风格的卡片组件，用于展示信息和内容分组。"
+      toc={tocItems}
     >
-      <ComponentDemo title="基础用法" description="最简单的卡片用法" code={basicCode}>
+      <ComponentDemo id="basic" title="基础用法" description="最简单的卡片用法" code={basicCode}>
         <Card title="基础卡片">
           这是一个基础的星露谷风格卡片组件。
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo title="卡片变体" description="提供三种不同风格的卡片" code={variantCode}>
+      <ComponentDemo id="variant" title="卡片变体" description="提供三种不同风格的卡片" code={variantCode}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <Card variant="default" title="默认卡片" style={{ flex: 1, minWidth: '200px' }}>
             带有像素阴影效果的默认卡片
@@ -165,7 +177,7 @@ function CardDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="配色主题" description="10种星露谷风格配色方案" code={colorCode}>
+      <ComponentDemo id="color" title="配色主题" description="10种星露谷风格配色方案" code={colorCode}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
           {colorOptions.map((option) => (
             <Card key={option.value} color={option.value} size="small">
@@ -178,13 +190,13 @@ function CardDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="悬停效果" description="鼠标悬停时的动画效果" code={hoverableCode}>
+      <ComponentDemo id="hoverable" title="悬停效果" description="鼠标悬停时的动画效果" code={hoverableCode}>
         <Card hoverable title="可悬停卡片">
           鼠标悬停时会有动画效果，点击时会有按压效果。
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo title="卡片尺寸" description="不同尺寸的卡片" code={sizeCode}>
+      <ComponentDemo id="size" title="卡片尺寸" description="不同尺寸的卡片" code={sizeCode}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <Card size="small" title="小卡片" style={{ flex: 1, minWidth: '150px' }}>
             小尺寸卡片
@@ -198,9 +210,9 @@ function CardDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="带底部操作" description="卡片可以包含底部操作区域" code={withFooterCode}>
-        <Card 
-          title="带底部卡片" 
+      <ComponentDemo id="footer" title="带底部操作" description="卡片可以包含底部操作区域" code={withFooterCode}>
+        <Card
+          title="带底部卡片"
           footer={
             <div style={{ display: 'flex', gap: '8px' }}>
               <button className="stardew-btn">取消</button>
@@ -212,16 +224,16 @@ function CardDemo() {
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo title="元信息" description="使用 Card.Meta 显示结构化信息" code={metaCode}>
+      <ComponentDemo id="meta" title="元信息" description="使用 Card.Meta 显示结构化信息" code={metaCode}>
         <Card>
-          <Card.Meta 
-            title="卡片元信息" 
+          <Card.Meta
+            title="卡片元信息"
             description="这是卡片的描述内容，可以包含更多详细信息。"
           />
         </Card>
       </ComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <ApiTable data={cardApiData} />
       </div>
     </ComponentPage>

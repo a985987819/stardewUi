@@ -9,6 +9,7 @@ interface ComponentDemoProps {
   children: React.ReactNode
   code?: string
   defaultShowCode?: boolean
+  id?: string
 }
 
 function ComponentDemo({
@@ -17,11 +18,12 @@ function ComponentDemo({
   children,
   code,
   defaultShowCode = false,
+  id,
 }: ComponentDemoProps) {
   const [showCode, setShowCode] = useState(defaultShowCode)
 
   return (
-    <div className={`component-demo ${code ? 'has-code' : ''}`}>
+    <div id={id} className={`component-demo ${code ? 'has-code' : ''}`}>
       <div className="component-demo-header">
         <h3 className="component-demo-title">{title}</h3>
         {description && (
@@ -49,10 +51,6 @@ function ComponentDemo({
       )}
     </div>
   )
-}
-
-export function ComponentDemoWithCode(props: ComponentDemoProps) {
-  return <ComponentDemo {...props} defaultShowCode={true} />
 }
 
 export default ComponentDemo

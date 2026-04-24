@@ -70,6 +70,15 @@ const dialogApiData = [
   },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'pagination', title: '分页对话', level: 1 },
+  { id: 'custom-actions', title: '自定义按钮', level: 1 },
+  { id: 'no-actions', title: '无操作按钮', level: 1 },
+  { id: 'no-typewriter', title: '禁用打字机', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `const [open, setOpen] = useState(false)
 
 <Dialog
@@ -146,8 +155,9 @@ function DialogDemo() {
     <ComponentPage
       title="Dialog 弹窗"
       description="星露谷风格的对话弹窗组件，支持分页内容和打字机效果。"
+      toc={tocItems}
     >
-      <ComponentDemo title="基础用法" description="最简单的弹窗用法，带打字机效果" code={basicCode}>
+      <ComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机效果" code={basicCode}>
         <button className="demo-button demo-button-primary" onClick={() => setBasicOpen(true)}>
           打开基础弹窗
         </button>
@@ -161,7 +171,7 @@ function DialogDemo() {
         />
       </ComponentDemo>
 
-      <ComponentDemo title="分页对话" description="支持多页内容，按箭头切换" code={paginationCode}>
+      <ComponentDemo id="pagination" title="分页对话" description="支持多页内容，按箭头切换" code={paginationCode}>
         <button className="demo-button demo-button-primary" onClick={() => setPaginationOpen(true)}>
           打开分页弹窗
         </button>
@@ -179,7 +189,7 @@ function DialogDemo() {
         />
       </ComponentDemo>
 
-      <ComponentDemo title="自定义按钮" description="自定义操作按钮和样式" code={customActionsCode}>
+      <ComponentDemo id="custom-actions" title="自定义按钮" description="自定义操作按钮和样式" code={customActionsCode}>
         <button className="demo-button demo-button-primary" onClick={() => setCustomOpen(true)}>
           打开自定义按钮弹窗
         </button>
@@ -197,7 +207,7 @@ function DialogDemo() {
         />
       </ComponentDemo>
 
-      <ComponentDemo title="无操作按钮" description="隐藏操作按钮，仅用于展示信息" code={noActionsCode}>
+      <ComponentDemo id="no-actions" title="无操作按钮" description="隐藏操作按钮，仅用于展示信息" code={noActionsCode}>
         <button className="demo-button demo-button-primary" onClick={() => setNoActionOpen(true)}>
           打开无按钮弹窗
         </button>
@@ -213,7 +223,7 @@ function DialogDemo() {
         />
       </ComponentDemo>
 
-      <ComponentDemo title="禁用打字机" description="直接显示内容，无打字动画" code={noTypewriterCode}>
+      <ComponentDemo id="no-typewriter" title="禁用打字机" description="直接显示内容，无打字动画" code={noTypewriterCode}>
         <button className="demo-button demo-button-primary" onClick={() => setNoTypewriterOpen(true)}>
           打开无打字机弹窗
         </button>
@@ -226,7 +236,7 @@ function DialogDemo() {
         />
       </ComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <ApiTable data={dialogApiData} />
       </div>
     </ComponentPage>

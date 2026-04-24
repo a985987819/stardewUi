@@ -38,6 +38,13 @@ const typewriterApiData = [
   },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'speed', title: '不同速度', level: 1 },
+  { id: 'delay', title: '延迟开始', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `<Typewriter text="你好，欢迎来到星露谷！" />`
 
 const speedCode = `<Typewriter text="快速打字效果" speed={50} />
@@ -57,8 +64,9 @@ function TypewriterDemo() {
     <ComponentPage
       title="Typewriter 打字机"
       description="打字机效果组件，模拟文字逐个出现的动画效果。点击文字可快速显示全部内容。"
+      toc={tocItems}
     >
-      <ComponentDemo title="基础用法" description="最简单的打字机效果" code={basicCode}>
+      <ComponentDemo id="basic" title="基础用法" description="最简单的打字机效果" code={basicCode}>
         <div className="typewriter-demo-box">
           <Typewriter text="你好，欢迎来到星露谷！这是一个美丽的农场世界。" key={key} />
         </div>
@@ -67,7 +75,7 @@ function TypewriterDemo() {
         </button>
       </ComponentDemo>
 
-      <ComponentDemo title="不同速度" description="自定义打字速度" code={speedCode}>
+      <ComponentDemo id="speed" title="不同速度" description="自定义打字速度" code={speedCode}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="typewriter-demo-box">
             <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>快速 (50ms):</div>
@@ -87,7 +95,7 @@ function TypewriterDemo() {
         </button>
       </ComponentDemo>
 
-      <ComponentDemo title="延迟开始" description="设置开始打字前的延迟时间" code={delayCode}>
+      <ComponentDemo id="delay" title="延迟开始" description="设置开始打字前的延迟时间" code={delayCode}>
         <div className="typewriter-demo-box">
           <Typewriter
             text="这段文字会在1秒后开始逐字出现..."
@@ -100,7 +108,7 @@ function TypewriterDemo() {
         </button>
       </ComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <ApiTable data={typewriterApiData} />
       </div>
     </ComponentPage>

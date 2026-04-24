@@ -31,6 +31,13 @@ const messageApiData = [
   },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'duration', title: '持续时间', level: 1 },
+  { id: 'config', title: '配置对象', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `import { message } from '../components/ui/Message'
 
 // 普通提示
@@ -78,8 +85,9 @@ function MessageDemo() {
     <ComponentPage
       title="Message 消息提示"
       description="星露谷风格的消息提示组件，用于全局展示操作反馈信息。"
+      toc={tocItems}
     >
-      <ComponentDemo title="基础用法" description="五种不同类型的消息提示" code={basicCode}>
+      <ComponentDemo id="basic" title="基础用法" description="五种不同类型的消息提示" code={basicCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button className="demo-button" onClick={showNormal}>
             普通提示
@@ -99,7 +107,7 @@ function MessageDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="持续时间" description="设置消息显示的持续时间" code={durationCode}>
+      <ComponentDemo id="duration" title="持续时间" description="设置消息显示的持续时间" code={durationCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button className="demo-button demo-button-primary" onClick={showSuccess}>
             默认3秒
@@ -113,7 +121,7 @@ function MessageDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="配置对象" description="使用配置对象方式调用" code={configCode}>
+      <ComponentDemo id="config" title="配置对象" description="使用配置对象方式调用" code={configCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button
             className="demo-button demo-button-primary"
@@ -130,7 +138,7 @@ function MessageDemo() {
         </div>
       </ComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <ApiTable data={messageApiData} />
       </div>
     </ComponentPage>
