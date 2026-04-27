@@ -159,15 +159,15 @@ code, pre {
 }
 
 .demo-button {
-  padding: 8px 16px;
+  padding: 15px 20px;
   font-family: var(--font-pixel);
   font-size: 14px;
   border: 3px solid var(--color-border-dark);
   background: var(--color-bg-card);
   color: var(--color-text);
   cursor: pointer;
-  box-shadow: var(--shadow-pixel-sm);
-  transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
+  box-shadow: none;
+  transition: transform 0.1s steps(2);
 }
 
 .demo-button:hover {
@@ -176,7 +176,6 @@ code, pre {
 
 .demo-button:active {
   transform: translate(2px, 2px);
-  box-shadow: none;
 }
 
 .demo-button-primary {

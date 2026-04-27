@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import CanvasPanel from './CanvasPanel'
+import NineSliceButton from './NineSliceButton'
 import Typewriter from './Typewriter'
 import './Dialog.css'
 
 export interface DialogAction {
   label: string
   variant?: 'default' | 'primary' | 'danger'
+  disabled?: boolean
   onClick?: () => void
 }
 
@@ -23,6 +26,15 @@ export interface DialogProps {
   onClose?: () => void
 }
 
+const LABEL_CONFIRM = '\u786e\u8ba4'
+const LABEL_CANCEL = '\u53d6\u6d88'
+const LABEL_ROLE = '\u89d2\u8272'
+const TITLE_PREV = '\u4e0a\u4e00\u9875'
+const TITLE_NEXT = '\u4e0b\u4e00\u9875'
+const TITLE_PREV_DISABLED = '\u5df2\u662f\u7b2c\u4e00\u9875'
+const TITLE_NEXT_DISABLED = '\u5df2\u662f\u6700\u540e\u4e00\u9875'
+const WAITING_TEXT = '\u7b49\u5f85\u6807\u9898\u5b8c\u6210...'
+
 function Dialog({
   open,
   title,
@@ -36,7 +48,8 @@ function Dialog({
   onClose,
 }: DialogProps) {
   const [currentPage, setCurrentPage] = useState(0)
-  const [key, setKey] = useState(0)
+  const [titleKey, setTitleKey] = useState(0)
+  const [contentKey, setContentKey] = useState(0)
   const [titleComplete, setTitleComplete] = useState(false)
 
   const pages = useMemo(() => {
@@ -52,14 +65,17 @@ function Dialog({
     if (open) {
       setCurrentPage(0)
       setTitleComplete(!title || !typewriter)
-      setKey((k) => k + 1)
+      setTitleKey((k) => k + 1)
+      setContentKey((k) => k + 1)
     }
   }, [open, title, typewriter])
 
   useEffect(() => {
-    setKey((k) => k + 1)
-    // 只有第一页时标题使用打字机效果，后续页面直接显示完整标题
-    setTitleComplete(!title || !typewriter || !isFirstPage)
+    setContentKey((k) => k + 1)
+
+    if (!isFirstPage) {
+      setTitleComplete(true)
+    }
   }, [currentPage, title, typewriter, isFirstPage])
 
   useEffect(() => {
@@ -107,8 +123,8 @@ function Dialog({
   }, [])
 
   const defaultActions: DialogAction[] = [
-    { label: '确认', variant: 'primary', onClick: onClose },
-    { label: '取消', variant: 'default', onClick: onClose },
+    { label: LABEL_CONFIRM, variant: 'primary', onClick: onClose },
+    { label: LABEL_CANCEL, variant: 'default', onClick: onClose },
   ]
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
@@ -118,21 +134,25 @@ function Dialog({
 
   return (
     <div
-      className={classNames(
-        'stardew-dialog-overlay',
-        maskClosable && 'stardew-dialog-overlay--clickable'
-      )}
+      className={classNames('stardew-dialog-overlay', maskClosable && 'stardew-dialog-overlay--clickable')}
       onClick={handleOverlayClick}
     >
       <div className="stardew-dialog" onClick={(e) => e.stopPropagation()}>
-        <div className="stardew-dialog__left">
+        <CanvasPanel
+          className="stardew-dialog__left"
+          fillColor="#f7edd6"
+          borderColor="#9e460f"
+          borderWidth={5}
+          stepSize={8}
+          contentPadding={14}
+        >
           {title && (
             <h3 className="stardew-dialog__title">
-              {typewriter ? (
+              {typewriter && !titleComplete ? (
                 <Typewriter
                   text={title}
                   speed={typewriterSpeed}
-                  key={`title-${key}`}
+                  key={`title-${titleKey}`}
                   onComplete={handleTitleComplete}
                 />
               ) : (
@@ -144,9 +164,13 @@ function Dialog({
           <div className="stardew-dialog__content">
             {typewriter ? (
               titleComplete ? (
-                <Typewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${key}`} />
+                <Typewriter
+                  text={pages[currentPage]}
+                  speed={typewriterSpeed}
+                  key={`content-${contentKey}`}
+                />
               ) : (
-                <span style={{ opacity: 0 }}>等待标题完成...</span>
+                <span style={{ opacity: 0 }}>{WAITING_TEXT}</span>
               )
             ) : (
               pages[currentPage]
@@ -157,58 +181,73 @@ function Dialog({
             {showActions && (
               <div className="stardew-dialog__actions">
                 {finalActions.map((action, index) => (
-                  <button
+                  <NineSliceButton
                     key={index}
-                    className={classNames(
-                      'stardew-dialog-btn',
-                      action.variant === 'primary' && 'stardew-dialog-btn--primary',
-                      action.variant === 'danger' && 'stardew-dialog-btn--danger'
-                    )}
+                    type="button"
+                    size="small"
+                    variant={action.variant ?? 'default'}
+                    disabled={action.disabled}
                     onClick={action.onClick}
                   >
                     {action.label}
-                  </button>
+                  </NineSliceButton>
                 ))}
               </div>
             )}
 
             <div className="stardew-dialog__pagination">
-              <button
+              <NineSliceButton
+                type="button"
+                size="small"
                 className="stardew-dialog__nav-btn"
                 onClick={handlePrev}
                 disabled={isFirstPage}
-                title={isFirstPage ? '已是第一页' : '上一页'}
+                title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
               >
                 <ChevronUp size={18} />
-              </button>
+              </NineSliceButton>
               <span className="stardew-dialog__page-indicator">
                 {currentPage + 1} / {totalPages}
               </span>
-              <button
+              <NineSliceButton
+                type="button"
+                size="small"
                 className="stardew-dialog__nav-btn"
                 onClick={handleNext}
                 disabled={isLastPage}
-                title={isLastPage ? '已是最后一页' : '下一页'}
+                title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
               >
                 <ChevronDown size={18} />
-              </button>
+              </NineSliceButton>
             </div>
           </div>
-        </div>
+        </CanvasPanel>
 
         {(image || name) && (
           <div className="stardew-dialog__right">
             {image && (
-              <div className="stardew-dialog__image-wrap">
-                <img
-                  src={image}
-                  alt={name || '角色'}
-                  className="stardew-dialog__image"
-                />
-              </div>
+              <CanvasPanel
+                className="stardew-dialog__image-wrap"
+                fillColor="#f7edd6"
+                borderColor="#9e460f"
+                borderWidth={5}
+                stepSize={8}
+                contentPadding={10}
+              >
+                <img src={image} alt={name || LABEL_ROLE} className="stardew-dialog__image" />
+              </CanvasPanel>
             )}
             {name && (
-              <div className="stardew-dialog__name">{name}</div>
+              <CanvasPanel
+                className="stardew-dialog__name"
+                fillColor="#fdd284"
+                borderColor="#9e460f"
+                borderWidth={5}
+                stepSize={8}
+                contentPadding={8}
+              >
+                {name}
+              </CanvasPanel>
             )}
           </div>
         )}

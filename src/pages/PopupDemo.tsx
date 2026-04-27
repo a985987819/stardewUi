@@ -6,43 +6,37 @@ import { NineSliceButton, Popup, type PopupPlacement } from '../components/ui'
 import './PopupDemo.css'
 
 const popupApiData = [
-  { property: 'open', description: '是否显示气泡', type: 'boolean', default: 'true' },
+  { property: 'open', description: '\u662f\u5426\u663e\u793a\u5f39\u7a97', type: 'boolean', default: 'true' },
   {
     property: 'placement',
-    description: '弹出位置',
+    description: '\u5f39\u51fa\u4f4d\u7f6e',
     type: "'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'",
     default: "'right'",
   },
-  { property: 'title', description: '标题区域', type: 'ReactNode', default: '-' },
-  { property: 'content', description: '内容区域', type: 'ReactNode', default: '-', required: true },
-  { property: 'actions', description: '底部操作按钮', type: 'PopupAction[]', default: '-' },
-  { property: 'offset', description: '与触发元素的间距', type: 'number', default: '12' },
-  { property: 'children', description: '触发元素', type: 'ReactNode', default: '-', required: true },
+  { property: 'title', description: '\u6807\u9898\u533a\u57df', type: 'ReactNode', default: '-' },
+  { property: 'content', description: '\u5185\u5bb9\u533a\u57df', type: 'ReactNode', default: '-', required: true },
+  { property: 'actions', description: '\u5e95\u90e8\u64cd\u4f5c\u6309\u94ae', type: 'PopupAction[]', default: '-' },
+  { property: 'offset', description: '\u4e0e\u89e6\u53d1\u5143\u7d20\u7684\u95f4\u8ddd', type: 'number', default: '12' },
+  { property: 'children', description: '\u89e6\u53d1\u5143\u7d20', type: 'ReactNode', default: '-', required: true },
 ]
 
-const placements: PopupPlacement[] = [
-  'top-start',
-  'top',
-  'top-end',
-  'right-start',
-  'right',
-  'right-end',
-  'bottom-start',
-  'bottom',
-  'bottom-end',
-  'left-start',
-  'left',
-  'left-end',
-]
+const rightPlacements: PopupPlacement[] = ['right-start', 'right', 'right-end']
+
+const placementGroups = {
+  top: ['top-start', 'top', 'top-end'],
+  right: ['right-start', 'right', 'right-end'],
+  bottom: ['bottom-start', 'bottom', 'bottom-end'],
+  left: ['left-start', 'left', 'left-end'],
+} satisfies Record<'top' | 'right' | 'bottom' | 'left', PopupPlacement[]>
 
 const rightPlacementCode = `<Popup
   open
   placement="right-start"
-  title="提示"
-  content="支持像素气泡箭头与动作按钮"
+  title="\u63d0\u793a"
+  content="\u652f\u6301\u50cf\u7d20\u6c14\u6ce1\u7bad\u5934\u548c\u591a\u6309\u94ae\u64cd\u4f5c\u3002"
   actions={[
-    { label: 'No' },
-    { label: 'Yes', variant: 'primary' },
+    { label: '\u53d6\u6d88' },
+    { label: '\u786e\u8ba4', variant: 'primary' },
   ]}
 >
   <NineSliceButton>right-start</NineSliceButton>
@@ -53,8 +47,13 @@ const allPlacementCode = `const [placement, setPlacement] = useState<PopupPlacem
 <Popup
   open
   placement={placement}
-  title="全方向控制"
-  content="支持 top / right / bottom / left，以及 start / end 对齐。"
+  title="\u5168\u65b9\u4f4d\u63a7\u5236"
+  content="\u652f\u6301 top / right / bottom / left\uff0c\u4ee5\u53ca start / end \u5bf9\u9f50\u3002"
+  actions={[
+    { label: '\u53d6\u6d88' },
+    { label: '\u7981\u7528', disabled: true },
+    { label: '\u786e\u8ba4', variant: 'primary' },
+  ]}
 >
   <NineSliceButton variant="primary">{placement}</NineSliceButton>
 </Popup>`
@@ -63,23 +62,26 @@ function PopupDemo() {
   const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
   return (
-    <ComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持上下左右及 start/end 对齐控制。">
+    <ComponentPage
+      title="Popup \u6c14\u6ce1\u5f39\u7a97"
+      description="\u50cf\u7d20\u98ce\u6c14\u6ce1\u5f39\u7a97\u7ec4\u4ef6\uff0c\u652f\u6301\u56db\u5411\u4f4d\u7f6e\u4e0e start/end \u5bf9\u9f50\u63a7\u5236\u3002"
+    >
       <ComponentDemo
-        title="右侧弹窗"
-        description="效果接近参考图中的右侧对话框，包含 start / center / end 三种对齐。"
+        title="\u53f3\u4fa7\u5f39\u7a97"
+        description="\u53f3\u4fa7\u4e09\u79cd\u5bf9\u9f50\u65b9\u5f0f\u7684\u57fa\u7840\u793a\u4f8b\u3002"
         code={rightPlacementCode}
       >
         <div className="popup-demo-stack">
-          {(['right-start', 'right', 'right-end'] as PopupPlacement[]).map((item) => (
+          {rightPlacements.map((item) => (
             <Popup
               key={item}
               open
               placement={item}
-              title="?"
+              title="\u63d0\u793a"
               content="Right placement prompts info"
               actions={[
-                { label: 'No' },
-                { label: 'Yes', variant: 'primary' },
+                { label: '\u53d6\u6d88' },
+                { label: '\u786e\u8ba4', variant: 'primary' },
               ]}
             >
               <NineSliceButton variant={item === 'right' ? 'primary' : 'default'}>{item}</NineSliceButton>
@@ -89,36 +91,86 @@ function PopupDemo() {
       </ComponentDemo>
 
       <ComponentDemo
-        title="全方向控制"
-        description="通过 placement 切换所有方向与对齐方式。"
+        title="\u5168\u65b9\u4f4d\u63a7\u5236"
+        description="\u6309\u7167\u53c2\u8003\u56fe\u7684\u56db\u5411\u5e03\u5c40\u6392\u5217\u6240\u6709 placement \u63a7\u5236\u6309\u94ae\u3002"
         code={allPlacementCode}
       >
-        <div className="popup-demo-control-panel">
-          {placements.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={`popup-demo-placement-btn ${item === placement ? 'is-active' : ''}`}
-              onClick={() => setPlacement(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        <div className="popup-demo-placement-map">
+          <div className="popup-demo-placement-row popup-demo-placement-row--top">
+            {placementGroups.top.map((item) => (
+              <NineSliceButton
+                key={item}
+                type="button"
+                size="small"
+                variant={item === placement ? 'primary' : 'default'}
+                className="popup-demo-placement-btn"
+                onClick={() => setPlacement(item)}
+              >
+                {item}
+              </NineSliceButton>
+            ))}
+          </div>
 
-        <div className="popup-demo-playground">
-          <Popup
-            open
-            placement={placement}
-            title="位置控制"
-            content="支持 top / right / bottom / left 以及 start / end 对齐。"
-            actions={[
-              { label: '取消' },
-              { label: '确认', variant: 'primary' },
-            ]}
-          >
-            <NineSliceButton variant="primary">{placement}</NineSliceButton>
-          </Popup>
+          <div className="popup-demo-placement-column popup-demo-placement-column--left">
+            {placementGroups.left.map((item) => (
+              <NineSliceButton
+                key={item}
+                type="button"
+                size="small"
+                variant={item === placement ? 'primary' : 'default'}
+                className="popup-demo-placement-btn"
+                onClick={() => setPlacement(item)}
+              >
+                {item}
+              </NineSliceButton>
+            ))}
+          </div>
+
+          <div className="popup-demo-playground">
+            <Popup
+              open
+              placement={placement}
+              title="\u4f4d\u7f6e\u63a7\u5236"
+              content="\u652f\u6301 top / right / bottom / left \u4ee5\u53ca start / end \u5bf9\u9f50\u3002"
+              actions={[
+                { label: '\u53d6\u6d88' },
+                { label: '\u7981\u7528', disabled: true },
+                { label: '\u786e\u8ba4', variant: 'primary' },
+              ]}
+            >
+              <NineSliceButton variant="primary">{placement}</NineSliceButton>
+            </Popup>
+          </div>
+
+          <div className="popup-demo-placement-column popup-demo-placement-column--right">
+            {placementGroups.right.map((item) => (
+              <NineSliceButton
+                key={item}
+                type="button"
+                size="small"
+                variant={item === placement ? 'primary' : 'default'}
+                className="popup-demo-placement-btn"
+                onClick={() => setPlacement(item)}
+              >
+                {item}
+              </NineSliceButton>
+            ))}
+          </div>
+
+          <div className="popup-demo-placement-row popup-demo-placement-row--bottom">
+            {placementGroups.bottom.map((item) => (
+              <NineSliceButton
+                key={item}
+                type="button"
+                size="small"
+                variant={item === placement ? 'primary' : 'default'}
+                className="popup-demo-placement-btn"
+                onClick={() => setPlacement(item)}
+              >
+                {item}
+              </NineSliceButton>
+            ))}
+          </div>
         </div>
       </ComponentDemo>
 

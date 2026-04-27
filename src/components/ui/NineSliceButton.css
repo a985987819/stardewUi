@@ -1,12 +1,13 @@
-﻿.nine-slice-button {
+.nine-slice-button {
   @apply inline-flex items-center justify-center text-sm font-medium cursor-pointer;
   position: relative;
   overflow: hidden;
   border: none;
   color: var(--color-text);
-  box-shadow: var(--shadow-pixel-sm);
+  box-shadow: none;
   background: transparent;
-  padding: 15px;
+  padding: 15px 20px;
+  transition: transform 0.08s steps(2);
 }
 
 .nine-slice-button__bg {
@@ -30,7 +31,6 @@
 
 .nine-slice-button:hover:not(:disabled) {
   transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-pixel);
 }
 
 .nine-slice-button:active:not(:disabled) {
@@ -39,15 +39,24 @@
 }
 
 .nine-slice-button--default {
-  color: #3b2b1f;
+  color: #3A2E39;
 }
 
 .nine-slice-button--primary {
-  color: #ffffff;
+  color: #FFE8B6;
 }
 
 .nine-slice-button--warning {
-  color: #fff7e6;
+  color: #FFF2D5;
+}
+
+.nine-slice-button--danger {
+  color: #FFF2D5;
+}
+
+.nine-slice-button--disabled {
+  color: #E0D9C6;
+  cursor: not-allowed;
 }
 
 .nine-slice-button--dashed {
@@ -80,10 +89,12 @@
 
 .nine-slice-button--small {
   @apply text-xs;
+  padding: 10px 14px;
 }
 
 .nine-slice-button--large {
   @apply text-base;
+  padding: 16px 22px;
 }
 
 .nine-slice-button--block {
@@ -91,7 +102,7 @@
 }
 
 .nine-slice-button:disabled {
-  opacity: 0.5;
+  opacity: 1;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;

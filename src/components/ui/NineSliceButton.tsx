@@ -1,8 +1,16 @@
-﻿import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes } from 'react'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
 import './NineSliceButton.css'
 
-type NineSliceButtonVariant = 'default' | 'primary' | 'warning' | 'dashed' | 'text' | 'link'
+type NineSliceButtonVariant =
+  | 'default'
+  | 'primary'
+  | 'warning'
+  | 'danger'
+  | 'disabled'
+  | 'dashed'
+  | 'text'
+  | 'link'
 type NineSliceButtonSize = 'small' | 'medium' | 'large'
 
 export type NineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -23,9 +31,11 @@ const cls = (...classNames: Array<string | false | undefined>) => classNames.fil
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 
 const COLOR_MAP: Record<Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'link'>, { bg: string; text: string }> = {
-  default: { bg: '#f6e3b4', text: '#3b2b1f' },
-  primary: { bg: '#4f73c9', text: '#ffffff' },
-  warning: { bg: '#cc7d2b', text: '#fff7e6' },
+  default: { bg: '#F5E6CC', text: '#3A2E39' },
+  primary: { bg: '#7A4E2D', text: '#FFE8B6' },
+  warning: { bg: '#C28A45', text: '#FFF2D5' },
+  danger: { bg: '#C62828', text: '#FFF2D5' },
+  disabled: { bg: '#B0A999', text: '#E0D9C6' },
 }
 
 const drawDashedBorder = (ctx: CanvasRenderingContext2D, width: number, height: number, dpr: number) => {
@@ -50,19 +60,35 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
       backgroundInsets = DEFAULT_INSETS,
       className,
       children,
+      disabled,
       ...rest
     },
     ref
   ) => {
-    const imageVariant = variant === 'default' || variant === 'primary' || variant === 'warning'
-    const dashedVariant = variant === 'dashed'
+    const effectiveVariant =
+      disabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+
+    const imageVariant =
+      effectiveVariant === 'default' ||
+      effectiveVariant === 'primary' ||
+      effectiveVariant === 'warning' ||
+      effectiveVariant === 'danger' ||
+      effectiveVariant === 'disabled'
+
+    const dashedVariant = effectiveVariant === 'dashed'
 
     const tone = useMemo(() => {
-      if (variant === 'default' || variant === 'primary' || variant === 'warning') {
-        return COLOR_MAP[variant]
+      if (
+        effectiveVariant === 'default' ||
+        effectiveVariant === 'primary' ||
+        effectiveVariant === 'warning' ||
+        effectiveVariant === 'danger' ||
+        effectiveVariant === 'disabled'
+      ) {
+        return COLOR_MAP[effectiveVariant]
       }
       return null
-    }, [variant])
+    }, [effectiveVariant])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
       src: backgroundSrc,
@@ -125,9 +151,10 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
       <button
         {...rest}
         ref={ref}
+        disabled={disabled}
         className={cls(
           'nine-slice-button',
-          `nine-slice-button--${variant}`,
+          `nine-slice-button--${effectiveVariant}`,
           `nine-slice-button--${size}`,
           block && 'nine-slice-button--block',
           className

@@ -8,7 +8,8 @@ export type PopupPlacement = Exclude<BubblePlacement, 'none'>
 
 export interface PopupAction {
   label: string
-  variant?: 'default' | 'primary'
+  variant?: 'default' | 'primary' | 'danger'
+  disabled?: boolean
   onClick?: () => void
 }
 
@@ -74,13 +75,13 @@ function Popup({
           <CanvasBubble
             className="stardew-popup__bubble"
             bubblePlacement={bubblePlacement}
-            fillColor="#f8f7f3"
-            borderColor="#2f3440"
-            borderWidth={4}
-            cornerSize={10}
-            arrowWidth={20}
-            arrowDepth={12}
-            contentPadding={14}
+            fillColor="#fff7ea"
+            borderColor="#9e460f"
+            borderWidth={6}
+            cornerSize={14}
+            arrowWidth={24}
+            arrowDepth={14}
+            contentPadding={12}
           >
             {title ? <div className="stardew-popup__title">{title}</div> : null}
             <div className="stardew-popup__content">{content}</div>
@@ -92,6 +93,7 @@ function Popup({
                     type="button"
                     variant={action.variant ?? 'default'}
                     size="small"
+                    disabled={action.disabled}
                     onClick={action.onClick}
                   >
                     {action.label}

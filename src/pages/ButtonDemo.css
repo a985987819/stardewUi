@@ -1,14 +1,14 @@
 .demo-button {
-  @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium cursor-pointer;
+  @apply inline-flex items-center justify-center text-sm font-medium cursor-pointer;
   background: var(--color-bg-card);
   color: var(--color-text);
   border: 3px solid var(--color-border-dark);
-  box-shadow: var(--shadow-pixel-sm);
+  box-shadow: none;
+  padding: 15px 20px;
 }
 
 .demo-button:hover {
   transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-pixel);
 }
 
 .demo-button:active {
