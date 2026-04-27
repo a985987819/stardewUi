@@ -20,24 +20,49 @@
 .stardew-dialog {
   position: relative;
   z-index: 1;
-  display: flex;
-  width: min(820px, 100%);
-  align-items: stretch;
-  gap: 18px;
+  width: min(1080px, 100%);
   cursor: default;
 
-  &__left {
+  &__shell {
+    width: 100%;
+  }
+
+  &__inner {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    min-height: 350px;
+  }
+
+  &__content-panel {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     min-width: 0;
+    min-height: 0;
+    padding: 18px 20px;
+    background:
+      linear-gradient(180deg, rgba(255, 249, 235, 0.22), rgba(215, 119, 15, 0.08)),
+      rgba(255, 247, 226, 0.14);
+    border: 3px solid rgba(157, 65, 0, 0.22);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -2px 0 rgba(157, 65, 0, 0.06);
   }
 
   &__content {
-    min-height: 180px;
+    flex: 1;
+    min-height: 250px;
     color: #4f2b17;
     font-size: 1em;
     line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
+
+    &--typing {
+      cursor: pointer;
+    }
   }
 
   &__waiting {
@@ -50,6 +75,8 @@
     justify-content: space-between;
     gap: 12px;
     width: 100%;
+    padding-top: 14px;
+    border-top: 2px solid rgba(157, 65, 0, 0.18);
   }
 
   &__actions {
@@ -79,23 +106,38 @@
     padding: 0 10px;
   }
 
-  &__right {
+  &__sidebar {
     display: flex;
-    width: 210px;
+    width: 232px;
     flex-shrink: 0;
     flex-direction: column;
-    gap: 12px;
+    gap: 4px;
   }
 
-  &__image-card {
+  &__image-panel,
+  &__name-panel {
+    padding: 12px;
+    background:
+      linear-gradient(180deg, rgba(255, 249, 235, 0.2), rgba(215, 119, 15, 0.06)),
+      rgba(255, 247, 226, 0.12);
+    border: 3px solid rgba(157, 65, 0, 0.22);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -2px 0 rgba(157, 65, 0, 0.06);
+  }
+
+  &__image-panel {
     flex: 1;
-    min-height: 250px;
+    min-height: 282px;
   }
 
   &__image-wrap {
     width: 100%;
     height: 100%;
-    min-height: 206px;
+    min-height: 254px;
+    overflow: hidden;
+    background: rgba(255, 245, 220, 0.5);
+    border: 2px solid rgba(157, 65, 0, 0.22);
   }
 
   &__image {
@@ -107,28 +149,36 @@
     image-rendering: crisp-edges;
   }
 
-  &__name-card {
-    flex-shrink: 0;
-  }
-
   &__name {
     display: flex;
-    min-height: 52px;
+    min-height: 68px;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: #7a3514;
+    font-size: 1.25em;
+    line-height: 1.2;
+    background: rgba(255, 245, 220, 0.32);
+    border: 2px solid rgba(157, 65, 0, 0.16);
   }
 
   @media (max-width: 720px) {
-    flex-direction: column-reverse;
+    width: min(680px, 100%);
 
-    &__right {
+    &__inner {
+      flex-direction: column-reverse;
+    }
+
+    &__sidebar {
       width: 100%;
     }
 
-    &__image-card {
+    &__image-panel {
       min-height: 180px;
+    }
+
+    &__image-wrap {
+      min-height: 156px;
     }
 
     &__content {

@@ -52,6 +52,9 @@ function StarDialog({
   const [titleKey, setTitleKey] = useState(0)
   const [contentKey, setContentKey] = useState(0)
   const [titleComplete, setTitleComplete] = useState(false)
+  const [contentComplete, setContentComplete] = useState(false)
+  const [titleCompleteTrigger, setTitleCompleteTrigger] = useState(0)
+  const [contentCompleteTrigger, setContentCompleteTrigger] = useState(0)
 
   const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
   const totalPages = pages.length
@@ -62,6 +65,7 @@ function StarDialog({
     if (open) {
       setCurrentPage(0)
       setTitleComplete(!title || !typewriter)
+      setContentComplete(!typewriter)
       setTitleKey((k) => k + 1)
       setContentKey((k) => k + 1)
     }
@@ -69,10 +73,11 @@ function StarDialog({
 
   useEffect(() => {
     setContentKey((k) => k + 1)
+    setContentComplete(!typewriter)
     if (!isFirstPage) {
       setTitleComplete(true)
     }
-  }, [currentPage, isFirstPage])
+  }, [currentPage, isFirstPage, typewriter])
 
   useEffect(() => {
     if (!open) return
@@ -85,31 +90,6 @@ function StarDialog({
     }
   }, [open])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!open) return
-
-      if (e.key === 'Escape' && maskClosable) {
-        onClose?.()
-      }
-
-      if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
-        if (!isLastPage) {
-          setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
-        }
-      }
-
-      if (e.key === 'ArrowLeft') {
-        if (!isFirstPage) {
-          setCurrentPage((page) => Math.max(page - 1, 0))
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isFirstPage, isLastPage, maskClosable, onClose, open, totalPages])
-
   const handlePrev = useCallback(() => {
     if (!isFirstPage) {
       setCurrentPage((page) => Math.max(page - 1, 0))
@@ -117,10 +97,20 @@ function StarDialog({
   }, [isFirstPage])
 
   const handleNext = useCallback(() => {
+    if (typewriter && (!titleComplete || !contentComplete)) {
+      if (!titleComplete) {
+        setTitleCompleteTrigger((value) => value + 1)
+      }
+      if (!contentComplete) {
+        setContentCompleteTrigger((value) => value + 1)
+      }
+      return
+    }
+
     if (!isLastPage) {
       setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
     }
-  }, [isLastPage, totalPages])
+  }, [contentComplete, isLastPage, titleComplete, totalPages, typewriter])
 
   const handleOverlayClick = useCallback(() => {
     if (maskClosable) {
@@ -132,6 +122,45 @@ function StarDialog({
     setTitleComplete(true)
   }, [])
 
+  const handleContentComplete = useCallback(() => {
+    setContentComplete(true)
+  }, [])
+
+  const handleContentClick = useCallback(() => {
+    if (!typewriter) {
+      return
+    }
+
+    if (!titleComplete) {
+      setTitleCompleteTrigger((value) => value + 1)
+    }
+
+    if (!contentComplete) {
+      setContentCompleteTrigger((value) => value + 1)
+    }
+  }, [contentComplete, titleComplete, typewriter])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!open) return
+
+      if (e.key === 'Escape' && maskClosable) {
+        onClose?.()
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
+        handleNext()
+      }
+
+      if (e.key === 'ArrowLeft') {
+        handlePrev()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleNext, handlePrev, maskClosable, onClose, open])
+
   const defaultActions: DialogAction[] = [
     { label: LABEL_CONFIRM, variant: 'primary', onClick: onClose },
     { label: LABEL_CANCEL, variant: 'default', onClick: onClose },
@@ -139,6 +168,7 @@ function StarDialog({
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
   const showActions = isLastPage && finalActions.length > 0
+  const hasSidebar = Boolean(image || name)
 
   if (!open) return null
 
@@ -158,93 +188,117 @@ function StarDialog({
         onClick={(event) => event.stopPropagation()}
       >
         <StarCard
-          className={styles['stardew-dialog__left']}
+          className={classNames(
+            styles['stardew-dialog__shell'],
+            hasSidebar && styles['stardew-dialog__shell--with-sidebar']
+          )}
           title={
             typewriter && !titleComplete && title ? (
-              <StarTypewriter text={title} speed={typewriterSpeed} key={`title-${titleKey}`} onComplete={handleTitleComplete} />
+              <StarTypewriter
+                text={title}
+                speed={typewriterSpeed}
+                key={`title-${titleKey}`}
+                onComplete={handleTitleComplete}
+                completeTrigger={titleCompleteTrigger}
+              />
             ) : (
               title
             )
           }
           showTitle={Boolean(title)}
-          footer={
-            <div className={styles['stardew-dialog__footer']}>
-              {showActions ? (
-                <div className={styles['stardew-dialog__actions']}>
-                  {finalActions.map((action, index) => (
-                    <StarNineSliceButton
-                      key={index}
-                      type="button"
-                      size="small"
-                      variant={action.variant ?? 'default'}
-                      disabled={action.disabled}
-                      onClick={action.onClick}
-                    >
-                      {action.label}
-                    </StarNineSliceButton>
-                  ))}
-                </div>
-              ) : (
-                <div />
-              )}
+        >
+          <div className={styles['stardew-dialog__inner']}>
+            <div className={styles['stardew-dialog__content-panel']}>
+              <div
+                className={classNames(
+                  styles['stardew-dialog__content'],
+                  typewriter && (!titleComplete || !contentComplete) && styles['stardew-dialog__content--typing']
+                )}
+                onClick={handleContentClick}
+              >
+                {typewriter ? (
+                  titleComplete ? (
+                    <StarTypewriter
+                      text={pages[currentPage]}
+                      speed={typewriterSpeed}
+                      key={`content-${contentKey}`}
+                      onComplete={handleContentComplete}
+                      completeTrigger={contentCompleteTrigger}
+                    />
+                  ) : (
+                    <span className={styles['stardew-dialog__waiting']}>{WAITING_TEXT}</span>
+                  )
+                ) : (
+                  pages[currentPage]
+                )}
+              </div>
 
-              <div className={styles['stardew-dialog__pagination']}>
-                <StarNineSliceButton
-                  type="button"
-                  size="small"
-                  className={styles['stardew-dialog__nav-btn']}
-                  onClick={handlePrev}
-                  disabled={isFirstPage}
-                  title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-                >
-                  <ChevronUp size={18} />
-                </StarNineSliceButton>
-                <span className={styles['stardew-dialog__page-indicator']}>
-                  {currentPage + 1} / {totalPages}
-                </span>
-                <StarNineSliceButton
-                  type="button"
-                  size="small"
-                  className={styles['stardew-dialog__nav-btn']}
-                  onClick={handleNext}
-                  disabled={isLastPage}
-                  title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-                >
-                  <ChevronDown size={18} />
-                </StarNineSliceButton>
+              <div className={styles['stardew-dialog__footer']}>
+                {showActions ? (
+                  <div className={styles['stardew-dialog__actions']}>
+                    {finalActions.map((action, index) => (
+                      <StarNineSliceButton
+                        key={index}
+                        type="button"
+                        size="small"
+                        variant={action.variant ?? 'default'}
+                        disabled={action.disabled}
+                        onClick={action.onClick}
+                      >
+                        {action.label}
+                      </StarNineSliceButton>
+                    ))}
+                  </div>
+                ) : (
+                  <div />
+                )}
+
+                <div className={styles['stardew-dialog__pagination']}>
+                  <StarNineSliceButton
+                    type="button"
+                    size="small"
+                    className={styles['stardew-dialog__nav-btn']}
+                    onClick={handlePrev}
+                    disabled={isFirstPage}
+                    title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
+                  >
+                    <ChevronUp size={18} />
+                  </StarNineSliceButton>
+                  <span className={styles['stardew-dialog__page-indicator']}>
+                    {currentPage + 1} / {totalPages}
+                  </span>
+                  <StarNineSliceButton
+                    type="button"
+                    size="small"
+                    className={styles['stardew-dialog__nav-btn']}
+                    onClick={handleNext}
+                    disabled={isLastPage}
+                    title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
+                  >
+                    <ChevronDown size={18} />
+                  </StarNineSliceButton>
+                </div>
               </div>
             </div>
-          }
-        >
-          <div className={styles['stardew-dialog__content']}>
-            {typewriter ? (
-              titleComplete ? (
-                <StarTypewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${contentKey}`} />
-              ) : (
-                <span className={styles['stardew-dialog__waiting']}>{WAITING_TEXT}</span>
-              )
-            ) : (
-              pages[currentPage]
-            )}
-          </div>
-        </StarCard>
 
-        {image || name ? (
-          <div className={styles['stardew-dialog__right']}>
-            {image ? (
-              <StarCard className={styles['stardew-dialog__image-card']}>
-                <div className={styles['stardew-dialog__image-wrap']}>
-                  <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
-                </div>
-              </StarCard>
+            {hasSidebar ? (
+              <div className={styles['stardew-dialog__sidebar']}>
+                {image ? (
+                  <div className={styles['stardew-dialog__image-panel']}>
+                    <div className={styles['stardew-dialog__image-wrap']}>
+                      <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
+                    </div>
+                  </div>
+                ) : null}
+                {name ? (
+                  <div className={styles['stardew-dialog__name-panel']}>
+                    <div className={styles['stardew-dialog__name']}>{name}</div>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
-            {name ? (
-              <StarCard className={styles['stardew-dialog__name-card']}>
-                <div className={styles['stardew-dialog__name']}>{name}</div>
-              </StarCard>
-            ) : null}
-          </div>
-        ) : null}
+            </div>
+        </StarCard>
       </div>
     </div>,
     portalTarget

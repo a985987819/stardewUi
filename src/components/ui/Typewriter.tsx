@@ -8,6 +8,7 @@ export interface StarTypewriterProps {
   className?: string
   onComplete?: () => void
   startDelay?: number
+  completeTrigger?: number
 }
 
 function StarTypewriter({
@@ -16,6 +17,7 @@ function StarTypewriter({
   className = '',
   onComplete,
   startDelay = 0,
+  completeTrigger = 0,
 }: StarTypewriterProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [isComplete, setIsComplete] = useState(false)
@@ -23,6 +25,7 @@ function StarTypewriter({
   const indexRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const startTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const previousCompleteTriggerRef = useRef(completeTrigger)
 
   const clearAllTimers = useCallback(() => {
     if (timerRef.current) {
@@ -64,6 +67,18 @@ function StarTypewriter({
 
     return clearAllTimers
   }, [text, speed, startDelay, clearAllTimers, completeTyping])
+
+  useEffect(() => {
+    if (previousCompleteTriggerRef.current === completeTrigger) {
+      return
+    }
+
+    previousCompleteTriggerRef.current = completeTrigger
+
+    if (!isComplete) {
+      completeTyping()
+    }
+  }, [completeTrigger, completeTyping, isComplete])
 
   const handleClick = useCallback(() => {
     if (!isComplete && isStarted) {
