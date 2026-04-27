@@ -2,17 +2,21 @@
   @apply max-w-full;
 }
 
+.components-header-card {
+  margin-bottom: 32px;
+}
+
 .components-header {
-  @apply mb-10;
+  padding: 8px 4px;
 }
 
 .components-header h1 {
-  @apply text-2xl font-semibold m-0 mb-3;
+  @apply m-0 mb-3 text-2xl font-semibold;
   color: var(--color-text);
 }
 
 .components-header p {
-  @apply text-base mb-0;
+  @apply m-0 text-base;
   color: var(--color-text-secondary);
 }
 
@@ -20,28 +24,23 @@
   @apply grid grid-cols-2 gap-6;
 }
 
+.components-card-link {
+  display: block;
+  text-decoration: none;
+}
+
 .components-card {
-  @apply flex items-center gap-4 p-5 no-underline;
-  background: var(--color-bg-card);
-  border: 4px solid var(--color-border-dark);
-  box-shadow: var(--shadow-pixel);
-}
-
-.components-card:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-}
-
-.components-card:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 132px;
 }
 
 .components-card-icon {
-  @apply flex items-center justify-center w-12 h-12 flex-shrink-0;
-  background: var(--color-primary);
-  color: var(--color-text-light);
-  border: 3px solid var(--color-primary-dark);
+  @apply flex h-12 w-12 flex-shrink-0 items-center justify-center;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-text);
+  border: 3px solid rgba(157, 65, 0, 0.32);
 }
 
 .components-card-content {
@@ -49,18 +48,18 @@
 }
 
 .components-card-content h3 {
-  @apply text-base font-semibold m-0 mb-1;
+  @apply m-0 mb-1 text-base font-semibold;
   color: var(--color-text);
 }
 
 .components-card-content p {
-  @apply text-[13px] mb-0;
+  @apply m-0 text-[13px];
   color: var(--color-text-secondary);
 }
 
 .components-card-arrow {
   @apply flex-shrink-0;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {

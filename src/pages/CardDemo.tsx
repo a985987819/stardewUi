@@ -6,9 +6,15 @@ import { Card, type CardColor } from '../components/ui/Card'
 const cardApiData = [
   {
     property: 'title',
-    description: '卡片标题',
-    type: 'string',
+    description: '卡片标题内容',
+    type: 'ReactNode',
     default: '-',
+  },
+  {
+    property: 'showTitle',
+    description: '是否展示标题区，默认关闭',
+    type: 'boolean',
+    default: 'false',
   },
   {
     property: 'variant',
@@ -24,39 +30,27 @@ const cardApiData = [
   },
   {
     property: 'color',
-    description: '卡片配色主题，可选值见 CardColor 类型',
-    type: "CardColor",
+    description: '卡片配色主题，可选值见 CardColor',
+    type: 'CardColor',
     default: '-',
-  },
-  {
-    property: 'CardColor',
-    description: '配色主题类型，包含10种星露谷风格配色',
-    type: "'night-village' | 'forest-farm' | 'wooden-cabin' | 'lake-night' | 'flower-festival' | 'mine-starry' | 'farmland' | 'orchard-grass' | 'workshop-ore' | 'night-celebration'",
-    default: '-',
-  },
-  {
-    property: 'hoverable',
-    description: '是否显示悬停效果',
-    type: 'boolean',
-    default: 'false',
   },
   {
     property: 'headerExtra',
-    description: '标题栏额外内容',
+    description: '标题区右侧扩展内容',
     type: 'ReactNode',
     default: '-',
   },
   {
     property: 'footer',
-    description: '卡片底部内容',
+    description: '卡片底部操作区',
     type: 'ReactNode',
     default: '-',
   },
   {
-    property: 'onClick',
-    description: '点击事件回调',
-    type: '() => void',
-    default: '-',
+    property: 'hoverable',
+    description: '是否显示悬停动效',
+    type: 'boolean',
+    default: 'false',
   },
   {
     property: 'children',
@@ -70,49 +64,55 @@ const cardApiData = [
 const colorOptions: { value: CardColor; label: string; desc: string }[] = [
   { value: 'night-village', label: '夜晚村庄', desc: '深紫灰 + 米黄' },
   { value: 'forest-farm', label: '森林农田', desc: '森林绿 + 浅米白' },
-  { value: 'wooden-cabin', label: '木屋农舍', desc: '棕褐色 + 浅杏色' },
-  { value: 'lake-night', label: '湖泊夜空', desc: '深蓝灰 + 浅青蓝' },
-  { value: 'flower-festival', label: '花田节日', desc: '葡萄紫 + 浅粉' },
-  { value: 'mine-starry', label: '矿洞星空', desc: '靛蓝 + 白色' },
-  { value: 'farmland', label: '农田耕作', desc: '泥土棕 + 奶油色' },
-  { value: 'orchard-grass', label: '果树草地', desc: '深绿 + 浅绿白' },
-  { value: 'workshop-ore', label: '工坊矿石', desc: '石灰蓝灰 + 亮黄' },
-  { value: 'night-celebration', label: '夜晚节庆', desc: '深蓝 + 浅蓝灰' },
+  { value: 'wooden-cabin', label: '木屋农舍', desc: '棕橙 + 浅杏色' },
+  { value: 'lake-night', label: '湖泊夜色', desc: '湖蓝 + 浅青白' },
+  { value: 'flower-festival', label: '花田节日', desc: '粉紫 + 浅粉白' },
+  { value: 'mine-starry', label: '矿洞星夜', desc: '靛蓝 + 冷白' },
+  { value: 'farmland', label: '耕地收获', desc: '泥棕 + 奶油白' },
+  { value: 'orchard-grass', label: '果园草地', desc: '草绿 + 浅青绿' },
+  { value: 'workshop-ore', label: '工坊矿石', desc: '灰蓝 + 亮黄' },
+  { value: 'night-celebration', label: '节庆夜空', desc: '宝蓝 + 淡紫白' },
 ]
 
 const tocItems = [
   { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'title', title: '可选标题', level: 1 },
   { id: 'variant', title: '卡片变体', level: 1 },
   { id: 'color', title: '配色主题', level: 1 },
   { id: 'hoverable', title: '悬停效果', level: 1 },
   { id: 'size', title: '卡片尺寸', level: 1 },
-  { id: 'footer', title: '带底部操作', level: 1 },
+  { id: 'footer', title: '底部操作', level: 1 },
   { id: 'meta', title: '元信息', level: 1 },
   { id: 'api', title: 'API', level: 1 },
 ]
 
-const basicCode = `<Card title="基础卡片">
-  这是一个基础的星露谷风格卡片组件。
+const basicCode = `<Card>
+  默认是不带标题区的纯内容卡片
 </Card>`
 
-const variantCode = `<Card variant="default" title="默认卡片">
-  带有像素阴影效果的默认卡片
+const titleCode = `<Card title="默认卡片" showTitle>
+  标题会展示在卡片左上角的标签区域。
+</Card>`
+
+const variantCode = `<Card variant="default" title="默认卡片" showTitle>
+  带有阴影效果的默认卡片
 </Card>
 
-<Card variant="outlined" title="描边卡片">
-  只有边框，没有阴影的卡片
+<Card variant="outlined" title="描边卡片" showTitle>
+  只有边框，没有明显阴影的卡片
 </Card>
 
-<Card variant="elevated" title="悬浮卡片">
-  带有更大阴影的悬浮效果卡片
+<Card variant="elevated" title="悬浮卡片" showTitle>
+  带有更强浮起感的卡片
 </Card>`
 
-const hoverableCode = `<Card hoverable title="可悬停卡片">
-  鼠标悬停时会有动画效果
+const hoverableCode = `<Card hoverable title="可悬停卡片" showTitle>
+  鼠标悬停时会出现轻微抬起效果。
 </Card>`
 
-const withFooterCode = `<Card 
-  title="带底部卡片" 
+const withFooterCode = `<Card
+  title="底部操作"
+  showTitle
   footer={
     <div style={{ display: 'flex', gap: '8px' }}>
       <button className="stardew-btn">取消</button>
@@ -120,33 +120,33 @@ const withFooterCode = `<Card
     </div>
   }
 >
-  这是一个带有底部操作区域的卡片
+  卡片可以承载操作区和内容区。
 </Card>`
 
-const sizeCode = `<Card size="small" title="小卡片">
+const sizeCode = `<Card size="small" title="小卡片" showTitle>
   小尺寸卡片
 </Card>
 
-<Card size="medium" title="中等卡片">
-  中等尺寸卡片
+<Card size="medium" title="中卡片" showTitle>
+  中尺寸卡片
 </Card>
 
-<Card size="large" title="大卡片">
+<Card size="large" title="大卡片" showTitle>
   大尺寸卡片
 </Card>`
 
-const colorCode = `<Card color="night-village" title="夜晚村庄">
-  深紫灰背景配米黄色文字
+const colorCode = `<Card color="night-village" title="夜晚村庄" showTitle>
+  深紫灰色调卡片
 </Card>
 
-<Card color="forest-farm" title="森林农田">
-  森林绿背景配浅米白文字
+<Card color="forest-farm" title="森林农田" showTitle>
+  森林绿配色卡片
 </Card>`
 
 const metaCode = `<Card>
-  <Card.Meta 
-    title="卡片元信息" 
-    description="这是卡片的描述内容，可以包含更多详细信息。"
+  <Card.Meta
+    title="元信息标题"
+    description="用于展示结构化说明内容。"
   />
 </Card>`
 
@@ -154,35 +154,38 @@ function CardDemo() {
   return (
     <ComponentPage
       title="Card 卡片"
-      description="星露谷风格的卡片组件，用于展示信息和内容分组。"
+      description="星露谷风格卡片组件，支持可选标题区、交互状态和多种配色方案。"
       toc={tocItems}
     >
-      <ComponentDemo id="basic" title="基础用法" description="最简单的卡片用法" code={basicCode}>
-        <Card title="基础卡片">
-          这是一个基础的星露谷风格卡片组件。
+      <ComponentDemo id="basic" title="基础用法" description="默认卡片不带标题区，只展示内容区域。" code={basicCode}>
+        <Card>默认是不带标题区的纯内容卡片。</Card>
+      </ComponentDemo>
+
+      <ComponentDemo id="title" title="可选标题" description="通过 showTitle 打开标题区，标题显示在卡片左上角标签位。" code={titleCode}>
+        <Card title="默认卡片" showTitle>
+          标题会展示在卡片左上角的标签区域。
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo id="variant" title="卡片变体" description="提供三种不同风格的卡片" code={variantCode}>
+      <ComponentDemo id="variant" title="卡片变体" description="默认、描边和悬浮三种卡片风格。" code={variantCode}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <Card variant="default" title="默认卡片" style={{ flex: 1, minWidth: '200px' }}>
-            带有像素阴影效果的默认卡片
+          <Card variant="default" title="默认卡片" showTitle style={{ flex: 1, minWidth: '220px' }}>
+            带有像素阴影效果的默认卡片。
           </Card>
-          <Card variant="outlined" title="描边卡片" style={{ flex: 1, minWidth: '200px' }}>
-            只有边框，没有阴影的卡片
+          <Card variant="outlined" title="描边卡片" showTitle style={{ flex: 1, minWidth: '220px' }}>
+            只有边框，没有明显阴影的卡片。
           </Card>
-          <Card variant="elevated" title="悬浮卡片" style={{ flex: 1, minWidth: '200px' }}>
-            带有更大阴影的悬浮效果卡片
+          <Card variant="elevated" title="悬浮卡片" showTitle style={{ flex: 1, minWidth: '220px' }}>
+            带有更强浮起感的卡片。
           </Card>
         </div>
       </ComponentDemo>
 
-      <ComponentDemo id="color" title="配色主题" description="10种星露谷风格配色方案" code={colorCode}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '12px' }}>
+      <ComponentDemo id="color" title="配色主题" description="不同主题颜色会同步影响卡片背景、边框和标题标签。" code={colorCode}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
           {colorOptions.map((option) => (
-            <Card key={option.value} color={option.value} size="small">
-              <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                <div style={{ fontWeight: 'normal', marginBottom: '4px' }}>{option.label}</div>
+            <Card key={option.value} color={option.value} size="small" showTitle title={option.label}>
+              <div style={{ textAlign: 'center', padding: '6px 0' }}>
                 <div style={{ fontSize: '12px', opacity: 0.85 }}>{option.desc}</div>
               </div>
             </Card>
@@ -190,29 +193,30 @@ function CardDemo() {
         </div>
       </ComponentDemo>
 
-      <ComponentDemo id="hoverable" title="悬停效果" description="鼠标悬停时的动画效果" code={hoverableCode}>
-        <Card hoverable title="可悬停卡片">
-          鼠标悬停时会有动画效果，点击时会有按压效果。
+      <ComponentDemo id="hoverable" title="悬停效果" description="hoverable 会让卡片在鼠标悬停时轻微抬起。" code={hoverableCode}>
+        <Card hoverable title="可悬停卡片" showTitle>
+          鼠标悬停时会有轻微的抬起动效，点击时会有按压反馈。
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo id="size" title="卡片尺寸" description="不同尺寸的卡片" code={sizeCode}>
+      <ComponentDemo id="size" title="卡片尺寸" description="提供 small、medium、large 三种字号尺寸。" code={sizeCode}>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <Card size="small" title="小卡片" style={{ flex: 1, minWidth: '150px' }}>
-            小尺寸卡片
+          <Card size="small" title="小卡片" showTitle style={{ flex: 1, minWidth: '160px' }}>
+            小尺寸卡片。
           </Card>
-          <Card size="medium" title="中等卡片" style={{ flex: 1, minWidth: '150px' }}>
-            中等尺寸卡片
+          <Card size="medium" title="中卡片" showTitle style={{ flex: 1, minWidth: '180px' }}>
+            中尺寸卡片。
           </Card>
-          <Card size="large" title="大卡片" style={{ flex: 1, minWidth: '150px' }}>
-            大尺寸卡片
+          <Card size="large" title="大卡片" showTitle style={{ flex: 1, minWidth: '220px' }}>
+            大尺寸卡片。
           </Card>
         </div>
       </ComponentDemo>
 
-      <ComponentDemo id="footer" title="带底部操作" description="卡片可以包含底部操作区域" code={withFooterCode}>
+      <ComponentDemo id="footer" title="底部操作" description="卡片可承载底部操作区域。" code={withFooterCode}>
         <Card
-          title="带底部卡片"
+          title="底部操作"
+          showTitle
           footer={
             <div style={{ display: 'flex', gap: '8px' }}>
               <button className="stardew-btn">取消</button>
@@ -220,16 +224,13 @@ function CardDemo() {
             </div>
           }
         >
-          这是一个带有底部操作区域的卡片，可以放置按钮等操作元素。
+          卡片可以同时承载说明内容和操作按钮。
         </Card>
       </ComponentDemo>
 
-      <ComponentDemo id="meta" title="元信息" description="使用 Card.Meta 显示结构化信息" code={metaCode}>
+      <ComponentDemo id="meta" title="元信息" description="使用 Card.Meta 展示结构化信息块。" code={metaCode}>
         <Card>
-          <Card.Meta
-            title="卡片元信息"
-            description="这是卡片的描述内容，可以包含更多详细信息。"
-          />
+          <Card.Meta title="元信息标题" description="用于展示结构化说明内容。" />
         </Card>
       </ComponentDemo>
 

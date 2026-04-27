@@ -1,4 +1,4 @@
-$panel-bg: #f5b565;
+$panel-bg: #ffc675;
 $panel-bg-light: #ffe0b2;
 $panel-bg-dark: #ffb74d;
 $border-dark: #d7770f;
@@ -15,11 +15,12 @@ $inner-glow: rgba(255, 255, 255, 0.18);
   --card-text: #4d2608;
   --card-text-secondary: #6a350b;
   --card-section-bg: rgba(255, 255, 255, 0.12);
+  --card-title-tag-bg: rgba(255, 239, 190, 0.82);
 
   position: relative;
   box-sizing: border-box;
-  // overflow: hidden;
-  // background: $panel-bg;
+  overflow: visible;
+  background: var(--card-bg);
   border: 6px solid var(--card-border-dark);
   border-radius: 8px;
   transition:
@@ -28,7 +29,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
   &::before,
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     pointer-events: none;
   }
@@ -37,19 +38,15 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     inset: 1px;
     border: 2px solid var(--card-border-light);
     border-radius: 4px;
-
     box-shadow:
-      inset -2px 4px 0 #9e9e9e,
-      inset -3px 4px 0 #9e9e9e;
+      inset -2px 4px 0 rgba(216, 154, 106, 0.92),
+      inset -3px 4px 0 rgba(216, 154, 106, 0.92);
   }
 
   &::after {
     inset: -8px;
     border: 3px solid var(--card-border-light);
-
-    // border: 1px solid red;
     border-radius: 12px;
-    // opacity: 0.9;
   }
 
   &--default,
@@ -109,16 +106,22 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
   &__header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    padding: 14px 18px 12px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.24),
-      var(--card-section-bg)
-    );
-    border-bottom: 2px solid rgba(157, 65, 0, 0.34);
+    min-height: 72px;
+    padding: 14px 16px 16px;
+    border-bottom: 3px solid rgba(157, 65, 0, 0.26);
+  }
+
+  &__title-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 52px;
+    padding: 8px 16px;
+    background: var(--card-title-tag-bg);
+    border: 3px solid rgba(215, 119, 15, 0.9);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2);
   }
 
   &__title {
@@ -133,12 +136,18 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-left: auto;
+    padding-top: 6px;
   }
 
   &__body {
-    padding: 16px 18px 18px;
+    padding: 18px;
     color: var(--card-text-secondary);
     line-height: 1.6;
+  }
+
+  &--with-title &__body {
+    padding-top: 20px;
   }
 
   &__footer {
@@ -147,11 +156,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 18px 16px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1),
-      rgba(157, 65, 0, 0.08)
-    );
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(157, 65, 0, 0.08));
     border-top: 2px solid rgba(157, 65, 0, 0.26);
   }
 
@@ -197,7 +202,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #dcbf8b;
     --card-text: #fff1d6;
     --card-text-secondary: #f6e5c5;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(255, 241, 214, 0.92);
   }
 
   &--color-forest-farm {
@@ -208,7 +213,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #f0e4be;
     --card-text: #243611;
     --card-text-secondary: #334a18;
-    --card-section-bg: rgba(255, 255, 255, 0.12);
+    --card-title-tag-bg: rgba(233, 244, 200, 0.88);
   }
 
   &--color-wooden-cabin {
@@ -219,7 +224,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #ffe0b4;
     --card-text: #fff1d8;
     --card-text-secondary: #ffe4b8;
-    --card-section-bg: rgba(255, 255, 255, 0.1);
+    --card-title-tag-bg: rgba(255, 230, 184, 0.88);
   }
 
   &--color-lake-night {
@@ -230,7 +235,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #d9ecff;
     --card-text: #f5fbff;
     --card-text-secondary: #e2f1fb;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(230, 243, 255, 0.88);
   }
 
   &--color-flower-festival {
@@ -241,7 +246,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #ffe3ee;
     --card-text: #fff8fb;
     --card-text-secondary: #fde8ef;
-    --card-section-bg: rgba(255, 255, 255, 0.1);
+    --card-title-tag-bg: rgba(255, 231, 240, 0.9);
   }
 
   &--color-mine-starry {
@@ -252,7 +257,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #edf1ff;
     --card-text: #fffef5;
     --card-text-secondary: #f2f0db;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(242, 245, 255, 0.9);
   }
 
   &--color-farmland {
@@ -263,7 +268,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #ffe5bd;
     --card-text: #fff2dc;
     --card-text-secondary: #f8e0bc;
-    --card-section-bg: rgba(255, 255, 255, 0.1);
+    --card-title-tag-bg: rgba(255, 238, 208, 0.88);
   }
 
   &--color-orchard-grass {
@@ -274,7 +279,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #e9f7d1;
     --card-text: #f6ffe9;
     --card-text-secondary: #e1f0cb;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(236, 248, 215, 0.88);
   }
 
   &--color-workshop-ore {
@@ -285,7 +290,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #eff4f8;
     --card-text: #fff7b5;
     --card-text-secondary: #f4e98e;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(244, 248, 252, 0.88);
   }
 
   &--color-night-celebration {
@@ -296,6 +301,6 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     --card-border-light: #dde3ff;
     --card-text: #eef1ff;
     --card-text-secondary: #dce0fb;
-    --card-section-bg: rgba(255, 255, 255, 0.08);
+    --card-title-tag-bg: rgba(234, 239, 255, 0.88);
   }
 }

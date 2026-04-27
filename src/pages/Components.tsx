@@ -9,6 +9,7 @@ import {
   Square,
   Type,
 } from 'lucide-react'
+import Card from '../components/ui/Card'
 import './Components.css'
 
 const components = [
@@ -21,13 +22,13 @@ const components = [
   {
     path: '/components/title',
     title: 'Title 标题',
-    description: '基于 canvas 木牌背景和木纹文字效果的标题组件。',
+    description: '基于木牌背景与像素字效果的标题组件。',
     icon: <Heading1 size={20} />,
   },
   {
     path: '/components/card',
     title: 'Card 卡片',
-    description: '用于展示内容区块的星露谷风格卡片组件。',
+    description: '支持可选标题区、配色和交互状态的面板卡片组件。',
     icon: <Square size={20} />,
   },
   {
@@ -39,7 +40,7 @@ const components = [
   {
     path: '/components/popup',
     title: 'Popup 气泡弹窗',
-    description: '支持上下左右和 start/end 对齐的像素气泡组件。',
+    description: '支持上下左右与 start/end 对齐的像素气泡组件。',
     icon: <MessageSquareMore size={20} />,
   },
   {
@@ -59,20 +60,24 @@ const components = [
 function Components() {
   return (
     <div className="components-page">
-      <div className="components-header">
-        <h1>组件列表</h1>
-        <p>以下是当前可用的 UI 组件，点击可查看示例与 API。</p>
-      </div>
+      <Card className="components-header-card">
+        <div className="components-header">
+          <h1>组件列表</h1>
+          <p>以下是当前可用的 UI 组件，点击卡片可查看示例与 API。</p>
+        </div>
+      </Card>
 
       <div className="components-grid">
         {components.map((item) => (
-          <Link key={item.path} to={item.path} className="components-card">
-            <div className="components-card-icon">{item.icon}</div>
-            <div className="components-card-content">
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </div>
-            <ChevronRight size={20} className="components-card-arrow" />
+          <Link key={item.path} to={item.path} className="components-card-link">
+            <Card className="components-card" hoverable>
+              <div className="components-card-icon">{item.icon}</div>
+              <div className="components-card-content">
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+              <ChevronRight size={20} className="components-card-arrow" />
+            </Card>
           </Link>
         ))}
       </div>

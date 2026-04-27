@@ -2,19 +2,21 @@
   @apply max-w-full;
 }
 
+.component-page-header-card {
+  margin-bottom: 32px;
+}
+
 .component-page-header {
-  @apply mb-10;
-  padding-bottom: 16px;
-  border-bottom: 4px solid var(--color-border-dark);
+  padding: 8px 4px;
 }
 
 .component-page-title {
-  @apply text-2xl font-semibold m-0 mb-3;
+  @apply m-0 mb-3 text-2xl font-semibold;
   color: var(--color-text);
 }
 
 .component-page-desc {
-  @apply text-base mb-0 leading-relaxed;
+  @apply m-0 text-base leading-relaxed;
   color: var(--color-text-secondary);
 }
 
@@ -23,6 +25,5 @@
 }
 
 .component-page-api {
-  @apply mt-12 pt-8;
-  border-top: 4px solid var(--color-border-dark);
+  @apply mt-6;
 }

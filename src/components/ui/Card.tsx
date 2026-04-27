@@ -1,7 +1,8 @@
+import { type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import './Card.scss'
 
-export type CardColor = 
+export type CardColor =
   | 'night-village'
   | 'forest-farm'
   | 'wooden-cabin'
@@ -13,17 +14,16 @@ export type CardColor =
   | 'workshop-ore'
   | 'night-celebration'
 
-interface CardProps {
-  title?: string
-  children: React.ReactNode
+export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  title?: ReactNode
+  children: ReactNode
   variant?: 'default' | 'outlined' | 'elevated'
   size?: 'small' | 'medium' | 'large'
   color?: CardColor
-  className?: string
-  headerExtra?: React.ReactNode
-  footer?: React.ReactNode
-  onClick?: () => void
+  headerExtra?: ReactNode
+  footer?: ReactNode
   hoverable?: boolean
+  showTitle?: boolean
 }
 
 function Card({
@@ -35,29 +35,36 @@ function Card({
   className = '',
   headerExtra,
   footer,
-  onClick,
   hoverable = false,
+  showTitle = false,
+  onClick,
+  ...rest
 }: CardProps) {
+  const hasTitle = showTitle && Boolean(title)
+
   const cardClass = classNames(
     'stardew-card',
     `stardew-card--${variant}`,
     `stardew-card--${size}`,
     color && `stardew-card--color-${color}`,
+    hasTitle && 'stardew-card--with-title',
     hoverable && 'stardew-card--hoverable',
     onClick && 'stardew-card--clickable',
     className
   )
 
   return (
-    <div className={cardClass} onClick={onClick}>
-      {title && (
+    <div {...rest} className={cardClass} onClick={onClick}>
+      {hasTitle ? (
         <div className="stardew-card__header">
-          <h3 className="stardew-card__title">{title}</h3>
-          {headerExtra && <div className="stardew-card__extra">{headerExtra}</div>}
+          <div className="stardew-card__title-tag">
+            <h3 className="stardew-card__title">{title}</h3>
+          </div>
+          {headerExtra ? <div className="stardew-card__extra">{headerExtra}</div> : null}
         </div>
-      )}
+      ) : null}
       <div className="stardew-card__body">{children}</div>
-      {footer && <div className="stardew-card__footer">{footer}</div>}
+      {footer ? <div className="stardew-card__footer">{footer}</div> : null}
     </div>
   )
 }
@@ -85,8 +92,8 @@ interface CardMetaProps {
 function CardMeta({ title, description, className = '' }: CardMetaProps) {
   return (
     <div className={`stardew-card__meta ${className}`}>
-      {title && <h4 className="stardew-card__meta-title">{title}</h4>}
-      {description && <p className="stardew-card__meta-desc">{description}</p>}
+      {title ? <h4 className="stardew-card__meta-title">{title}</h4> : null}
+      {description ? <p className="stardew-card__meta-desc">{description}</p> : null}
     </div>
   )
 }
