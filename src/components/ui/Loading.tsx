@@ -3,9 +3,16 @@ import { classNames } from '../../utils/classNames'
 import styles from './Loading.module.scss'
 
 const FRAME_COUNT = 12
-const FRAME_DURATION = 200
+const FRAME_DURATION = 300
 const DEFAULT_TEXT = '请稍候'
 const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
+const FULL_CIRCLE = Math.PI * 2
+const START_ANGLE = -Math.PI / 2
+const BUN_EDGE_RATIO = 0
+const BITE_WIDTH_RATIO = 0.3
+const BITE_DEPTH_RATIO = 0.25
+const BITE_OUTLINE_START = Math.PI * 0.45
+const BITE_OUTLINE_END = Math.PI * 0.6
 
 let loadingImagePromise: Promise<HTMLImageElement> | null = null
 
@@ -23,25 +30,92 @@ function loadLoadingImage() {
   return loadingImagePromise
 }
 
+function getBunRadius(canvasSize: number) {
+  return canvasSize / 2 - canvasSize * BUN_EDGE_RATIO
+}
+
 function drawFallback(ctx: CanvasRenderingContext2D, size: number) {
   const center = size / 2
-  const radius = center - size * 0.06
+  const radius = getBunRadius(size)
 
   ctx.fillStyle = '#f5d7a1'
   ctx.beginPath()
-  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
   ctx.fill()
 
   ctx.strokeStyle = '#8b4c22'
   ctx.lineWidth = Math.max(2, size * 0.08)
   ctx.beginPath()
-  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
   ctx.stroke()
 
   ctx.fillStyle = 'rgba(255, 255, 255, 0.28)'
   ctx.beginPath()
-  ctx.arc(center - size * 0.12, center - size * 0.14, size * 0.17, 0, Math.PI * 2)
+  ctx.arc(center - size * 0.12, center - size * 0.14, size * 0.17, 0, FULL_CIRCLE)
   ctx.fill()
+}
+
+type BiteMask = {
+  x: number
+  y: number
+  rotation: number
+}
+
+function createBiteMasks(canvasSize: number, biteCount: number): BiteMask[] {
+  const centerPoint = canvasSize / 2
+  const bunRadius = getBunRadius(canvasSize)
+  const biteRadiusY = canvasSize * BITE_DEPTH_RATIO
+  const biteDistance = bunRadius + biteRadiusY * 0.12
+  const stepAngle = FULL_CIRCLE / FRAME_COUNT
+
+  return Array.from({ length: biteCount }, (_, index) => {
+    const angle = START_ANGLE + index * stepAngle
+
+    return {
+      x: centerPoint + Math.cos(angle) * biteDistance,
+      y: centerPoint + Math.sin(angle) * biteDistance,
+      rotation: angle + Math.PI / 2,
+    }
+  })
+}
+
+function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteCount: number) {
+  if (biteCount <= 0) {
+    return
+  }
+
+  const centerPoint = canvasSize / 2
+  const bunRadius = getBunRadius(canvasSize)
+  const biteRadiusX = canvasSize * BITE_WIDTH_RATIO
+  const biteRadiusY = canvasSize * BITE_DEPTH_RATIO
+  const strokeWidth = Math.max(1.1, canvasSize * 0.03)
+  const bites = createBiteMasks(canvasSize, biteCount)
+
+  ctx.save()
+  ctx.globalCompositeOperation = 'destination-out'
+  bites.forEach(({ x, y, rotation }) => {
+    ctx.beginPath()
+    ctx.ellipse(x, y, biteRadiusX, biteRadiusY, rotation, 0, FULL_CIRCLE)
+    ctx.fill()
+  })
+  ctx.restore()
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(centerPoint, centerPoint, bunRadius, 0, FULL_CIRCLE)
+  ctx.clip()
+
+  ctx.strokeStyle = '#6c4836'
+  ctx.lineWidth = strokeWidth
+  ctx.lineJoin = 'round'
+  ctx.lineCap = 'round'
+  bites.forEach(({ x, y, rotation }) => {
+    // Only draw the inward-facing bite arc, so neighboring bites do not expose stray interior lines.
+    ctx.beginPath()
+    ctx.ellipse(x, y, biteRadiusX, biteRadiusY, rotation, BITE_OUTLINE_START, BITE_OUTLINE_END)
+    ctx.stroke()
+  })
+  ctx.restore()
 }
 
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
@@ -146,14 +220,9 @@ function StarLoading({
       return
     }
 
-    const visibleRatio = 1 - hiddenSlices / FRAME_COUNT
-    const centerPoint = targetSize / 2
-
     ctx.save()
     ctx.beginPath()
-    ctx.moveTo(centerPoint, centerPoint)
-    ctx.arc(centerPoint, centerPoint, centerPoint, -Math.PI / 2, -Math.PI / 2 + visibleRatio * Math.PI * 2, false)
-    ctx.closePath()
+    ctx.arc(targetSize / 2, targetSize / 2, getBunRadius(targetSize), 0, FULL_CIRCLE)
     ctx.clip()
 
     if (image) {
@@ -163,9 +232,11 @@ function StarLoading({
     }
 
     ctx.restore()
+
+    applyBiteMasks(ctx, targetSize, hiddenSlices)
   }, [hiddenSlices, image, size])
 
-  const resolvedText = text === undefined ? `${DEFAULT_TEXT}` : text
+  const resolvedText = text === undefined ? DEFAULT_TEXT : text
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
   const rootStyle = useMemo(
     () =>
@@ -192,8 +263,7 @@ function StarLoading({
       aria-label={isAriaHidden ? undefined : resolvedText || DEFAULT_TEXT}
     >
       <canvas ref={canvasRef} className={styles['loading__canvas']} aria-hidden />
-
-      <span className={styles['loading__text']}>{resolvedText || null}</span>
+      {resolvedText ? <span className={styles['loading__text']}>{resolvedText}</span> : null}
     </div>
   )
 }

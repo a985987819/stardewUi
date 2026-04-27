@@ -56,7 +56,7 @@ function StarLoadingDemoPage() {
         code={basicCode}
       >
         <div className={styles['loading-demo__inline-group']}>
-          <StarLoading />
+          <StarLoading size={80} />
         </div>
       </StarComponentDemo>
 
