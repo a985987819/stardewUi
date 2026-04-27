@@ -28,6 +28,7 @@ const menuItems: MenuItem[] = [
       { path: '/components/dialog', label: 'Dialog 对话框' },
       { path: '/components/popup', label: 'Popup 气泡弹窗' },
       { path: '/components/typewriter', label: 'Typewriter 打字机' },
+      { path: '/components/loading', label: 'Loading 加载' },
       { path: '/components/message', label: 'Message 消息提示' },
       { path: '/components/empty-state', label: 'EmptyState 空状态' },
     ],

@@ -8,9 +8,11 @@ export {
   type StarEmptyStateProps,
 } from './EmptyState'
 export { default as StarTypewriter } from './Typewriter'
+export { default as StarLoading } from './Loading'
 export { message } from './Message'
 export type { MessageType, MessageProps } from './Message'
 export { default as StarNineSliceButton } from './NineSliceButton'
+export type { StarLoadingProps } from './Loading'
 export type { StarNineSliceButtonProps, NineSliceButtonTheme } from './NineSliceButton'
 export { default as StarPopup } from './Popup'
 export type { PopupPlacement, StarPopupProps, PopupAction } from './Popup'

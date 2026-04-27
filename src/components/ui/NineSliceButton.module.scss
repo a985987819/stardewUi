@@ -25,7 +25,21 @@
   &__content {
     position: relative;
     z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     line-height: 1.2;
+  }
+
+  &__loading {
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
   }
 
   &:hover:not(:disabled) {
@@ -97,11 +111,19 @@
   &--small {
     @apply text-xs;
     padding: 10px 14px;
+
+    .nine-slice-button__content {
+      gap: 6px;
+    }
   }
 
   &--large {
     @apply text-base;
     padding: 16px 22px;
+
+    .nine-slice-button__content {
+      gap: 10px;
+    }
   }
 
   &--block {

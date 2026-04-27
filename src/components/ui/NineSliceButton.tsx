@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes, type CSSProperties } from 'react'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
+import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
 
 type NineSliceButtonVariant =
@@ -27,6 +28,7 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   size?: NineSliceButtonSize
   block?: boolean
   theme?: NineSliceButtonTheme
+  loading?: boolean
   backgroundSrc?: string
   backgroundInsets?: {
     top: number
@@ -79,6 +81,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       size = 'medium',
       block = false,
       theme,
+      loading = false,
       backgroundSrc = '/btnImg.png',
       backgroundInsets = DEFAULT_INSETS,
       className,
@@ -89,8 +92,10 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     },
     ref
   ) => {
+    const isDisabled = disabled || loading
     const effectiveVariant =
-      disabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+      isDisabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+    const loadingSize = size === 'small' ? 14 : size === 'large' ? 18 : 16
 
     const seasonalDefaultTone = useMemo(
       () => (theme && effectiveVariant === 'default' ? SEASONAL_DEFAULT_TONES[theme] : null),
@@ -193,7 +198,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       <button
         {...rest}
         ref={ref}
-        disabled={disabled}
+        disabled={isDisabled}
+        aria-busy={loading || undefined}
         style={buttonStyle}
         className={cls(
           styles['nine-slice-button'],
@@ -214,7 +220,12 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
             <canvas ref={dashedCanvasRef} className={styles['nine-slice-button__canvas']} aria-hidden />
           </span>
         ) : null}
-        <span className={styles['nine-slice-button__content']}>{children}</span>
+        <span className={styles['nine-slice-button__content']}>
+          {loading ? (
+            <StarLoading active text="" size={loadingSize} className={styles['nine-slice-button__loading']} aria-hidden />
+          ) : null}
+          {children !== undefined && children !== null ? <span className={styles['nine-slice-button__label']}>{children}</span> : null}
+        </span>
       </button>
     )
   }

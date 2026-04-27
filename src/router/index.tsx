@@ -11,6 +11,7 @@ import StarPopupDemoPage from '../pages/PopupDemo'
 import StarTypewriterDemoPage from '../pages/TypewriterDemo'
 import StarMessageDemoPage from '../pages/MessageDemo'
 import StarTitleDemoPage from '../pages/TitleDemo'
+import StarLoadingDemoPage from '../pages/LoadingDemo'
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
       { path: 'components/empty-state', element: <StarEmptyStateDemoPage /> },
       { path: 'components/popup', element: <StarPopupDemoPage /> },
       { path: 'components/typewriter', element: <StarTypewriterDemoPage /> },
+      { path: 'components/loading', element: <StarLoadingDemoPage /> },
       { path: 'components/message', element: <StarMessageDemoPage /> },
     ],
   },
