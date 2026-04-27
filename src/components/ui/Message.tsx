@@ -43,9 +43,9 @@ function StarMessageCard({ content, type = 'normal', duration = 3000, onClose }:
     const closeTimer =
       duration > 0
         ? window.setTimeout(() => {
-            setVisible(false)
-            window.setTimeout(() => onClose?.(), 200)
-          }, duration)
+          setVisible(false)
+          window.setTimeout(() => onClose?.(), 200)
+        }, duration)
         : null
 
     return () => {
@@ -75,10 +75,12 @@ function StarMessageCard({ content, type = 'normal', duration = 3000, onClose }:
       contentPadding={12}
     >
       {iconMap[type] ? <span className={styles['stardew-message__icon']}>{iconMap[type]}</span> : null}
-      <span className={styles['stardew-message__content']}>{content}</span>
-      <button type="button" className={styles['stardew-message__close']} onClick={handleClose} style={{ color: theme.text }}>
-        <X size={14} />
-      </button>
+      <div className={styles['stardew-message__body']}>
+        <span className={styles['stardew-message__content']}>{content}</span>
+        <button type="button" className={styles['stardew-message__close']} onClick={handleClose} style={{ color: theme.text }}>
+          <X size={14} />
+        </button>
+      </div>
     </StarCanvasBubble>
   )
 }
@@ -113,7 +115,7 @@ function getContainer() {
     messageContainer = document.createElement('div')
     messageContainer.id = 'star-message-root'
     const appRoot = document.querySelector('[class*="starApp"]')
-    ;(appRoot ?? document.body).appendChild(messageContainer)
+      ; (appRoot ?? document.body).appendChild(messageContainer)
     messageRoot = createRoot(messageContainer)
   }
 

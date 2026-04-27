@@ -8,7 +8,7 @@ const DEFAULT_TEXT = '请稍候'
 const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
 const FULL_CIRCLE = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
-const BUN_EDGE_RATIO = 0.02
+const BUN_EDGE_RATIO = 0
 const BITE_CENTER_DISTANCE_RATIO = 0.97
 const BITE_DEPTH_RATIO = 0.39
 
