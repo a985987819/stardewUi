@@ -3,7 +3,6 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import Dialog from '../components/ui/Dialog'
-import type { DialogAction } from '../components/ui/Dialog'
 
 const dialogApiData = [
   {

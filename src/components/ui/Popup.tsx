@@ -75,8 +75,8 @@ function Popup({
           <CanvasBubble
             className="stardew-popup__bubble"
             bubblePlacement={bubblePlacement}
-            fillColor="#fff7ea"
-            borderColor="#9e460f"
+            fillColor="#ffe0b2"
+            borderColor="#9d4100"
             borderWidth={6}
             cornerSize={14}
             arrowWidth={24}

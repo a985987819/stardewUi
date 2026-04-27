@@ -13,43 +13,43 @@
 }
 
 :root {
-  --color-primary: #5a8c4a;
-  --color-primary-rgb: 90, 140, 74;
-  --color-primary-dark: #4a7a3a;
-  --color-primary-light: #6a9c5a;
-  --color-primary-bg: rgba(90, 140, 74, 0.15);
+  --color-primary: #b86a21;
+  --color-primary-rgb: 184, 106, 33;
+  --color-primary-dark: #9d4100;
+  --color-primary-light: #d98b45;
+  --color-primary-bg: rgba(184, 106, 33, 0.16);
 
-  --color-secondary: #8b6914;
-  --color-secondary-rgb: 139, 105, 20;
-  --color-secondary-dark: #7a5a10;
-  --color-secondary-light: #9c7a1a;
+  --color-secondary: #c8882d;
+  --color-secondary-rgb: 200, 136, 45;
+  --color-secondary-dark: #a76419;
+  --color-secondary-light: #e0a24d;
 
   --color-accent: #c45c3e;
   --color-accent-rgb: 196, 92, 62;
 
-  --color-success: #5a8c4a;
-  --color-warning: #d4a520;
-  --color-danger: #c45c3e;
-  --color-info: #5a8cb4;
+  --color-success: #7a9d3d;
+  --color-warning: #d7992e;
+  --color-danger: #b9542f;
+  --color-info: #8b6fcb;
 
-  --color-bg: #f4e4c1;
-  --color-bg-secondary: #e8d4a8;
-  --color-bg-header: rgba(244, 228, 193, 0.95);
-  --color-bg-sidebar: #f0e0bc;
-  --color-bg-card: #faf0dc;
-  --color-bg-hover: #e8d4a8;
+  --color-bg: #f5cf8f;
+  --color-bg-secondary: #ffd9a3;
+  --color-bg-header: rgba(255, 214, 150, 0.95);
+  --color-bg-sidebar: #f7c57a;
+  --color-bg-card: #ffc675;
+  --color-bg-hover: #ffe0b2;
   --color-bg-code: #2d2418;
   --color-bg-code-header: #3d3428;
   --color-bg-code-lines: #352c20;
 
-  --color-text: #3d2b1f;
-  --color-text-secondary: #5a4a3a;
-  --color-text-tertiary: #8a7a6a;
-  --color-text-light: #faf0dc;
+  --color-text: #4d2608;
+  --color-text-secondary: #6a350b;
+  --color-text-tertiary: #8d5d2a;
+  --color-text-light: #fff8eb;
 
-  --color-border: #b8a070;
-  --color-border-dark: #8a7040;
-  --color-border-light: #d4c090;
+  --color-border: #d7770f;
+  --color-border-dark: #9d4100;
+  --color-border-light: #ffe0b2;
 
   --font-pixel: 'Stardew', monospace;
   --font-sans: 'Stardew', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -63,23 +63,23 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #1a1410;
-    --color-bg-secondary: #2a2420;
-    --color-bg-header: rgba(26, 20, 16, 0.95);
-    --color-bg-sidebar: #201a16;
-    --color-bg-card: #2a2420;
-    --color-bg-hover: #3a3430;
+    --color-bg: #3f2412;
+    --color-bg-secondary: #5a3518;
+    --color-bg-header: rgba(63, 36, 18, 0.95);
+    --color-bg-sidebar: #4d2c15;
+    --color-bg-card: #71411d;
+    --color-bg-hover: #8a5527;
     --color-bg-code: #1a1410;
     --color-bg-code-header: #2a2420;
     --color-bg-code-lines: #201a16;
 
-    --color-text: #f4e4c1;
-    --color-text-secondary: #c4b4a1;
-    --color-text-tertiary: #948474;
+    --color-text: #fff1d8;
+    --color-text-secondary: #ffdcae;
+    --color-text-tertiary: #d9b884;
 
-    --color-border: #5a4a3a;
-    --color-border-dark: #3a2a1a;
-    --color-border-light: #7a6a5a;
+    --color-border: #d48a43;
+    --color-border-dark: #f0be73;
+    --color-border-light: #9d5a26;
 
     --shadow-pixel: 4px 4px 0px rgba(0, 0, 0, 0.4);
     --shadow-pixel-sm: 2px 2px 0px rgba(0, 0, 0, 0.3);

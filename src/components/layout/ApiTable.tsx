@@ -1,10 +1,10 @@
-import { useCallback, MouseEvent } from 'react'
+import { useCallback, type MouseEvent } from 'react'
+import Card from '../ui/Card'
 import { message } from '../ui/Message'
 import './ApiTable.css'
 
 interface ApiColumn {
   title: string
-  key: string
   dataIndex: string
   width?: number
 }
@@ -25,7 +25,7 @@ interface ApiTableProps {
 }
 
 function ApiTable({ title = 'API', data }: ApiTableProps) {
-  const columns = [
+  const columns: ApiColumn[] = [
     { title: '属性', dataIndex: 'property', width: 150 },
     { title: '说明', dataIndex: 'description' },
     { title: '类型', dataIndex: 'type', width: 280 },
@@ -38,7 +38,6 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
 
     if (!textToCopy.trim()) return
 
-    // 清理文本，移除可能的前后空格和分隔符
     const cleanText = textToCopy.replace(/^\s*[|\s]\s*|\s*[|\s]\s*$/g, '').trim()
     if (!cleanText) return
 
@@ -51,23 +50,17 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     }
   }, [])
 
-  // 将类型值拆分成多个可点击的部分
   const renderTypeValue = (value: string) => {
-    // 如果包含 | 分隔符，则拆分成多个部分
     if (value.includes('|')) {
       const parts = value.split('|')
       return (
         <>
           {parts.map((part, index) => (
-            <span key={index}>
-              <span
-                className="api-table-copyable api-table-type-part"
-                onClick={handleCopy}
-                title="点击复制"
-              >
+            <span key={`${part.trim()}-${index}`}>
+              <span className="api-table-copyable api-table-type-part" onClick={handleCopy} title="点击复制">
                 {part.trim()}
               </span>
-              {index < parts.length - 1 && <span className="api-table-type-separator"> | </span>}
+              {index < parts.length - 1 ? <span className="api-table-type-separator"> | </span> : null}
             </span>
           ))}
         </>
@@ -75,11 +68,7 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     }
 
     return (
-      <span
-        className="api-table-copyable"
-        onClick={handleCopy}
-        title="点击复制"
-      >
+      <span className="api-table-copyable" onClick={handleCopy} title="点击复制">
         {value}
       </span>
     )
@@ -90,13 +79,9 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
 
     if (column.dataIndex === 'property') {
       return (
-        <code
-          className="api-table-name api-table-copyable"
-          onClick={handleCopy}
-          title="点击复制"
-        >
+        <code className="api-table-name api-table-copyable" onClick={handleCopy} title="点击复制">
           {value}
-          {record.required && <span className="api-table-required">*</span>}
+          {record.required ? <span className="api-table-required">*</span> : null}
         </code>
       )
     }
@@ -107,12 +92,9 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
 
     if (column.dataIndex === 'default') {
       if (!value) return <span className="api-table-empty">-</span>
+
       return (
-        <code
-          className="api-table-copyable"
-          onClick={handleCopy}
-          title="点击复制"
-        >
+        <code className="api-table-copyable" onClick={handleCopy} title="点击复制">
           {value}
         </code>
       )
@@ -122,31 +104,32 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
   }
 
   return (
-    <div className="api-table-wrapper">
-      <h3 className="api-table-title">{title}</h3>
-      <table className="api-table">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th key={col.dataIndex} style={{ width: col.width }}>
-                {col.title}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((record, index) => (
-            <tr key={index} className="api-table-row">
+    <Card className="api-table-wrapper" showTitle title={title}>
+      <div className="api-table-scroll">
+        <table className="api-table">
+          <thead>
+            <tr>
               {columns.map((col) => (
-                <td key={col.dataIndex} className="api-table-cell">
-                  {renderCell(col, record)}
-                </td>
+                <th key={col.dataIndex} style={{ width: col.width }}>
+                  {col.title}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {data.map((record, index) => (
+              <tr key={index} className="api-table-row">
+                {columns.map((col) => (
+                  <td key={col.dataIndex} className="api-table-cell">
+                    {renderCell(col, record)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
   )
 }
 

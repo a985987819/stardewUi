@@ -41,7 +41,7 @@ describe('useLocalStorage', () => {
   })
 
   it('should handle object values', () => {
-    const { result } = renderHook(() => useLocalStorage('test-key', { a: 1 }))
+    const { result } = renderHook(() => useLocalStorage<{ a: number; b?: number }>('test-key', { a: 1 }))
 
     act(() => {
       result.current[1]({ a: 2, b: 3 })

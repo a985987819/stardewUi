@@ -78,7 +78,7 @@ function PopupDemo() {
               open
               placement={item}
               title="\u63d0\u793a"
-              content="Right placement prompts info"
+              content="\u652f\u6301\u50cf\u7d20\u6c14\u6ce1\u7bad\u5934\u548c\u591a\u6309\u94ae\u64cd\u4f5c\u3002"
               actions={[
                 { label: '\u53d6\u6d88' },
                 { label: '\u786e\u8ba4', variant: 'primary' },
