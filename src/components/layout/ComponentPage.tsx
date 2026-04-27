@@ -1,6 +1,6 @@
-import Card from '../ui/Card'
-import './ComponentPage.css'
-import TableOfContents from './TableOfContents'
+import { Card } from '../ui/Card'
+import StarTableOfContents from './TableOfContents'
+import styles from './ComponentPage.module.css'
 
 interface TocItem {
   id: string
@@ -15,19 +15,19 @@ interface ComponentPageProps {
   toc?: TocItem[]
 }
 
-function ComponentPage({ title, description, children, toc }: ComponentPageProps) {
+function StarComponentPage({ title, description, children, toc }: ComponentPageProps) {
   return (
-    <div className="component-page">
-      <Card className="component-page-header-card">
-        <div className="component-page-header">
-          <h1 className="component-page-title">{title}</h1>
-          <p className="component-page-desc">{description}</p>
+    <div className={styles['component-page']}>
+      <Card className={styles['component-page-header-card']}>
+        <div className={styles['component-page-header']}>
+          <h1 className={styles['component-page-title']}>{title}</h1>
+          <p className={styles['component-page-desc']}>{description}</p>
         </div>
       </Card>
-      <div className="component-page-content">{children}</div>
-      {toc ? <TableOfContents items={toc} /> : null}
+      <div className={styles['component-page-content']}>{children}</div>
+      {toc ? <StarTableOfContents items={toc} /> : null}
     </div>
   )
 }
 
-export default ComponentPage
+export default StarComponentPage

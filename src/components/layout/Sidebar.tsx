@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ChevronDown, Book, Box } from 'lucide-react'
-import './Sidebar.css'
 import { classNames } from '../../utils/classNames'
+import styles from './Sidebar.module.css'
 
 interface MenuItem {
   path: string
@@ -33,7 +33,7 @@ const menuItems: MenuItem[] = [
   },
 ]
 
-function Sidebar() {
+function StarSidebar() {
   const location = useLocation()
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
 
@@ -44,16 +44,20 @@ function Sidebar() {
   const isExpanded = (path: string) => expandedKeys.includes(path)
   const isActive = (path: string) => location.pathname.startsWith(path)
 
-  const renderMenuItem = (item: MenuItem, level: number = 0) => {
+  const renderMenuItem = (item: MenuItem, level = 0) => {
     const hasChildren = Boolean(item.children?.length)
     const expanded = isExpanded(item.path)
     const active = isActive(item.path)
 
     return (
-      <div key={item.path} className="doc-sidebar-item">
+      <div key={item.path} className={styles['doc-sidebar-item']}>
         <NavLink
           to={item.path}
-          className={classNames('doc-sidebar-link', active && 'is-active', `level-${level}`)}
+          className={classNames(
+            styles['doc-sidebar-link'],
+            active && styles['is-active'],
+            level > 0 && styles[`level-${level}`]
+          )}
           onClick={(event) => {
             if (hasChildren) {
               event.preventDefault()
@@ -61,17 +65,17 @@ function Sidebar() {
             }
           }}
         >
-          {item.icon ? <span className="doc-sidebar-icon">{item.icon}</span> : null}
-          <span className="doc-sidebar-text">{item.label}</span>
+          {item.icon ? <span className={styles['doc-sidebar-icon']}>{item.icon}</span> : null}
+          <span className={styles['doc-sidebar-text']}>{item.label}</span>
           {hasChildren ? (
-            <span className={classNames('doc-sidebar-arrow', expanded && 'is-expanded')}>
+            <span className={classNames(styles['doc-sidebar-arrow'], expanded && styles['is-expanded'])}>
               <ChevronDown size={16} />
             </span>
           ) : null}
         </NavLink>
 
         {hasChildren && expanded ? (
-          <div className="doc-sidebar-children">
+          <div className={styles['doc-sidebar-children']}>
             {item.children!.map((child) => renderMenuItem(child, level + 1))}
           </div>
         ) : null}
@@ -80,10 +84,10 @@ function Sidebar() {
   }
 
   return (
-    <aside className="doc-sidebar">
-      <nav className="doc-sidebar-nav">{menuItems.map((item) => renderMenuItem(item))}</nav>
+    <aside className={styles['doc-sidebar']}>
+      <nav className={styles['doc-sidebar-nav']}>{menuItems.map((item) => renderMenuItem(item))}</nav>
     </aside>
   )
 }
 
-export default Sidebar
+export default StarSidebar

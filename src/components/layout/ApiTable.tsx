@@ -1,7 +1,7 @@
 import { useCallback, type MouseEvent } from 'react'
-import Card from '../ui/Card'
+import { Card } from '../ui/Card'
 import { message } from '../ui/Message'
-import './ApiTable.css'
+import styles from './ApiTable.module.css'
 
 interface ApiColumn {
   title: string
@@ -24,7 +24,7 @@ interface ApiTableProps {
   data: ApiTableData[]
 }
 
-function ApiTable({ title = 'API', data }: ApiTableProps) {
+function StarApiTable({ title = 'API', data }: ApiTableProps) {
   const columns: ApiColumn[] = [
     { title: '属性', dataIndex: 'property', width: 150 },
     { title: '说明', dataIndex: 'description' },
@@ -32,8 +32,8 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     { title: '默认值', dataIndex: 'default', width: 120 },
   ]
 
-  const handleCopy = useCallback(async (e: MouseEvent<HTMLElement>) => {
-    const target = e.target as HTMLElement
+  const handleCopy = useCallback(async (event: MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement
     const textToCopy = target.textContent || ''
 
     if (!textToCopy.trim()) return
@@ -57,10 +57,10 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
         <>
           {parts.map((part, index) => (
             <span key={`${part.trim()}-${index}`}>
-              <span className="api-table-copyable api-table-type-part" onClick={handleCopy} title="点击复制">
+              <span className={`${styles['api-table-copyable']} ${styles['api-table-type-part']}`} onClick={handleCopy} title="点击复制">
                 {part.trim()}
               </span>
-              {index < parts.length - 1 ? <span className="api-table-type-separator"> | </span> : null}
+              {index < parts.length - 1 ? <span className={styles['api-table-type-separator']}> | </span> : null}
             </span>
           ))}
         </>
@@ -68,7 +68,7 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     }
 
     return (
-      <span className="api-table-copyable" onClick={handleCopy} title="点击复制">
+      <span className={styles['api-table-copyable']} onClick={handleCopy} title="点击复制">
         {value}
       </span>
     )
@@ -79,9 +79,9 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
 
     if (column.dataIndex === 'property') {
       return (
-        <code className="api-table-name api-table-copyable" onClick={handleCopy} title="点击复制">
+        <code className={`${styles['api-table-name']} ${styles['api-table-copyable']}`} onClick={handleCopy} title="点击复制">
           {value}
-          {record.required ? <span className="api-table-required">*</span> : null}
+          {record.required ? <span className={styles['api-table-required']}>*</span> : null}
         </code>
       )
     }
@@ -91,10 +91,10 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
     }
 
     if (column.dataIndex === 'default') {
-      if (!value) return <span className="api-table-empty">-</span>
+      if (!value) return <span className={styles['api-table-empty']}>-</span>
 
       return (
-        <code className="api-table-copyable" onClick={handleCopy} title="点击复制">
+        <code className={styles['api-table-copyable']} onClick={handleCopy} title="点击复制">
           {value}
         </code>
       )
@@ -104,9 +104,9 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
   }
 
   return (
-    <Card className="api-table-wrapper" showTitle title={title}>
-      <div className="api-table-scroll">
-        <table className="api-table">
+    <Card className={styles['api-table-wrapper']} showTitle title={title}>
+      <div className={styles['api-table-scroll']}>
+        <table className={styles['api-table']}>
           <thead>
             <tr>
               {columns.map((col) => (
@@ -118,9 +118,9 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
           </thead>
           <tbody>
             {data.map((record, index) => (
-              <tr key={index} className="api-table-row">
+              <tr key={index} className={styles['api-table-row']}>
                 {columns.map((col) => (
-                  <td key={col.dataIndex} className="api-table-cell">
+                  <td key={col.dataIndex} className={styles['api-table-cell']}>
                     {renderCell(col, record)}
                   </td>
                 ))}
@@ -133,4 +133,4 @@ function ApiTable({ title = 'API', data }: ApiTableProps) {
   )
 }
 
-export default ApiTable
+export default StarApiTable

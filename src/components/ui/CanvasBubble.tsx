@@ -10,9 +10,9 @@ import {
 } from 'react'
 import { classNames } from '../../utils/classNames'
 import { drawPixelBubble, resolveBubblePlacement, type BubblePlacement } from '../../utils'
-import './CanvasBubble.css'
+import styles from './CanvasBubble.module.css'
 
-export interface CanvasBubbleProps extends HTMLAttributes<HTMLDivElement> {
+export interface StarCanvasBubbleProps extends HTMLAttributes<HTMLDivElement> {
   bubblePlacement?: BubblePlacement
   fillColor?: string
   borderColor?: string
@@ -35,7 +35,7 @@ const setRefValue = <T,>(ref: ForwardedRef<T>, value: T) => {
   }
 }
 
-const CanvasBubble = forwardRef<HTMLDivElement, CanvasBubbleProps>(
+const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
   (
     {
       bubblePlacement = 'none',
@@ -134,19 +134,21 @@ const CanvasBubble = forwardRef<HTMLDivElement, CanvasBubbleProps>(
 
     const resolvedPlacement = useMemo(() => resolveBubblePlacement(bubblePlacement), [bubblePlacement])
 
-    const contentStyle = useMemo(() => {
-      return {
-        paddingTop: contentPadding + borderWidth + (resolvedPlacement.side === 'top' ? arrowDepth : 0),
-        paddingRight: contentPadding + borderWidth + (resolvedPlacement.side === 'right' ? arrowDepth : 0),
-        paddingBottom: contentPadding + borderWidth + (resolvedPlacement.side === 'bottom' ? arrowDepth : 0),
-        paddingLeft: contentPadding + borderWidth + (resolvedPlacement.side === 'left' ? arrowDepth : 0),
-      } satisfies CSSProperties
-    }, [arrowDepth, borderWidth, contentPadding, resolvedPlacement.side])
+    const contentStyle = useMemo(
+      () =>
+        ({
+          paddingTop: contentPadding + borderWidth + (resolvedPlacement.side === 'top' ? arrowDepth : 0),
+          paddingRight: contentPadding + borderWidth + (resolvedPlacement.side === 'right' ? arrowDepth : 0),
+          paddingBottom: contentPadding + borderWidth + (resolvedPlacement.side === 'bottom' ? arrowDepth : 0),
+          paddingLeft: contentPadding + borderWidth + (resolvedPlacement.side === 'left' ? arrowDepth : 0),
+        }) satisfies CSSProperties,
+      [arrowDepth, borderWidth, contentPadding, resolvedPlacement.side]
+    )
 
     return (
-      <div {...rest} ref={setHostRef} className={classNames('canvas-bubble', className)} style={style}>
-        <canvas ref={canvasRef} className="canvas-bubble__canvas" aria-hidden />
-        <div className={classNames('canvas-bubble__content', contentClassName)} style={contentStyle}>
+      <div {...rest} ref={setHostRef} className={classNames(styles['canvas-bubble'], className)} style={style}>
+        <canvas ref={canvasRef} className={styles['canvas-bubble__canvas']} aria-hidden />
+        <div className={classNames(styles['canvas-bubble__content'], contentClassName)} style={contentStyle}>
           {children}
         </div>
       </div>
@@ -154,6 +156,6 @@ const CanvasBubble = forwardRef<HTMLDivElement, CanvasBubbleProps>(
   }
 )
 
-CanvasBubble.displayName = 'CanvasBubble'
+StarCanvasBubble.displayName = 'StarCanvasBubble'
 
-export default CanvasBubble
+export default StarCanvasBubble

@@ -32,7 +32,7 @@
   min-width: 0;
 }
 
-.stardew-dialog__left .canvas-panel__content {
+.stardew-dialog__left-content {
   display: flex;
   flex-direction: column;
   min-height: 100%;

@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { CheckCircle, Info, AlertTriangle, XCircle, X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import CanvasBubble from './CanvasBubble'
-import './Message.css'
+import StarCanvasBubble from './CanvasBubble'
+import styles from './Message.module.css'
 
 export type MessageType = 'normal' | 'info' | 'success' | 'warning' | 'error'
 
@@ -34,12 +34,7 @@ const themeMap: Record<MessageType, { fill: string; border: string; text: string
   error: { fill: '#FFD1E3', border: '#5C3A57', text: '#5C3A57' },
 }
 
-function MessageCard({
-  content,
-  type = 'normal',
-  duration = 3000,
-  onClose,
-}: MessageRecord) {
+function StarMessageCard({ content, type = 'normal', duration = 3000, onClose }: MessageRecord) {
   const [visible, setVisible] = useState(false)
   const theme = themeMap[type]
 
@@ -67,25 +62,24 @@ function MessageCard({
   }, [onClose])
 
   return (
-    <CanvasBubble
-      className={classNames('stardew-message', `stardew-message--${type}`, visible && 'stardew-message--visible')}
+    <StarCanvasBubble
+      className={classNames(
+        styles['stardew-message'],
+        styles[`stardew-message--${type}`],
+        visible && styles['stardew-message--visible']
+      )}
       fillColor={theme.fill}
       borderColor={theme.border}
       borderWidth={4}
       cornerSize={8}
       contentPadding={12}
     >
-      {iconMap[type] ? <span className="stardew-message__icon">{iconMap[type]}</span> : null}
-      <span className="stardew-message__content">{content}</span>
-      <button
-        type="button"
-        className="stardew-message__close"
-        onClick={handleClose}
-        style={{ color: theme.text }}
-      >
+      {iconMap[type] ? <span className={styles['stardew-message__icon']}>{iconMap[type]}</span> : null}
+      <span className={styles['stardew-message__content']}>{content}</span>
+      <button type="button" className={styles['stardew-message__close']} onClick={handleClose} style={{ color: theme.text }}>
         <X size={14} />
       </button>
-    </CanvasBubble>
+    </StarCanvasBubble>
   )
 }
 
@@ -95,14 +89,12 @@ let messageId = 0
 const messages: Map<string, MessageRecord> = new Map()
 
 function renderMessages() {
-  if (!messageRoot) {
-    return
-  }
+  if (!messageRoot) return
 
   messageRoot.render(
-    <div className="stardew-message-container">
+    <div className={styles['stardew-message-container']}>
       {Array.from(messages.values()).map((msg) => (
-        <MessageCard
+        <StarMessageCard
           key={msg.id}
           {...msg}
           onClose={() => {
@@ -119,8 +111,9 @@ function renderMessages() {
 function getContainer() {
   if (!messageContainer) {
     messageContainer = document.createElement('div')
-    messageContainer.id = 'stardew-message-root'
-    document.body.appendChild(messageContainer)
+    messageContainer.id = 'star-message-root'
+    const appRoot = document.querySelector('[class*="starApp"]')
+    ;(appRoot ?? document.body).appendChild(messageContainer)
     messageRoot = createRoot(messageContainer)
   }
 

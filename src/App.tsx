@@ -1,8 +1,13 @@
 import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
+import styles from './styles/global.module.css'
 
-function App() {
-  return <RouterProvider router={router} />
+function StarApp() {
+  return (
+    <div className={styles.starApp}>
+      <RouterProvider router={router} />
+    </div>
+  )
 }
 
-export default App
+export default StarApp

@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes, type CSSProperties } from 'react'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
-import './NineSliceButton.css'
+import styles from './NineSliceButton.module.css'
 
 type NineSliceButtonVariant =
   | 'default'
@@ -20,10 +20,9 @@ type ButtonTone = {
 }
 
 type ImageButtonVariant = Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'link'>
-
 type ButtonColorMap = Record<ImageButtonVariant, ButtonTone>
 
-export type NineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: NineSliceButtonVariant
   size?: NineSliceButtonSize
   block?: boolean
@@ -38,7 +37,6 @@ export type NineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const cls = (...classNames: Array<string | false | undefined>) => classNames.filter(Boolean).join(' ')
-
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 
 const DEFAULT_COLOR_MAP: ButtonColorMap = {
@@ -74,7 +72,7 @@ const drawDashedBorder = (
   ctx.strokeRect(lineWidth / 2, lineWidth / 2, width - lineWidth, height - lineWidth)
 }
 
-const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
+const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonProps>(
   (
     {
       variant = 'default',
@@ -137,7 +135,7 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
     const { hostRef, canvasProps } = useNineSliceBackground({
       src: backgroundSrc,
       insets: backgroundInsets,
-      className: 'nine-slice-button__canvas',
+      className: styles['nine-slice-button__canvas'],
       zIndex: 0,
       imageSmoothingEnabled: false,
       backgroundColor: tone?.bg,
@@ -198,30 +196,30 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
         disabled={disabled}
         style={buttonStyle}
         className={cls(
-          'nine-slice-button',
-          `nine-slice-button--${effectiveVariant}`,
-          seasonalDefaultTone ? `nine-slice-button--theme-${theme}` : undefined,
-          `nine-slice-button--${size}`,
-          block && 'nine-slice-button--block',
+          styles['nine-slice-button'],
+          styles[`nine-slice-button--${effectiveVariant}`],
+          seasonalDefaultTone ? styles[`nine-slice-button--theme-${theme}`] : undefined,
+          styles[`nine-slice-button--${size}`],
+          block ? styles['nine-slice-button--block'] : undefined,
           className
         )}
       >
         {imageVariant ? (
-          <span className="nine-slice-button__bg" ref={hostRef as (node: HTMLSpanElement | null) => void}>
+          <span className={styles['nine-slice-button__bg']} ref={hostRef as (node: HTMLSpanElement | null) => void}>
             <canvas {...canvasProps} />
           </span>
         ) : null}
         {dashedVariant ? (
-          <span className="nine-slice-button__bg">
-            <canvas ref={dashedCanvasRef} className="nine-slice-button__canvas" aria-hidden />
+          <span className={styles['nine-slice-button__bg']}>
+            <canvas ref={dashedCanvasRef} className={styles['nine-slice-button__canvas']} aria-hidden />
           </span>
         ) : null}
-        <span className="nine-slice-button__content">{children}</span>
+        <span className={styles['nine-slice-button__content']}>{children}</span>
       </button>
     )
   }
 )
 
-NineSliceButton.displayName = 'NineSliceButton'
+StarNineSliceButton.displayName = 'StarNineSliceButton'
 
-export default NineSliceButton
+export default StarNineSliceButton

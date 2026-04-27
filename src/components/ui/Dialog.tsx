@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import CanvasPanel from './CanvasPanel'
-import NineSliceButton from './NineSliceButton'
-import Typewriter from './Typewriter'
-import './Dialog.css'
+import StarCanvasPanel from './CanvasPanel'
+import StarNineSliceButton from './NineSliceButton'
+import StarTypewriter from './Typewriter'
+import styles from './Dialog.module.css'
 
 export interface DialogAction {
   label: string
@@ -13,7 +13,7 @@ export interface DialogAction {
   onClick?: () => void
 }
 
-export interface DialogProps {
+export interface StarDialogProps {
   open: boolean
   title?: string
   content: string | string[]
@@ -26,16 +26,16 @@ export interface DialogProps {
   onClose?: () => void
 }
 
-const LABEL_CONFIRM = '\u786e\u8ba4'
-const LABEL_CANCEL = '\u53d6\u6d88'
-const LABEL_ROLE = '\u89d2\u8272'
-const TITLE_PREV = '\u4e0a\u4e00\u9875'
-const TITLE_NEXT = '\u4e0b\u4e00\u9875'
-const TITLE_PREV_DISABLED = '\u5df2\u662f\u7b2c\u4e00\u9875'
-const TITLE_NEXT_DISABLED = '\u5df2\u662f\u6700\u540e\u4e00\u9875'
-const WAITING_TEXT = '\u7b49\u5f85\u6807\u9898\u5b8c\u6210...'
+const LABEL_CONFIRM = '确认'
+const LABEL_CANCEL = '取消'
+const LABEL_ROLE = '角色'
+const TITLE_PREV = '上一页'
+const TITLE_NEXT = '下一页'
+const TITLE_PREV_DISABLED = '已是第一页'
+const TITLE_NEXT_DISABLED = '已是最后一页'
+const WAITING_TEXT = '等待标题完成...'
 
-function Dialog({
+function StarDialog({
   open,
   title,
   content,
@@ -46,17 +46,13 @@ function Dialog({
   typewriter = true,
   typewriterSpeed = 100,
   onClose,
-}: DialogProps) {
+}: StarDialogProps) {
   const [currentPage, setCurrentPage] = useState(0)
   const [titleKey, setTitleKey] = useState(0)
   const [contentKey, setContentKey] = useState(0)
   const [titleComplete, setTitleComplete] = useState(false)
 
-  const pages = useMemo(() => {
-    if (Array.isArray(content)) return content
-    return [content]
-  }, [content])
-
+  const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
   const totalPages = pages.length
   const isFirstPage = currentPage === 0
   const isLastPage = currentPage >= totalPages - 1
@@ -72,43 +68,45 @@ function Dialog({
 
   useEffect(() => {
     setContentKey((k) => k + 1)
-
     if (!isFirstPage) {
       setTitleComplete(true)
     }
-  }, [currentPage, title, typewriter, isFirstPage])
+  }, [currentPage, isFirstPage])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return
+
       if (e.key === 'Escape' && maskClosable) {
         onClose?.()
       }
+
       if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
         if (!isLastPage) {
-          setCurrentPage((p) => Math.min(p + 1, totalPages - 1))
+          setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
         }
       }
+
       if (e.key === 'ArrowLeft') {
         if (!isFirstPage) {
-          setCurrentPage((p) => Math.max(p - 1, 0))
+          setCurrentPage((page) => Math.max(page - 1, 0))
         }
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, isFirstPage, isLastPage, totalPages, maskClosable, onClose])
+  }, [isFirstPage, isLastPage, maskClosable, onClose, open, totalPages])
 
   const handlePrev = useCallback(() => {
     if (!isFirstPage) {
-      setCurrentPage((p) => Math.max(p - 1, 0))
+      setCurrentPage((page) => Math.max(page - 1, 0))
     }
   }, [isFirstPage])
 
   const handleNext = useCallback(() => {
     if (!isLastPage) {
-      setCurrentPage((p) => Math.min(p + 1, totalPages - 1))
+      setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
     }
   }, [isLastPage, totalPages])
 
@@ -134,22 +132,23 @@ function Dialog({
 
   return (
     <div
-      className={classNames('stardew-dialog-overlay', maskClosable && 'stardew-dialog-overlay--clickable')}
+      className={classNames(styles['stardew-dialog-overlay'], maskClosable && styles['stardew-dialog-overlay--clickable'])}
       onClick={handleOverlayClick}
     >
-      <div className="stardew-dialog" onClick={(e) => e.stopPropagation()}>
-        <CanvasPanel
-          className="stardew-dialog__left"
+      <div className={styles['stardew-dialog']} onClick={(event) => event.stopPropagation()}>
+        <StarCanvasPanel
+          className={styles['stardew-dialog__left']}
+          contentClassName={styles['stardew-dialog__left-content']}
           fillColor="#f7edd6"
           borderColor="#9e460f"
           borderWidth={5}
           stepSize={8}
           contentPadding={14}
         >
-          {title && (
-            <h3 className="stardew-dialog__title">
+          {title ? (
+            <h3 className={styles['stardew-dialog__title']}>
               {typewriter && !titleComplete ? (
-                <Typewriter
+                <StarTypewriter
                   text={title}
                   speed={typewriterSpeed}
                   key={`title-${titleKey}`}
@@ -159,16 +158,12 @@ function Dialog({
                 title
               )}
             </h3>
-          )}
+          ) : null}
 
-          <div className="stardew-dialog__content">
+          <div className={styles['stardew-dialog__content']}>
             {typewriter ? (
               titleComplete ? (
-                <Typewriter
-                  text={pages[currentPage]}
-                  speed={typewriterSpeed}
-                  key={`content-${contentKey}`}
-                />
+                <StarTypewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${contentKey}`} />
               ) : (
                 <span style={{ opacity: 0 }}>{WAITING_TEXT}</span>
               )
@@ -177,11 +172,11 @@ function Dialog({
             )}
           </div>
 
-          <div className="stardew-dialog__footer">
-            {showActions && (
-              <div className="stardew-dialog__actions">
+          <div className={styles['stardew-dialog__footer']}>
+            {showActions ? (
+              <div className={styles['stardew-dialog__actions']}>
                 {finalActions.map((action, index) => (
-                  <NineSliceButton
+                  <StarNineSliceButton
                     key={index}
                     type="button"
                     size="small"
@@ -190,56 +185,56 @@ function Dialog({
                     onClick={action.onClick}
                   >
                     {action.label}
-                  </NineSliceButton>
+                  </StarNineSliceButton>
                 ))}
               </div>
-            )}
+            ) : null}
 
-            <div className="stardew-dialog__pagination">
-              <NineSliceButton
+            <div className={styles['stardew-dialog__pagination']}>
+              <StarNineSliceButton
                 type="button"
                 size="small"
-                className="stardew-dialog__nav-btn"
+                className={styles['stardew-dialog__nav-btn']}
                 onClick={handlePrev}
                 disabled={isFirstPage}
                 title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
               >
                 <ChevronUp size={18} />
-              </NineSliceButton>
-              <span className="stardew-dialog__page-indicator">
+              </StarNineSliceButton>
+              <span className={styles['stardew-dialog__page-indicator']}>
                 {currentPage + 1} / {totalPages}
               </span>
-              <NineSliceButton
+              <StarNineSliceButton
                 type="button"
                 size="small"
-                className="stardew-dialog__nav-btn"
+                className={styles['stardew-dialog__nav-btn']}
                 onClick={handleNext}
                 disabled={isLastPage}
                 title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
               >
                 <ChevronDown size={18} />
-              </NineSliceButton>
+              </StarNineSliceButton>
             </div>
           </div>
-        </CanvasPanel>
+        </StarCanvasPanel>
 
-        {(image || name) && (
-          <div className="stardew-dialog__right">
-            {image && (
-              <CanvasPanel
-                className="stardew-dialog__image-wrap"
+        {image || name ? (
+          <div className={styles['stardew-dialog__right']}>
+            {image ? (
+              <StarCanvasPanel
+                className={styles['stardew-dialog__image-wrap']}
                 fillColor="#f7edd6"
                 borderColor="#9e460f"
                 borderWidth={5}
                 stepSize={8}
                 contentPadding={10}
               >
-                <img src={image} alt={name || LABEL_ROLE} className="stardew-dialog__image" />
-              </CanvasPanel>
-            )}
-            {name && (
-              <CanvasPanel
-                className="stardew-dialog__name"
+                <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
+              </StarCanvasPanel>
+            ) : null}
+            {name ? (
+              <StarCanvasPanel
+                className={styles['stardew-dialog__name']}
                 fillColor="#fdd284"
                 borderColor="#9e460f"
                 borderWidth={5}
@@ -247,13 +242,13 @@ function Dialog({
                 contentPadding={8}
               >
                 {name}
-              </CanvasPanel>
-            )}
+              </StarCanvasPanel>
+            ) : null}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
 }
 
-export default Dialog
+export default StarDialog

@@ -13,7 +13,7 @@
   border: 3px solid rgba(157, 65, 0, 0.18);
 }
 
-.component-demo.has-code .component-demo-preview {
+.has-code .component-demo-preview {
   margin-bottom: 18px;
 }
 
@@ -41,7 +41,7 @@
   border-top: 3px solid rgba(157, 65, 0, 0.22);
 }
 
-.component-demo-code .code-block {
+.component-demo-code-block {
   border: none;
   box-shadow: none;
 }

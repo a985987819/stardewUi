@@ -9,13 +9,13 @@ import {
   useRef,
 } from 'react'
 import { classNames } from '../../utils/classNames'
-import './Title.css'
+import styles from './Title.module.css'
 
 export type TitleSize = 'small' | 'medium' | 'large'
 export type TitleAlign = 'left' | 'center'
 export type TitleTag = 'div' | 'h1' | 'h2' | 'h3' | 'p'
 
-export interface TitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface StarTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   children: string
   size?: TitleSize
   align?: TitleAlign
@@ -55,33 +55,9 @@ const measureCanvas = document.createElement('canvas')
 const measureContext = measureCanvas.getContext('2d')
 
 const TITLE_PRESETS: Record<TitleSize, TitlePreset> = {
-  small: {
-    fontSize: 34,
-    lineGap: 10,
-    paddingX: 122,
-    paddingY: 54,
-    minWidth: 420,
-    maxWidth: 560,
-    minHeight: 142,
-  },
-  medium: {
-    fontSize: 48,
-    lineGap: 12,
-    paddingX: 152,
-    paddingY: 62,
-    minWidth: 520,
-    maxWidth: 760,
-    minHeight: 178,
-  },
-  large: {
-    fontSize: 62,
-    lineGap: 14,
-    paddingX: 188,
-    paddingY: 74,
-    minWidth: 620,
-    maxWidth: 980,
-    minHeight: 228,
-  },
+  small: { fontSize: 34, lineGap: 10, paddingX: 122, paddingY: 54, minWidth: 420, maxWidth: 560, minHeight: 142 },
+  medium: { fontSize: 48, lineGap: 12, paddingX: 152, paddingY: 62, minWidth: 520, maxWidth: 760, minHeight: 178 },
+  large: { fontSize: 62, lineGap: 14, paddingX: 188, paddingY: 74, minWidth: 620, maxWidth: 980, minHeight: 228 },
 }
 
 const setRefValue = <T,>(ref: ForwardedRef<T>, value: T) => {
@@ -97,20 +73,12 @@ const setRefValue = <T,>(ref: ForwardedRef<T>, value: T) => {
 
 const loadImage = (src: string) => {
   const cached = IMAGE_CACHE.get(src)
-  if (cached) {
-    return cached
-  }
+  if (cached) return cached
 
   const loading = new Promise<LoadedImage>((resolve, reject) => {
     const image = new Image()
     image.decoding = 'async'
-    image.onload = () => {
-      resolve({
-        element: image,
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-      })
-    }
+    image.onload = () => resolve({ element: image, width: image.naturalWidth, height: image.naturalHeight })
     image.onerror = () => {
       IMAGE_CACHE.delete(src)
       reject(new Error(`Failed to load title background: ${src}`))
@@ -177,25 +145,15 @@ const getTitleLayout = (content: string, size: TitleSize): TitleLayout => {
   }
 }
 
-const Title = forwardRef<HTMLDivElement, TitleProps>(
+const StarTitle = forwardRef<HTMLDivElement, StarTitleProps>(
   (
-    {
-      children,
-      size = 'medium',
-      align = 'center',
-      as = 'h2',
-      backgroundSrc = '/titleBg.png',
-      className,
-      style,
-      ...rest
-    },
+    { children, size = 'medium', align = 'center', as = 'h2', backgroundSrc = '/titleBg.png', className, style, ...rest },
     forwardedRef
   ) => {
     const hostRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const imageRef = useRef<LoadedImage | null>(null)
     const HeadingTag = as
-
     const layout = useMemo(() => getTitleLayout(children, size), [children, size])
 
     const setHostRef = useCallback(
@@ -211,16 +169,11 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
       const canvas = canvasRef.current
       const image = imageRef.current
 
-      if (!host || !canvas || !image) {
-        return
-      }
+      if (!host || !canvas || !image) return
 
       const width = Math.round(host.clientWidth)
       const height = Math.round(host.clientHeight)
-
-      if (width <= 0 || height <= 0) {
-        return
-      }
+      if (width <= 0 || height <= 0) return
 
       const dpr = window.devicePixelRatio || 1
       const targetWidth = Math.max(1, Math.round(width * dpr))
@@ -236,9 +189,7 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
       }
 
       const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        return
-      }
+      if (!ctx) return
 
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, targetWidth, targetHeight)
@@ -248,22 +199,16 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
 
     useEffect(() => {
       let cancelled = false
-
       imageRef.current = null
 
       loadImage(backgroundSrc)
         .then((loaded) => {
-          if (cancelled) {
-            return
-          }
-
+          if (cancelled) return
           imageRef.current = loaded
           draw()
         })
         .catch(() => {
-          if (!cancelled) {
-            imageRef.current = null
-          }
+          if (!cancelled) imageRef.current = null
         })
 
       return () => {
@@ -277,11 +222,8 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
 
     useEffect(() => {
       let cancelled = false
-
       document.fonts?.ready.then(() => {
-        if (!cancelled) {
-          draw()
-        }
+        if (!cancelled) draw()
       })
 
       return () => {
@@ -291,9 +233,7 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
 
     useEffect(() => {
       const host = hostRef.current
-      if (!host) {
-        return
-      }
+      if (!host) return
 
       const resizeObserver = new ResizeObserver(() => {
         draw()
@@ -326,19 +266,19 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
       <div
         {...rest}
         ref={setHostRef}
-        className={classNames('title-board', `title-board--${size}`, `title-board--${align}`, className)}
+        className={classNames(styles['title-board'], styles[`title-board--${size}`], styles[`title-board--${align}`], className)}
         style={titleStyle}
       >
-        <canvas ref={canvasRef} className="title-board__canvas" aria-hidden />
-        <div className="title-board__content">
-          <HeadingTag className="title-board__heading">
-            <span className="title-board__shadow" aria-hidden>
+        <canvas ref={canvasRef} className={styles['title-board__canvas']} aria-hidden />
+        <div className={styles['title-board__content']}>
+          <HeadingTag className={styles['title-board__heading']}>
+            <span className={styles['title-board__shadow']} aria-hidden>
               {titleText}
             </span>
-            <span className="title-board__stroke" aria-hidden>
+            <span className={styles['title-board__stroke']} aria-hidden>
               {titleText}
             </span>
-            <span className="title-board__fill">{titleText}</span>
+            <span className={styles['title-board__fill']}>{titleText}</span>
           </HeadingTag>
         </div>
       </div>
@@ -346,6 +286,6 @@ const Title = forwardRef<HTMLDivElement, TitleProps>(
   }
 )
 
-Title.displayName = 'Title'
+StarTitle.displayName = 'StarTitle'
 
-export default Title
+export default StarTitle

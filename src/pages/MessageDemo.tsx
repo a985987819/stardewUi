@@ -2,6 +2,8 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { message } from '../components/ui/Message'
+import { classNames } from '../utils/classNames'
+import appStyles from '../styles/global.module.css'
 
 const messageApiData = [
   {
@@ -72,7 +74,7 @@ message({
   onClose: () => console.log('关闭了')
 })`
 
-function MessageDemo() {
+function StarMessageDemoPage() {
   const showNormal = () => message.normal('这是一条普通提示')
   const showInfo = () => message.info('这是一条信息提示')
   const showSuccess = () => message.success('操作成功！')
@@ -89,19 +91,19 @@ function MessageDemo() {
     >
       <ComponentDemo id="basic" title="基础用法" description="五种不同类型的消息提示" code={basicCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className="demo-button" onClick={showNormal}>
+          <button className={appStyles.demoButton} onClick={showNormal}>
             普通提示
           </button>
-          <button className="demo-button" style={{ background: '#E0F7FA', color: '#2E4057' }} onClick={showInfo}>
+          <button className={appStyles.demoButton} style={{ background: '#E0F7FA', color: '#2E4057' }} onClick={showInfo}>
             信息提示
           </button>
-          <button className="demo-button" style={{ background: '#E6F2D9', color: '#2F5233' }} onClick={showSuccess}>
+          <button className={appStyles.demoButton} style={{ background: '#E6F2D9', color: '#2F5233' }} onClick={showSuccess}>
             成功提示
           </button>
-          <button className="demo-button" style={{ background: '#FFF2D5', color: '#6B4226' }} onClick={showWarning}>
+          <button className={appStyles.demoButton} style={{ background: '#FFF2D5', color: '#6B4226' }} onClick={showWarning}>
             警告提示
           </button>
-          <button className="demo-button" style={{ background: '#FFD1E3', color: '#5C3A57' }} onClick={showError}>
+          <button className={appStyles.demoButton} style={{ background: '#FFD1E3', color: '#5C3A57' }} onClick={showError}>
             错误提示
           </button>
         </div>
@@ -109,13 +111,13 @@ function MessageDemo() {
 
       <ComponentDemo id="duration" title="持续时间" description="设置消息显示的持续时间" code={durationCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className="demo-button demo-button-primary" onClick={showSuccess}>
+          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showSuccess}>
             默认3秒
           </button>
-          <button className="demo-button demo-button-primary" onClick={showLong}>
+          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showLong}>
             5秒关闭
           </button>
-          <button className="demo-button demo-button-primary" onClick={showPersistent}>
+          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showPersistent}>
             不自动关闭
           </button>
         </div>
@@ -124,7 +126,7 @@ function MessageDemo() {
       <ComponentDemo id="config" title="配置对象" description="使用配置对象方式调用" code={configCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <button
-            className="demo-button demo-button-primary"
+            className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)}
             onClick={() =>
               message({
                 content: '使用配置对象的消息',
@@ -145,4 +147,4 @@ function MessageDemo() {
   )
 }
 
-export default MessageDemo
+export default StarMessageDemoPage

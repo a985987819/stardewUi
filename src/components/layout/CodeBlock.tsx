@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
+import { classNames } from '../../utils/classNames'
 import hljs from 'highlight.js'
-import './CodeBlock.css'
+import styles from './CodeBlock.module.css'
 
 interface CodeBlockProps {
   code: string
@@ -10,7 +11,7 @@ interface CodeBlockProps {
   className?: string
 }
 
-function CodeBlock({
+function StarCodeBlock({
   code,
   language = 'typescript',
   showLineNumbers = true,
@@ -39,10 +40,10 @@ function CodeBlock({
   const lines = code.split('\n')
 
   return (
-    <div className={`code-block ${className}`}>
-      <div className="code-block-header">
-        <span className="code-block-language">{language}</span>
-        <button className="code-block-copy" onClick={handleCopy}>
+    <div className={classNames(styles['code-block'], className)}>
+      <div className={styles['code-block-header']}>
+        <span className={styles['code-block-language']}>{language}</span>
+        <button className={styles['code-block-copy']} onClick={handleCopy}>
           {copied ? (
             <>
               <Check size={14} />
@@ -56,17 +57,17 @@ function CodeBlock({
           )}
         </button>
       </div>
-      <div className="code-block-content">
-        {showLineNumbers && (
-          <div className="code-block-lines">
+      <div className={styles['code-block-content']}>
+        {showLineNumbers ? (
+          <div className={styles['code-block-lines']}>
             {lines.map((_, index) => (
-              <span key={index} className="code-block-line-number">
+              <span key={index} className={styles['code-block-line-number']}>
                 {index + 1}
               </span>
             ))}
           </div>
-        )}
-        <pre className="code-block-pre">
+        ) : null}
+        <pre className={styles['code-block-pre']}>
           <code ref={codeRef} className={`language-${language}`}>
             {code}
           </code>
@@ -76,4 +77,4 @@ function CodeBlock({
   )
 }
 
-export default CodeBlock
+export default StarCodeBlock

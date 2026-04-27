@@ -150,7 +150,7 @@ const metaCode = `<Card>
   />
 </Card>`
 
-function CardDemo() {
+function StarCardDemoPage() {
   return (
     <ComponentPage
       title="Card 卡片"
@@ -241,4 +241,4 @@ function CardDemo() {
   )
 }
 
-export default CardDemo
+export default StarCardDemoPage

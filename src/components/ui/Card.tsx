@@ -1,6 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import './Card.scss'
+import styles from './Card.module.scss'
 
 export type CardColor =
   | 'night-village'
@@ -14,7 +14,7 @@ export type CardColor =
   | 'workshop-ore'
   | 'night-celebration'
 
-export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: ReactNode
   children: ReactNode
   variant?: 'default' | 'outlined' | 'elevated'
@@ -26,7 +26,7 @@ export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'>
   showTitle?: boolean
 }
 
-function Card({
+function StarCard({
   title,
   children,
   variant = 'default',
@@ -39,67 +39,70 @@ function Card({
   showTitle = false,
   onClick,
   ...rest
-}: CardProps) {
+}: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
 
   const cardClass = classNames(
-    'stardew-card',
-    `stardew-card--${variant}`,
-    `stardew-card--${size}`,
-    color && `stardew-card--color-${color}`,
-    hasTitle && 'stardew-card--with-title',
-    hoverable && 'stardew-card--hoverable',
-    onClick && 'stardew-card--clickable',
+    styles['stardew-card'],
+    styles[`stardew-card--${variant}`],
+    styles[`stardew-card--${size}`],
+    color && styles[`stardew-card--color-${color}`],
+    hasTitle && styles['stardew-card--with-title'],
+    hoverable && styles['stardew-card--hoverable'],
+    onClick && styles['stardew-card--clickable'],
     className
   )
 
   return (
     <div {...rest} className={cardClass} onClick={onClick}>
+      <span className={styles['stardew-card__frame']} aria-hidden />
+      <span className={styles['stardew-card__outline']} aria-hidden />
       {hasTitle ? (
-        <div className="stardew-card__header">
-          <div className="stardew-card__title-tag">
-            <h3 className="stardew-card__title">{title}</h3>
+        <div className={styles['stardew-card__header']}>
+          <div className={styles['stardew-card__title-tag']}>
+            <h3 className={styles['stardew-card__title']}>{title}</h3>
           </div>
-          {headerExtra ? <div className="stardew-card__extra">{headerExtra}</div> : null}
+          {headerExtra ? <div className={styles['stardew-card__extra']}>{headerExtra}</div> : null}
         </div>
       ) : null}
-      <div className="stardew-card__body">{children}</div>
-      {footer ? <div className="stardew-card__footer">{footer}</div> : null}
+      <div className={styles['stardew-card__body']}>{children}</div>
+      {footer ? <div className={styles['stardew-card__footer']}>{footer}</div> : null}
     </div>
   )
 }
 
-interface CardImageProps {
+interface StarCardImageProps {
   src: string
   alt: string
   className?: string
 }
 
-function CardImage({ src, alt, className = '' }: CardImageProps) {
+function StarCardImage({ src, alt, className = '' }: StarCardImageProps) {
   return (
-    <div className={`stardew-card__image ${className}`}>
+    <div className={classNames(styles['stardew-card__image'], className)}>
       <img src={src} alt={alt} />
     </div>
   )
 }
 
-interface CardMetaProps {
+interface StarCardMetaProps {
   title?: string
   description?: string
   className?: string
 }
 
-function CardMeta({ title, description, className = '' }: CardMetaProps) {
+function StarCardMeta({ title, description, className = '' }: StarCardMetaProps) {
   return (
-    <div className={`stardew-card__meta ${className}`}>
-      {title ? <h4 className="stardew-card__meta-title">{title}</h4> : null}
-      {description ? <p className="stardew-card__meta-desc">{description}</p> : null}
+    <div className={classNames(styles['stardew-card__meta'], className)}>
+      {title ? <h4 className={styles['stardew-card__meta-title']}>{title}</h4> : null}
+      {description ? <p className={styles['stardew-card__meta-desc']}>{description}</p> : null}
     </div>
   )
 }
 
-Card.Image = CardImage
-Card.Meta = CardMeta
+StarCard.Image = StarCardImage
+StarCard.Meta = StarCardMeta
 
-export { Card, CardImage, CardMeta }
-export default Card
+export { StarCard, StarCardImage, StarCardMeta }
+export { StarCard as Card, StarCardImage as CardImage, StarCardMeta as CardMeta }
+export default StarCard

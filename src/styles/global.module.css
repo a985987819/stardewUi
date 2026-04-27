@@ -1,5 +1,3 @@
-@import 'highlight.js/styles/github-dark.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,26 +10,22 @@
   font-display: swap;
 }
 
-:root {
+.starApp {
   --color-primary: #b86a21;
   --color-primary-rgb: 184, 106, 33;
   --color-primary-dark: #9d4100;
   --color-primary-light: #d98b45;
   --color-primary-bg: rgba(184, 106, 33, 0.16);
-
   --color-secondary: #c8882d;
   --color-secondary-rgb: 200, 136, 45;
   --color-secondary-dark: #a76419;
   --color-secondary-light: #e0a24d;
-
   --color-accent: #c45c3e;
   --color-accent-rgb: 196, 92, 62;
-
   --color-success: #7a9d3d;
   --color-warning: #d7992e;
   --color-danger: #b9542f;
   --color-info: #8b6fcb;
-
   --color-bg: #f5cf8f;
   --color-bg-secondary: #ffd9a3;
   --color-bg-header: rgba(255, 214, 150, 0.95);
@@ -41,28 +35,33 @@
   --color-bg-code: #2d2418;
   --color-bg-code-header: #3d3428;
   --color-bg-code-lines: #352c20;
-
   --color-text: #4d2608;
   --color-text-secondary: #6a350b;
   --color-text-tertiary: #8d5d2a;
   --color-text-light: #fff8eb;
-
   --color-border: #d7770f;
   --color-border-dark: #9d4100;
   --color-border-light: #ffe0b2;
-
   --font-pixel: 'Stardew', monospace;
   --font-sans: 'Stardew', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Stardew', 'SF Mono', Monaco, Consolas, monospace;
-
-  --shadow-pixel: 4px 4px 0px rgba(0, 0, 0, 0.15);
-  --shadow-pixel-sm: 2px 2px 0px rgba(0, 0, 0, 0.1);
-  --shadow-pixel-lg: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  --shadow-inset: inset 2px 2px 0px rgba(255, 255, 255, 0.3), inset -2px -2px 0px rgba(0, 0, 0, 0.1);
+  --shadow-pixel: 4px 4px 0 rgba(0, 0, 0, 0.15);
+  --shadow-pixel-sm: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  --shadow-pixel-lg: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  --shadow-inset: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px 0 rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  .starApp {
     --color-bg: #3f2412;
     --color-bg-secondary: #5a3518;
     --color-bg-header: rgba(63, 36, 18, 0.95);
@@ -72,95 +71,68 @@
     --color-bg-code: #1a1410;
     --color-bg-code-header: #2a2420;
     --color-bg-code-lines: #201a16;
-
     --color-text: #fff1d8;
     --color-text-secondary: #ffdcae;
     --color-text-tertiary: #d9b884;
-
     --color-border: #d48a43;
     --color-border-dark: #f0be73;
     --color-border-light: #9d5a26;
-
-    --shadow-pixel: 4px 4px 0px rgba(0, 0, 0, 0.4);
-    --shadow-pixel-sm: 2px 2px 0px rgba(0, 0, 0, 0.3);
-    --shadow-pixel-lg: 6px 6px 0px rgba(0, 0, 0, 0.5);
+    --shadow-pixel: 4px 4px 0 rgba(0, 0, 0, 0.4);
+    --shadow-pixel-sm: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-pixel-lg: 6px 6px 0 rgba(0, 0, 0, 0.5);
   }
 }
 
-* {
-  margin: 0;
-  padding: 0;
+.starApp,
+.starApp * {
   box-sizing: border-box;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: unset;
-}
-
-body {
-  font-family: var(--font-pixel);
-  background: var(--color-bg);
-  color: var(--color-text);
-  line-height: 1.6;
-  letter-spacing: 0.5px;
-}
-
-a {
+.starApp :where(a) {
   color: inherit;
   text-decoration: none;
 }
 
-button {
+.starApp :where(button) {
   font-family: var(--font-pixel);
 }
 
-code, pre {
+.starApp :where(code, pre) {
   font-family: var(--font-mono);
 }
 
-::selection {
+.starApp ::selection {
   background: var(--color-primary);
   color: var(--color-text-light);
 }
 
-::-webkit-scrollbar {
+.starApp *::-webkit-scrollbar {
   width: 12px;
   height: 12px;
 }
 
-::-webkit-scrollbar-track {
+.starApp *::-webkit-scrollbar-track {
   background: var(--color-bg-secondary);
   border: 2px solid var(--color-border);
 }
 
-::-webkit-scrollbar-thumb {
+.starApp *::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border: 2px solid var(--color-border-dark);
 }
 
-::-webkit-scrollbar-thumb:hover {
+.starApp *::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-dark);
 }
 
-::-webkit-scrollbar-corner {
+.starApp *::-webkit-scrollbar-corner {
   background: var(--color-bg-secondary);
 }
 
-.typewriter-demo-box {
-  padding: 16px;
-  background: var(--color-bg-card);
-  border: 3px solid var(--color-border-dark);
-  box-shadow: var(--shadow-pixel);
-  min-height: 60px;
-}
-
-.demo-button {
+.demoButton {
   padding: 15px 20px;
-  font-family: var(--font-pixel);
   font-size: 14px;
   border: 3px solid var(--color-border-dark);
   background: var(--color-bg-card);
@@ -170,20 +142,28 @@ code, pre {
   transition: transform 0.1s steps(2);
 }
 
-.demo-button:hover {
+.demoButton:hover {
   background: var(--color-bg-hover);
 }
 
-.demo-button:active {
+.demoButton:active {
   transform: translate(2px, 2px);
 }
 
-.demo-button-primary {
+.demoButtonPrimary {
   background: var(--color-primary);
   color: var(--color-text-light);
   border-color: var(--color-primary-dark);
 }
 
-.demo-button-primary:hover {
+.demoButtonPrimary:hover {
   background: var(--color-primary-dark);
+}
+
+.typewriterDemoBox {
+  min-height: 60px;
+  padding: 16px;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel);
 }

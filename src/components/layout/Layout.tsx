@@ -1,15 +1,15 @@
 import { Outlet } from 'react-router-dom'
-import Header from './Header'
-import Sidebar from './Sidebar'
-import './Layout.css'
+import StarHeader from './Header'
+import StarSidebar from './Sidebar'
+import styles from './Layout.module.css'
 
-function Layout() {
+function StarLayout() {
   return (
-    <div className="doc-layout">
-      <Header />
-      <Sidebar />
-      <main className="doc-main">
-        <div className="doc-content">
+    <div className={styles['doc-layout']}>
+      <StarHeader />
+      <StarSidebar />
+      <main className={styles['doc-main']}>
+        <div className={styles['doc-content']}>
           <Outlet />
         </div>
       </main>
@@ -17,4 +17,4 @@ function Layout() {
   )
 }
 
-export default Layout
+export default StarLayout

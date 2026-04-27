@@ -1,8 +1,8 @@
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames, flipBubblePlacement, type BubblePlacement } from '../../utils'
-import CanvasBubble from './CanvasBubble'
-import NineSliceButton from './NineSliceButton'
-import './Popup.css'
+import StarCanvasBubble from './CanvasBubble'
+import StarNineSliceButton from './NineSliceButton'
+import styles from './Popup.module.css'
 
 export type PopupPlacement = Exclude<BubblePlacement, 'none'>
 
@@ -13,7 +13,7 @@ export interface PopupAction {
   onClick?: () => void
 }
 
-export interface PopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
+export interface StarPopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
   open?: boolean
   placement?: PopupPlacement
   title?: ReactNode
@@ -54,7 +54,7 @@ const getPopupPositionStyle = (placement: PopupPlacement, offset: number): CSSPr
   }
 }
 
-function Popup({
+function StarPopup({
   open = true,
   placement = 'right',
   title,
@@ -64,16 +64,16 @@ function Popup({
   children,
   className,
   ...rest
-}: PopupProps) {
+}: StarPopupProps) {
   const bubblePlacement = flipBubblePlacement(placement)
 
   return (
-    <div {...rest} className={classNames('stardew-popup', className)}>
-      <div className="stardew-popup__trigger">{children}</div>
+    <div {...rest} className={classNames(styles['stardew-popup'], className)}>
+      <div className={styles['stardew-popup__trigger']}>{children}</div>
       {open ? (
-        <div className="stardew-popup__bubble-wrap" style={getPopupPositionStyle(placement, offset)}>
-          <CanvasBubble
-            className="stardew-popup__bubble"
+        <div className={styles['stardew-popup__bubble-wrap']} style={getPopupPositionStyle(placement, offset)}>
+          <StarCanvasBubble
+            className={styles['stardew-popup__bubble']}
             bubblePlacement={bubblePlacement}
             fillColor="#ffe0b2"
             borderColor="#9d4100"
@@ -83,12 +83,12 @@ function Popup({
             arrowDepth={14}
             contentPadding={12}
           >
-            {title ? <div className="stardew-popup__title">{title}</div> : null}
-            <div className="stardew-popup__content">{content}</div>
+            {title ? <div className={styles['stardew-popup__title']}>{title}</div> : null}
+            <div className={styles['stardew-popup__content']}>{content}</div>
             {actions?.length ? (
-              <div className="stardew-popup__actions">
+              <div className={styles['stardew-popup__actions']}>
                 {actions.map((action) => (
-                  <NineSliceButton
+                  <StarNineSliceButton
                     key={action.label}
                     type="button"
                     variant={action.variant ?? 'default'}
@@ -97,15 +97,15 @@ function Popup({
                     onClick={action.onClick}
                   >
                     {action.label}
-                  </NineSliceButton>
+                  </StarNineSliceButton>
                 ))}
               </div>
             ) : null}
-          </CanvasBubble>
+          </StarCanvasBubble>
         </div>
       ) : null}
     </div>
   )
 }
 
-export default Popup
+export default StarPopup

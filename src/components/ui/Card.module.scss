@@ -18,6 +18,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
   --card-title-tag-bg: rgba(255, 239, 190, 0.82);
 
   position: relative;
+  isolation: isolate;
   box-sizing: border-box;
   overflow: visible;
   background: var(--card-bg);
@@ -27,14 +28,14 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     transform 0.1s steps(2),
     box-shadow 0.1s steps(2);
 
-  &::before,
-  &::after {
-    content: '';
+  &__frame,
+  &__outline {
     position: absolute;
     pointer-events: none;
+    z-index: 0;
   }
 
-  &::before {
+  &__frame {
     inset: 1px;
     border: 2px solid var(--card-border-light);
     border-radius: 4px;
@@ -43,7 +44,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
       inset -3px 4px 0 rgba(216, 154, 106, 0.92);
   }
 
-  &::after {
+  &__outline {
     inset: -8px;
     border: 3px solid var(--card-border-light);
     border-radius: 12px;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import './TableOfContents.css'
+import { classNames } from '../../utils/classNames'
+import styles from './TableOfContents.module.css'
 
 interface TocItem {
   id: string
@@ -11,7 +12,7 @@ interface TableOfContentsProps {
   items: TocItem[]
 }
 
-function TableOfContents({ items }: TableOfContentsProps) {
+function StarTableOfContents({ items }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
 
   useEffect(() => {
@@ -46,18 +47,19 @@ function TableOfContents({ items }: TableOfContentsProps) {
   if (items.length === 0) return null
 
   return (
-    <nav className="table-of-contents">
-      <h3 className="toc-title">目录</h3>
-      <ul className="toc-list">
+    <nav className={styles['table-of-contents']}>
+      <h3 className={styles['toc-title']}>目录</h3>
+      <ul className={styles['toc-list']}>
         {items.map((item) => (
           <li
             key={item.id}
-            className={`toc-item toc-item--level-${item.level} ${activeId === item.id ? 'is-active' : ''}`}
+            className={classNames(
+              styles['toc-item'],
+              item.level > 1 && styles[`toc-item--level-${item.level}`],
+              activeId === item.id && styles['is-active']
+            )}
           >
-            <button
-              className="toc-link"
-              onClick={() => handleClick(item.id)}
-            >
+            <button className={styles['toc-link']} onClick={() => handleClick(item.id)}>
               {item.title}
             </button>
           </li>
@@ -67,4 +69,4 @@ function TableOfContents({ items }: TableOfContentsProps) {
   )
 }
 
-export default TableOfContents
+export default StarTableOfContents

@@ -2,54 +2,22 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { Title } from '../components/ui'
-import './TitleDemo.css'
+import styles from './TitleDemo.module.css'
 
 const titleApiData = [
-  {
-    property: 'children',
-    description: '标题内容，支持通过 \\n 强制换行',
-    type: 'string',
-    default: '-',
-    required: true,
-  },
-  {
-    property: 'size',
-    description: '标题尺寸',
-    type: "'small' | 'medium' | 'large'",
-    default: "'medium'",
-  },
-  {
-    property: 'align',
-    description: '标题对齐方式',
-    type: "'left' | 'center'",
-    default: "'center'",
-  },
-  {
-    property: 'as',
-    description: '语义标签',
-    type: "'div' | 'h1' | 'h2' | 'h3' | 'p'",
-    default: "'h2'",
-  },
-  {
-    property: 'backgroundSrc',
-    description: '背景板图片地址',
-    type: 'string',
-    default: "'/titleBg.png'",
-  },
+  { property: 'children', description: '标题内容，支持通过 \\n 强制换行', type: 'string', default: '-', required: true },
+  { property: 'size', description: '标题尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
+  { property: 'align', description: '标题对齐方式', type: "'left' | 'center'", default: "'center'" },
+  { property: 'as', description: '语义标签', type: "'div' | 'h1' | 'h2' | 'h3' | 'p'", default: "'h2'" },
+  { property: 'backgroundSrc', description: '背景板图片地址', type: 'string', default: "'/titleBg.png'" },
 ]
 
 const basicCode = `<Title>农场任务</Title>`
-
-const multilineCode = `<Title size="large">{'Stardew\\nValley'}</Title>
-<Title>{'春季\\n市集公告'}</Title>`
-
-const sizeCode = `<Title size="small">春季市集</Title>
-<Title size="medium">夏季庆典</Title>
-<Title size="large">秋日收获</Title>`
-
+const multilineCode = `<Title size="large">{'Stardew\\nValley'}</Title>\n<Title>{'春季\\n市集公告'}</Title>`
+const sizeCode = `<Title size="small">春季市集</Title>\n<Title size="medium">夏季庆典</Title>\n<Title size="large">秋日收获</Title>`
 const alignCode = `<Title align="left">工坊公告</Title>`
 
-function TitleDemo() {
+function StarTitleDemoPage() {
   return (
     <ComponentPage
       title="Title 标题"
@@ -59,15 +27,15 @@ function TitleDemo() {
         <Title>农场任务</Title>
       </ComponentDemo>
 
-      <ComponentDemo title="多行标题" description="可通过换行符控制标题分行，接近游戏内的招牌排版" code={multilineCode}>
-        <div className="title-demo-stack">
+      <ComponentDemo title="多行标题" description="通过换行符控制分行，接近游戏内招牌排版" code={multilineCode}>
+        <div className={styles['title-demo-stack']}>
           <Title size="large">{'Stardew\nValley'}</Title>
           <Title>{'春季\n市集公告'}</Title>
         </div>
       </ComponentDemo>
 
-      <ComponentDemo title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和视觉留白" code={sizeCode}>
-        <div className="title-demo-stack">
+      <ComponentDemo title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和留白" code={sizeCode}>
+        <div className={styles['title-demo-stack']}>
           <Title size="small">春季市集</Title>
           <Title size="medium">夏季庆典</Title>
           <Title size="large">秋日收获</Title>
@@ -85,4 +53,4 @@ function TitleDemo() {
   )
 }
 
-export default TitleDemo
+export default StarTitleDemoPage

@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import './Typewriter.css'
+import { classNames } from '../../utils/classNames'
+import styles from './Typewriter.module.css'
 
-export interface TypewriterProps {
+export interface StarTypewriterProps {
   text: string
   speed?: number
   className?: string
@@ -9,13 +10,13 @@ export interface TypewriterProps {
   startDelay?: number
 }
 
-function Typewriter({
+function StarTypewriter({
   text,
   speed = 100,
   className = '',
   onComplete,
   startDelay = 0,
-}: TypewriterProps) {
+}: StarTypewriterProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [isComplete, setIsComplete] = useState(false)
   const [isStarted, setIsStarted] = useState(false)
@@ -50,7 +51,7 @@ function Typewriter({
 
     startTimerRef.current = setTimeout(() => {
       setIsStarted(true)
-      
+
       timerRef.current = setInterval(() => {
         if (indexRef.current < text.length) {
           setDisplayedText(text.slice(0, indexRef.current + 1))
@@ -72,14 +73,14 @@ function Typewriter({
 
   return (
     <span
-      className={`typewriter ${!isComplete && isStarted ? 'typewriter--typing' : ''} ${className}`}
+      className={classNames(styles.typewriter, !isComplete && isStarted && styles['typewriter--typing'], className)}
       onClick={handleClick}
       title={!isComplete && isStarted ? '点击快速显示全部' : undefined}
     >
       {displayedText}
-      {!isComplete && isStarted && <span className="typewriter__cursor">|</span>}
+      {!isComplete && isStarted ? <span className={styles['typewriter__cursor']}>|</span> : null}
     </span>
   )
 }
 
-export default Typewriter
+export default StarTypewriter

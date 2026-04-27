@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import Card from '../ui/Card'
-import CodeBlock from './CodeBlock'
-import './ComponentDemo.css'
+import { Card } from '../ui/Card'
+import StarCodeBlock from './CodeBlock'
+import styles from './ComponentDemo.module.css'
 
 interface ComponentDemoProps {
   title: string
@@ -13,7 +13,7 @@ interface ComponentDemoProps {
   id?: string
 }
 
-function ComponentDemo({
+function StarComponentDemo({
   title,
   description,
   children,
@@ -26,27 +26,27 @@ function ComponentDemo({
   return (
     <Card
       id={id}
-      className={`component-demo ${code ? 'has-code' : ''}`}
+      className={code ? `${styles['component-demo']} ${styles['has-code']}` : styles['component-demo']}
       showTitle
       title={title}
       headerExtra={
         code ? (
-          <button className="component-demo-toggle" type="button" onClick={() => setShowCode(!showCode)}>
+          <button className={styles['component-demo-toggle']} type="button" onClick={() => setShowCode(!showCode)}>
             {showCode ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             <span>{showCode ? '隐藏代码' : '显示代码'}</span>
           </button>
         ) : null
       }
     >
-      {description ? <p className="component-demo-desc">{description}</p> : null}
-      <div className="component-demo-preview">{children}</div>
+      {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
+      <div className={styles['component-demo-preview']}>{children}</div>
       {showCode && code ? (
-        <div className="component-demo-code">
-          <CodeBlock code={code} language="tsx" />
+        <div className={styles['component-demo-code']}>
+          <StarCodeBlock code={code} language="tsx" className={styles['component-demo-code-block']} />
         </div>
       ) : null}
     </Card>
   )
 }
 
-export default ComponentDemo
+export default StarComponentDemo

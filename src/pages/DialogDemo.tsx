@@ -3,6 +3,8 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import Dialog from '../components/ui/Dialog'
+import { classNames } from '../utils/classNames'
+import appStyles from '../styles/global.module.css'
 
 const dialogApiData = [
   {
@@ -138,7 +140,7 @@ const noTypewriterCode = `const [open, setOpen] = useState(false)
   onClose={() => setOpen(false)}
 />`
 
-function DialogDemo() {
+function StarDialogDemoPage() {
   const [basicOpen, setBasicOpen] = useState(false)
   const [paginationOpen, setPaginationOpen] = useState(false)
   const [customOpen, setCustomOpen] = useState(false)
@@ -157,7 +159,7 @@ function DialogDemo() {
       toc={tocItems}
     >
       <ComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机效果" code={basicCode}>
-        <button className="demo-button demo-button-primary" onClick={() => setBasicOpen(true)}>
+        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setBasicOpen(true)}>
           打开基础弹窗
         </button>
         <Dialog
@@ -171,7 +173,7 @@ function DialogDemo() {
       </ComponentDemo>
 
       <ComponentDemo id="pagination" title="分页对话" description="支持多页内容，按箭头切换" code={paginationCode}>
-        <button className="demo-button demo-button-primary" onClick={() => setPaginationOpen(true)}>
+        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setPaginationOpen(true)}>
           打开分页弹窗
         </button>
         <Dialog
@@ -189,7 +191,7 @@ function DialogDemo() {
       </ComponentDemo>
 
       <ComponentDemo id="custom-actions" title="自定义按钮" description="自定义操作按钮和样式" code={customActionsCode}>
-        <button className="demo-button demo-button-primary" onClick={() => setCustomOpen(true)}>
+        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setCustomOpen(true)}>
           打开自定义按钮弹窗
         </button>
         <Dialog
@@ -207,7 +209,7 @@ function DialogDemo() {
       </ComponentDemo>
 
       <ComponentDemo id="no-actions" title="无操作按钮" description="隐藏操作按钮，仅用于展示信息" code={noActionsCode}>
-        <button className="demo-button demo-button-primary" onClick={() => setNoActionOpen(true)}>
+        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoActionOpen(true)}>
           打开无按钮弹窗
         </button>
         <Dialog
@@ -223,7 +225,7 @@ function DialogDemo() {
       </ComponentDemo>
 
       <ComponentDemo id="no-typewriter" title="禁用打字机" description="直接显示内容，无打字动画" code={noTypewriterCode}>
-        <button className="demo-button demo-button-primary" onClick={() => setNoTypewriterOpen(true)}>
+        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoTypewriterOpen(true)}>
           打开无打字机弹窗
         </button>
         <Dialog
@@ -242,4 +244,4 @@ function DialogDemo() {
   )
 }
 
-export default DialogDemo
+export default StarDialogDemoPage

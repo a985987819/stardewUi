@@ -10,9 +10,9 @@ import {
 } from 'react'
 import { classNames } from '../../utils/classNames'
 import { drawPixelPanel } from '../../utils/pixelPanelCanvas'
-import './CanvasPanel.css'
+import styles from './CanvasPanel.module.css'
 
-export interface CanvasPanelProps extends HTMLAttributes<HTMLDivElement> {
+export interface StarCanvasPanelProps extends HTMLAttributes<HTMLDivElement> {
   fillColor?: string
   borderColor?: string
   borderWidth?: number
@@ -32,7 +32,7 @@ const setRefValue = <T,>(ref: ForwardedRef<T>, value: T) => {
   }
 }
 
-const CanvasPanel = forwardRef<HTMLDivElement, CanvasPanelProps>(
+const StarCanvasPanel = forwardRef<HTMLDivElement, StarCanvasPanelProps>(
   (
     {
       fillColor = '#f8f0dc',
@@ -132,9 +132,9 @@ const CanvasPanel = forwardRef<HTMLDivElement, CanvasPanelProps>(
     )
 
     return (
-      <div {...rest} ref={setHostRef} className={classNames('canvas-panel', className)} style={style}>
-        <canvas ref={canvasRef} className="canvas-panel__canvas" aria-hidden />
-        <div className={classNames('canvas-panel__content', contentClassName)} style={contentStyle}>
+      <div {...rest} ref={setHostRef} className={classNames(styles['canvas-panel'], className)} style={style}>
+        <canvas ref={canvasRef} className={styles['canvas-panel__canvas']} aria-hidden />
+        <div className={classNames(styles['canvas-panel__content'], contentClassName)} style={contentStyle}>
           {children}
         </div>
       </div>
@@ -142,6 +142,6 @@ const CanvasPanel = forwardRef<HTMLDivElement, CanvasPanelProps>(
   }
 )
 
-CanvasPanel.displayName = 'CanvasPanel'
+StarCanvasPanel.displayName = 'StarCanvasPanel'
 
-export default CanvasPanel
+export default StarCanvasPanel
