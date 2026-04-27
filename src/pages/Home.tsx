@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Package, Code, BookOpen, ArrowRight } from 'lucide-react'
-import Card from '../components/ui/Card'
+import StarCard from '../components/ui/Card'
 import { classNames } from '../utils/classNames'
 import styles from './Home.module.scss'
 
@@ -25,7 +25,7 @@ const features = [
 function StarHomePage() {
   return (
     <div className={styles.home}>
-      <Card className={styles['home-hero-card']}>
+      <StarCard className={styles['home-hero-card']}>
         <section className={styles['home-hero']}>
           <div className={styles['home-hero-content']}>
             <h1 className={styles['home-title']}>
@@ -51,16 +51,16 @@ function StarHomePage() {
             </div>
           </div>
         </section>
-      </Card>
+      </StarCard>
 
       <section className={styles['home-features']}>
         {features.map((item) => (
-          <Card key={item.title} className={styles['home-feature-card']} showTitle title={item.title} hoverable>
+          <StarCard key={item.title} className={styles['home-feature-card']} showTitle title={item.title} hoverable>
             <div className={styles['home-feature-body']}>
               <div className={styles['home-feature-icon']}>{item.icon}</div>
               <p>{item.description}</p>
             </div>
-          </Card>
+          </StarCard>
         ))}
       </section>
     </div>

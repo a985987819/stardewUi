@@ -1,33 +1,33 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import Layout from '../components/layout/Layout'
-import Home from '../pages/Home'
-import Guide from '../pages/Guide'
-import Components from '../pages/Components'
-import ButtonDemo from '../pages/ButtonDemo'
-import CardDemo from '../pages/CardDemo'
-import DialogDemo from '../pages/DialogDemo'
-import EmptyStateDemo from '../pages/EmptyStateDemo'
-import PopupDemo from '../pages/PopupDemo'
-import TypewriterDemo from '../pages/TypewriterDemo'
-import MessageDemo from '../pages/MessageDemo'
-import TitleDemo from '../pages/TitleDemo'
+import StarLayout from '../components/layout/Layout'
+import StarHomePage from '../pages/Home'
+import StarGuidePage from '../pages/Guide'
+import StarComponentsPage from '../pages/Components'
+import StarButtonDemoPage from '../pages/ButtonDemo'
+import StarCardDemoPage from '../pages/CardDemo'
+import StarDialogDemoPage from '../pages/DialogDemo'
+import StarEmptyStateDemoPage from '../pages/EmptyStateDemo'
+import StarPopupDemoPage from '../pages/PopupDemo'
+import StarTypewriterDemoPage from '../pages/TypewriterDemo'
+import StarMessageDemoPage from '../pages/MessageDemo'
+import StarTitleDemoPage from '../pages/TitleDemo'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout />,
+    element: <StarLayout />,
     children: [
-      { index: true, element: <Home /> },
-      { path: 'guide', element: <Guide /> },
-      { path: 'components', element: <Components /> },
-      { path: 'components/button', element: <ButtonDemo /> },
-      { path: 'components/title', element: <TitleDemo /> },
-      { path: 'components/card', element: <CardDemo /> },
-      { path: 'components/dialog', element: <DialogDemo /> },
-      { path: 'components/empty-state', element: <EmptyStateDemo /> },
-      { path: 'components/popup', element: <PopupDemo /> },
-      { path: 'components/typewriter', element: <TypewriterDemo /> },
-      { path: 'components/message', element: <MessageDemo /> },
+      { index: true, element: <StarHomePage /> },
+      { path: 'guide', element: <StarGuidePage /> },
+      { path: 'components', element: <StarComponentsPage /> },
+      { path: 'components/button', element: <StarButtonDemoPage /> },
+      { path: 'components/title', element: <StarTitleDemoPage /> },
+      { path: 'components/card', element: <StarCardDemoPage /> },
+      { path: 'components/dialog', element: <StarDialogDemoPage /> },
+      { path: 'components/empty-state', element: <StarEmptyStateDemoPage /> },
+      { path: 'components/popup', element: <StarPopupDemoPage /> },
+      { path: 'components/typewriter', element: <StarTypewriterDemoPage /> },
+      { path: 'components/message', element: <StarMessageDemoPage /> },
     ],
   },
   {

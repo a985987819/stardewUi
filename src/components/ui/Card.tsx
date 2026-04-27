@@ -104,5 +104,4 @@ StarCard.Image = StarCardImage
 StarCard.Meta = StarCardMeta
 
 export { StarCard, StarCardImage, StarCardMeta }
-export { StarCard as Card, StarCardImage as CardImage, StarCardMeta as CardMeta }
 export default StarCard

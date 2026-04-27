@@ -1,74 +1,22 @@
 import { useState } from 'react'
-import ComponentPage from '../components/layout/ComponentPage'
-import ComponentDemo from '../components/layout/ComponentDemo'
-import ApiTable from '../components/layout/ApiTable'
-import StarDialog from '../components/ui/Dialog'
+import StarComponentPage from '../components/layout/ComponentPage'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarApiTable from '../components/layout/ApiTable'
+import { StarDialog } from '../components/ui'
 import { classNames } from '../utils/classNames'
 import appStyles from '../styles/global.module.scss'
 
 const dialogApiData = [
-  {
-    property: 'open',
-    description: '是否显示弹窗',
-    type: 'boolean',
-    default: 'false',
-    required: true,
-  },
-  {
-    property: 'title',
-    description: '弹窗标题',
-    type: 'string',
-    default: '-',
-  },
-  {
-    property: 'content',
-    description: '弹窗内容，支持字符串数组分页',
-    type: 'string | string[]',
-    default: '-',
-    required: true,
-  },
-  {
-    property: 'image',
-    description: '右侧角色图片 URL',
-    type: 'string',
-    default: '-',
-  },
-  {
-    property: 'name',
-    description: '右侧角色名称',
-    type: 'string',
-    default: '-',
-  },
-  {
-    property: 'actions',
-    description: '操作按钮，传 null 隐藏按钮',
-    type: 'DialogAction[] | null',
-    default: '[确认, 取消]',
-  },
-  {
-    property: 'maskClosable',
-    description: '点击遮罩层是否关闭',
-    type: 'boolean',
-    default: 'true',
-  },
-  {
-    property: 'typewriter',
-    description: '是否启用打字机效果',
-    type: 'boolean',
-    default: 'true',
-  },
-  {
-    property: 'typewriterSpeed',
-    description: '打字机速度（毫秒/字符）',
-    type: 'number',
-    default: '30',
-  },
-  {
-    property: 'onClose',
-    description: '关闭回调',
-    type: '() => void',
-    default: '-',
-  },
+  { property: 'open', description: '是否显示弹窗', type: 'boolean', default: 'false', required: true },
+  { property: 'title', description: '弹窗标题', type: 'string', default: '-' },
+  { property: 'content', description: '弹窗内容，支持字符串数组分页', type: 'string | string[]', default: '-', required: true },
+  { property: 'image', description: '右侧角色图片 URL', type: 'string', default: '-' },
+  { property: 'name', description: '右侧角色名称', type: 'string', default: '-' },
+  { property: 'actions', description: '操作按钮，传 null 隐藏按钮', type: 'DialogAction[] | null', default: '[确认, 取消]' },
+  { property: 'maskClosable', description: '点击遮罩层是否关闭', type: 'boolean', default: 'true' },
+  { property: 'typewriter', description: '是否启用打字机效果', type: 'boolean', default: 'true' },
+  { property: 'typewriterSpeed', description: '打字机速度（毫秒/字符）', type: 'number', default: '30' },
+  { property: 'onClose', description: '关闭回调', type: '() => void', default: '-' },
 ]
 
 const tocItems = [
@@ -85,7 +33,7 @@ const basicCode = `const [open, setOpen] = useState(false)
 <StarDialog
   open={open}
   title="欢迎来到星露谷"
-  content="你好，我是新来的农夫！这里真是个美丽的地方。"
+  content="你好，我是新来的农夫，这里真是个美丽的地方。"
   image="/avatar.png"
   name="农夫"
   onClose={() => setOpen(false)}
@@ -97,9 +45,9 @@ const paginationCode = `const [open, setOpen] = useState(false)
   open={open}
   title="任务对话"
   content={[
-    "你好！我是村里的铁匠。",
-    "我听说你在农场工作得很努力。",
-    "如果你需要升级工具，可以来找我！",
+    '你好！我是村里的铁匠。',
+    '我听说你在农场工作得很努力。',
+    '如果你需要升级工具，可以来找我。'
   ]}
   image="/avatar.png"
   name="克林特"
@@ -126,7 +74,7 @@ const noActionsCode = `const [open, setOpen] = useState(false)
   title="提示"
   content="这是一个纯提示弹窗，没有操作按钮。"
   actions={null}
-  maskClosable={true}
+  maskClosable
   onClose={() => setOpen(false)}
 />`
 
@@ -148,31 +96,31 @@ function StarDialogDemoPage() {
   const [noTypewriterOpen, setNoTypewriterOpen] = useState(false)
 
   const handleSell = () => {
-    alert('物品已出售！')
+    alert('物品已出售。')
     setCustomOpen(false)
   }
 
   return (
-    <ComponentPage
+    <StarComponentPage
       title="Dialog 弹窗"
       description="星露谷风格的对话弹窗组件，支持分页内容和打字机效果。"
       toc={tocItems}
     >
-      <ComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机效果" code={basicCode}>
+      <StarComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机效果。" code={basicCode}>
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setBasicOpen(true)}>
           打开基础弹窗
         </button>
         <StarDialog
           open={basicOpen}
           title="欢迎来到星露谷"
-          content="你好，我是新来的农夫！这里真是个美丽的地方。点击文字可以快速显示全部内容。"
+          content="你好，我是新来的农夫，这里真是个美丽的地方。点击文本可以快速显示全部内容。"
           image="https://stardewvalleywiki.com/mediawiki/images/2/28/Abigail.png"
           name="农夫"
           onClose={() => setBasicOpen(false)}
         />
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo id="pagination" title="分页对话" description="支持多页内容，按箭头切换" code={paginationCode}>
+      <StarComponentDemo id="pagination" title="分页对话" description="支持多页内容，按箭头切换。" code={paginationCode}>
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setPaginationOpen(true)}>
           打开分页弹窗
         </button>
@@ -181,16 +129,16 @@ function StarDialogDemoPage() {
           title="任务对话"
           content={[
             '你好！我是村里的铁匠克林特。',
-            '我听说你在农场工作得很努力，这很不错！',
-            '如果你需要升级工具，随时可以来找我！我会给你优惠的。',
+            '我听说你在农场工作得很努力，这很不错。',
+            '如果你需要升级工具，随时可以来找我。',
           ]}
           image="https://stardewvalleywiki.com/mediawiki/images/6/6e/Clint.png"
           name="克林特"
           onClose={() => setPaginationOpen(false)}
         />
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo id="custom-actions" title="自定义按钮" description="自定义操作按钮和样式" code={customActionsCode}>
+      <StarComponentDemo id="custom-actions" title="自定义按钮" description="自定义操作按钮和样式。" code={customActionsCode}>
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setCustomOpen(true)}>
           打开自定义按钮弹窗
         </button>
@@ -206,25 +154,25 @@ function StarDialogDemoPage() {
           ]}
           onClose={() => setCustomOpen(false)}
         />
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo id="no-actions" title="无操作按钮" description="隐藏操作按钮，仅用于展示信息" code={noActionsCode}>
+      <StarComponentDemo id="no-actions" title="无操作按钮" description="隐藏操作按钮，仅用于展示信息。" code={noActionsCode}>
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoActionOpen(true)}>
           打开无按钮弹窗
         </button>
         <StarDialog
           open={noActionOpen}
           title="提示"
-          content="这是一个纯提示弹窗，没有操作按钮。点击遮罩层或按 ESC 关闭。"
+          content="这是一个纯提示弹窗，没有操作按钮。点击遮罩层或按 ESC 可关闭。"
           image="https://stardewvalleywiki.com/mediawiki/images/8/8e/Marnie.png"
           name="玛妮"
           actions={null}
-          maskClosable={true}
+          maskClosable
           onClose={() => setNoActionOpen(false)}
         />
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo id="no-typewriter" title="禁用打字机" description="直接显示内容，无打字动画" code={noTypewriterCode}>
+      <StarComponentDemo id="no-typewriter" title="禁用打字机" description="直接显示内容，无打字动画。" code={noTypewriterCode}>
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoTypewriterOpen(true)}>
           打开无打字机弹窗
         </button>
@@ -235,12 +183,12 @@ function StarDialogDemoPage() {
           onClose={() => setNoTypewriterOpen(false)}
           typewriter={false}
         />
-      </ComponentDemo>
+      </StarComponentDemo>
 
       <div id="api" className="component-page-api">
-        <ApiTable data={dialogApiData} />
+        <StarApiTable data={dialogApiData} />
       </div>
-    </ComponentPage>
+    </StarComponentPage>
   )
 }
 

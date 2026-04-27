@@ -1,7 +1,7 @@
-import ComponentPage from '../components/layout/ComponentPage'
-import ComponentDemo from '../components/layout/ComponentDemo'
-import ApiTable from '../components/layout/ApiTable'
-import { Title } from '../components/ui'
+import StarComponentPage from '../components/layout/ComponentPage'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarApiTable from '../components/layout/ApiTable'
+import { StarTitle } from '../components/ui'
 import styles from './TitleDemo.module.scss'
 
 const titleApiData = [
@@ -12,44 +12,44 @@ const titleApiData = [
   { property: 'backgroundSrc', description: '背景板图片地址', type: 'string', default: "'/titleBg.png'" },
 ]
 
-const basicCode = `<Title>农场任务</Title>`
-const multilineCode = `<Title size="large">{'Stardew\\nValley'}</Title>\n<Title>{'春季\\n市集公告'}</Title>`
-const sizeCode = `<Title size="small">春季市集</Title>\n<Title size="medium">夏季庆典</Title>\n<Title size="large">秋日收获</Title>`
-const alignCode = `<Title align="left">工坊公告</Title>`
+const basicCode = `<StarTitle>农场任务</StarTitle>`
+const multilineCode = `<StarTitle size="large">{'Stardew\\nValley'}</StarTitle>\n<StarTitle>{'春季\\n市集公告'}</StarTitle>`
+const sizeCode = `<StarTitle size="small">春季市集</StarTitle>\n<StarTitle size="medium">夏季庆典</StarTitle>\n<StarTitle size="large">秋日收获</StarTitle>`
+const alignCode = `<StarTitle align="left">工坊公告</StarTitle>`
 
 function StarTitleDemoPage() {
   return (
-    <ComponentPage
+    <StarComponentPage
       title="Title 标题"
       description="基于 canvas 绘制木质标题牌背景，并叠加带木纹质感的像素标题文字。"
     >
-      <ComponentDemo title="基础用法" description="默认尺寸和居中排版的标题组件" code={basicCode}>
-        <Title>农场任务</Title>
-      </ComponentDemo>
+      <StarComponentDemo title="基础用法" description="默认尺寸和居中排版的标题组件" code={basicCode}>
+        <StarTitle>农场任务</StarTitle>
+      </StarComponentDemo>
 
-      <ComponentDemo title="多行标题" description="通过换行符控制分行，接近游戏内招牌排版" code={multilineCode}>
+      <StarComponentDemo title="多行标题" description="通过换行符控制分行，接近游戏内招牌排版" code={multilineCode}>
         <div className={styles['title-demo-stack']}>
-          <Title size="large">{'Stardew\nValley'}</Title>
-          <Title>{'春季\n市集公告'}</Title>
+          <StarTitle size="large">{'Stardew\nValley'}</StarTitle>
+          <StarTitle>{'春季\n市集公告'}</StarTitle>
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和留白" code={sizeCode}>
+      <StarComponentDemo title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和留白" code={sizeCode}>
         <div className={styles['title-demo-stack']}>
-          <Title size="small">春季市集</Title>
-          <Title size="medium">夏季庆典</Title>
-          <Title size="large">秋日收获</Title>
+          <StarTitle size="small">春季市集</StarTitle>
+          <StarTitle size="medium">夏季庆典</StarTitle>
+          <StarTitle size="large">秋日收获</StarTitle>
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo title="对齐方式" description="内容区支持左对齐，适合公告类标题" code={alignCode}>
-        <Title align="left">工坊公告</Title>
-      </ComponentDemo>
+      <StarComponentDemo title="对齐方式" description="内容区支持左对齐，适合公告类标题" code={alignCode}>
+        <StarTitle align="left">工坊公告</StarTitle>
+      </StarComponentDemo>
 
       <div className="component-page-api">
-        <ApiTable data={titleApiData} />
+        <StarApiTable data={titleApiData} />
       </div>
-    </ComponentPage>
+    </StarComponentPage>
   )
 }
 

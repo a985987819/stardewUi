@@ -1,5 +1,5 @@
 import { useCallback, type MouseEvent } from 'react'
-import { Card } from '../ui/Card'
+import { StarCard } from '../ui/Card'
 import { message } from '../ui/Message'
 import styles from './ApiTable.module.scss'
 
@@ -104,7 +104,7 @@ function StarApiTable({ title = 'API', data }: ApiTableProps) {
   }
 
   return (
-    <Card className={styles['api-table-wrapper']} showTitle title={title}>
+    <StarCard className={styles['api-table-wrapper']} showTitle title={title}>
       <div className={styles['api-table-scroll']}>
         <table className={styles['api-table']}>
           <thead>
@@ -129,7 +129,7 @@ function StarApiTable({ title = 'API', data }: ApiTableProps) {
           </tbody>
         </table>
       </div>
-    </Card>
+    </StarCard>
   )
 }
 

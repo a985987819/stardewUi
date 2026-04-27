@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Card } from '../ui/Card'
+import { StarCard } from '../ui/Card'
 import StarCodeBlock from './CodeBlock'
 import styles from './ComponentDemo.module.scss'
 
@@ -24,7 +24,7 @@ function StarComponentDemo({
   const [showCode, setShowCode] = useState(defaultShowCode)
 
   return (
-    <Card
+    <StarCard
       id={id}
       className={code ? `${styles['component-demo']} ${styles['has-code']}` : styles['component-demo']}
       showTitle
@@ -45,7 +45,7 @@ function StarComponentDemo({
           <StarCodeBlock code={code} language="tsx" className={styles['component-demo-code-block']} />
         </div>
       ) : null}
-    </Card>
+    </StarCard>
   )
 }
 

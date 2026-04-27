@@ -1,7 +1,7 @@
-import ComponentPage from '../components/layout/ComponentPage'
-import ComponentDemo from '../components/layout/ComponentDemo'
-import ApiTable from '../components/layout/ApiTable'
-import { NineSliceButton, type NineSliceButtonTheme } from '../components/ui'
+import StarComponentPage from '../components/layout/ComponentPage'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarApiTable from '../components/layout/ApiTable'
+import { StarNineSliceButton, type NineSliceButtonTheme } from '../components/ui'
 import styles from './ButtonDemo.module.scss'
 
 const seasonalThemes: Array<{ key: NineSliceButtonTheme; label: string }> = [
@@ -21,75 +21,75 @@ const buttonApiData = [
   { property: 'children', description: '按钮内容', type: 'ReactNode', default: '-', required: true },
 ]
 
-const basicCode = `<NineSliceButton>默认按钮</NineSliceButton>
-<NineSliceButton variant="primary">主要按钮</NineSliceButton>
-<NineSliceButton variant="dashed">虚线按钮</NineSliceButton>
-<NineSliceButton variant="text">文本按钮</NineSliceButton>
-<NineSliceButton variant="link">链接按钮</NineSliceButton>`
+const basicCode = `<StarNineSliceButton>默认按钮</StarNineSliceButton>
+<StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
+<StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
+<StarNineSliceButton variant="text">文本按钮</StarNineSliceButton>
+<StarNineSliceButton variant="link">链接按钮</StarNineSliceButton>`
 
-const sizeCode = `<NineSliceButton variant="primary" size="small">小按钮</NineSliceButton>
-<NineSliceButton variant="primary">默认按钮</NineSliceButton>
-<NineSliceButton variant="primary" size="large">大按钮</NineSliceButton>`
+const sizeCode = `<StarNineSliceButton variant="primary" size="small">小按钮</StarNineSliceButton>
+<StarNineSliceButton variant="primary">默认按钮</StarNineSliceButton>
+<StarNineSliceButton variant="primary" size="large">大按钮</StarNineSliceButton>`
 
-const disabledCode = `<NineSliceButton variant="primary" disabled>禁用主要按钮</NineSliceButton>
-<NineSliceButton disabled>禁用默认按钮</NineSliceButton>`
+const disabledCode = `<StarNineSliceButton variant="primary" disabled>禁用主要按钮</StarNineSliceButton>
+<StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>`
 
-const themeCode = `<NineSliceButton theme="spring">春季默认按钮</NineSliceButton>
-<NineSliceButton theme="summer">夏季默认按钮</NineSliceButton>
-<NineSliceButton theme="autumn">秋季默认按钮</NineSliceButton>
-<NineSliceButton theme="winter">冬季默认按钮</NineSliceButton>`
+const themeCode = `<StarNineSliceButton theme="spring">春季默认按钮</StarNineSliceButton>
+<StarNineSliceButton theme="summer">夏季默认按钮</StarNineSliceButton>
+<StarNineSliceButton theme="autumn">秋季默认按钮</StarNineSliceButton>
+<StarNineSliceButton theme="winter">冬季默认按钮</StarNineSliceButton>`
 
 const multiInstanceCode = `{Array.from({ length: 10 }).map((_, index) => (
-  <NineSliceButton key={index}>按钮 {index + 1}</NineSliceButton>
+  <StarNineSliceButton key={index}>按钮 {index + 1}</StarNineSliceButton>
 ))}`
 
 function StarButtonDemoPage() {
   return (
-    <ComponentPage title="Button 按钮" description="按钮用于触发一个操作或事件，是用户界面中最基础的交互元素。">
-      <ComponentDemo title="按钮类型" description="支持多种不同类型的按钮" code={basicCode}>
-        <NineSliceButton>默认按钮</NineSliceButton>
-        <NineSliceButton variant="primary">主要按钮</NineSliceButton>
-        <NineSliceButton variant="dashed">虚线按钮</NineSliceButton>
-        <NineSliceButton variant="text">文本按钮</NineSliceButton>
-        <NineSliceButton variant="link">链接按钮</NineSliceButton>
-      </ComponentDemo>
+    <StarComponentPage title="Button 按钮" description="按钮用于触发一个操作或事件，是用户界面中最基础的交互元素。">
+      <StarComponentDemo title="按钮类型" description="支持多种不同类型的按钮" code={basicCode}>
+        <StarNineSliceButton>默认按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="text">文本按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="link">链接按钮</StarNineSliceButton>
+      </StarComponentDemo>
 
-      <ComponentDemo title="季节主题" description="通过 theme 属性切换春夏秋冬四种默认按钮风格，其它特殊按钮保持统一配色。" code={themeCode}>
+      <StarComponentDemo title="季节主题" description="通过 theme 属性切换春夏秋冬四种默认按钮风格，其它特殊按钮保持统一配色。" code={themeCode}>
         <div className={styles['button-theme-grid']}>
           {seasonalThemes.map((item) => (
             <div key={item.key} className={styles['button-theme-card']}>
               <p className={styles['button-theme-title']}>{item.label}</p>
               <div className={styles['button-theme-actions']}>
-                <NineSliceButton theme={item.key}>默认按钮</NineSliceButton>
+                <StarNineSliceButton theme={item.key}>默认按钮</StarNineSliceButton>
               </div>
             </div>
           ))}
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo title="按钮尺寸" description="提供三种尺寸的按钮" code={sizeCode}>
-        <NineSliceButton variant="primary" size="small">小按钮</NineSliceButton>
-        <NineSliceButton variant="primary">默认按钮</NineSliceButton>
-        <NineSliceButton variant="primary" size="large">大按钮</NineSliceButton>
-      </ComponentDemo>
+      <StarComponentDemo title="按钮尺寸" description="提供三种尺寸的按钮" code={sizeCode}>
+        <StarNineSliceButton variant="primary" size="small">小按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="primary">默认按钮</StarNineSliceButton>
+        <StarNineSliceButton variant="primary" size="large">大按钮</StarNineSliceButton>
+      </StarComponentDemo>
 
-      <ComponentDemo title="禁用状态" description="按钮的禁用状态" code={disabledCode}>
-        <NineSliceButton variant="primary" disabled>禁用主要按钮</NineSliceButton>
-        <NineSliceButton disabled>禁用默认按钮</NineSliceButton>
-      </ComponentDemo>
+      <StarComponentDemo title="禁用状态" description="按钮的禁用状态" code={disabledCode}>
+        <StarNineSliceButton variant="primary" disabled>禁用主要按钮</StarNineSliceButton>
+        <StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
+      </StarComponentDemo>
 
-      <ComponentDemo title="多实例场景" description="同一页面多个按钮可复用同一图片缓存并独立绘制" code={multiInstanceCode}>
+      <StarComponentDemo title="多实例场景" description="同一页面多个按钮可复用同一图片缓存并独立绘制" code={multiInstanceCode}>
         <div className={styles['demo-multi-buttons']}>
           {Array.from({ length: 10 }).map((_, index) => (
-            <NineSliceButton key={`multi-${index}`}>按钮 {index + 1}</NineSliceButton>
+            <StarNineSliceButton key={`multi-${index}`}>按钮 {index + 1}</StarNineSliceButton>
           ))}
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
       <div className="component-page-api">
-        <ApiTable data={buttonApiData} />
+        <StarApiTable data={buttonApiData} />
       </div>
-    </ComponentPage>
+    </StarComponentPage>
   )
 }
 

@@ -1,9 +1,6 @@
 export { StarCard, StarCardImage, StarCardMeta } from './Card'
-export { Card, CardImage, CardMeta } from './Card'
 export { default as StarDialog } from './Dialog'
-export { default as Dialog } from './Dialog'
 export { default as StarEmptyState } from './EmptyState'
-export { default as EmptyState } from './EmptyState'
 export {
   EMPTY_STATE_DEFAULT_IMAGE_SRC,
   EMPTY_STATE_DEFAULT_MESSAGE,
@@ -11,15 +8,11 @@ export {
   type StarEmptyStateProps,
 } from './EmptyState'
 export { default as StarTypewriter } from './Typewriter'
-export { default as Typewriter } from './Typewriter'
 export { message } from './Message'
 export type { MessageType, MessageProps } from './Message'
 export { default as StarNineSliceButton } from './NineSliceButton'
-export { default as NineSliceButton } from './NineSliceButton'
 export type { StarNineSliceButtonProps, NineSliceButtonTheme } from './NineSliceButton'
 export { default as StarPopup } from './Popup'
-export { default as Popup } from './Popup'
 export type { PopupPlacement, StarPopupProps, PopupAction } from './Popup'
 export { default as StarTitle } from './Title'
-export { default as Title } from './Title'
 export type { StarTitleProps, TitleSize, TitleAlign, TitleTag } from './Title'

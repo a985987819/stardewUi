@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import ComponentPage from '../components/layout/ComponentPage'
-import ComponentDemo from '../components/layout/ComponentDemo'
-import ApiTable from '../components/layout/ApiTable'
-import { NineSliceButton, Popup, type PopupPlacement } from '../components/ui'
+import StarComponentPage from '../components/layout/ComponentPage'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarApiTable from '../components/layout/ApiTable'
+import { StarNineSliceButton, StarPopup, type PopupPlacement } from '../components/ui'
 import styles from './PopupDemo.module.scss'
 
 const popupApiData = [
@@ -28,7 +28,7 @@ const placementGroups = {
   left: ['left-start', 'left', 'left-end'],
 } satisfies Record<'top' | 'right' | 'bottom' | 'left', PopupPlacement[]>
 
-const rightPlacementCode = `<Popup
+const rightPlacementCode = `<StarPopup
   open
   placement="right-start"
   title="提示"
@@ -38,12 +38,12 @@ const rightPlacementCode = `<Popup
     { label: '确认', variant: 'primary' },
   ]}
 >
-  <NineSliceButton>right-start</NineSliceButton>
-</Popup>`
+  <StarNineSliceButton>right-start</StarNineSliceButton>
+</StarPopup>`
 
 const allPlacementCode = `const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
-<Popup
+<StarPopup
   open
   placement={placement}
   title="全方位控制"
@@ -54,18 +54,18 @@ const allPlacementCode = `const [placement, setPlacement] = useState<PopupPlacem
     { label: '确认', variant: 'primary' },
   ]}
 >
-  <NineSliceButton variant="primary">{placement}</NineSliceButton>
-</Popup>`
+  <StarNineSliceButton variant="primary">{placement}</StarNineSliceButton>
+</StarPopup>`
 
 function StarPopupDemoPage() {
   const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
   return (
-    <ComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持四向位置与 start/end 对齐控制。">
-      <ComponentDemo title="右侧弹窗" description="右侧三种对齐方式的基础示例。" code={rightPlacementCode}>
+    <StarComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持四向位置与 start/end 对齐控制。">
+      <StarComponentDemo title="右侧弹窗" description="右侧三种对齐方式的基础示例。" code={rightPlacementCode}>
         <div className={styles['popup-demo-stack']}>
           {rightPlacements.map((item) => (
-            <Popup
+            <StarPopup
               key={item}
               open
               placement={item}
@@ -76,17 +76,17 @@ function StarPopupDemoPage() {
                 { label: '确认', variant: 'primary' },
               ]}
             >
-              <NineSliceButton variant={item === 'right' ? 'primary' : 'default'}>{item}</NineSliceButton>
-            </Popup>
+              <StarNineSliceButton variant={item === 'right' ? 'primary' : 'default'}>{item}</StarNineSliceButton>
+            </StarPopup>
           ))}
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
-      <ComponentDemo title="全方位控制" description="按照参考图的四向布局排列所有 placement 控制按钮。" code={allPlacementCode}>
+      <StarComponentDemo title="全方位控制" description="按照参考图的四向布局排列所有 placement 控制按钮。" code={allPlacementCode}>
         <div className={styles['popup-demo-placement-map']}>
           <div className={`${styles['popup-demo-placement-row']} ${styles['popup-demo-placement-row--top']}`}>
             {placementGroups.top.map((item) => (
-              <NineSliceButton
+              <StarNineSliceButton
                 key={item}
                 type="button"
                 size="small"
@@ -95,13 +95,13 @@ function StarPopupDemoPage() {
                 onClick={() => setPlacement(item)}
               >
                 {item}
-              </NineSliceButton>
+              </StarNineSliceButton>
             ))}
           </div>
 
           <div className={`${styles['popup-demo-placement-column']} ${styles['popup-demo-placement-column--left']}`}>
             {placementGroups.left.map((item) => (
-              <NineSliceButton
+              <StarNineSliceButton
                 key={item}
                 type="button"
                 size="small"
@@ -110,12 +110,12 @@ function StarPopupDemoPage() {
                 onClick={() => setPlacement(item)}
               >
                 {item}
-              </NineSliceButton>
+              </StarNineSliceButton>
             ))}
           </div>
 
           <div className={styles['popup-demo-playground']}>
-            <Popup
+            <StarPopup
               open
               placement={placement}
               title="位置控制"
@@ -126,13 +126,13 @@ function StarPopupDemoPage() {
                 { label: '确认', variant: 'primary' },
               ]}
             >
-              <NineSliceButton variant="primary">{placement}</NineSliceButton>
-            </Popup>
+              <StarNineSliceButton variant="primary">{placement}</StarNineSliceButton>
+            </StarPopup>
           </div>
 
           <div className={`${styles['popup-demo-placement-column']} ${styles['popup-demo-placement-column--right']}`}>
             {placementGroups.right.map((item) => (
-              <NineSliceButton
+              <StarNineSliceButton
                 key={item}
                 type="button"
                 size="small"
@@ -141,13 +141,13 @@ function StarPopupDemoPage() {
                 onClick={() => setPlacement(item)}
               >
                 {item}
-              </NineSliceButton>
+              </StarNineSliceButton>
             ))}
           </div>
 
           <div className={`${styles['popup-demo-placement-row']} ${styles['popup-demo-placement-row--bottom']}`}>
             {placementGroups.bottom.map((item) => (
-              <NineSliceButton
+              <StarNineSliceButton
                 key={item}
                 type="button"
                 size="small"
@@ -156,16 +156,16 @@ function StarPopupDemoPage() {
                 onClick={() => setPlacement(item)}
               >
                 {item}
-              </NineSliceButton>
+              </StarNineSliceButton>
             ))}
           </div>
         </div>
-      </ComponentDemo>
+      </StarComponentDemo>
 
       <div className="component-page-api">
-        <ApiTable data={popupApiData} />
+        <StarApiTable data={popupApiData} />
       </div>
-    </ComponentPage>
+    </StarComponentPage>
   )
 }
 
