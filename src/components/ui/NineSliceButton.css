@@ -39,51 +39,52 @@
 }
 
 .nine-slice-button--default {
-  color: #3A2E39;
+  color: var(--nine-slice-button-default-color, #3A2E39);
 }
 
 .nine-slice-button--primary {
-  color: #FFE8B6;
+  color: var(--nine-slice-button-primary-color, #FFE8B6);
 }
 
 .nine-slice-button--warning {
-  color: #FFF2D5;
+  color: var(--nine-slice-button-warning-color, #FFF2D5);
 }
 
 .nine-slice-button--danger {
-  color: #FFF2D5;
+  color: var(--nine-slice-button-danger-color, #FFF2D5);
 }
 
 .nine-slice-button--disabled {
-  color: #E0D9C6;
+  color: var(--nine-slice-button-disabled-color, #E0D9C6);
   cursor: not-allowed;
 }
 
 .nine-slice-button--dashed {
-  color: #3b2b1f;
-  background: #f6e3b4;
+  color: var(--nine-slice-button-dashed-color, #3b2b1f);
+  background: var(--nine-slice-button-dashed-bg, #f6e3b4);
 }
 
 .nine-slice-button--text {
+  color: var(--nine-slice-button-text-color, var(--color-text));
   background: transparent;
   box-shadow: none;
 }
 
 .nine-slice-button--text:hover:not(:disabled) {
-  background: var(--color-bg-hover);
+  background: var(--nine-slice-button-text-hover-bg, var(--color-bg-hover));
   transform: none;
 }
 
 .nine-slice-button--link {
   background: transparent;
   box-shadow: none;
-  color: var(--color-primary);
+  color: var(--nine-slice-button-link-color, var(--color-primary));
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .nine-slice-button--link:hover:not(:disabled) {
-  color: var(--color-primary-dark);
+  color: var(--nine-slice-button-link-hover-color, var(--color-primary-dark));
   transform: none;
 }
 

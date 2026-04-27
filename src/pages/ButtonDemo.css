@@ -74,3 +74,30 @@
 .demo-multi-buttons {
   @apply flex flex-wrap gap-3;
 }
+
+.button-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.button-theme-card {
+  padding: 16px;
+  background: rgba(255, 248, 235, 0.85);
+  border: 3px solid var(--color-border);
+  box-shadow: var(--shadow-pixel-sm);
+}
+
+.button-theme-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.button-theme-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}

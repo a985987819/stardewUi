@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes, type CSSProperties } from 'react'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
 import './NineSliceButton.css'
 
@@ -12,11 +12,22 @@ type NineSliceButtonVariant =
   | 'text'
   | 'link'
 type NineSliceButtonSize = 'small' | 'medium' | 'large'
+export type NineSliceButtonTheme = 'spring' | 'summer' | 'autumn' | 'winter'
+
+type ButtonTone = {
+  bg: string
+  text: string
+}
+
+type ImageButtonVariant = Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'link'>
+
+type ButtonColorMap = Record<ImageButtonVariant, ButtonTone>
 
 export type NineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: NineSliceButtonVariant
   size?: NineSliceButtonSize
   block?: boolean
+  theme?: NineSliceButtonTheme
   backgroundSrc?: string
   backgroundInsets?: {
     top: number
@@ -30,7 +41,7 @@ const cls = (...classNames: Array<string | false | undefined>) => classNames.fil
 
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 
-const COLOR_MAP: Record<Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'link'>, { bg: string; text: string }> = {
+const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
   primary: { bg: '#7A4E2D', text: '#FFE8B6' },
   warning: { bg: '#C28A45', text: '#FFF2D5' },
@@ -38,13 +49,26 @@ const COLOR_MAP: Record<Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'lin
   disabled: { bg: '#B0A999', text: '#E0D9C6' },
 }
 
-const drawDashedBorder = (ctx: CanvasRenderingContext2D, width: number, height: number, dpr: number) => {
+const SEASONAL_DEFAULT_TONES: Record<NineSliceButtonTheme, ButtonTone> = {
+  spring: { bg: '#A8D5BA', text: '#2F5233' },
+  summer: { bg: '#4DA6FF', text: '#F9F9F9' },
+  autumn: { bg: '#D97B3E', text: '#FFF2D5' },
+  winter: { bg: '#6BAED6', text: '#2E4057' },
+}
+
+const drawDashedBorder = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  dpr: number,
+  borderColor: string
+) => {
   const lineWidth = Math.max(1, Math.round(dpr))
   const dashLength = 6 * dpr
   const gapLength = 4 * dpr
 
   ctx.clearRect(0, 0, width, height)
-  ctx.strokeStyle = '#6f5135'
+  ctx.strokeStyle = borderColor
   ctx.lineWidth = lineWidth
   ctx.setLineDash([dashLength, gapLength])
   ctx.strokeRect(lineWidth / 2, lineWidth / 2, width - lineWidth, height - lineWidth)
@@ -56,17 +80,24 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
       variant = 'default',
       size = 'medium',
       block = false,
+      theme,
       backgroundSrc = '/btnImg.png',
       backgroundInsets = DEFAULT_INSETS,
       className,
       children,
       disabled,
+      style,
       ...rest
     },
     ref
   ) => {
     const effectiveVariant =
       disabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+
+    const seasonalDefaultTone = useMemo(
+      () => (theme && effectiveVariant === 'default' ? SEASONAL_DEFAULT_TONES[theme] : null),
+      [effectiveVariant, theme]
+    )
 
     const imageVariant =
       effectiveVariant === 'default' ||
@@ -85,10 +116,23 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
         effectiveVariant === 'danger' ||
         effectiveVariant === 'disabled'
       ) {
-        return COLOR_MAP[effectiveVariant]
+        return effectiveVariant === 'default' && seasonalDefaultTone
+          ? seasonalDefaultTone
+          : DEFAULT_COLOR_MAP[effectiveVariant]
       }
       return null
-    }, [effectiveVariant])
+    }, [effectiveVariant, seasonalDefaultTone])
+
+    const buttonStyle = useMemo(() => {
+      if (!seasonalDefaultTone) {
+        return style
+      }
+
+      return {
+        ...style,
+        '--nine-slice-button-default-color': seasonalDefaultTone.text,
+      } as CSSProperties
+    }, [seasonalDefaultTone, style])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
       src: backgroundSrc,
@@ -133,7 +177,7 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
         if (!ctx) {
           return
         }
-        drawDashedBorder(ctx, targetWidth, targetHeight, dpr)
+        drawDashedBorder(ctx, targetWidth, targetHeight, dpr, DEFAULT_COLOR_MAP.default.text)
       }
 
       redraw()
@@ -152,9 +196,11 @@ const NineSliceButton = forwardRef<HTMLButtonElement, NineSliceButtonProps>(
         {...rest}
         ref={ref}
         disabled={disabled}
+        style={buttonStyle}
         className={cls(
           'nine-slice-button',
           `nine-slice-button--${effectiveVariant}`,
+          seasonalDefaultTone ? `nine-slice-button--theme-${theme}` : undefined,
           `nine-slice-button--${size}`,
           block && 'nine-slice-button--block',
           className

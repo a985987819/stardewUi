@@ -1,14 +1,21 @@
 ﻿import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
-import { NineSliceButton } from '../components/ui'
+import { NineSliceButton, type NineSliceButtonTheme } from '../components/ui'
 import './ButtonDemo.css'
+
+const seasonalThemes: Array<{ key: NineSliceButtonTheme; label: string }> = [
+  { key: 'spring', label: '春季' },
+  { key: 'summer', label: '夏季' },
+  { key: 'autumn', label: '秋季' },
+  { key: 'winter', label: '冬季' },
+]
 
 const buttonApiData = [
   {
-    property: 'type',
+    property: 'variant',
     description: '按钮类型',
-    type: "'default' | 'primary' | 'dashed' | 'text' | 'link'",
+    type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'",
     default: "'default'",
   },
   {
@@ -28,6 +35,12 @@ const buttonApiData = [
     description: '是否块级元素',
     type: 'boolean',
     default: 'false',
+  },
+  {
+    property: 'theme',
+    description: '季节主题，仅对默认按钮生效',
+    type: "'spring' | 'summer' | 'autumn' | 'winter'",
+    default: '-',
   },
   {
     property: 'onClick',
@@ -57,6 +70,11 @@ const sizeCode = `<NineSliceButton variant="primary" size="small">小按钮</Nin
 const disabledCode = `<NineSliceButton variant="primary" disabled>禁用主要按钮</NineSliceButton>
 <NineSliceButton disabled>禁用默认按钮</NineSliceButton>`
 
+const themeCode = `<NineSliceButton theme="spring">春季默认按钮</NineSliceButton>
+<NineSliceButton theme="summer">夏季默认按钮</NineSliceButton>
+<NineSliceButton theme="autumn">秋季默认按钮</NineSliceButton>
+<NineSliceButton theme="winter">冬季默认按钮</NineSliceButton>`
+
 const multiInstanceCode = `{Array.from({ length: 10 }).map((_, index) => (
   <NineSliceButton key={index}>按钮 {index + 1}</NineSliceButton>
 ))}`
@@ -73,6 +91,22 @@ function ButtonDemo() {
         <NineSliceButton variant="dashed">虚线按钮</NineSliceButton>
         <NineSliceButton variant="text">文本按钮</NineSliceButton>
         <NineSliceButton variant="link">链接按钮</NineSliceButton>
+      </ComponentDemo>
+      <ComponentDemo
+        title="季节主题"
+        description="通过 theme 属性切换春夏秋冬四种默认按钮风格，其它特殊按钮保持统一配色。"
+        code={themeCode}
+      >
+        <div className="button-theme-grid">
+          {seasonalThemes.map((item) => (
+            <div key={item.key} className="button-theme-card">
+              <p className="button-theme-title">{item.label}</p>
+              <div className="button-theme-actions">
+                <NineSliceButton theme={item.key}>默认按钮</NineSliceButton>
+              </div>
+            </div>
+          ))}
+        </div>
       </ComponentDemo>
 
       <ComponentDemo title="按钮尺寸" description="提供三种尺寸的按钮" code={sizeCode}>
