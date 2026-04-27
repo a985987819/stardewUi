@@ -2,7 +2,7 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { NineSliceButton, type NineSliceButtonTheme } from '../components/ui'
-import styles from './ButtonDemo.module.css'
+import styles from './ButtonDemo.module.scss'
 
 const seasonalThemes: Array<{ key: NineSliceButtonTheme; label: string }> = [
   { key: 'spring', label: '春季' },

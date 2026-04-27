@@ -6,18 +6,16 @@
 .doc-main {
   @apply pt-[60px] min-h-screen;
   margin-left: 260px;
+
+  @media (max-width: 1024px) {
+    @apply ml-0;
+  }
 }
 
 .doc-content {
   @apply max-w-[1200px] mx-auto py-10 px-12;
-}
 
-@media (max-width: 1024px) {
-  .doc-main {
-    @apply ml-0;
-  }
-
-  .doc-content {
+  @media (max-width: 1024px) {
     @apply p-6;
   }
 }

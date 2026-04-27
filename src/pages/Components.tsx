@@ -11,7 +11,7 @@ import {
   Type,
 } from 'lucide-react'
 import StarCard from '../components/ui/Card'
-import styles from './Components.module.css'
+import styles from './Components.module.scss'
 
 const components = [
   {

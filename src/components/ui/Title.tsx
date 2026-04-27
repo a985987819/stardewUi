@@ -9,7 +9,7 @@ import {
   useRef,
 } from 'react'
 import { classNames } from '../../utils/classNames'
-import styles from './Title.module.css'
+import styles from './Title.module.scss'
 
 export type TitleSize = 'small' | 'medium' | 'large'
 export type TitleAlign = 'left' | 'center'

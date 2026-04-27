@@ -3,7 +3,7 @@ import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { message } from '../components/ui/Message'
 import { classNames } from '../utils/classNames'
-import appStyles from '../styles/global.module.css'
+import appStyles from '../styles/global.module.scss'
 
 const messageApiData = [
   {

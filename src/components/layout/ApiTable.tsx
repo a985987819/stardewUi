@@ -1,7 +1,7 @@
 import { useCallback, type MouseEvent } from 'react'
 import { Card } from '../ui/Card'
 import { message } from '../ui/Message'
-import styles from './ApiTable.module.css'
+import styles from './ApiTable.module.scss'
 
 interface ApiColumn {
   title: string

@@ -1,0 +1,110 @@
+.nine-slice-button {
+  @apply inline-flex items-center justify-center text-sm font-medium cursor-pointer;
+  position: relative;
+  overflow: hidden;
+  padding: 15px 20px;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  box-shadow: none;
+  transition: transform 0.08s steps(2);
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    line-height: 1.2;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 1;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &--default {
+    color: var(--nine-slice-button-default-color, #3a2e39);
+  }
+
+  &--primary {
+    color: var(--nine-slice-button-primary-color, #ffe8b6);
+  }
+
+  &--warning {
+    color: var(--nine-slice-button-warning-color, #fff2d5);
+  }
+
+  &--danger {
+    color: var(--nine-slice-button-danger-color, #fff2d5);
+  }
+
+  &--disabled {
+    color: var(--nine-slice-button-disabled-color, #e0d9c6);
+    cursor: not-allowed;
+  }
+
+  &--dashed {
+    background: var(--nine-slice-button-dashed-bg, #f6e3b4);
+    color: var(--nine-slice-button-dashed-color, #3b2b1f);
+  }
+
+  &--text {
+    background: transparent;
+    color: var(--nine-slice-button-text-color, var(--color-text));
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+      background: var(--nine-slice-button-text-hover-bg, var(--color-bg-hover));
+      transform: none;
+    }
+  }
+
+  &--link {
+    background: transparent;
+    color: var(--nine-slice-button-link-color, var(--color-primary));
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+      color: var(--nine-slice-button-link-hover-color, var(--color-primary-dark));
+      transform: none;
+    }
+  }
+
+  &--small {
+    @apply text-xs;
+    padding: 10px 14px;
+  }
+
+  &--large {
+    @apply text-base;
+    padding: 16px 22px;
+  }
+
+  &--block {
+    @apply block w-full;
+  }
+}

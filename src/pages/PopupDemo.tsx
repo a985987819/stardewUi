@@ -3,7 +3,7 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { NineSliceButton, Popup, type PopupPlacement } from '../components/ui'
-import styles from './PopupDemo.module.css'
+import styles from './PopupDemo.module.scss'
 
 const popupApiData = [
   { property: 'open', description: '是否显示弹窗', type: 'boolean', default: 'true' },

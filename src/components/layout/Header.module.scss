@@ -1,0 +1,98 @@
+.doc-header {
+  @apply fixed top-0 left-0 right-0 h-[60px] z-[100];
+  background: var(--color-bg-secondary);
+  border-bottom: 4px solid var(--color-border-dark);
+
+  &-container {
+    @apply max-w-[1400px] mx-auto h-full flex items-center justify-between px-6;
+  }
+
+  &-logo {
+    @apply flex items-center gap-2 no-underline font-semibold text-lg;
+    color: var(--color-text);
+  }
+
+  &-logo-text {
+    color: var(--color-primary);
+  }
+
+  &-nav {
+    @apply flex items-center gap-8;
+
+    &.is-open {
+      @media (max-width: 768px) {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+  }
+
+  &-nav-item {
+    @apply no-underline text-sm font-medium;
+    padding: 4px 8px;
+    color: var(--color-text-secondary);
+    border: 2px solid transparent;
+
+    &:hover {
+      color: var(--color-text);
+      background: var(--color-bg-hover);
+    }
+
+    &.is-active {
+      color: var(--color-primary);
+      background: var(--color-primary-bg);
+      border-color: var(--color-primary);
+    }
+  }
+
+  &-actions {
+    @apply flex items-center gap-4;
+  }
+
+  &-github {
+    padding: 4px;
+    color: var(--color-text-secondary);
+
+    &:hover {
+      color: var(--color-text);
+      background: var(--color-bg-hover);
+    }
+  }
+
+  &-menu-btn {
+    @apply hidden bg-transparent border-none cursor-pointer p-1;
+    color: var(--color-text);
+  }
+
+  @media (max-width: 768px) {
+    &-nav {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      background: var(--color-bg-secondary);
+      border-bottom: 4px solid var(--color-border-dark);
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 99;
+    }
+
+    &-nav-item {
+      padding: 12px 16px;
+      text-align: center;
+      border: 3px solid var(--color-border-dark);
+      background: var(--color-bg-card);
+    }
+
+    &-menu-btn {
+      @apply block;
+    }
+  }
+}

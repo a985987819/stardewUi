@@ -4,7 +4,7 @@ import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import Typewriter from '../components/ui/Typewriter'
 import { classNames } from '../utils/classNames'
-import appStyles from '../styles/global.module.css'
+import appStyles from '../styles/global.module.scss'
 
 const typewriterApiData = [
   {

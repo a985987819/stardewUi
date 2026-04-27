@@ -1,5 +1,5 @@
 import StarCodeBlock from '../components/layout/CodeBlock'
-import styles from './Guide.module.css'
+import styles from './Guide.module.scss'
 
 const installCode = `npm install stardew-valley-ui
 # 或

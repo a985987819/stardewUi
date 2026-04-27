@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ExternalLink, Menu } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import styles from './Header.module.css'
+import styles from './Header.module.scss'
 
 function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

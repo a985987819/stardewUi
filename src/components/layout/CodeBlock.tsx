@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import hljs from 'highlight.js'
-import styles from './CodeBlock.module.css'
+import styles from './CodeBlock.module.scss'
 
 interface CodeBlockProps {
   code: string

@@ -2,7 +2,7 @@ import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
 import { Title } from '../components/ui'
-import styles from './TitleDemo.module.css'
+import styles from './TitleDemo.module.scss'
 
 const titleApiData = [
   { property: 'children', description: '标题内容，支持通过 \\n 强制换行', type: 'string', default: '-', required: true },

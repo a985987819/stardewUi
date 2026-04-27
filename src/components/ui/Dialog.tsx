@@ -5,7 +5,7 @@ import { classNames } from '../../utils/classNames'
 import { StarCard } from './Card'
 import StarNineSliceButton from './NineSliceButton'
 import StarTypewriter from './Typewriter'
-import styles from './Dialog.module.css'
+import styles from './Dialog.module.scss'
 
 export interface DialogAction {
   label: string

@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import StarHeader from './Header'
 import StarSidebar from './Sidebar'
-import styles from './Layout.module.css'
+import styles from './Layout.module.scss'
 
 function StarLayout() {
   return (

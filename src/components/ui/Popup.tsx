@@ -2,7 +2,7 @@ import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames, flipBubblePlacement, type BubblePlacement } from '../../utils'
 import StarCanvasBubble from './CanvasBubble'
 import StarNineSliceButton from './NineSliceButton'
-import styles from './Popup.module.css'
+import styles from './Popup.module.scss'
 
 export type PopupPlacement = Exclude<BubblePlacement, 'none'>
 

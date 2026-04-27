@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Book, Box, ChevronDown } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import styles from './Sidebar.module.css'
+import styles from './Sidebar.module.scss'
 
 interface MenuItem {
   path: string

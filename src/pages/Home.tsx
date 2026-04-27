@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { Package, Code, BookOpen, ArrowRight } from 'lucide-react'
 import Card from '../components/ui/Card'
 import { classNames } from '../utils/classNames'
-import styles from './Home.module.css'
+import styles from './Home.module.scss'
 
 const features = [
   {

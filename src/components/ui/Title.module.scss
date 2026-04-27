@@ -1,0 +1,105 @@
+.title-board {
+  @apply relative mx-auto block w-full overflow-hidden;
+
+  &--small {
+    max-width: 560px;
+  }
+
+  &--medium {
+    max-width: 760px;
+  }
+
+  &--large {
+    max-width: 980px;
+  }
+
+  &__canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  &__content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+      calc(var(--title-padding-y, 62) * var(--title-scale, 1) * 1px)
+      calc(var(--title-padding-x, 152) * var(--title-scale, 1) * 1px);
+  }
+
+  &--left &__content {
+    justify-content: flex-start;
+  }
+
+  &__heading {
+    display: grid;
+    width: 100%;
+    font-family: var(--font-pixel);
+    font-size: calc(var(--title-font-size, 48) * var(--title-scale, 1) * 1px);
+    font-weight: 700;
+    line-height: calc(var(--title-line-height, 42) * var(--title-scale, 1) * 1px);
+    letter-spacing: 0.09em;
+    text-align: var(--title-text-align, center);
+    text-transform: uppercase;
+    white-space: pre-line;
+
+    > span {
+      grid-area: 1 / 1;
+    }
+  }
+
+  &__shadow,
+  &__stroke,
+  &__fill {
+    display: block;
+    width: 100%;
+    word-break: break-word;
+    line-height: 3.5rem;
+  }
+
+  &__shadow {
+    color: #de7b3d;
+    transform: translate(0.01em, 0.01em);
+  }
+
+  &__stroke {
+    color: #9b532f;
+    text-shadow:
+      -0.06em 0 #8b4828,
+      0.06em 0 #8b4828,
+      0 -0.06em #8b4828,
+      0 0.06em #8b4828,
+      -0.06em -0.06em #8b4828,
+      0.06em -0.06em #8b4828,
+      -0.06em 0.06em #8b4828,
+      0.06em 0.06em #8b4828;
+  }
+
+  &__fill {
+    color: transparent;
+    background-image:
+      linear-gradient(180deg, #ffc875 0%, #f2a356 24%, #da7d40 52%, #bd5f34 76%, #874022 100%),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 240, 207, 0.28) 0 4px,
+        rgba(145, 71, 35, 0.14) 4px 7px,
+        rgba(255, 214, 153, 0.24) 7px 11px
+      );
+    background-blend-mode: multiply;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow:
+      -0.055em 0 #8b4828,
+      0.055em 0 #8b4828,
+      0 -0.055em #8b4828,
+      0 0.055em #8b4828,
+      0.11em 0.13em 0 rgba(86, 34, 20, 0.72),
+      0 0.035em 0 rgba(255, 233, 190, 0.66);
+  }
+}

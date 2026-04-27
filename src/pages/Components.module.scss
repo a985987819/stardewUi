@@ -1,0 +1,69 @@
+.components {
+  &-page {
+    @apply max-w-full;
+  }
+
+  &-header-card {
+    margin-bottom: 32px;
+  }
+
+  &-header {
+    padding: 8px 4px;
+
+    h1 {
+      @apply m-0 mb-3 text-2xl font-semibold;
+      color: var(--color-text);
+    }
+
+    p {
+      @apply m-0 text-base;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &-grid {
+    @apply grid grid-cols-2 gap-6;
+
+    @media (max-width: 768px) {
+      @apply grid-cols-1;
+    }
+  }
+
+  &-card-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  &-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 132px;
+  }
+
+  &-card-icon {
+    @apply flex h-12 w-12 flex-shrink-0 items-center justify-center;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-text);
+    border: 3px solid rgba(157, 65, 0, 0.32);
+  }
+
+  &-card-content {
+    @apply flex-1;
+
+    h3 {
+      @apply m-0 mb-1 text-base font-semibold;
+      color: var(--color-text);
+    }
+
+    p {
+      @apply m-0 text-[13px];
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &-card-arrow {
+    @apply flex-shrink-0;
+    color: var(--color-text-secondary);
+  }
+}

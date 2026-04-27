@@ -1,6 +1,6 @@
 import { Card } from '../ui/Card'
 import StarTableOfContents from './TableOfContents'
-import styles from './ComponentPage.module.css'
+import styles from './ComponentPage.module.scss'
 
 interface TocItem {
   id: string

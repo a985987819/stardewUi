@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import StarEmptyState, { EMPTY_STATE_DEFAULT_IMAGE_SRC } from './EmptyState'
-import styles from './EmptyState.module.css'
+import styles from './EmptyState.module.scss'
 
 describe('StarEmptyState', () => {
   it('renders the default image and message', () => {

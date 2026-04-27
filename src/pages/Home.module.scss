@@ -1,0 +1,106 @@
+.home {
+  @apply min-h-[calc(100vh-60px)] p-0;
+
+  &-hero-card {
+    margin-bottom: 32px;
+  }
+
+  &-hero {
+    @apply px-12 py-16 text-center;
+  }
+
+  &-hero-content {
+    @apply mx-auto max-w-[800px];
+  }
+
+  &-title {
+    @apply m-0 mb-4 flex flex-wrap items-center justify-center gap-4 text-4xl font-semibold;
+    color: var(--color-text);
+  }
+
+  &-title-badge {
+    @apply px-3 py-1 text-sm font-medium;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-text);
+    border: 2px solid rgba(157, 65, 0, 0.28);
+  }
+
+  &-desc {
+    @apply mb-8 text-lg leading-relaxed;
+    color: var(--color-text-secondary);
+  }
+
+  &-actions {
+    @apply flex flex-wrap items-center justify-center gap-4;
+  }
+
+  &-btn {
+    @apply inline-flex items-center gap-2 px-6 py-3 text-base font-medium no-underline;
+    border: 3px solid rgba(157, 65, 0, 0.34);
+    box-shadow: var(--shadow-pixel-sm);
+
+    &-primary {
+      background: #f4a54f;
+      color: #4d2608;
+    }
+
+    &-secondary {
+      background: rgba(255, 255, 255, 0.22);
+      color: var(--color-text);
+    }
+
+    &-primary:hover,
+    &-secondary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    &-primary:active,
+    &-secondary:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &-features {
+    @apply mx-auto grid max-w-[1200px] grid-cols-3 gap-6;
+  }
+
+  &-feature-card {
+    min-height: 260px;
+  }
+
+  &-feature-body {
+    @apply flex h-full flex-col items-center justify-center text-center;
+
+    p {
+      @apply m-0 text-sm leading-relaxed;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  &-feature-icon {
+    @apply mb-4 inline-flex h-14 w-14 items-center justify-center;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--color-text);
+    border: 3px solid rgba(157, 65, 0, 0.32);
+  }
+
+  @media (max-width: 768px) {
+    &-hero {
+      @apply px-6 py-10;
+    }
+
+    &-title {
+      @apply flex-col gap-3 text-[28px];
+    }
+
+    &-desc {
+      @apply text-base;
+    }
+
+    &-features {
+      @apply grid-cols-1;
+    }
+  }
+}

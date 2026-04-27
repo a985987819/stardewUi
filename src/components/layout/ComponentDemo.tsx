@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Card } from '../ui/Card'
 import StarCodeBlock from './CodeBlock'
-import styles from './ComponentDemo.module.css'
+import styles from './ComponentDemo.module.scss'
 
 interface ComponentDemoProps {
   title: string

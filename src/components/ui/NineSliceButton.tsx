@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useMemo, useRef, type ButtonHTMLAttributes, type CSSProperties } from 'react'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
-import styles from './NineSliceButton.module.css'
+import styles from './NineSliceButton.module.scss'
 
 type NineSliceButtonVariant =
   | 'default'

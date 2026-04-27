@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { classNames } from '../../utils/classNames'
-import styles from './TableOfContents.module.css'
+import styles from './TableOfContents.module.scss'
 
 interface TocItem {
   id: string

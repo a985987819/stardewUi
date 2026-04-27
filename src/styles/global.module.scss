@@ -58,10 +58,8 @@
   background: var(--color-bg);
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: unset;
-}
 
-@media (prefers-color-scheme: dark) {
-  .starApp {
+  @media (prefers-color-scheme: dark) {
     --color-bg: #3f2412;
     --color-bg-secondary: #5a3518;
     --color-bg-header: rgba(63, 36, 18, 0.95);
@@ -81,54 +79,56 @@
     --shadow-pixel-sm: 2px 2px 0 rgba(0, 0, 0, 0.3);
     --shadow-pixel-lg: 6px 6px 0 rgba(0, 0, 0, 0.5);
   }
-}
 
-.starApp,
-.starApp * {
-  box-sizing: border-box;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-}
+  &,
+  * {
+    box-sizing: border-box;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
 
-.starApp :where(a) {
-  color: inherit;
-  text-decoration: none;
-}
+  :where(a) {
+    color: inherit;
+    text-decoration: none;
+  }
 
-.starApp :where(button) {
-  font-family: var(--font-pixel);
-}
+  :where(button) {
+    font-family: var(--font-pixel);
+  }
 
-.starApp :where(code, pre) {
-  font-family: var(--font-mono);
-}
+  :where(code, pre) {
+    font-family: var(--font-mono);
+  }
 
-.starApp ::selection {
-  background: var(--color-primary);
-  color: var(--color-text-light);
-}
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-text-light);
+  }
 
-.starApp *::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
+  * {
+    &::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
 
-.starApp *::-webkit-scrollbar-track {
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-border);
-}
+    &::-webkit-scrollbar-track {
+      background: var(--color-bg-secondary);
+      border: 2px solid var(--color-border);
+    }
 
-.starApp *::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border: 2px solid var(--color-border-dark);
-}
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border: 2px solid var(--color-border-dark);
 
-.starApp *::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-dark);
-}
+      &:hover {
+        background: var(--color-border-dark);
+      }
+    }
 
-.starApp *::-webkit-scrollbar-corner {
-  background: var(--color-bg-secondary);
+    &::-webkit-scrollbar-corner {
+      background: var(--color-bg-secondary);
+    }
+  }
 }
 
 .demoButton {
@@ -140,24 +140,24 @@
   cursor: pointer;
   box-shadow: none;
   transition: transform 0.1s steps(2);
-}
 
-.demoButton:hover {
-  background: var(--color-bg-hover);
-}
+  &:hover {
+    background: var(--color-bg-hover);
+  }
 
-.demoButton:active {
-  transform: translate(2px, 2px);
+  &:active {
+    transform: translate(2px, 2px);
+  }
 }
 
 .demoButtonPrimary {
   background: var(--color-primary);
   color: var(--color-text-light);
   border-color: var(--color-primary-dark);
-}
 
-.demoButtonPrimary:hover {
-  background: var(--color-primary-dark);
+  &:hover {
+    background: var(--color-primary-dark);
+  }
 }
 
 .typewriterDemoBox {

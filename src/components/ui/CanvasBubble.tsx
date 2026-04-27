@@ -10,7 +10,7 @@ import {
 } from 'react'
 import { classNames } from '../../utils/classNames'
 import { drawPixelBubble, resolveBubblePlacement, type BubblePlacement } from '../../utils'
-import styles from './CanvasBubble.module.css'
+import styles from './CanvasBubble.module.scss'
 
 export interface StarCanvasBubbleProps extends HTMLAttributes<HTMLDivElement> {
   bubblePlacement?: BubblePlacement

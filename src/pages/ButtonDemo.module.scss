@@ -1,0 +1,105 @@
+.demo-button {
+  @apply inline-flex items-center justify-center text-sm font-medium cursor-pointer;
+  padding: 15px 20px;
+  border: 3px solid var(--color-border-dark);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  box-shadow: none;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+  }
+
+  &:active {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  &-primary {
+    background: var(--color-primary);
+    color: var(--color-text-light);
+    border-color: var(--color-primary-dark);
+
+    &:hover {
+      background: var(--color-primary-light);
+    }
+  }
+
+  &-dashed {
+    border-style: dashed;
+    border-width: 3px;
+  }
+
+  &-text {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+
+    &:hover {
+      background: var(--color-bg-hover);
+    }
+  }
+
+  &-link {
+    border: none;
+    background: transparent;
+    color: var(--color-primary);
+    box-shadow: none;
+
+    &:hover {
+      color: var(--color-primary-dark);
+    }
+  }
+
+  &-small {
+    @apply px-3 py-1 text-xs;
+  }
+
+  &-large {
+    @apply px-6 py-3 text-base;
+  }
+
+  &-block {
+    @apply block w-full;
+  }
+}
+
+.demo-multi-buttons {
+  @apply flex flex-wrap gap-3;
+}
+
+.button-theme {
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  &-card {
+    padding: 16px;
+    background: rgba(255, 248, 235, 0.85);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-pixel-sm);
+  }
+
+  &-title {
+    margin: 0 0 12px;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

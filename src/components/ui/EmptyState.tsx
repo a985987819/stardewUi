@@ -1,6 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import styles from './EmptyState.module.css'
+import styles from './EmptyState.module.scss'
 
 export type EmptyStateDirection = 'horizontal' | 'vertical'
 

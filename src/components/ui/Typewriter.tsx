@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { classNames } from '../../utils/classNames'
-import styles from './Typewriter.module.css'
+import styles from './Typewriter.module.scss'
 
 export interface StarTypewriterProps {
   text: string

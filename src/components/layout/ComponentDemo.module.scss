@@ -1,0 +1,47 @@
+.component-demo {
+  @apply mb-8 overflow-hidden;
+
+  &-desc {
+    @apply mb-4 text-sm;
+    color: var(--color-text-secondary);
+  }
+
+  &-preview {
+    @apply flex min-h-[100px] flex-wrap items-center justify-center gap-4 rounded-[4px] px-5 py-8;
+    background: rgba(255, 248, 235, 0.28);
+    border: 3px solid rgba(157, 65, 0, 0.18);
+
+    .has-code & {
+      margin-bottom: 18px;
+    }
+  }
+
+  &-toggle {
+    @apply flex cursor-pointer items-center gap-1.5 px-4 py-2 text-sm;
+    background: rgba(255, 240, 210, 0.84);
+    color: var(--color-text);
+    border: 3px solid rgba(157, 65, 0, 0.38);
+    box-shadow: 2px 2px 0 rgba(77, 38, 8, 0.12);
+
+    &:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 rgba(77, 38, 8, 0.16);
+    }
+
+    &:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+  }
+
+  &-code {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 3px solid rgba(157, 65, 0, 0.22);
+  }
+
+  &-code-block {
+    border: none;
+    box-shadow: none;
+  }
+}

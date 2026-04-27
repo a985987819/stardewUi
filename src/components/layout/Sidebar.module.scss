@@ -1,0 +1,67 @@
+.doc-sidebar {
+  @apply fixed top-[60px] left-0 bottom-0 w-[260px] overflow-y-auto py-6;
+  background: var(--color-bg-sidebar);
+  border-right: 4px solid var(--color-border-dark);
+
+  &-nav {
+    @apply flex flex-col gap-1;
+  }
+
+  &-item {
+    @apply relative;
+  }
+
+  &-link {
+    @apply flex items-center gap-2 py-2 px-6 no-underline text-sm cursor-pointer;
+    color: var(--color-text-secondary);
+    border-left: 4px solid transparent;
+
+    &:hover {
+      color: var(--color-text);
+      background: var(--color-bg-hover);
+    }
+
+    &.is-active {
+      color: var(--color-primary);
+      background: var(--color-primary-bg);
+      border-left-color: var(--color-primary);
+    }
+
+    &.level-1 {
+      @apply pl-10 text-[13px];
+    }
+
+    &.level-2 {
+      @apply pl-14 text-xs;
+    }
+  }
+
+  &-icon {
+    @apply flex items-center justify-center w-[18px] h-[18px];
+  }
+
+  &-text {
+    @apply flex-1;
+  }
+
+  &-arrow {
+    @apply flex items-center;
+    color: var(--color-text-tertiary);
+
+    &.is-expanded {
+      transform: rotate(180deg);
+    }
+  }
+
+  &-children {
+    @apply flex flex-col;
+  }
+
+  @media (max-width: 1024px) {
+    @apply -translate-x-full z-[90];
+
+    &.is-open {
+      @apply translate-x-0;
+    }
+  }
+}

@@ -10,7 +10,7 @@ import {
 } from 'react'
 import { classNames } from '../../utils/classNames'
 import { drawPixelPanel } from '../../utils/pixelPanelCanvas'
-import styles from './CanvasPanel.module.css'
+import styles from './CanvasPanel.module.scss'
 
 export interface StarCanvasPanelProps extends HTMLAttributes<HTMLDivElement> {
   fillColor?: string

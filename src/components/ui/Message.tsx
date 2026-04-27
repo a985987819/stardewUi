@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { CheckCircle, Info, AlertTriangle, XCircle, X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import StarCanvasBubble from './CanvasBubble'
-import styles from './Message.module.css'
+import styles from './Message.module.scss'
 
 export type MessageType = 'normal' | 'info' | 'success' | 'warning' | 'error'
 

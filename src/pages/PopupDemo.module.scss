@@ -1,0 +1,124 @@
+.popup-demo {
+  &-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    padding-right: 320px;
+  }
+
+  &-placement-btn {
+    min-width: 112px;
+  }
+
+  &-placement-map {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 160px minmax(280px, 1fr) 160px;
+    grid-template-rows: auto minmax(260px, 1fr) auto;
+    align-items: center;
+    justify-items: center;
+    gap: 18px 32px;
+    padding: 20px 0;
+  }
+
+  &-placement-row,
+  &-placement-column {
+    display: flex;
+    gap: 12px;
+  }
+
+  &-placement-row {
+    &--top {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    &--bottom {
+      grid-column: 2;
+      grid-row: 3;
+    }
+  }
+
+  &-placement-column {
+    flex-direction: column;
+
+    &--left {
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: start;
+    }
+
+    &--right {
+      grid-column: 3;
+      grid-row: 2;
+      justify-self: end;
+    }
+  }
+
+  &-playground {
+    display: flex;
+    width: 100%;
+    min-height: 280px;
+    grid-column: 2;
+    grid-row: 2;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  @media (max-width: 900px) {
+    &-placement-map {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto auto auto;
+      gap: 16px;
+    }
+
+    &-placement-row--top,
+    &-placement-column--left,
+    &-playground,
+    &-placement-column--right,
+    &-placement-row--bottom {
+      grid-column: 1;
+      justify-self: center;
+    }
+
+    &-placement-row--top {
+      grid-row: 1;
+    }
+
+    &-placement-column--left {
+      grid-row: 2;
+    }
+
+    &-playground {
+      min-height: 220px;
+      grid-row: 3;
+    }
+
+    &-placement-column--right {
+      grid-row: 4;
+    }
+
+    &-placement-row--bottom {
+      grid-row: 5;
+    }
+
+    &-placement-column {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 560px) {
+    &-placement-row {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    &-placement-btn {
+      min-width: 100px;
+    }
+  }
+}
