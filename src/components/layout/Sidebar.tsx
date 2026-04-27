@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, Book, Box } from 'lucide-react'
+import { Book, Box, ChevronDown } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import styles from './Sidebar.module.css'
 
@@ -29,6 +29,7 @@ const menuItems: MenuItem[] = [
       { path: '/components/popup', label: 'Popup 气泡弹窗' },
       { path: '/components/typewriter', label: 'Typewriter 打字机' },
       { path: '/components/message', label: 'Message 消息提示' },
+      { path: '/components/empty-state', label: 'EmptyState 空状态' },
     ],
   },
 ]

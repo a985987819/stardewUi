@@ -1,0 +1,77 @@
+.stardew-empty-state {
+  display: inline-flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 24px 16px;
+  color: var(--color-text-secondary, #6a350b);
+  text-align: center;
+  vertical-align: top;
+}
+
+.stardew-empty-state,
+.stardew-empty-state * {
+  box-sizing: border-box;
+}
+
+.stardew-empty-state--vertical {
+  flex-direction: column;
+}
+
+.stardew-empty-state--horizontal {
+  flex-direction: row;
+  text-align: left;
+}
+
+.stardew-empty-state__image-wrap {
+  display: flex;
+  width: min(180px, 100%);
+  max-width: 100%;
+  min-width: 96px;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+}
+
+.stardew-empty-state__image {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.stardew-empty-state__message {
+  display: flex;
+  min-width: 0;
+  max-width: 22em;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.stardew-empty-state--horizontal .stardew-empty-state__message {
+  justify-content: flex-start;
+}
+
+@media (max-width: 640px) {
+  .stardew-empty-state--horizontal {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stardew-empty-state--horizontal .stardew-empty-state__message {
+    justify-content: center;
+  }
+}
