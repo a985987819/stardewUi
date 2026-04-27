@@ -1,5 +1,5 @@
 import { classNames } from '../../utils/classNames'
-import './Card.css'
+import './Card.scss'
 
 export type CardColor = 
   | 'night-village'

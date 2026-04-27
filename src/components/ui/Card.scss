@@ -1,0 +1,301 @@
+$panel-bg: #f5b565;
+$panel-bg-light: #ffe0b2;
+$panel-bg-dark: #ffb74d;
+$border-dark: #d7770f;
+$border-light: #9d4100;
+$shadow-color: rgba(0, 0, 0, 0.3);
+$inner-glow: rgba(255, 255, 255, 0.18);
+
+.stardew-card {
+  --card-bg: #{$panel-bg};
+  --card-bg-light: #{$panel-bg-light};
+  --card-bg-dark: #{$panel-bg-dark};
+  --card-border-dark: #{$border-dark};
+  --card-border-light: #{$border-light};
+  --card-text: #4d2608;
+  --card-text-secondary: #6a350b;
+  --card-section-bg: rgba(255, 255, 255, 0.12);
+
+  position: relative;
+  box-sizing: border-box;
+  // overflow: hidden;
+  // background: $panel-bg;
+  border: 6px solid var(--card-border-dark);
+  border-radius: 8px;
+  transition:
+    transform 0.1s steps(2),
+    box-shadow 0.1s steps(2);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+  }
+
+  &::before {
+    inset: 1px;
+    border: 2px solid var(--card-border-light);
+    border-radius: 4px;
+
+    box-shadow:
+      inset -2px 4px 0 #9e9e9e,
+      inset -3px 4px 0 #9e9e9e;
+  }
+
+  &::after {
+    inset: -8px;
+    border: 3px solid var(--card-border-light);
+
+    // border: 1px solid red;
+    border-radius: 12px;
+    // opacity: 0.9;
+  }
+
+  &--default,
+  &--elevated {
+    box-shadow:
+      0 6px 8px $shadow-color,
+      inset 0 1px 0 $inner-glow;
+  }
+
+  &--outlined {
+    box-shadow: inset 0 1px 0 $inner-glow;
+  }
+
+  &--elevated {
+    box-shadow:
+      0 10px 14px rgba(0, 0, 0, 0.28),
+      0 4px 0 rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 $inner-glow;
+  }
+
+  &--small {
+    font-size: 14px;
+  }
+
+  &--medium {
+    font-size: 16px;
+  }
+
+  &--large {
+    font-size: 18px;
+  }
+
+  &--hoverable:hover {
+    transform: translate(-2px, -2px);
+    box-shadow:
+      0 12px 18px rgba(0, 0, 0, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  &--clickable {
+    cursor: pointer;
+
+    &:active {
+      transform: translate(2px, 2px);
+      box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  &__header,
+  &__body,
+  &__footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.24),
+      var(--card-section-bg)
+    );
+    border-bottom: 2px solid rgba(157, 65, 0, 0.34);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.05em;
+    font-weight: 700;
+    color: var(--card-text);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  &__extra {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__body {
+    padding: 16px 18px 18px;
+    color: var(--card-text-secondary);
+    line-height: 1.6;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 18px 16px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(157, 65, 0, 0.08)
+    );
+    border-top: 2px solid rgba(157, 65, 0, 0.26);
+  }
+
+  &__image {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 3px solid rgba(157, 65, 0, 0.35);
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  }
+
+  &__meta {
+    padding: 10px 0;
+  }
+
+  &__meta-title {
+    margin: 0 0 4px;
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--card-text);
+  }
+
+  &__meta-desc {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.5;
+    color: var(--card-text-secondary);
+  }
+
+  &--color-night-village {
+    --card-bg: #5d4951;
+    --card-bg-light: #7a626b;
+    --card-bg-dark: #3d2c35;
+    --card-border-dark: #2f1e27;
+    --card-border-light: #dcbf8b;
+    --card-text: #fff1d6;
+    --card-text-secondary: #f6e5c5;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  &--color-forest-farm {
+    --card-bg: #94b56d;
+    --card-bg-light: #b8cf8e;
+    --card-bg-dark: #6f8f47;
+    --card-border-dark: #48652c;
+    --card-border-light: #f0e4be;
+    --card-text: #243611;
+    --card-text-secondary: #334a18;
+    --card-section-bg: rgba(255, 255, 255, 0.12);
+  }
+
+  &--color-wooden-cabin {
+    --card-bg: #b97845;
+    --card-bg-light: #d69560;
+    --card-bg-dark: #93562a;
+    --card-border-dark: #6f3a18;
+    --card-border-light: #ffe0b4;
+    --card-text: #fff1d8;
+    --card-text-secondary: #ffe4b8;
+    --card-section-bg: rgba(255, 255, 255, 0.1);
+  }
+
+  &--color-lake-night {
+    --card-bg: #678bb0;
+    --card-bg-light: #87a9ca;
+    --card-bg-dark: #446a92;
+    --card-border-dark: #274d70;
+    --card-border-light: #d9ecff;
+    --card-text: #f5fbff;
+    --card-text-secondary: #e2f1fb;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  &--color-flower-festival {
+    --card-bg: #d18a9f;
+    --card-bg-light: #e6afbf;
+    --card-bg-dark: #ad6880;
+    --card-border-dark: #82445f;
+    --card-border-light: #ffe3ee;
+    --card-text: #fff8fb;
+    --card-text-secondary: #fde8ef;
+    --card-section-bg: rgba(255, 255, 255, 0.1);
+  }
+
+  &--color-mine-starry {
+    --card-bg: #7a89c9;
+    --card-bg-light: #9da9dd;
+    --card-bg-dark: #596ab3;
+    --card-border-dark: #34458a;
+    --card-border-light: #edf1ff;
+    --card-text: #fffef5;
+    --card-text-secondary: #f2f0db;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  &--color-farmland {
+    --card-bg: #c48e5d;
+    --card-bg-light: #ddb07f;
+    --card-bg-dark: #a56a3d;
+    --card-border-dark: #7a4824;
+    --card-border-light: #ffe5bd;
+    --card-text: #fff2dc;
+    --card-text-secondary: #f8e0bc;
+    --card-section-bg: rgba(255, 255, 255, 0.1);
+  }
+
+  &--color-orchard-grass {
+    --card-bg: #7ea163;
+    --card-bg-light: #a0c17f;
+    --card-bg-dark: #5b7c42;
+    --card-border-dark: #355123;
+    --card-border-light: #e9f7d1;
+    --card-text: #f6ffe9;
+    --card-text-secondary: #e1f0cb;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  &--color-workshop-ore {
+    --card-bg: #808a93;
+    --card-bg-light: #a0aab3;
+    --card-bg-dark: #5f6972;
+    --card-border-dark: #39434c;
+    --card-border-light: #eff4f8;
+    --card-text: #fff7b5;
+    --card-text-secondary: #f4e98e;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+
+  &--color-night-celebration {
+    --card-bg: #5868c8;
+    --card-bg-light: #7f8be0;
+    --card-bg-dark: #3848a2;
+    --card-border-dark: #202f76;
+    --card-border-light: #dde3ff;
+    --card-text: #eef1ff;
+    --card-text-secondary: #dce0fb;
+    --card-section-bg: rgba(255, 255, 255, 0.08);
+  }
+}
