@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import {
   Bell,
   ChevronRight,
+  Heading1,
   MessageSquare,
   MessageSquareMore,
   MousePointer,
@@ -18,9 +19,15 @@ const components = [
     icon: <MousePointer size={20} />,
   },
   {
+    path: '/components/title',
+    title: 'Title 标题',
+    description: '基于 canvas 木牌背景和木纹文字效果的标题组件。',
+    icon: <Heading1 size={20} />,
+  },
+  {
     path: '/components/card',
     title: 'Card 卡片',
-    description: '用于展示内容块的星露谷风格卡片组件。',
+    description: '用于展示内容区块的星露谷风格卡片组件。',
     icon: <Square size={20} />,
   },
   {
@@ -32,7 +39,7 @@ const components = [
   {
     path: '/components/popup',
     title: 'Popup 气泡弹窗',
-    description: '支持上下左右与 start/end 对齐的像素气泡组件。',
+    description: '支持上下左右和 start/end 对齐的像素气泡组件。',
     icon: <MessageSquareMore size={20} />,
   },
   {

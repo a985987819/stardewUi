@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ChevronDown, Book, Box } from 'lucide-react'
 import './Sidebar.css'
@@ -7,7 +7,7 @@ import { classNames } from '../../utils/classNames'
 interface MenuItem {
   path: string
   label: string
-  icon?: React.ReactNode
+  icon?: ReactNode
   children?: MenuItem[]
 }
 
@@ -23,6 +23,7 @@ const menuItems: MenuItem[] = [
     icon: <Box size={18} />,
     children: [
       { path: '/components/button', label: 'Button 按钮' },
+      { path: '/components/title', label: 'Title 标题' },
       { path: '/components/card', label: 'Card 卡片' },
       { path: '/components/dialog', label: 'Dialog 对话框' },
       { path: '/components/popup', label: 'Popup 气泡弹窗' },
