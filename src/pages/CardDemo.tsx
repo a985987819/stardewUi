@@ -136,7 +136,7 @@ function StarCardDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="color" title="配色主题" description="不同主题颜色会同步影响卡片背景、边框和标题标签。" code={colorCode}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
           {colorOptions.map((option) => (
             <StarCard key={option.value} color={option.value} size="small" showTitle title={option.label}>
               <div style={{ textAlign: 'center', padding: '6px 0' }}>

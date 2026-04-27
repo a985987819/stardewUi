@@ -21,6 +21,15 @@ const buttonApiData = [
   { property: 'children', description: '按钮内容', type: 'ReactNode', default: '-', required: true },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '按钮类型', level: 1 },
+  { id: 'theme', title: '季节主题', level: 1 },
+  { id: 'size', title: '按钮尺寸', level: 1 },
+  { id: 'disabled', title: '禁用状态', level: 1 },
+  { id: 'multi', title: '多实例场景', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `<StarNineSliceButton>默认按钮</StarNineSliceButton>
 <StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
 <StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
@@ -45,8 +54,8 @@ const multiInstanceCode = `{Array.from({ length: 10 }).map((_, index) => (
 
 function StarButtonDemoPage() {
   return (
-    <StarComponentPage title="Button 按钮" description="按钮用于触发一个操作或事件，是用户界面中最基础的交互元素。">
-      <StarComponentDemo title="按钮类型" description="支持多种不同类型的按钮" code={basicCode}>
+    <StarComponentPage title="Button 按钮" description="按钮用于触发一个操作或事件，是用户界面中最基础的交互元素。" toc={tocItems}>
+      <StarComponentDemo id="basic" title="按钮类型" description="支持多种不同类型的按钮" code={basicCode}>
         <StarNineSliceButton>默认按钮</StarNineSliceButton>
         <StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
         <StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
@@ -54,7 +63,7 @@ function StarButtonDemoPage() {
         <StarNineSliceButton variant="link">链接按钮</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo title="季节主题" description="通过 theme 属性切换春夏秋冬四种默认按钮风格，其它特殊按钮保持统一配色。" code={themeCode}>
+      <StarComponentDemo id="theme" title="季节主题" description="通过 theme 属性切换春夏秋冬四种默认按钮风格，其它特殊按钮保持统一配色。" code={themeCode}>
         <div className={styles['button-theme-grid']}>
           {seasonalThemes.map((item) => (
             <div key={item.key} className={styles['button-theme-card']}>
@@ -67,18 +76,18 @@ function StarButtonDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo title="按钮尺寸" description="提供三种尺寸的按钮" code={sizeCode}>
+      <StarComponentDemo id="size" title="按钮尺寸" description="提供三种尺寸的按钮" code={sizeCode}>
         <StarNineSliceButton variant="primary" size="small">小按钮</StarNineSliceButton>
         <StarNineSliceButton variant="primary">默认按钮</StarNineSliceButton>
         <StarNineSliceButton variant="primary" size="large">大按钮</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo title="禁用状态" description="按钮的禁用状态" code={disabledCode}>
+      <StarComponentDemo id="disabled" title="禁用状态" description="按钮的禁用状态" code={disabledCode}>
         <StarNineSliceButton variant="primary" disabled>禁用主要按钮</StarNineSliceButton>
         <StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo title="多实例场景" description="同一页面多个按钮可复用同一图片缓存并独立绘制" code={multiInstanceCode}>
+      <StarComponentDemo id="multi" title="多实例场景" description="同一页面多个按钮可复用同一图片缓存并独立绘制" code={multiInstanceCode}>
         <div className={styles['demo-multi-buttons']}>
           {Array.from({ length: 10 }).map((_, index) => (
             <StarNineSliceButton key={`multi-${index}`}>按钮 {index + 1}</StarNineSliceButton>
@@ -86,7 +95,7 @@ function StarButtonDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <StarApiTable data={buttonApiData} />
       </div>
     </StarComponentPage>

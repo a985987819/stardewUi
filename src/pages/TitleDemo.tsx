@@ -12,6 +12,14 @@ const titleApiData = [
   { property: 'backgroundSrc', description: '背景板图片地址', type: 'string', default: "'/titleBg.png'" },
 ]
 
+const tocItems = [
+  { id: 'basic', title: '基础用法', level: 1 },
+  { id: 'multiline', title: '多行标题', level: 1 },
+  { id: 'size', title: '尺寸', level: 1 },
+  { id: 'align', title: '对齐方式', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const basicCode = `<StarTitle>农场任务</StarTitle>`
 const multilineCode = `<StarTitle size="large">{'Stardew\\nValley'}</StarTitle>\n<StarTitle>{'春季\\n市集公告'}</StarTitle>`
 const sizeCode = `<StarTitle size="small">春季市集</StarTitle>\n<StarTitle size="medium">夏季庆典</StarTitle>\n<StarTitle size="large">秋日收获</StarTitle>`
@@ -22,19 +30,20 @@ function StarTitleDemoPage() {
     <StarComponentPage
       title="Title 标题"
       description="基于 canvas 绘制木质标题牌背景，并叠加带木纹质感的像素标题文字。"
+      toc={tocItems}
     >
-      <StarComponentDemo title="基础用法" description="默认尺寸和居中排版的标题组件" code={basicCode}>
+      <StarComponentDemo id="basic" title="基础用法" description="默认尺寸和居中排版的标题组件" code={basicCode}>
         <StarTitle>农场任务</StarTitle>
       </StarComponentDemo>
 
-      <StarComponentDemo title="多行标题" description="通过换行符控制分行，接近游戏内招牌排版" code={multilineCode}>
+      <StarComponentDemo id="multiline" title="多行标题" description="通过换行符控制分行，接近游戏内招牌排版" code={multilineCode}>
         <div className={styles['title-demo-stack']}>
           <StarTitle size="large">{'Stardew\nValley'}</StarTitle>
           <StarTitle>{'春季\n市集公告'}</StarTitle>
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和留白" code={sizeCode}>
+      <StarComponentDemo id="size" title="尺寸" description="提供三种稳定的标题尺寸，保持一致的边距和留白" code={sizeCode}>
         <div className={styles['title-demo-stack']}>
           <StarTitle size="small">春季市集</StarTitle>
           <StarTitle size="medium">夏季庆典</StarTitle>
@@ -42,11 +51,11 @@ function StarTitleDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo title="对齐方式" description="内容区支持左对齐，适合公告类标题" code={alignCode}>
+      <StarComponentDemo id="align" title="对齐方式" description="内容区支持左对齐，适合公告类标题" code={alignCode}>
         <StarTitle align="left">工坊公告</StarTitle>
       </StarComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <StarApiTable data={titleApiData} />
       </div>
     </StarComponentPage>

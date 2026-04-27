@@ -20,6 +20,12 @@ const popupApiData = [
   { property: 'children', description: '触发元素', type: 'ReactNode', default: '-', required: true },
 ]
 
+const tocItems = [
+  { id: 'right', title: '右侧弹窗', level: 1 },
+  { id: 'all-placement', title: '全方位控制', level: 1 },
+  { id: 'api', title: 'API', level: 1 },
+]
+
 const rightPlacements: PopupPlacement[] = ['right-start', 'right', 'right-end']
 const placementGroups = {
   top: ['top-start', 'top', 'top-end'],
@@ -61,8 +67,8 @@ function StarPopupDemoPage() {
   const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
   return (
-    <StarComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持四向位置与 start/end 对齐控制。">
-      <StarComponentDemo title="右侧弹窗" description="右侧三种对齐方式的基础示例。" code={rightPlacementCode}>
+    <StarComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持四向位置与 start/end 对齐控制。" toc={tocItems}>
+      <StarComponentDemo id="right" title="右侧弹窗" description="右侧三种对齐方式的基础示例。" code={rightPlacementCode}>
         <div className={styles['popup-demo-stack']}>
           {rightPlacements.map((item) => (
             <StarPopup
@@ -82,7 +88,7 @@ function StarPopupDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo title="全方位控制" description="按照参考图的四向布局排列所有 placement 控制按钮。" code={allPlacementCode}>
+      <StarComponentDemo id="all-placement" title="全方位控制" description="按照参考图的四向布局排列所有 placement 控制按钮。" code={allPlacementCode}>
         <div className={styles['popup-demo-placement-map']}>
           <div className={`${styles['popup-demo-placement-row']} ${styles['popup-demo-placement-row--top']}`}>
             {placementGroups.top.map((item) => (
@@ -162,7 +168,7 @@ function StarPopupDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <div className="component-page-api">
+      <div id="api" className="component-page-api">
         <StarApiTable data={popupApiData} />
       </div>
     </StarComponentPage>
