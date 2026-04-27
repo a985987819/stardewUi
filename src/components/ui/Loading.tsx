@@ -3,16 +3,14 @@ import { classNames } from '../../utils/classNames'
 import styles from './Loading.module.scss'
 
 const FRAME_COUNT = 12
-const FRAME_DURATION = 300
+const FRAME_DURATION = 240
 const DEFAULT_TEXT = '请稍候'
 const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
 const FULL_CIRCLE = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
-const BUN_EDGE_RATIO = 0
-const BITE_WIDTH_RATIO = 0.3
-const BITE_DEPTH_RATIO = 0.25
-const BITE_OUTLINE_START = Math.PI * 0.45
-const BITE_OUTLINE_END = Math.PI * 0.6
+const BUN_EDGE_RATIO = 0.02
+const BITE_CENTER_DISTANCE_RATIO = 0.97
+const BITE_DEPTH_RATIO = 0.39
 
 let loadingImagePromise: Promise<HTMLImageElement> | null = null
 
@@ -58,23 +56,35 @@ function drawFallback(ctx: CanvasRenderingContext2D, size: number) {
 type BiteMask = {
   x: number
   y: number
+  radiusX: number
+  radiusY: number
   rotation: number
+  arcStart: number
+  arcEnd: number
 }
 
 function createBiteMasks(canvasSize: number, biteCount: number): BiteMask[] {
   const centerPoint = canvasSize / 2
   const bunRadius = getBunRadius(canvasSize)
-  const biteRadiusY = canvasSize * BITE_DEPTH_RATIO
-  const biteDistance = bunRadius + biteRadiusY * 0.12
   const stepAngle = FULL_CIRCLE / FRAME_COUNT
+  const halfStep = stepAngle / 2
+  const centerDistance = bunRadius * BITE_CENTER_DISTANCE_RATIO
+  const radiusY = bunRadius * BITE_DEPTH_RATIO
+  const radiusX = Math.tan(halfStep) * Math.sqrt(Math.max(centerDistance * centerDistance - radiusY * radiusY, 0))
+  const arcStart = Math.atan2(radiusY * Math.sin(halfStep), radiusX * Math.cos(halfStep))
+  const arcEnd = Math.PI - arcStart
 
   return Array.from({ length: biteCount }, (_, index) => {
     const angle = START_ANGLE + index * stepAngle
 
     return {
-      x: centerPoint + Math.cos(angle) * biteDistance,
-      y: centerPoint + Math.sin(angle) * biteDistance,
+      x: centerPoint + Math.cos(angle) * centerDistance,
+      y: centerPoint + Math.sin(angle) * centerDistance,
+      radiusX,
+      radiusY,
       rotation: angle + Math.PI / 2,
+      arcStart,
+      arcEnd,
     }
   })
 }
@@ -86,16 +96,14 @@ function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteC
 
   const centerPoint = canvasSize / 2
   const bunRadius = getBunRadius(canvasSize)
-  const biteRadiusX = canvasSize * BITE_WIDTH_RATIO
-  const biteRadiusY = canvasSize * BITE_DEPTH_RATIO
   const strokeWidth = Math.max(1.1, canvasSize * 0.03)
   const bites = createBiteMasks(canvasSize, biteCount)
 
   ctx.save()
   ctx.globalCompositeOperation = 'destination-out'
-  bites.forEach(({ x, y, rotation }) => {
+  bites.forEach(({ x, y, radiusX, radiusY, rotation }) => {
     ctx.beginPath()
-    ctx.ellipse(x, y, biteRadiusX, biteRadiusY, rotation, 0, FULL_CIRCLE)
+    ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, FULL_CIRCLE)
     ctx.fill()
   })
   ctx.restore()
@@ -105,14 +113,14 @@ function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteC
   ctx.arc(centerPoint, centerPoint, bunRadius, 0, FULL_CIRCLE)
   ctx.clip()
 
-  ctx.strokeStyle = '#6c4836'
+  ctx.strokeStyle = 'rgb(105, 69, 51,0.3)'
   ctx.lineWidth = strokeWidth
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
-  bites.forEach(({ x, y, rotation }) => {
-    // Only draw the inward-facing bite arc, so neighboring bites do not expose stray interior lines.
+  bites.forEach(({ x, y, radiusX, radiusY, rotation, arcStart, arcEnd }) => {
+    // Draw only the inward bite edge between the two tangency points.
     ctx.beginPath()
-    ctx.ellipse(x, y, biteRadiusX, biteRadiusY, rotation, BITE_OUTLINE_START, BITE_OUTLINE_END)
+    ctx.ellipse(x, y, radiusX, radiusY, rotation, arcStart, arcEnd)
     ctx.stroke()
   })
   ctx.restore()
