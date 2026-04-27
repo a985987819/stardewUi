@@ -1,9 +1,4 @@
 .stardew-message {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 200px;
-  max-width: 400px;
   pointer-events: auto;
   opacity: 0;
   transform: translateY(-20px);
@@ -13,9 +8,6 @@
   font-family: var(--font-pixel, "Stardew", monospace);
   font-size: 14px;
 
-  .stardew-message__icon {
-    margin-bottom: 15px;
-  }
   &-container {
     position: fixed;
     top: 20px;
@@ -26,6 +18,27 @@
     gap: 12px;
     pointer-events: none;
     transform: translateX(-50%);
+
+    &--bottom-left {
+      top: auto;
+      bottom: 20px;
+      left: 20px;
+      transform: none;
+    }
+
+    &--bottom-right {
+      top: auto;
+      bottom: 20px;
+      left: auto;
+      right: 20px;
+      transform: none;
+    }
+  }
+
+  &-layer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   &--visible {
@@ -55,16 +68,31 @@
 
   &__icon {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+
+  &__icon-box {
+    display: flex;
+    width: 52px;
+    min-height: 52px;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
+    align-self: stretch;
+    padding-right: 10px;
+    border-right: 3px solid rgba(58, 46, 57, 0.18);
   }
 
   &__body {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex: 1;
+    padding: 4px 6px 4px 0;
   }
 
   &__content {
@@ -83,6 +111,9 @@
     border: 2px solid transparent;
     background: transparent;
     cursor: pointer;
+    font-family: inherit;
+    font-size: 18px;
+    line-height: 1;
     transition:
       background 0.1s steps(2),
       transform 0.1s steps(2);

@@ -1,15 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { CheckCircle, Info, AlertTriangle, XCircle, X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import StarCanvasBubble from './CanvasBubble'
+import StarCard from './Card'
 import styles from './Message.module.scss'
 
 export type MessageType = 'normal' | 'info' | 'success' | 'warning' | 'error'
+export type MessageBottom = 'left' | 'right'
+export type MessagePosition = 'top' | 'bottom-left' | 'bottom-right'
+
+export interface MessageOptions {
+  position?: MessagePosition
+  bottom?: MessageBottom
+  duration?: number
+}
 
 export interface MessageProps {
   content: string
   type?: MessageType
+  position?: MessagePosition
+  bottom?: MessageBottom
   duration?: number
   onClose?: () => void
 }
@@ -18,12 +27,14 @@ interface MessageRecord extends MessageProps {
   id: string
 }
 
+const placements: MessagePosition[] = ['top', 'bottom-left', 'bottom-right']
+
 const iconMap = {
-  normal: null,
-  info: <Info size={16} />,
-  success: <CheckCircle size={16} />,
-  warning: <AlertTriangle size={16} />,
-  error: <XCircle size={16} />,
+  normal: '💬',
+  info: '📘',
+  success: '✅',
+  warning: '⚠️',
+  error: '❌',
 }
 
 const themeMap: Record<MessageType, { fill: string; border: string; text: string }> = {
@@ -34,9 +45,26 @@ const themeMap: Record<MessageType, { fill: string; border: string; text: string
   error: { fill: '#FFD1E3', border: '#5C3A57', text: '#5C3A57' },
 }
 
-function StarMessageCard({ content, type = 'normal', duration = 3000, onClose }: MessageRecord) {
+function resolvePlacement(position?: MessagePosition, bottom?: MessageBottom): MessagePosition {
+  if (position) {
+    return position
+  }
+
+  if (bottom === 'left') {
+    return 'bottom-left'
+  }
+
+  if (bottom === 'right') {
+    return 'bottom-right'
+  }
+
+  return 'top'
+}
+
+function StarMessageCard({ content, type = 'normal', duration = 3000, position, bottom, onClose }: MessageRecord) {
   const [visible, setVisible] = useState(false)
   const theme = themeMap[type]
+  const placement = resolvePlacement(position, bottom)
 
   useEffect(() => {
     const enterTimer = window.setTimeout(() => setVisible(true), 10)
@@ -62,26 +90,31 @@ function StarMessageCard({ content, type = 'normal', duration = 3000, onClose }:
   }, [onClose])
 
   return (
-    <StarCanvasBubble
+    <StarCard
       className={classNames(
         styles['stardew-message'],
         styles[`stardew-message--${type}`],
+        placement !== 'top' && styles['stardew-message--bottom'],
         visible && styles['stardew-message--visible']
       )}
-      fillColor={theme.fill}
-      borderColor={theme.border}
-      borderWidth={4}
-      cornerSize={8}
-      contentPadding={12}
+      size="small"
     >
-      {iconMap[type] ? <span className={styles['stardew-message__icon']}>{iconMap[type]}</span> : null}
       <div className={styles['stardew-message__body']}>
+        <div className={styles['stardew-message__icon-box']} aria-hidden>
+          <span className={styles['stardew-message__icon']}>{iconMap[type]}</span>
+        </div>
         <span className={styles['stardew-message__content']}>{content}</span>
-        <button type="button" className={styles['stardew-message__close']} onClick={handleClose} style={{ color: theme.text }}>
-          <X size={14} />
+        <button
+          type="button"
+          aria-label="关闭消息"
+          className={styles['stardew-message__close']}
+          onClick={handleClose}
+          style={{ color: theme.text }}
+        >
+          ×
         </button>
       </div>
-    </StarCanvasBubble>
+    </StarCard>
   )
 }
 
@@ -93,19 +126,38 @@ const messages: Map<string, MessageRecord> = new Map()
 function renderMessages() {
   if (!messageRoot) return
 
+  const messageList = Array.from(messages.values())
+
   messageRoot.render(
-    <div className={styles['stardew-message-container']}>
-      {Array.from(messages.values()).map((msg) => (
-        <StarMessageCard
-          key={msg.id}
-          {...msg}
-          onClose={() => {
-            messages.delete(msg.id)
-            renderMessages()
-            msg.onClose?.()
-          }}
-        />
-      ))}
+    <div className={styles['stardew-message-layer']}>
+      {placements.map((placement) => {
+        const groupedMessages = messageList.filter((msg) => resolvePlacement(msg.position, msg.bottom) === placement)
+        if (groupedMessages.length === 0) {
+          return null
+        }
+
+        return (
+          <div
+            key={placement}
+            className={classNames(
+              styles['stardew-message-container'],
+              styles[`stardew-message-container--${placement}`]
+            )}
+          >
+            {groupedMessages.map((msg) => (
+              <StarMessageCard
+                key={msg.id}
+                {...msg}
+                onClose={() => {
+                  messages.delete(msg.id)
+                  renderMessages()
+                  msg.onClose?.()
+                }}
+              />
+            ))}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -122,8 +174,18 @@ function getContainer() {
   return messageRoot
 }
 
-export function message(props: MessageProps | string, duration?: number) {
-  const config: MessageProps = typeof props === 'string' ? { content: props, duration } : props
+export function message(props: MessageProps | string, options?: MessageOptions | number) {
+  const resolvedOptions = typeof options === 'number' ? { duration: options } : options
+  const config: MessageProps =
+    typeof props === 'string'
+      ? {
+        content: props,
+        ...resolvedOptions,
+      }
+      : {
+        ...props,
+        ...resolvedOptions,
+      }
   const id = `message-${++messageId}`
 
   getContainer()
@@ -138,10 +200,15 @@ export function message(props: MessageProps | string, duration?: number) {
   }
 }
 
-message.normal = (content: string, duration?: number) => message({ content, type: 'normal', duration })
-message.info = (content: string, duration?: number) => message({ content, type: 'info', duration })
-message.success = (content: string, duration?: number) => message({ content, type: 'success', duration })
-message.warning = (content: string, duration?: number) => message({ content, type: 'warning', duration })
-message.error = (content: string, duration?: number) => message({ content, type: 'error', duration })
+message.normal = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'normal' }, options)
+message.info = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'info' }, options)
+message.success = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'success' }, options)
+message.warning = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'warning' }, options)
+message.error = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'error' }, options)
 
 export default message
