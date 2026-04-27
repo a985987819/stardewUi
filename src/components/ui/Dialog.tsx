@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import StarCanvasPanel from './CanvasPanel'
+import { StarCard } from './Card'
 import StarNineSliceButton from './NineSliceButton'
 import StarTypewriter from './Typewriter'
 import styles from './Dialog.module.css'
@@ -74,6 +75,17 @@ function StarDialog({
   }, [currentPage, isFirstPage])
 
   useEffect(() => {
+    if (!open) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [open])
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!open) return
 
@@ -130,124 +142,112 @@ function StarDialog({
 
   if (!open) return null
 
-  return (
+  const portalTarget = document.querySelector('[data-star-app="true"]') ?? document.body
+  const dialogLabel = typeof title === 'string' ? title : undefined
+
+  return createPortal(
     <div
       className={classNames(styles['stardew-dialog-overlay'], maskClosable && styles['stardew-dialog-overlay--clickable'])}
       onClick={handleOverlayClick}
     >
-      <div className={styles['stardew-dialog']} onClick={(event) => event.stopPropagation()}>
-        <StarCanvasPanel
+      <div
+        className={styles['stardew-dialog']}
+        role="dialog"
+        aria-modal="true"
+        aria-label={dialogLabel}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <StarCard
           className={styles['stardew-dialog__left']}
-          contentClassName={styles['stardew-dialog__left-content']}
-          fillColor="#f7edd6"
-          borderColor="#9e460f"
-          borderWidth={5}
-          stepSize={8}
-          contentPadding={14}
-        >
-          {title ? (
-            <h3 className={styles['stardew-dialog__title']}>
-              {typewriter && !titleComplete ? (
-                <StarTypewriter
-                  text={title}
-                  speed={typewriterSpeed}
-                  key={`title-${titleKey}`}
-                  onComplete={handleTitleComplete}
-                />
+          title={
+            typewriter && !titleComplete && title ? (
+              <StarTypewriter text={title} speed={typewriterSpeed} key={`title-${titleKey}`} onComplete={handleTitleComplete} />
+            ) : (
+              title
+            )
+          }
+          showTitle={Boolean(title)}
+          footer={
+            <div className={styles['stardew-dialog__footer']}>
+              {showActions ? (
+                <div className={styles['stardew-dialog__actions']}>
+                  {finalActions.map((action, index) => (
+                    <StarNineSliceButton
+                      key={index}
+                      type="button"
+                      size="small"
+                      variant={action.variant ?? 'default'}
+                      disabled={action.disabled}
+                      onClick={action.onClick}
+                    >
+                      {action.label}
+                    </StarNineSliceButton>
+                  ))}
+                </div>
               ) : (
-                title
+                <div />
               )}
-            </h3>
-          ) : null}
 
+              <div className={styles['stardew-dialog__pagination']}>
+                <StarNineSliceButton
+                  type="button"
+                  size="small"
+                  className={styles['stardew-dialog__nav-btn']}
+                  onClick={handlePrev}
+                  disabled={isFirstPage}
+                  title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
+                >
+                  <ChevronUp size={18} />
+                </StarNineSliceButton>
+                <span className={styles['stardew-dialog__page-indicator']}>
+                  {currentPage + 1} / {totalPages}
+                </span>
+                <StarNineSliceButton
+                  type="button"
+                  size="small"
+                  className={styles['stardew-dialog__nav-btn']}
+                  onClick={handleNext}
+                  disabled={isLastPage}
+                  title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
+                >
+                  <ChevronDown size={18} />
+                </StarNineSliceButton>
+              </div>
+            </div>
+          }
+        >
           <div className={styles['stardew-dialog__content']}>
             {typewriter ? (
               titleComplete ? (
                 <StarTypewriter text={pages[currentPage]} speed={typewriterSpeed} key={`content-${contentKey}`} />
               ) : (
-                <span style={{ opacity: 0 }}>{WAITING_TEXT}</span>
+                <span className={styles['stardew-dialog__waiting']}>{WAITING_TEXT}</span>
               )
             ) : (
               pages[currentPage]
             )}
           </div>
-
-          <div className={styles['stardew-dialog__footer']}>
-            {showActions ? (
-              <div className={styles['stardew-dialog__actions']}>
-                {finalActions.map((action, index) => (
-                  <StarNineSliceButton
-                    key={index}
-                    type="button"
-                    size="small"
-                    variant={action.variant ?? 'default'}
-                    disabled={action.disabled}
-                    onClick={action.onClick}
-                  >
-                    {action.label}
-                  </StarNineSliceButton>
-                ))}
-              </div>
-            ) : null}
-
-            <div className={styles['stardew-dialog__pagination']}>
-              <StarNineSliceButton
-                type="button"
-                size="small"
-                className={styles['stardew-dialog__nav-btn']}
-                onClick={handlePrev}
-                disabled={isFirstPage}
-                title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-              >
-                <ChevronUp size={18} />
-              </StarNineSliceButton>
-              <span className={styles['stardew-dialog__page-indicator']}>
-                {currentPage + 1} / {totalPages}
-              </span>
-              <StarNineSliceButton
-                type="button"
-                size="small"
-                className={styles['stardew-dialog__nav-btn']}
-                onClick={handleNext}
-                disabled={isLastPage}
-                title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-              >
-                <ChevronDown size={18} />
-              </StarNineSliceButton>
-            </div>
-          </div>
-        </StarCanvasPanel>
+        </StarCard>
 
         {image || name ? (
           <div className={styles['stardew-dialog__right']}>
             {image ? (
-              <StarCanvasPanel
-                className={styles['stardew-dialog__image-wrap']}
-                fillColor="#f7edd6"
-                borderColor="#9e460f"
-                borderWidth={5}
-                stepSize={8}
-                contentPadding={10}
-              >
-                <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
-              </StarCanvasPanel>
+              <StarCard className={styles['stardew-dialog__image-card']}>
+                <div className={styles['stardew-dialog__image-wrap']}>
+                  <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
+                </div>
+              </StarCard>
             ) : null}
             {name ? (
-              <StarCanvasPanel
-                className={styles['stardew-dialog__name']}
-                fillColor="#fdd284"
-                borderColor="#9e460f"
-                borderWidth={5}
-                stepSize={8}
-                contentPadding={8}
-              >
-                {name}
-              </StarCanvasPanel>
+              <StarCard className={styles['stardew-dialog__name-card']}>
+                <div className={styles['stardew-dialog__name']}>{name}</div>
+              </StarCard>
             ) : null}
           </div>
         ) : null}
       </div>
-    </div>
+    </div>,
+    portalTarget
   )
 }
 

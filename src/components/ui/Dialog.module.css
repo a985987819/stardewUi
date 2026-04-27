@@ -1,11 +1,16 @@
 .stardew-dialog-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 4000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  padding: 32px 20px;
+  isolation: isolate;
+  background: rgba(43, 24, 10, 0.9);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .stardew-dialog-overlay--clickable {
@@ -14,68 +19,44 @@
 
 .stardew-dialog {
   position: relative;
+  z-index: 1;
   display: flex;
-  width: 612px;
-  max-width: 90vw;
-  min-height: 252px;
-  padding: 10px;
-  gap: 10px;
-  background: #d3b07a;
-  box-shadow: 10px 10px 0 rgba(56, 26, 10, 0.28);
+  width: min(820px, 100%);
+  align-items: stretch;
+  gap: 18px;
   cursor: default;
 }
 
 .stardew-dialog__left {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
 
-.stardew-dialog__left-content {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.stardew-dialog__title {
-  margin: 0 0 12px 0;
-  padding-bottom: 8px;
-  font-size: 1.1em;
-  font-weight: normal;
-  color: #7a3514;
-  border-bottom: 4px solid #d49a56;
-}
-
 .stardew-dialog__content {
-  flex: 1;
-  min-height: 0;
-  font-size: 1em;
+  min-height: 180px;
   color: #4f2b17;
-  line-height: 1.55;
-  word-wrap: break-word;
+  font-size: 1em;
+  line-height: 1.6;
   white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.stardew-dialog__waiting {
+  opacity: 0;
 }
 
 .stardew-dialog__footer {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-top: auto;
-  padding-top: 16px;
   gap: 12px;
-  min-height: 40px;
+  width: 100%;
 }
 
 .stardew-dialog__actions {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.stardew-dialog__actions:empty {
-  display: none;
 }
 
 .stardew-dialog__pagination {
@@ -85,10 +66,12 @@
   margin-left: auto;
   font-size: 0.9em;
   color: #7a4c24;
+  white-space: nowrap;
 }
 
 .stardew-dialog__page-indicator {
-  white-space: nowrap;
+  min-width: 56px;
+  text-align: center;
 }
 
 .stardew-dialog__nav-btn {
@@ -99,19 +82,25 @@
 
 .stardew-dialog__right {
   display: flex;
-  flex-direction: column;
-  width: 170px;
+  width: 210px;
   flex-shrink: 0;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stardew-dialog__image-card {
+  flex: 1;
+  min-height: 250px;
 }
 
 .stardew-dialog__image-wrap {
-  flex: 1;
-  display: flex;
-  min-height: 168px;
+  width: 100%;
+  height: 100%;
+  min-height: 206px;
 }
 
 .stardew-dialog__image {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -119,33 +108,43 @@
   image-rendering: crisp-edges;
 }
 
+.stardew-dialog__name-card {
+  flex-shrink: 0;
+}
+
 .stardew-dialog__name {
-  min-height: 56px;
   display: flex;
+  min-height: 52px;
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 1em;
   color: #7a3514;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .stardew-dialog {
     flex-direction: column-reverse;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
   }
 
   .stardew-dialog__right {
     width: 100%;
   }
 
-  .stardew-dialog__image-wrap {
-    min-height: 120px;
+  .stardew-dialog__image-card {
+    min-height: 180px;
   }
 
-  .stardew-dialog__name {
-    width: 100%;
+  .stardew-dialog__content {
+    min-height: 140px;
+  }
+
+  .stardew-dialog__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stardew-dialog__pagination {
+    margin-left: 0;
+    justify-content: flex-end;
   }
 }

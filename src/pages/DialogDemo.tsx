@@ -2,7 +2,7 @@ import { useState } from 'react'
 import ComponentPage from '../components/layout/ComponentPage'
 import ComponentDemo from '../components/layout/ComponentDemo'
 import ApiTable from '../components/layout/ApiTable'
-import Dialog from '../components/ui/Dialog'
+import StarDialog from '../components/ui/Dialog'
 import { classNames } from '../utils/classNames'
 import appStyles from '../styles/global.module.css'
 
@@ -82,7 +82,7 @@ const tocItems = [
 
 const basicCode = `const [open, setOpen] = useState(false)
 
-<Dialog
+<StarDialog
   open={open}
   title="欢迎来到星露谷"
   content="你好，我是新来的农夫！这里真是个美丽的地方。"
@@ -93,7 +93,7 @@ const basicCode = `const [open, setOpen] = useState(false)
 
 const paginationCode = `const [open, setOpen] = useState(false)
 
-<Dialog
+<StarDialog
   open={open}
   title="任务对话"
   content={[
@@ -108,7 +108,7 @@ const paginationCode = `const [open, setOpen] = useState(false)
 
 const customActionsCode = `const [open, setOpen] = useState(false)
 
-<Dialog
+<StarDialog
   open={open}
   title="确认操作"
   content="你确定要出售这个物品吗？此操作不可撤销。"
@@ -121,7 +121,7 @@ const customActionsCode = `const [open, setOpen] = useState(false)
 
 const noActionsCode = `const [open, setOpen] = useState(false)
 
-<Dialog
+<StarDialog
   open={open}
   title="提示"
   content="这是一个纯提示弹窗，没有操作按钮。"
@@ -132,7 +132,7 @@ const noActionsCode = `const [open, setOpen] = useState(false)
 
 const noTypewriterCode = `const [open, setOpen] = useState(false)
 
-<Dialog
+<StarDialog
   open={open}
   title="无打字机效果"
   content="这段文字会直接显示，没有打字机动画效果。"
@@ -162,7 +162,7 @@ function StarDialogDemoPage() {
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setBasicOpen(true)}>
           打开基础弹窗
         </button>
-        <Dialog
+        <StarDialog
           open={basicOpen}
           title="欢迎来到星露谷"
           content="你好，我是新来的农夫！这里真是个美丽的地方。点击文字可以快速显示全部内容。"
@@ -176,7 +176,7 @@ function StarDialogDemoPage() {
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setPaginationOpen(true)}>
           打开分页弹窗
         </button>
-        <Dialog
+        <StarDialog
           open={paginationOpen}
           title="任务对话"
           content={[
@@ -194,7 +194,7 @@ function StarDialogDemoPage() {
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setCustomOpen(true)}>
           打开自定义按钮弹窗
         </button>
-        <Dialog
+        <StarDialog
           open={customOpen}
           title="确认操作"
           content="你确定要出售这个物品吗？此操作不可撤销。"
@@ -212,7 +212,7 @@ function StarDialogDemoPage() {
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoActionOpen(true)}>
           打开无按钮弹窗
         </button>
-        <Dialog
+        <StarDialog
           open={noActionOpen}
           title="提示"
           content="这是一个纯提示弹窗，没有操作按钮。点击遮罩层或按 ESC 关闭。"
@@ -228,7 +228,7 @@ function StarDialogDemoPage() {
         <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoTypewriterOpen(true)}>
           打开无打字机弹窗
         </button>
-        <Dialog
+        <StarDialog
           open={noTypewriterOpen}
           title="无打字机效果"
           content="这段文字会直接显示，没有打字机动画效果。适用于需要快速展示内容的场景。"
