@@ -22,48 +22,50 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
+  gap: 2px;
+  margin-top: 2px;
+  width: 100%;
 }
 
 .calendar__marker {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 16px;
-  min-height: 16px;
-  border-radius: 999px;
+  min-width: 12px;
+  min-height: 12px;
+  border-radius: 2px;
   background: #f4c46a;
   color: #4e342e;
   overflow: hidden;
+  font-size: 9px;
 }
 
 .calendar__marker-image {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   object-fit: cover;
+  image-rendering: pixelated;
 }
 
 .calendar__marker-dot {
   display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
   background: currentColor;
 }
 
 .calendar__marker-summary {
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 700;
   color: #6d4c41;
 }
 
 .calendar__details {
   padding: 12px;
-  border: 2px solid #b57b33;
-  border-radius: 12px;
-  background: #fff6df;
+  border: 2px solid #2c2c2c;
+  background: #fbebc2;
   color: #4e342e;
 }
 
