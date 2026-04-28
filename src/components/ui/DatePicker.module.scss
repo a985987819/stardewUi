@@ -1,0 +1,36 @@
+.date-picker {
+  display: grid;
+  gap: 16px;
+}
+
+.date-picker__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.date-picker__month {
+  flex: 1;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #4e342e;
+}
+
+.date-picker__cell--selected button,
+.date-picker__cell--range-start button,
+.date-picker__cell--range-end button {
+  border-color: #8f5a24;
+  background: #f4c46a;
+  color: #4e342e;
+}
+
+.date-picker__cell--in-range button {
+  background: #fff1bf;
+}
+
+.date-picker__cell--range-start button,
+.date-picker__cell--range-end button {
+  box-shadow: inset 0 0 0 1px #6d4c41;
+}
