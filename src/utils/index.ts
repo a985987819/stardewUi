@@ -1,4 +1,5 @@
 export * from './classNames'
+export * from './githubPages'
 export * from './helpers'
 export * from './nineSliceCanvas'
 export * from './pixelBubbleCanvas'

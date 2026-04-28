@@ -1,8 +1,10 @@
 import { defineConfig } from 'vitest/config'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
+import { GITHUB_PAGES_BASE_PATH } from './src/utils/githubPages'
 
 export default defineConfig({
+  base: GITHUB_PAGES_BASE_PATH,
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
