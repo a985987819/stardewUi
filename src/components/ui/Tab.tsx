@@ -20,6 +20,10 @@ export interface StarTabItem {
   content: ReactNode
   activeStyle?: CSSProperties
   activeClassName?: string
+  /** 选中时全局样式 - 应用于整个选项卡容器 */
+  activeGlobalStyle?: CSSProperties
+  /** 选中时全局类名 - 应用于整个选项卡容器 */
+  activeGlobalClassName?: string
   disabled?: boolean
 }
 
@@ -92,14 +96,20 @@ function StarTab({
 
   const isBottom = position === 'bottom'
 
+  // 获取当前选中项的全局样式和类名
+  const activeGlobalStyle = activeItem?.activeGlobalStyle
+  const activeGlobalClassName = activeItem?.activeGlobalClassName
+
   return (
     <div
       {...rest}
       className={classNames(
         styles['star-tab'],
         isBottom && styles['star-tab--bottom'],
+        activeGlobalClassName,
         className,
       )}
+      style={activeGlobalStyle}
     >
       {!isBottom && (
         <div className={styles['star-tab__nav-wrapper']}>

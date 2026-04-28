@@ -57,6 +57,26 @@
     @apply flex flex-col;
   }
 
+  &-search {
+    @apply flex items-center gap-2 mx-4 my-2 px-3 py-2 rounded;
+    background: var(--color-bg-hover);
+    border: 2px solid var(--color-border);
+
+    &-icon {
+      color: var(--color-text-tertiary);
+      flex-shrink: 0;
+    }
+
+    &-input {
+      @apply w-full text-sm bg-transparent outline-none;
+      color: var(--color-text);
+
+      &::placeholder {
+        color: var(--color-text-tertiary);
+      }
+    }
+  }
+
   @media (max-width: 1024px) {
     @apply -translate-x-full z-[90];
 

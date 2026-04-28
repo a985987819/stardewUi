@@ -10,6 +10,7 @@ const tocItems = [
   { id: 'icon', title: '带图标', level: 1 },
   { id: 'position', title: '底部导航', level: 1 },
   { id: 'custom', title: '自定义选中样式', level: 1 },
+  { id: 'global', title: '选中时全局样式', level: 1 },
   { id: 'disabled', title: '禁用选项', level: 1 },
   { id: 'controlled', title: '受控模式', level: 1 },
   { id: 'api', title: 'API', level: 1 },
@@ -30,6 +31,8 @@ const tabItemApiData = [
   { property: 'content', description: '选项卡内容', type: 'ReactNode', default: '-', required: true },
   { property: 'activeStyle', description: '选中时的内联样式', type: 'CSSProperties', default: '-' },
   { property: 'activeClassName', description: '选中时追加的类名', type: 'string', default: '-' },
+  { property: 'activeGlobalStyle', description: '选中时全局样式，应用于整个选项卡容器', type: 'CSSProperties', default: '-' },
+  { property: 'activeGlobalClassName', description: '选中时全局类名，应用于整个选项卡容器', type: 'string', default: '-' },
   { property: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
 ]
 
@@ -71,6 +74,23 @@ const customCode = `<StarTab
       label: '夏季',
       content: '夏日炎炎...',
       activeStyle: { background: '#d7992e', color: '#fff8eb' },
+    },
+  ]}
+/>`
+
+const globalCode = `<StarTab
+  items={[
+    { 
+      key: 'farm', 
+      label: '农场', 
+      content: '绿色主题 - 选中时整个区域变绿',
+      activeGlobalStyle: { background: '#2d4a3e', borderRadius: '8px', padding: '12px' }
+    },
+    { 
+      key: 'mine', 
+      label: '矿洞', 
+      content: '棕色主题 - 选中时整个区域变棕',
+      activeGlobalStyle: { background: '#4a3728', borderRadius: '8px', padding: '12px' }
     },
   ]}
 />`
@@ -142,6 +162,27 @@ const disabledItems = [
   { key: 'secret', label: '隐藏区域', content: '你发现了秘密区域！这里有稀有宝物。' },
 ]
 
+const globalItems = [
+  { 
+    key: 'farm', 
+    label: '农场', 
+    content: '绿色主题 - 选中农场时，整个选项卡区域变为绿色主题。', 
+    activeGlobalStyle: { background: '#2d4a3e', borderRadius: '8px', padding: '12px' } 
+  },
+  { 
+    key: 'mine', 
+    label: '矿洞', 
+    content: '棕色主题 - 选中矿洞时，整个选项卡区域变为棕色主题。', 
+    activeGlobalStyle: { background: '#4a3728', borderRadius: '8px', padding: '12px' } 
+  },
+  { 
+    key: 'fish', 
+    label: '钓鱼', 
+    content: '蓝色主题 - 选中钓鱼时，整个选项卡区域变为蓝色主题。', 
+    activeGlobalStyle: { background: '#2d4a5e', borderRadius: '8px', padding: '12px' } 
+  },
+]
+
 function StarTabDemoPage() {
   const [controlledKey, setControlledKey] = useState('spring')
 
@@ -192,6 +233,17 @@ function StarTabDemoPage() {
       >
         <div style={{ width: '100%' }}>
           <StarTab items={customItems} />
+        </div>
+      </StarComponentDemo>
+
+      <StarComponentDemo
+        id="global"
+        title="选中时全局样式"
+        description="为每个选项卡设置 activeGlobalStyle，当选中时整个选项卡容器的样式会改变。"
+        code={globalCode}
+      >
+        <div style={{ width: '100%' }}>
+          <StarTab items={globalItems} />
         </div>
       </StarComponentDemo>
 
