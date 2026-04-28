@@ -20,18 +20,52 @@
     filter: drop-shadow(4px 4px 0 rgba(77, 38, 8, 0.18));
   }
 
-  &__title {
-    margin-bottom: 8px;
-    color: #4d2608;
-    font-size: 18px;
-    line-height: 1.1;
-    text-shadow: 0 1px 0 rgba(255, 248, 235, 0.24);
-  }
+  &__card {
+    --card-bg: #ffe0b2;
+    --card-bg-light: #fff0d6;
+    --card-bg-dark: #ffc675;
+    --card-border-dark: #d7770f;
+    --card-border-light: #9d4100;
+    --card-text: #4d2608;
+    --card-text-secondary: #6a350b;
+    --card-title-tag-bg: rgba(255, 239, 190, 0.82);
 
-  &__content {
-    color: #6a350b;
-    font-size: 14px;
-    line-height: 1.4;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+
+    .stardew-card__frame,
+    .stardew-card__outline {
+      display: none;
+    }
+
+    .stardew-card__header {
+      min-height: auto;
+      padding: 0 0 8px;
+      border-bottom: 2px solid rgba(157, 65, 0, 0.2);
+    }
+
+    .stardew-card__title-tag {
+      min-height: auto;
+      padding: 4px 10px;
+    }
+
+    .stardew-card__title {
+      font-size: 16px;
+    }
+
+    .stardew-card__body {
+      padding: 8px 0;
+      color: #6a350b;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .stardew-card__footer {
+      padding: 10px 0 0;
+      background: none;
+      border-top: 2px solid rgba(157, 65, 0, 0.2);
+    }
   }
 
   &__actions {
@@ -39,6 +73,5 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 14px;
   }
 }

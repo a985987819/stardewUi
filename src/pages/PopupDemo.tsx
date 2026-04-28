@@ -6,12 +6,18 @@ import { StarNineSliceButton, StarPopup, type PopupPlacement } from '../componen
 import styles from './PopupDemo.module.scss'
 
 const popupApiData = [
-  { property: 'open', description: '是否显示弹窗', type: 'boolean', default: 'true' },
+  { property: 'open', description: '是否显示弹窗（受控）', type: 'boolean', default: '-' },
   {
     property: 'placement',
     description: '弹出位置',
     type: "'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'",
     default: "'right'",
+  },
+  {
+    property: 'trigger',
+    description: '触发方式',
+    type: "'hover' | 'click'",
+    default: "'hover'",
   },
   { property: 'title', description: '标题区域', type: 'ReactNode', default: '-' },
   { property: 'content', description: '内容区域', type: 'ReactNode', default: '-', required: true },
@@ -21,7 +27,8 @@ const popupApiData = [
 ]
 
 const tocItems = [
-  { id: 'right', title: '右侧弹窗', level: 1 },
+  { id: 'hover', title: 'Hover 触发', level: 1 },
+  { id: 'click', title: 'Click 触发', level: 1 },
   { id: 'all-placement', title: '全方位控制', level: 1 },
   { id: 'api', title: 'API', level: 1 },
 ]
@@ -34,11 +41,10 @@ const placementGroups = {
   left: ['left-start', 'left', 'left-end'],
 } satisfies Record<'top' | 'right' | 'bottom' | 'left', PopupPlacement[]>
 
-const rightPlacementCode = `<StarPopup
-  open
+const hoverCode = `<StarPopup
   placement="right-start"
   title="提示"
-  content="支持像素气泡箭头和多按钮操作。"
+  content="默认 hover 触发，支持像素气泡箭头和多按钮操作。"
   actions={[
     { label: '取消' },
     { label: '确认', variant: 'primary' },
@@ -47,10 +53,20 @@ const rightPlacementCode = `<StarPopup
   <StarNineSliceButton>right-start</StarNineSliceButton>
 </StarPopup>`
 
+const clickCode = `<StarPopup
+  trigger="click"
+  placement="bottom"
+  title="点击触发"
+  content="点击按钮切换显示，点击外部自动关闭。"
+  actions={[{ label: '知道了' }]}
+>
+  <StarNineSliceButton variant="primary">点击我</StarNineSliceButton>
+</StarPopup>`
+
 const allPlacementCode = `const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
 <StarPopup
-  open
+  trigger="click"
   placement={placement}
   title="全方位控制"
   content="支持 top / right / bottom / left，以及 start / end 对齐。"
@@ -67,16 +83,15 @@ function StarPopupDemoPage() {
   const [placement, setPlacement] = useState<PopupPlacement>('right-start')
 
   return (
-    <StarComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持四向位置与 start/end 对齐控制。" toc={tocItems}>
-      <StarComponentDemo id="right" title="右侧弹窗" description="右侧三种对齐方式的基础示例。" code={rightPlacementCode}>
+    <StarComponentPage title="Popup 气泡弹窗" description="像素风气泡弹窗组件，支持 hover / click 触发、四向位置与 start/end 对齐控制。" toc={tocItems}>
+      <StarComponentDemo id="hover" title="Hover 触发" description="默认 hover 触发，鼠标移入显示、移出隐藏。" code={hoverCode}>
         <div className={styles['popup-demo-stack']}>
           {rightPlacements.map((item) => (
             <StarPopup
               key={item}
-              open
               placement={item}
               title="提示"
-              content="支持像素气泡箭头和多按钮操作。"
+              content="默认 hover 触发，支持像素气泡箭头和多按钮操作。"
               actions={[
                 { label: '取消' },
                 { label: '确认', variant: 'primary' },
@@ -85,6 +100,33 @@ function StarPopupDemoPage() {
               <StarNineSliceButton variant={item === 'right' ? 'primary' : 'default'}>{item}</StarNineSliceButton>
             </StarPopup>
           ))}
+        </div>
+      </StarComponentDemo>
+
+      <StarComponentDemo id="click" title="Click 触发" description='trigger="click" 时，点击切换显示，点击弹窗外部自动关闭。' code={clickCode}>
+        <div className={styles['popup-demo-stack']}>
+          <StarPopup
+            trigger="click"
+            placement="bottom"
+            title="点击触发"
+            content="点击按钮切换显示，点击外部自动关闭。"
+            actions={[{ label: '知道了' }]}
+          >
+            <StarNineSliceButton variant="primary">点击我</StarNineSliceButton>
+          </StarPopup>
+
+          <StarPopup
+            trigger="click"
+            placement="right"
+            title="操作确认"
+            content="确定要执行此操作吗？"
+            actions={[
+              { label: '取消' },
+              { label: '确认', variant: 'primary' },
+            ]}
+          >
+            <StarNineSliceButton>删除</StarNineSliceButton>
+          </StarPopup>
         </div>
       </StarComponentDemo>
 
@@ -122,7 +164,7 @@ function StarPopupDemoPage() {
 
           <div className={styles['popup-demo-playground']}>
             <StarPopup
-              open
+              trigger="click"
               placement={placement}
               title="位置控制"
               content="支持 top / right / bottom / left 以及 start / end 对齐。"
@@ -171,7 +213,7 @@ function StarPopupDemoPage() {
       <div id="api" className="component-page-api">
         <StarApiTable data={popupApiData} />
       </div>
-    </StarComponentPage>
+    </StarComponentPage >
   )
 }
 
