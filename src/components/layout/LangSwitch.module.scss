@@ -1,0 +1,24 @@
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 2px solid var(--color-border-dark);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+    border-color: var(--color-primary);
+  }
+
+  &-text {
+    min-width: 18px;
+    text-align: center;
+  }
+}

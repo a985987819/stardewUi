@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Book, Box, ChevronDown } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import { useI18n } from '../../i18n'
 import styles from './Sidebar.module.scss'
 
 interface MenuItem {
@@ -11,36 +12,40 @@ interface MenuItem {
   children?: MenuItem[]
 }
 
-const menuItems: MenuItem[] = [
-  {
-    path: '/guide',
-    label: 'Guide / 指南',
-    icon: <Book size={18} />,
-  },
-  {
-    path: '/components',
-    label: 'Components / 组件',
-    icon: <Box size={18} />,
-    children: [
-      { path: '/components/button', label: 'Button / 按钮' },
-      { path: '/components/calendar', label: 'Calendar / 日历' },
-      { path: '/components/date-picker', label: 'DatePicker / 日期选择' },
-      { path: '/components/star-date-picker', label: 'StarDatePicker / 星露谷日期' },
-      { path: '/components/title', label: 'Title / 标题' },
-      { path: '/components/card', label: 'Card / 卡片' },
-      { path: '/components/dialog', label: 'Dialog / 对话框' },
-      { path: '/components/popup', label: 'Popup / 弹窗' },
-      { path: '/components/typewriter', label: 'Typewriter / 打字机' },
-      { path: '/components/loading', label: 'Loading / 加载' },
-      { path: '/components/message', label: 'Message / 消息' },
-      { path: '/components/empty-state', label: 'EmptyState / 空状态' },
-    ],
-  },
-]
+function useMenuItems(): MenuItem[] {
+  const { t } = useI18n()
+  return [
+    {
+      path: '/guide',
+      label: t('sidebar.guide'),
+      icon: <Book size={18} />,
+    },
+    {
+      path: '/components',
+      label: t('sidebar.components'),
+      icon: <Box size={18} />,
+      children: [
+        { path: '/components/button', label: t('sidebar.button') },
+        { path: '/components/calendar', label: t('sidebar.calendar') },
+        { path: '/components/date-picker', label: t('sidebar.datePicker') },
+        { path: '/components/star-date-picker', label: t('sidebar.starDatePicker') },
+        { path: '/components/title', label: t('sidebar.title') },
+        { path: '/components/card', label: t('sidebar.card') },
+        { path: '/components/dialog', label: t('sidebar.dialog') },
+        { path: '/components/popup', label: t('sidebar.popup') },
+        { path: '/components/typewriter', label: t('sidebar.typewriter') },
+        { path: '/components/loading', label: t('sidebar.loading') },
+        { path: '/components/message', label: t('sidebar.message') },
+        { path: '/components/empty-state', label: t('sidebar.emptyState') },
+      ],
+    },
+  ]
+}
 
 function StarSidebar() {
   const location = useLocation()
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
+  const menuItems = useMenuItems()
 
   const toggleExpand = (path: string) => {
     setExpandedKeys((prev) => (prev.includes(path) ? prev.filter((key) => key !== path) : [...prev, path]))
