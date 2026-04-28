@@ -165,6 +165,18 @@ export function isDayInRange(
   return dayTimestamp >= rangeStart && dayTimestamp <= rangeEnd
 }
 
+export function groupCalendarItemsByDay<Item extends { date: CalendarInput }>(
+  items: Item[],
+): Record<number, Item[]> {
+  return items.reduce<Record<number, Item[]>>((accumulator, item) => {
+    const dayTimestamp = normalizeToDayTimestamp(item.date)
+    const dayItems = accumulator[dayTimestamp] ?? []
+    dayItems.push(item)
+    accumulator[dayTimestamp] = dayItems
+    return accumulator
+  }, {})
+}
+
 export function buildCalendarCells(monthTimestamp: CalendarInput): CalendarCell[] {
   const currentMonthStart = getMonthStartTimestamp(monthTimestamp)
   const currentMonthDate = new Date(currentMonthStart)
