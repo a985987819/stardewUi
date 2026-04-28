@@ -3,6 +3,17 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import NineSliceButton from './NineSliceButton'
 
+const { drawDefaultButtonBackground } = vi.hoisted(() => ({
+  drawDefaultButtonBackground: vi.fn(),
+}))
+const canvasContextStub = new Proxy(
+  {},
+  {
+    get: () => vi.fn(),
+    set: () => true,
+  }
+) as CanvasRenderingContext2D
+
 vi.mock('../../hooks/useNineSliceBackground', () => ({
   useNineSliceBackground: ({
     src,
@@ -21,6 +32,10 @@ vi.mock('../../hooks/useNineSliceBackground', () => ({
     isReady: true,
     redraw: vi.fn(),
   }),
+}))
+
+vi.mock('../../utils/defaultButtonCanvas', () => ({
+  drawDefaultButtonBackground,
 }))
 
 vi.mock('../../utils/seasonalButtonCanvas', () => ({
@@ -71,6 +86,9 @@ class ResizeObserverMock {
 }
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
+vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(
+  () => canvasContextStub
+)
 
 describe('NineSliceButton', () => {
   it('keeps the regular default appearance when no theme is provided', () => {
@@ -82,20 +100,31 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#5D4037')
   })
 
-  it('uses the regular button image by default instead of the classical canvas path', () => {
+  it('renders the default button with a dedicated canvas background', () => {
     render(<NineSliceButton>默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '默认按钮' })
     const image = button.querySelector('img')
-    const canvas = button.querySelector('canvas')
+    const canvas = button.querySelector('canvas[class*="nine-slice-button__canvas--default"]')
     const label = button.querySelector('span[class*="nine-slice-button__label"]')
 
-    expect(image).toHaveAttribute('src', '/defaultBtn.png')
-    expect(canvas).toBeNull()
+    expect(image).toBeNull()
+    expect(canvas).not.toBeNull()
     expect(label).not.toBeNull()
     expect(getComputedStyle(label as Element).textShadow).not.toBe('none')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#5D4037')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
+  })
+
+  it('exposes derived border and text variables when a custom default color is provided', () => {
+    render(<NineSliceButton color="#2E6F40">custom button</NineSliceButton>)
+
+    const button = screen.getByRole('button', { name: 'custom button' })
+
+    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#2E6F40')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-inner-border')).not.toBe('')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).not.toBe('')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#FDF4E6')
   })
 
   it('updates regular default text colors on hover and active states', () => {
@@ -156,6 +185,41 @@ describe('NineSliceButton', () => {
     expect(canvas).toHaveAttribute('data-insets', '8,8,8,8')
   })
 
+  it('switches to square icon layout and keeps the default background on the dedicated canvas path', () => {
+    render(
+      <NineSliceButton icon={<svg aria-hidden="true" data-testid="button-icon" />}>
+        图标按钮
+      </NineSliceButton>
+    )
+
+    const button = screen.getByRole('button', { name: '图标按钮' })
+    const content = button.querySelector('span[class*="nine-slice-button__content"]')
+    const icon = screen.getByTestId('button-icon')
+    const iconWrapper = button.querySelector('span[class*="nine-slice-button__icon"]')
+    const label = button.querySelector('span[class*="nine-slice-button__label"]')
+    const image = button.querySelector('img')
+    const canvas = button.querySelector('canvas[class*="nine-slice-button__canvas--default"]')
+
+    expect(button.className).toContain('nine-slice-button--icon')
+    expect(content?.className).toContain('nine-slice-button__content--stacked')
+    expect(iconWrapper).not.toBeNull()
+    expect(icon).toBeInTheDocument()
+    expect(image).toBeNull()
+    expect(canvas).not.toBeNull()
+    expect(label?.compareDocumentPosition(iconWrapper as Node)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
+  it('accepts a string icon and renders it inside the icon wrapper', () => {
+    render(<NineSliceButton icon="★">字符串图标按钮</NineSliceButton>)
+
+    const button = screen.getByRole('button', { name: '字符串图标按钮' })
+    const iconWrapper = button.querySelector('span[class*="nine-slice-button__icon"]')
+
+    expect(button.className).toContain('nine-slice-button--icon')
+    expect(iconWrapper).not.toBeNull()
+    expect(iconWrapper).toHaveTextContent('★')
+  })
+
   it('keeps seasonal styles on disabled default buttons', () => {
     render(
       <NineSliceButton theme="summer" disabled>
@@ -175,7 +239,7 @@ describe('NineSliceButton', () => {
     const image = button.querySelector('img')
 
     expect(button).toBeDisabled()
-    expect(image).toHaveAttribute('src', '/defaultBtn.png')
+    expect(image).toBeNull()
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe(
       'rgba(240, 230, 210, 0.6)'
