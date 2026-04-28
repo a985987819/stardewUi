@@ -167,28 +167,32 @@ const drawPatch = (
   ctx.drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh)
 }
 
+const applyOverlayWithinOpaquePixels = (
+  ctx: CanvasRenderingContext2D,
+  color: string,
+  width: number,
+  height: number
+) => {
+  ctx.save()
+  ctx.globalCompositeOperation = 'source-atop'
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, width, height)
+  ctx.restore()
+}
+
 const applyStateOverlay = (
   ctx: CanvasRenderingContext2D,
-  theme: SeasonalButtonTheme,
   state: SeasonalButtonVisualState,
   width: number,
   height: number
 ) => {
   if (state === 'hover') {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.04)'
-    ctx.fillRect(0, 0, width, height)
-    return
-  }
-
-  if (state === 'active') {
-    ctx.fillStyle = theme === 'winter' ? 'rgba(13, 71, 161, 0.08)' : 'rgba(0, 0, 0, 0.08)'
-    ctx.fillRect(0, 0, width, height)
+    applyOverlayWithinOpaquePixels(ctx, 'rgba(255, 255, 255, 0.04)', width, height)
     return
   }
 
   if (state === 'disabled') {
-    ctx.fillStyle = 'rgba(248, 250, 252, 0.32)'
-    ctx.fillRect(0, 0, width, height)
+    applyOverlayWithinOpaquePixels(ctx, 'rgba(248, 250, 252, 0.32)', width, height)
   }
 }
 
@@ -394,32 +398,7 @@ export const drawSeasonalButtonBackground = ({
   ctx.fillRect(leftWidth, topHeight, centerWidth, centerHeight)
   ctx.globalCompositeOperation = 'source-over'
 
-  applyStateOverlay(ctx, theme, state, targetWidth, targetHeight)
-
-  if (state === 'active') {
-    ctx.strokeStyle = theme === 'winter' ? 'rgba(13, 71, 161, 0.32)' : 'rgba(0, 0, 0, 0.2)'
-    ctx.lineWidth = Math.max(1, Math.round(baseScale * 8))
-    ctx.strokeRect(
-      ctx.lineWidth / 2,
-      topHeight + ctx.lineWidth / 2,
-      targetWidth - ctx.lineWidth,
-      Math.max(0, targetHeight - topHeight - ctx.lineWidth)
-    )
-  }
-
-  if (state === 'disabled') {
-    ctx.strokeStyle = palette.border
-    ctx.globalAlpha = 0.2
-    ctx.lineWidth = Math.max(1, Math.round(baseScale * 6))
-    ctx.strokeRect(
-      ctx.lineWidth / 2,
-      topHeight + ctx.lineWidth / 2,
-      targetWidth - ctx.lineWidth,
-      Math.max(0, targetHeight - topHeight - ctx.lineWidth)
-    )
-    ctx.globalAlpha = 1
-  }
+  applyStateOverlay(ctx, state, targetWidth, targetHeight)
 
   ctx.restore()
 }
-

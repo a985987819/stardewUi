@@ -74,7 +74,7 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-primary-color')).toBe('')
   })
 
-  it('applies spring theme variables to themed buttons', () => {
+  it('applies spring palette to themed buttons', () => {
     render(<NineSliceButton theme="spring">春季默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '春季默认按钮' })
@@ -104,6 +104,19 @@ describe('NineSliceButton', () => {
 
     const button = screen.getByRole('button', { name: '夏季禁用按钮' })
     expect(button).toHaveClass('nine-slice-button--disabled', 'nine-slice-button--seasonal')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
+  })
+
+  it('uses the disabled seasonal palette while loading', () => {
+    render(
+      <NineSliceButton theme="spring" loading>
+        春季加载按钮
+      </NineSliceButton>
+    )
+
+    const button = screen.getByRole('button', { name: '春季加载按钮' })
+    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
   })
 
