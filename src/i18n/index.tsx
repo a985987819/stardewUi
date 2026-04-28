@@ -65,8 +65,8 @@ const zhDict: Record<string, string> = {
   'guide.feature3': '支持像素风主题定制',
   'guide.feature4': '提供多种可复用基础组件',
   'guide.feature5': '适合文档站和游戏风格界面',
-  'components.title': 'Components',
-  'components.desc': 'Browse the available UI demos and open each page for usage examples and a lightweight API reference.',
+  'components.title': '组件',
+  'components.desc': '浏览可用的 UI 组件演示，每个页面都包含使用示例和轻量级 API 参考。',
   'sidebar.guide': '指南',
   'sidebar.components': '组件',
   'sidebar.button': '按钮',
@@ -91,6 +91,8 @@ const zhDict: Record<string, string> = {
   'api.required': '必填',
   'lang.zh': '中文',
   'lang.en': 'English',
+  'toc.title': '目录',
+  'search.placeholder': '搜索组件...',
 }
 
 const enDict: Record<string, string> = {
@@ -150,6 +152,8 @@ const enDict: Record<string, string> = {
   'api.required': 'Required',
   'lang.zh': '中文',
   'lang.en': 'English',
+  'toc.title': 'Table of Contents',
+  'search.placeholder': 'Search components...',
 }
 
 const dictionaries: Record<Lang, Record<string, string>> = {

@@ -2,6 +2,7 @@ import { useState, useMemo, type ReactNode, type ChangeEvent } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Book, Box, ChevronDown, Search } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import { useI18n } from '../../i18n'
 import styles from './Sidebar.module.scss'
 
 interface MenuItem {
@@ -30,7 +31,7 @@ const bilingualLabels: Record<string, { zh: string; en: string }> = {
   'sidebar.tab': { zh: '选项卡', en: 'Tab' },
 }
 
-function useMenuItems(): MenuItem[] {
+function useMenuItems(lang: 'zh' | 'en'): MenuItem[] {
   const getBilingualLabel = (key: string): { zh: string; en: string } => {
     return bilingualLabels[key] || { zh: key, en: key }
   }
@@ -38,29 +39,34 @@ function useMenuItems(): MenuItem[] {
   const guide = getBilingualLabel('sidebar.guide')
   const components = getBilingualLabel('sidebar.components')
 
+  // 根据语言设置生成标签：中文模式只显示中文，英文模式显示中文+英文
+  const getLabel = (item: { zh: string; en: string }) => {
+    return  `${item.zh} ${item.en}` 
+  }
+
   return [
     {
       path: '/guide',
-      label: `${guide.zh} ${guide.en}`,
+      label: getLabel(guide),
       icon: <Book size={18} />,
     },
     {
       path: '/components',
-      label: `${components.zh} ${components.en}`,
+      label: getLabel(components),
       icon: <Box size={18} />,
       children: [
-        { path: '/components/button', label: getBilingualLabel('sidebar.button').zh, labelEn: getBilingualLabel('sidebar.button').en },
-        { path: '/components/calendar', label: getBilingualLabel('sidebar.calendar').zh, labelEn: getBilingualLabel('sidebar.calendar').en },
-        { path: '/components/date-picker', label: getBilingualLabel('sidebar.datePicker').zh, labelEn: getBilingualLabel('sidebar.datePicker').en },
-        { path: '/components/title', label: getBilingualLabel('sidebar.title').zh, labelEn: getBilingualLabel('sidebar.title').en },
-        { path: '/components/card', label: getBilingualLabel('sidebar.card').zh, labelEn: getBilingualLabel('sidebar.card').en },
-        { path: '/components/dialog', label: getBilingualLabel('sidebar.dialog').zh, labelEn: getBilingualLabel('sidebar.dialog').en },
-        { path: '/components/popup', label: getBilingualLabel('sidebar.popup').zh, labelEn: getBilingualLabel('sidebar.popup').en },
-        { path: '/components/typewriter', label: getBilingualLabel('sidebar.typewriter').zh, labelEn: getBilingualLabel('sidebar.typewriter').en },
-        { path: '/components/loading', label: getBilingualLabel('sidebar.loading').zh, labelEn: getBilingualLabel('sidebar.loading').en },
-        { path: '/components/message', label: getBilingualLabel('sidebar.message').zh, labelEn: getBilingualLabel('sidebar.message').en },
-        { path: '/components/empty-state', label: getBilingualLabel('sidebar.emptyState').zh, labelEn: getBilingualLabel('sidebar.emptyState').en },
-        { path: '/components/tab', label: getBilingualLabel('sidebar.tab').zh, labelEn: getBilingualLabel('sidebar.tab').en },
+        { path: '/components/button', label: getBilingualLabel('sidebar.button').zh, labelEn:  getBilingualLabel('sidebar.button').en },
+        { path: '/components/calendar', label: getBilingualLabel('sidebar.calendar').zh, labelEn:  getBilingualLabel('sidebar.calendar').en },
+        { path: '/components/date-picker', label: getBilingualLabel('sidebar.datePicker').zh, labelEn:  getBilingualLabel('sidebar.datePicker').en },
+        { path: '/components/title', label: getBilingualLabel('sidebar.title').zh, labelEn:  getBilingualLabel('sidebar.title').en },
+        { path: '/components/card', label: getBilingualLabel('sidebar.card').zh, labelEn:  getBilingualLabel('sidebar.card').en },
+        { path: '/components/dialog', label: getBilingualLabel('sidebar.dialog').zh, labelEn:  getBilingualLabel('sidebar.dialog').en },
+        { path: '/components/popup', label: getBilingualLabel('sidebar.popup').zh, labelEn:  getBilingualLabel('sidebar.popup').en },
+        { path: '/components/typewriter', label: getBilingualLabel('sidebar.typewriter').zh, labelEn:  getBilingualLabel('sidebar.typewriter').en },
+        { path: '/components/loading', label: getBilingualLabel('sidebar.loading').zh, labelEn:  getBilingualLabel('sidebar.loading').en },
+        { path: '/components/message', label: getBilingualLabel('sidebar.message').zh, labelEn:  getBilingualLabel('sidebar.message').en },
+        { path: '/components/empty-state', label: getBilingualLabel('sidebar.emptyState').zh, labelEn:  getBilingualLabel('sidebar.emptyState').en },
+        { path: '/components/tab', label: getBilingualLabel('sidebar.tab').zh, labelEn:  getBilingualLabel('sidebar.tab').en },
       ],
     },
   ]
@@ -68,9 +74,10 @@ function useMenuItems(): MenuItem[] {
 
 function StarSidebar() {
   const location = useLocation()
+  const { t, lang } = useI18n()
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
   const [searchQuery, setSearchQuery] = useState('')
-  const menuItems = useMenuItems()
+  const menuItems = useMenuItems(lang)
 
   const toggleExpand = (path: string) => {
     setExpandedKeys((prev) => (prev.includes(path) ? prev.filter((key) => key !== path) : [...prev, path]))
@@ -110,8 +117,12 @@ function StarSidebar() {
     const expanded = isExpanded(item.path)
     const active = isActive(item.path)
 
-    // 如果搜索中且没有子项，不渲染
-    if (searchQuery && hasChildren && item.children?.length === 0) {
+    // 对于组件菜单，即使搜索无结果也要渲染（为了显示搜索框）
+    const isComponentsMenu = item.path === '/components'
+    const hasVisibleChildren = item.children && item.children.length > 0
+    
+    // 如果搜索中且没有子项，不渲染（但组件菜单除外）
+    if (searchQuery && hasChildren && !hasVisibleChildren && !isComponentsMenu) {
       return null
     }
 
@@ -144,13 +155,13 @@ function StarSidebar() {
 
         {hasChildren && expanded ? (
           <div className={styles['doc-sidebar-children']}>
-            {/* 在组件选项下方添加搜索框 */}
-            {item.path === '/components' && (
+            {/* 在组件选项下方添加搜索框 - 始终显示 */}
+            {isComponentsMenu && (
               <div className={styles['doc-sidebar-search']}>
                 <Search size={14} className={styles['doc-sidebar-search-icon']} />
                 <input
                   type="text"
-                  placeholder="搜索组件..."
+                  placeholder={t('search.placeholder')}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   className={styles['doc-sidebar-search-input']}

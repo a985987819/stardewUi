@@ -13,6 +13,7 @@ const tocItems = [
   { id: 'global', title: '选中时全局样式', level: 1 },
   { id: 'disabled', title: '禁用选项', level: 1 },
   { id: 'controlled', title: '受控模式', level: 1 },
+  { id: 'nodeContent', title: 'Node 内容', level: 1 },
   { id: 'api', title: 'API', level: 1 },
 ]
 
@@ -110,6 +111,32 @@ const controlledCode = `const [key, setKey] = useState('spring')
   items={[...]}
 />`
 
+const nodeContentCode = `<StarTab
+  items={[
+    { 
+      key: 'card', 
+      label: '卡片内容', 
+      content: (
+        <div style={{ padding: '16px', background: '#f5f5f5', borderRadius: '8px' }}>
+          <h4>自定义卡片</h4>
+          <p>content 支持传入任意 ReactNode</p>
+        </div>
+      )
+    },
+    { 
+      key: 'list', 
+      label: '列表内容', 
+      content: (
+        <ul style={{ padding: '16px' }}>
+          <li>列表项 1</li>
+          <li>列表项 2</li>
+          <li>列表项 3</li>
+        </ul>
+      )
+    },
+  ]}
+/>`
+
 const basicItems = [
   { key: 'spring', label: '春季', content: '春天来了，万物复苏！可以种植土豆、花椰菜和草莓。别忘了参加花舞节！' },
   { key: 'summer', label: '夏季', content: '夏日炎炎，番茄、蓝莓和甜瓜是最佳选择。月光水母节在夏夜等你。' },
@@ -180,6 +207,57 @@ const globalItems = [
     label: '钓鱼', 
     content: '蓝色主题 - 选中钓鱼时，整个选项卡区域变为蓝色主题。', 
     activeGlobalStyle: { background: '#2d4a5e', borderRadius: '8px', padding: '12px' } 
+  },
+]
+
+const nodeContentItems = [
+  { 
+    key: 'card', 
+    label: '卡片内容', 
+    content: (
+      <div style={{ padding: '16px', background: 'rgba(122, 157, 61, 0.15)', borderRadius: '8px', border: '2px solid #7a9d3d' }}>
+        <h4 style={{ margin: '0 0 8px 0', color: '#5a7d2d' }}>🌱 自定义卡片</h4>
+        <p style={{ margin: 0, color: '#666' }}>content 支持传入任意 ReactNode，可以是复杂的组件结构</p>
+      </div>
+    ) 
+  },
+  { 
+    key: 'list', 
+    label: '列表内容', 
+    content: (
+      <ul style={{ padding: '16px 16px 16px 32px', margin: 0, background: 'rgba(215, 153, 46, 0.1)', borderRadius: '8px', border: '2px solid #d7992e' }}>
+        <li style={{ marginBottom: '8px', color: '#8a691e' }}>🌟 列表项 1 - 收集星星</li>
+        <li style={{ marginBottom: '8px', color: '#8a691e' }}>🎣 列表项 2 - 钓鱼收获</li>
+        <li style={{ color: '#8a691e' }}>⛏️ 列表项 3 - 采矿成果</li>
+      </ul>
+    ) 
+  },
+  { 
+    key: 'table', 
+    label: '表格内容', 
+    content: (
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+        <thead>
+          <tr style={{ background: '#4a3728', color: '#fff8eb' }}>
+            <th style={{ padding: '8px', border: '1px solid #6a5748' }}>季节</th>
+            <th style={{ padding: '8px', border: '1px solid #6a5748' }}>作物</th>
+            <th style={{ padding: '8px', border: '1px solid #6a5748' }}>收益</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style={{ background: 'rgba(122, 157, 61, 0.1)' }}>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>春季</td>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>草莓</td>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>★★★★★</td>
+          </tr>
+          <tr style={{ background: 'rgba(215, 153, 46, 0.1)' }}>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>夏季</td>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>蓝莓</td>
+            <td style={{ padding: '8px', border: '1px solid #ddd' }}>★★★★☆</td>
+          </tr>
+        </tbody>
+      </table>
+    ) 
   },
 ]
 
@@ -273,6 +351,17 @@ function StarTabDemoPage() {
           <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-text-tertiary)' }}>
             当前选中：<strong>{controlledKey}</strong>
           </p>
+        </div>
+      </StarComponentDemo>
+
+      <StarComponentDemo
+        id="nodeContent"
+        title="Node 内容"
+        description="content 支持传入任意 ReactNode，可以是卡片、列表、表格等复杂组件。"
+        code={nodeContentCode}
+      >
+        <div style={{ width: '100%' }}>
+          <StarTab items={nodeContentItems} />
         </div>
       </StarComponentDemo>
 
