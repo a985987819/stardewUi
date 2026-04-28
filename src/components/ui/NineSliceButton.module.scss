@@ -4,21 +4,26 @@
   overflow: hidden;
   padding: 15px 20px;
   border: none;
+  border-radius: var(--nine-slice-button-radius, 12px);
   background: transparent;
   color: var(--color-text);
   box-shadow: none;
-  transition: transform 0.08s steps(2), color 0.12s ease;
+  transition:
+    transform 0.08s steps(2),
+    color 0.12s ease;
 
   &__bg {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
+    border-radius: inherit;
 
     &::after {
       content: '';
       position: absolute;
       inset: 0;
+      border-radius: inherit;
       background: transparent;
     }
   }
@@ -47,6 +52,10 @@
     image-rendering: pixelated;
   }
 
+  &__canvas--default {
+    image-rendering: pixelated;
+  }
+
   &__content {
     position: relative;
     z-index: 1;
@@ -57,6 +66,25 @@
     line-height: 1.2;
   }
 
+  &__content--stacked {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5em;
+    height: 1.5em;
+    flex-shrink: 0;
+  }
+
+  &__icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
   &__loading {
     flex-shrink: 0;
     color: currentColor;
@@ -65,6 +93,9 @@
   &__label {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
     text-shadow:
       0 1px 0 rgba(255, 255, 255, 0.35),
       1px 0 0 rgba(77, 38, 8, 0.18),
@@ -103,6 +134,18 @@
 
   &--seasonal {
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  &--icon {
+    aspect-ratio: 1;
+    min-width: var(--nine-slice-button-icon-size, 72px);
+    min-height: var(--nine-slice-button-icon-size, 72px);
+    padding: 10px;
+
+    .nine-slice-button__content {
+      flex-direction: column;
+      text-align: center;
+    }
   }
 
   &--primary {
@@ -146,13 +189,17 @@
     box-shadow: none;
 
     &:hover:not(:disabled) {
-      color: var(--nine-slice-button-link-hover-color, var(--color-primary-dark));
+      color: var(
+        --nine-slice-button-link-hover-color,
+        var(--color-primary-dark)
+      );
       transform: none;
     }
   }
 
   &--small {
     @apply text-xs;
+    --nine-slice-button-icon-size: 56px;
     padding: 10px 14px;
 
     .nine-slice-button__content {
@@ -168,6 +215,7 @@
 
   &--large {
     @apply text-base;
+    --nine-slice-button-icon-size: 88px;
     padding: 16px 22px;
 
     .nine-slice-button__content {
@@ -179,6 +227,10 @@
     min-width: 116px;
     min-height: 40px;
     padding: 12px 28px 14px;
+  }
+
+  &--medium {
+    --nine-slice-button-icon-size: 72px;
   }
 
   &--block {
