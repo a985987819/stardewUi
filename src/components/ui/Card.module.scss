@@ -44,10 +44,14 @@ $inner-glow: rgba(255, 255, 255, 0.18);
       inset -3px 4px 0 rgba(216, 154, 106, 0.92);
   }
 
-  &__outline {
+  &::after {
+    content: '';
+    position: absolute;
     inset: -8px;
     border: 3px solid var(--card-border-light);
     border-radius: 12px;
+    pointer-events: none;
+    z-index: 0;
   }
 
   &--default,

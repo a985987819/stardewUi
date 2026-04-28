@@ -56,7 +56,6 @@ function StarCard({
   return (
     <div {...rest} className={cardClass} onClick={onClick}>
       <span className={styles['stardew-card__frame']} aria-hidden />
-      <span className={styles['stardew-card__outline']} aria-hidden />
       {hasTitle ? (
         <div className={styles['stardew-card__header']}>
           <div className={styles['stardew-card__title-tag']}>
