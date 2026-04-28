@@ -7,7 +7,7 @@
   background: transparent;
   color: var(--color-text);
   box-shadow: none;
-  transition: transform 0.08s steps(2);
+  transition: transform 0.08s steps(2), color 0.12s ease;
 
   &__bg {
     position: absolute;
@@ -20,6 +20,10 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+
+  &__canvas--seasonal {
+    image-rendering: pixelated;
   }
 
   &__content {
@@ -60,6 +64,10 @@
 
   &--default {
     color: var(--nine-slice-button-default-color, #3a2e39);
+  }
+
+  &--seasonal {
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 
   &--primary {

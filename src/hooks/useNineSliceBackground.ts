@@ -13,6 +13,7 @@ type LoadedImage = {
 }
 
 export type NineSliceBackgroundOptions = {
+  enabled?: boolean
   src: string
   insets: NineSliceInsets
   className?: string
@@ -57,6 +58,7 @@ export const clearNineSliceImageCache = () => {
 }
 
 export const useNineSliceBackground = ({
+  enabled = true,
   src,
   insets,
   className,
@@ -145,6 +147,12 @@ export const useNineSliceBackground = ({
   }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
 
   useEffect(() => {
+    if (!enabled) {
+      setIsReady(false)
+      imageRef.current = null
+      return
+    }
+
     let cancelled = false
 
     setIsReady(false)
@@ -167,7 +175,7 @@ export const useNineSliceBackground = ({
     return () => {
       cancelled = true
     }
-  }, [src])
+  }, [enabled, src])
 
   useEffect(() => {
     if (!isReady) {
