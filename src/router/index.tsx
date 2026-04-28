@@ -4,7 +4,9 @@ import StarHomePage from '../pages/Home'
 import StarGuidePage from '../pages/Guide'
 import StarComponentsPage from '../pages/Components'
 import StarButtonDemoPage from '../pages/ButtonDemo'
+import StarCalendarDemoPage from '../pages/CalendarDemo'
 import StarCardDemoPage from '../pages/CardDemo'
+import StarDatePickerDemoPage from '../pages/DatePickerDemo'
 import StarDialogDemoPage from '../pages/DialogDemo'
 import StarEmptyStateDemoPage from '../pages/EmptyStateDemo'
 import StarPopupDemoPage from '../pages/PopupDemo'
@@ -22,8 +24,10 @@ export const router = createBrowserRouter([
       { path: 'guide', element: <StarGuidePage /> },
       { path: 'components', element: <StarComponentsPage /> },
       { path: 'components/button', element: <StarButtonDemoPage /> },
+      { path: 'components/calendar', element: <StarCalendarDemoPage /> },
       { path: 'components/title', element: <StarTitleDemoPage /> },
       { path: 'components/card', element: <StarCardDemoPage /> },
+      { path: 'components/date-picker', element: <StarDatePickerDemoPage /> },
       { path: 'components/dialog', element: <StarDialogDemoPage /> },
       { path: 'components/empty-state', element: <StarEmptyStateDemoPage /> },
       { path: 'components/popup', element: <StarPopupDemoPage /> },
