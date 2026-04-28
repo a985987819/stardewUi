@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Heading1,
   Inbox,
+  LayoutList,
   LoaderCircle,
   MessageSquare,
   MessageSquareMore,
@@ -82,6 +83,12 @@ const components = [
     title: 'EmptyState',
     description: 'Placeholder layouts for blank lists, searches, and detail areas.',
     icon: <Inbox size={20} />,
+  },
+  {
+    path: '/components/tab',
+    title: 'Tab',
+    description: 'Tabbed navigation with icons, custom active styles, and top/bottom placement.',
+    icon: <LayoutList size={20} />,
   },
 ]
 

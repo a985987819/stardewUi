@@ -36,6 +36,7 @@ function useMenuItems(): MenuItem[] {
         { path: '/components/loading', label: t('sidebar.loading') },
         { path: '/components/message', label: t('sidebar.message') },
         { path: '/components/empty-state', label: t('sidebar.emptyState') },
+        { path: '/components/tab', label: t('sidebar.tab') },
       ],
     },
   ]

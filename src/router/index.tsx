@@ -15,6 +15,7 @@ import StarTypewriterDemoPage from '../pages/TypewriterDemo'
 import StarMessageDemoPage from '../pages/MessageDemo'
 import StarTitleDemoPage from '../pages/TitleDemo'
 import StarLoadingDemoPage from '../pages/LoadingDemo'
+import StarTabDemoPage from '../pages/TabDemo'
 
 export const router = createBrowserRouter(
   [
@@ -36,6 +37,7 @@ export const router = createBrowserRouter(
         { path: 'components/typewriter', element: <StarTypewriterDemoPage /> },
         { path: 'components/loading', element: <StarLoadingDemoPage /> },
         { path: 'components/message', element: <StarMessageDemoPage /> },
+        { path: 'components/tab', element: <StarTabDemoPage /> },
       ],
     },
     {
