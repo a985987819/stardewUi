@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames, flipBubblePlacement, type BubblePlacement } from '../../utils'
-import { StarCard } from './Card'
 import StarCanvasBubble from './CanvasBubble'
 import StarNineSliceButton from './NineSliceButton'
 import styles from './Popup.module.scss'
@@ -17,6 +16,7 @@ export interface PopupAction {
 
 export interface StarPopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'content'> {
   open?: boolean
+  onOpenChange?: (open: boolean) => void
   placement?: PopupPlacement
   trigger?: PopupTrigger
   title?: ReactNode
@@ -59,6 +59,7 @@ const getPopupPositionStyle = (placement: PopupPlacement, offset: number): CSSPr
 
 function StarPopup({
   open: openProp,
+  onOpenChange,
   placement = 'right',
   trigger = 'hover',
   title,
@@ -78,12 +79,22 @@ function StarPopup({
   const bubblePlacement = flipBubblePlacement(placement)
 
   const show = useCallback(() => {
-    if (!isControlled) setInternalOpen(true)
-  }, [isControlled])
+    if (isControlled) {
+      onOpenChange?.(true)
+      return
+    }
+
+    setInternalOpen(true)
+  }, [isControlled, onOpenChange])
 
   const hide = useCallback(() => {
-    if (!isControlled) setInternalOpen(false)
-  }, [isControlled])
+    if (isControlled) {
+      onOpenChange?.(false)
+      return
+    }
+
+    setInternalOpen(false)
+  }, [isControlled, onOpenChange])
 
   const handleMouseEnter = useCallback(() => {
     if (trigger !== 'hover') return
@@ -100,20 +111,26 @@ function StarPopup({
 
   const handleClick = useCallback(() => {
     if (trigger !== 'click') return
+
+    if (isControlled) {
+      onOpenChange?.(!open)
+      return
+    }
+
     setInternalOpen((prev) => !prev)
-  }, [trigger])
+  }, [isControlled, onOpenChange, open, trigger])
 
   useEffect(() => {
     if (trigger !== 'click') return
     const handleDocClick = (e: MouseEvent) => {
       if (!containerRef.current) return
       if (!containerRef.current.contains(e.target as Node)) {
-        setInternalOpen(false)
+        hide()
       }
     }
     document.addEventListener('click', handleDocClick)
     return () => document.removeEventListener('click', handleDocClick)
-  }, [trigger])
+  }, [hide, trigger])
 
   useEffect(() => {
     return () => {
@@ -121,8 +138,8 @@ function StarPopup({
     }
   }, [])
 
-  const cardFooter = actions?.length ? (
-    <div className={styles['stardew-popup__actions']}>
+  const footer = actions?.length ? (
+    <div className={styles['stardew-popup__footer']}>
       {actions.map((action) => (
         <StarNineSliceButton
           key={action.label}
@@ -154,23 +171,31 @@ function StarPopup({
             className={styles['stardew-popup__bubble']}
             bubblePlacement={bubblePlacement}
             fillColor="#ffe0b2"
-            borderColor="#9d4100"
+            borderColor="#d7770f"
             borderWidth={6}
             cornerSize={14}
             arrowWidth={24}
             arrowDepth={14}
             contentPadding={12}
           >
-            <StarCard
-              title={title}
-              showTitle={Boolean(title)}
-              footer={cardFooter}
-              variant="default"
-              size="small"
-              className={styles['stardew-popup__card']}
-            >
-              {content}
-            </StarCard>
+            <div className={styles['stardew-popup__surface']}>
+              {title ? (
+                <div className={styles['stardew-popup__header']}>
+                  <div className={styles['stardew-popup__title-tag']}>
+                    <h3 className={styles['stardew-popup__title']}>{title}</h3>
+                  </div>
+                </div>
+              ) : null}
+              <div
+                className={classNames(
+                  styles['stardew-popup__body'],
+                  !title ? styles['stardew-popup__body--without-title'] : undefined
+                )}
+              >
+                {content}
+              </div>
+              {footer}
+            </div>
           </StarCanvasBubble>
         </div>
       ) : null}

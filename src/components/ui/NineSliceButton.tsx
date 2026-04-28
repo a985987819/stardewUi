@@ -45,6 +45,7 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
   size?: NineSliceButtonSize
   block?: boolean
   theme?: NineSliceButtonTheme
+  appearance?: 'regular' | 'classical'
   loading?: boolean
   backgroundSrc?: string
   backgroundInsets?: {
@@ -99,6 +100,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       size = 'medium',
       block = false,
       theme,
+      appearance = 'regular',
       loading = false,
       backgroundSrc,
       backgroundInsets = DEFAULT_INSETS,
@@ -125,7 +127,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const loadingSize = size === 'small' ? 14 : size === 'large' ? 18 : 16
 
     const usesSeasonalBackground = Boolean(theme) && variant === 'default'
-    const usesPlainDefaultBackground = !theme && variant === 'default' && !backgroundSrc
+    const usesRegularBackground = !usesSeasonalBackground && appearance !== 'classical' && !backgroundSrc
+    const usesPlainDefaultBackground = usesRegularBackground
     const resolvedBackgroundSrc = backgroundSrc ?? '/btnImg.png'
     const [isHovered, setIsHovered] = useState(false)
     const [isPressed, setIsPressed] = useState(false)
@@ -143,6 +146,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
 
     const imageVariant =
       !usesSeasonalBackground &&
+      !usesRegularBackground &&
       (effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
         effectiveVariant === 'warning' ||
@@ -209,7 +213,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     }, [isDisabled, plainDefaultColor, seasonalState, style, theme, usesPlainDefaultBackground, usesSeasonalBackground])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
-      enabled: !usesSeasonalBackground && !usesPlainDefaultBackground,
+      enabled: !usesSeasonalBackground && !usesRegularBackground,
       src: resolvedBackgroundSrc,
       insets: backgroundInsets,
       className: styles['nine-slice-button__canvas'],

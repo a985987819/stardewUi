@@ -73,7 +73,7 @@ class ResizeObserverMock {
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 
 describe('NineSliceButton', () => {
-  it('keeps the default appearance when no theme is provided', () => {
+  it('keeps the regular default appearance when no theme is provided', () => {
     render(<NineSliceButton>默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '默认按钮' })
@@ -82,20 +82,23 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#5D4037')
   })
 
-  it('uses the full default button image instead of the nine-slice canvas path', () => {
+  it('uses the regular button image by default instead of the classical canvas path', () => {
     render(<NineSliceButton>默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '默认按钮' })
     const image = button.querySelector('img')
     const canvas = button.querySelector('canvas')
+    const label = button.querySelector('span[class*="nine-slice-button__label"]')
 
     expect(image).toHaveAttribute('src', '/defaultBtn.png')
     expect(canvas).toBeNull()
+    expect(label).not.toBeNull()
+    expect(getComputedStyle(label as Element).textShadow).not.toBe('none')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#5D4037')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
   })
 
-  it('updates plain default text colors on hover and active states', () => {
+  it('updates regular default text colors on hover and active states', () => {
     render(<NineSliceButton>状态按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '状态按钮' })
@@ -126,12 +129,29 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#2E7D32')
   })
 
-  it('keeps using the shared image source and default insets for non-default image variants', () => {
+  it('uses the regular button image for primary buttons unless classical is requested', () => {
     render(<NineSliceButton variant="primary">主要按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '主要按钮' })
+    const image = button.querySelector('img')
     const canvas = button.querySelector('canvas')
 
+    expect(image).toHaveAttribute('src', '/defaultBtn.png')
+    expect(canvas).toBeNull()
+  })
+
+  it('uses btnImg.png only when the classical appearance is requested', () => {
+    render(
+      <NineSliceButton variant="primary" appearance="classical">
+        古典按钮
+      </NineSliceButton>
+    )
+
+    const button = screen.getByRole('button', { name: '古典按钮' })
+    const canvas = button.querySelector('canvas')
+    const image = button.querySelector('img')
+
+    expect(image).toBeNull()
     expect(canvas).toHaveAttribute('data-src', '/btnImg.png')
     expect(canvas).toHaveAttribute('data-insets', '8,8,8,8')
   })
@@ -148,7 +168,7 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
   })
 
-  it('applies disabled overlay and disabled text color to plain default buttons', () => {
+  it('applies disabled overlay and disabled text color to regular default buttons', () => {
     render(<NineSliceButton disabled>禁用默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '禁用默认按钮' })
@@ -194,7 +214,7 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#BF360C')
   })
 
-  it('keeps seasonal default buttons on seasonal styling instead of defaultBtn.png', () => {
+  it('keeps seasonal default buttons on seasonal styling instead of regular or classical assets', () => {
     render(<NineSliceButton theme="spring">春季默认按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '春季默认按钮' })
@@ -203,5 +223,6 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#2E7D32')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('')
     expect(canvas).not.toHaveAttribute('data-src', '/defaultBtn.png')
+    expect(canvas).not.toHaveAttribute('data-src', '/btnImg.png')
   })
 })

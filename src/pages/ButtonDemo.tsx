@@ -23,12 +23,18 @@ const buttonApiData = [
   { property: 'block', description: '是否为块级按钮', type: 'boolean', default: 'false' },
   { property: 'loading', description: '是否显示加载态', type: 'boolean', default: 'false' },
   {
+    property: 'appearance',
+    description: '按钮外观，显式声明为 Classical 时才使用古典九宫格按钮',
+    type: "'regular' | 'classical'",
+    default: "'regular'",
+  },
+  {
     property: 'theme',
     description: '季节主题，仅对默认按钮生效',
     type: "'spring' | 'summer' | 'autumn' | 'winter'",
     default: '-',
   },
-  { property: 'backgroundSrc', description: '自定义九宫格背景图地址', type: 'string', default: "'/btnImg.png'" },
+  { property: 'backgroundSrc', description: '自定义九宫格背景图地址', type: 'string', default: '-' },
   {
     property: 'backgroundInsets',
     description: '九宫格切片边距',
@@ -131,9 +137,6 @@ function StarButtonDemoPage() {
 
       <StarComponentDemo id="disabled" title="禁用状态" description="默认按钮的禁用状态。" code={disabledCode}>
         <StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
-        <StarNineSliceButton theme="winter" disabled>
-          冬季禁用按钮
-        </StarNineSliceButton>
       </StarComponentDemo>
 
       <StarComponentDemo

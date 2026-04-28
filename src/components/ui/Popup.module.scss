@@ -10,68 +10,82 @@
 
   &__bubble-wrap {
     position: absolute;
-    z-index: 5;
+    z-index: 60;
   }
 
   &__bubble {
-    min-width: 216px;
-    max-width: 300px;
+    min-width: 232px;
+    max-width: 312px;
     color: #4d2608;
     filter: drop-shadow(4px 4px 0 rgba(77, 38, 8, 0.18));
   }
 
-  &__card {
-    --card-bg: #ffe0b2;
-    --card-bg-light: #fff0d6;
-    --card-bg-dark: #ffc675;
-    --card-border-dark: #d7770f;
-    --card-border-light: #9d4100;
-    --card-text: #4d2608;
-    --card-text-secondary: #6a350b;
-    --card-title-tag-bg: rgba(255, 239, 190, 0.82);
+  &__surface {
+    position: relative;
+    min-width: 196px;
+    color: #4d2608;
 
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    .stardew-card__frame,
-    .stardew-card__outline {
-      display: none;
-    }
-
-    .stardew-card__header {
-      min-height: auto;
-      padding: 0 0 8px;
-      border-bottom: 2px solid rgba(157, 65, 0, 0.2);
-    }
-
-    .stardew-card__title-tag {
-      min-height: auto;
-      padding: 4px 10px;
-    }
-
-    .stardew-card__title {
-      font-size: 16px;
-    }
-
-    .stardew-card__body {
-      padding: 8px 0;
-      color: #6a350b;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .stardew-card__footer {
-      padding: 10px 0 0;
-      background: none;
-      border-top: 2px solid rgba(157, 65, 0, 0.2);
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border: 2px solid #9d4100;
+      border-radius: 4px;
+      box-shadow:
+        inset -2px 4px 0 rgba(216, 154, 106, 0.92),
+        inset -3px 4px 0 rgba(216, 154, 106, 0.92);
+      pointer-events: none;
     }
   }
 
-  &__actions {
+  &__header,
+  &__body,
+  &__footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  &__header {
+    padding: 4px 6px 10px;
+    border-bottom: 2px solid rgba(157, 65, 0, 0.2);
+  }
+
+  &__title-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 6px 12px;
+    background: rgba(255, 239, 190, 0.82);
+    border: 3px solid rgba(215, 119, 15, 0.9);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #4d2608;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  &__body {
+    padding: 14px 8px 8px;
+    color: #6a350b;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  &__body--without-title {
+    padding-top: 8px;
+  }
+
+  &__footer {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10px;
+    padding: 10px 8px 4px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(157, 65, 0, 0.06));
+    border-top: 2px solid rgba(157, 65, 0, 0.2);
   }
 }
