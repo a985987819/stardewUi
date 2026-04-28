@@ -14,6 +14,13 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: transparent;
+    }
   }
 
   &__canvas {
@@ -64,6 +71,10 @@
 
   &--default {
     color: var(--nine-slice-button-default-color, #3a2e39);
+
+    &:disabled .nine-slice-button__bg::after {
+      background: var(--nine-slice-button-default-disabled-overlay, transparent);
+    }
   }
 
   &--seasonal {

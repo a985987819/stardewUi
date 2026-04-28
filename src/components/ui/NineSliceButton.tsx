@@ -66,6 +66,13 @@ const DEFAULT_COLOR_MAP: ButtonColorMap = {
   disabled: { bg: '#B0A999', text: '#E0D9C6' },
 }
 
+const PLAIN_DEFAULT_TEXT_COLORS = {
+  normal: '#5D4037',
+  hover: '#3E2723',
+  active: '#2E1B15',
+  disabled: '#B0BEC5',
+} as const
+
 const drawDashedBorder = (
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -92,7 +99,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       block = false,
       theme,
       loading = false,
-      backgroundSrc = '/btnImg.png',
+      backgroundSrc,
       backgroundInsets = DEFAULT_INSETS,
       className,
       children,
@@ -116,6 +123,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const loadingSize = size === 'small' ? 14 : size === 'large' ? 18 : 16
 
     const usesSeasonalBackground = Boolean(theme) && variant === 'default'
+    const usesPlainDefaultBackground = !theme && variant === 'default' && !backgroundSrc
+    const resolvedBackgroundSrc = usesPlainDefaultBackground ? '/defaultBtn.png' : backgroundSrc ?? '/btnImg.png'
     const [isHovered, setIsHovered] = useState(false)
     const [isPressed, setIsPressed] = useState(false)
     const [seasonalImageVersion, setSeasonalImageVersion] = useState(0)
@@ -153,22 +162,52 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       return null
     }, [effectiveVariant])
 
-    const buttonStyle = useMemo(() => {
-      if (!usesSeasonalBackground || !theme) {
-        return style
+    const plainDefaultColor = useMemo(() => {
+      if (!usesPlainDefaultBackground) {
+        return null
       }
 
-      return {
-        ...style,
-        '--nine-slice-button-default-color': getSeasonalButtonTextColor(theme, seasonalState),
-        '--nine-slice-button-disabled-color': getSeasonalButtonTextColor(theme, seasonalState),
-        fontWeight: seasonalState === 'active' ? 700 : style?.fontWeight,
-      } as CSSProperties
-    }, [seasonalState, style, theme, usesSeasonalBackground])
+      if (isDisabled) {
+        return PLAIN_DEFAULT_TEXT_COLORS.disabled
+      }
+
+      if (isPressed) {
+        return PLAIN_DEFAULT_TEXT_COLORS.active
+      }
+
+      if (isHovered) {
+        return PLAIN_DEFAULT_TEXT_COLORS.hover
+      }
+
+      return PLAIN_DEFAULT_TEXT_COLORS.normal
+    }, [isDisabled, isHovered, isPressed, usesPlainDefaultBackground])
+
+    const buttonStyle = useMemo(() => {
+      if (usesSeasonalBackground && theme) {
+        return {
+          ...style,
+          '--nine-slice-button-default-color': getSeasonalButtonTextColor(theme, seasonalState),
+          '--nine-slice-button-disabled-color': getSeasonalButtonTextColor(theme, seasonalState),
+          fontWeight: seasonalState === 'active' ? 700 : style?.fontWeight,
+        } as CSSProperties
+      }
+
+      if (usesPlainDefaultBackground && plainDefaultColor) {
+        return {
+          ...style,
+          '--nine-slice-button-default-color': plainDefaultColor,
+          '--nine-slice-button-default-disabled-overlay': isDisabled
+            ? 'rgba(240, 230, 210, 0.6)'
+            : 'transparent',
+        } as CSSProperties
+      }
+
+      return style
+    }, [isDisabled, plainDefaultColor, seasonalState, style, theme, usesPlainDefaultBackground, usesSeasonalBackground])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
       enabled: !usesSeasonalBackground,
-      src: backgroundSrc,
+      src: resolvedBackgroundSrc,
       insets: backgroundInsets,
       className: styles['nine-slice-button__canvas'],
       zIndex: 0,
