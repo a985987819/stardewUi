@@ -11,9 +11,9 @@ const minDate = normalizeToDayTimestamp('2024-05-10')
 const maxDate = normalizeToDayTimestamp('2024-05-20')
 
 const tocItems = [
-  { id: 'single', title: 'Single', level: 1 },
-  { id: 'range', title: 'Range', level: 1 },
-  { id: 'limits', title: 'Limits', level: 1 },
+  { id: 'single', title: '单日选择', level: 1 },
+  { id: 'range', title: '范围选择', level: 1 },
+  { id: 'limits', title: '限制条件', level: 1 },
   { id: 'api', title: 'API', level: 1 },
 ]
 

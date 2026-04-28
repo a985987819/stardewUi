@@ -36,12 +36,6 @@ const components = [
     icon: <CalendarRange size={20} />,
   },
   {
-    path: '/components/star-date-picker',
-    title: 'StarDatePicker',
-    description: 'Alias entry for the Stardew-styled date picker demo and API reference.',
-    icon: <CalendarRange size={20} />,
-  },
-  {
     path: '/components/title',
     title: 'Title',
     description: 'Decorative title banners with size and alignment options.',

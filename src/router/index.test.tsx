@@ -22,11 +22,8 @@ afterEach(() => {
 })
 
 describe('router', () => {
-  it.each([
-    '/components/date-picker',
-    '/components/star-date-picker',
-  ])('renders the date picker demo for %s', async (path) => {
-    await renderRoute(path)
+  it('renders the date picker demo for /components/date-picker', async () => {
+    await renderRoute('/components/date-picker')
 
     expect((await screen.findAllByRole('heading', { name: /DatePicker/ })).length).toBeGreaterThan(0)
   })

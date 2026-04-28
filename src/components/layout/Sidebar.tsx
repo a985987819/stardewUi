@@ -28,7 +28,6 @@ function useMenuItems(): MenuItem[] {
         { path: '/components/button', label: t('sidebar.button') },
         { path: '/components/calendar', label: t('sidebar.calendar') },
         { path: '/components/date-picker', label: t('sidebar.datePicker') },
-        { path: '/components/star-date-picker', label: t('sidebar.starDatePicker') },
         { path: '/components/title', label: t('sidebar.title') },
         { path: '/components/card', label: t('sidebar.card') },
         { path: '/components/dialog', label: t('sidebar.dialog') },
