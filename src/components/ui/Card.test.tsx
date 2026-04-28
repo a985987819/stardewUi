@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import Card from './Card'
+import styles from './Card.module.scss'
 
 describe('Card', () => {
   describe('基础渲染', () => {
@@ -10,13 +11,13 @@ describe('Card', () => {
     })
 
     it('应该渲染标题', () => {
-      render(<Card title="卡片标题">内容</Card>)
+      render(<Card title="卡片标题" showTitle>内容</Card>)
       expect(screen.getByText('卡片标题')).toBeInTheDocument()
     })
 
     it('应该渲染headerExtra', () => {
       render(
-        <Card title="标题" headerExtra={<span data-testid="extra">额外内容</span>}>
+        <Card title="标题" showTitle headerExtra={<span data-testid="extra">额外内容</span>}>
           内容
         </Card>
       )
@@ -32,86 +33,86 @@ describe('Card', () => {
   describe('变体样式', () => {
     it('应该应用默认变体样式', () => {
       const { container } = render(<Card>内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--default')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--default'])
     })
 
     it('应该应用outlined变体样式', () => {
       const { container } = render(<Card variant="outlined">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--outlined')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--outlined'])
     })
 
     it('应该应用elevated变体样式', () => {
       const { container } = render(<Card variant="elevated">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--elevated')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--elevated'])
     })
   })
 
   describe('尺寸', () => {
     it('应该应用medium尺寸', () => {
       const { container } = render(<Card>内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--medium')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--medium'])
     })
 
     it('应该应用small尺寸', () => {
       const { container } = render(<Card size="small">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--small')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--small'])
     })
 
     it('应该应用large尺寸', () => {
       const { container } = render(<Card size="large">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--large')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--large'])
     })
   })
 
   describe('配色主题', () => {
     it('应该应用night-village配色', () => {
       const { container } = render(<Card color="night-village">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-night-village')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-night-village'])
     })
 
     it('应该应用forest-farm配色', () => {
       const { container } = render(<Card color="forest-farm">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-forest-farm')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-forest-farm'])
     })
 
     it('应该应用wooden-cabin配色', () => {
       const { container } = render(<Card color="wooden-cabin">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-wooden-cabin')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-wooden-cabin'])
     })
 
     it('应该应用lake-night配色', () => {
       const { container } = render(<Card color="lake-night">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-lake-night')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-lake-night'])
     })
 
     it('应该应用flower-festival配色', () => {
       const { container } = render(<Card color="flower-festival">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-flower-festival')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-flower-festival'])
     })
 
     it('应该应用mine-starry配色', () => {
       const { container } = render(<Card color="mine-starry">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-mine-starry')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-mine-starry'])
     })
 
     it('应该应用farmland配色', () => {
       const { container } = render(<Card color="farmland">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-farmland')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-farmland'])
     })
 
     it('应该应用orchard-grass配色', () => {
       const { container } = render(<Card color="orchard-grass">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-orchard-grass')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-orchard-grass'])
     })
 
     it('应该应用workshop-ore配色', () => {
       const { container } = render(<Card color="workshop-ore">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-workshop-ore')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-workshop-ore'])
     })
 
     it('应该应用night-celebration配色', () => {
       const { container } = render(<Card color="night-celebration">内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--color-night-celebration')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--color-night-celebration'])
     })
   })
 
@@ -126,12 +127,12 @@ describe('Card', () => {
 
     it('应该有hoverable样式', () => {
       const { container } = render(<Card hoverable>内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--hoverable')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--hoverable'])
     })
 
     it('应该有clickable样式当提供onClick时', () => {
       const { container } = render(<Card onClick={() => {}}>内容</Card>)
-      expect(container.firstChild).toHaveClass('stardew-card--clickable')
+      expect(container.firstChild).toHaveClass(styles['stardew-card--clickable'])
     })
   })
 

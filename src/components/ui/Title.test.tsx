@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Title from './Title'
+import styles from './Title.module.scss'
 
 class ResizeObserverMock {
   observe() {}
@@ -39,7 +40,7 @@ describe('Title', () => {
       </Title>
     )
 
-    expect(container.firstChild).toHaveClass('title-board', 'title-board--large', 'title-board--left')
+    expect(container.firstChild).toHaveClass(styles['title-board'], styles['title-board--large'], styles['title-board--left'])
   })
 
   it('supports semantic tag overrides', () => {

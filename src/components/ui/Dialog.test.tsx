@@ -171,7 +171,7 @@ describe('Dialog', () => {
 
       await waitFor(() => {
         const prevButton = screen.getAllByRole('button').find(
-          btn => btn.getAttribute('title') === '上一页'
+          btn => btn.getAttribute('title') === '已是第一页'
         )
         expect(prevButton).toBeDisabled()
       })
