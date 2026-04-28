@@ -84,8 +84,8 @@ function StarDatePickerDemoPage() {
 
   return (
     <StarComponentPage
-      title="DatePicker"
-      description="Date picker for single-day and range selection, returning normalized day timestamps."
+      title="DatePicker 日期选择"
+      description="支持单日选择和日期范围选择的日期选择器，返回标准化的时间戳。"
       toc={tocItems}
     >
       <StarComponentDemo

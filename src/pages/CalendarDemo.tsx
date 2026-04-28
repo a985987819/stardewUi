@@ -131,8 +131,8 @@ const iconMap = {
 function StarCalendarDemoPage() {
   return (
     <StarComponentPage
-      title="Calendar"
-      description="Month view calendar with optional marker data, icon mapping, and hover or focus details."
+      title="Calendar 日历"
+      description="月视图日历组件，支持标记数据、图标映射以及悬停或聚焦时显示详情。"
       toc={tocItems}
     >
       <StarComponentDemo
