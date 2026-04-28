@@ -1,14 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import { I18nProvider } from '../i18n'
 import Home from './Home'
 
 describe('Home', () => {
   it('renders the product-focused hero copy and feature copy', () => {
     render(
-      <MemoryRouter>
-        <Home />
-      </MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter>
+          <Home />
+        </MemoryRouter>
+      </I18nProvider>
     )
 
     expect(screen.getByText('像素风 UI Kit')).toBeInTheDocument()
