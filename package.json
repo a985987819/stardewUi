@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@eslint/js": "^10.0.1",
+    "@rolldown/binding-win32-x64-msvc": "^1.0.0-rc.17",
     "@rolldown/plugin-babel": "^0.2.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -41,6 +42,7 @@
     "gh-pages": "^6.3.0",
     "globals": "^17.5.0",
     "jsdom": "^29.0.2",
+    "lightningcss-win32-x64-msvc": "^1.32.0",
     "postcss": "^8.5.10",
     "sass": "^1.99.0",
     "tailwindcss": "3",

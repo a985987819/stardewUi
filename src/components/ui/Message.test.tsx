@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { screen, fireEvent, waitFor, act, within } from '@testing-library/react'
+import { waitFor, act } from '@testing-library/react'
 import { message } from './Message'
 
 describe('Message', () => {
