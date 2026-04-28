@@ -11,6 +11,8 @@ const START_ANGLE = -Math.PI / 2
 const BUN_EDGE_RATIO = 0
 const BITE_CENTER_DISTANCE_RATIO = 0.97
 const BITE_DEPTH_RATIO = 0.39
+const BITE_JOLT_LEVELS = [1, 0.55, 0] as const
+const BITE_JOLT_DECAY_DURATION = 60
 
 let loadingImagePromise: Promise<HTMLImageElement> | null = null
 
@@ -126,6 +128,21 @@ function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteC
   ctx.restore()
 }
 
+export function getBunJoltOffset(size: number, biteCount: number, joltLevel: number) {
+  if (biteCount <= 0 || joltLevel <= 0) {
+    return { x: 0, y: 0 }
+  }
+
+  const baseOffset = Math.max(0.45, size * 0.035)
+  const angle = START_ANGLE + (biteCount - 1) * (FULL_CIRCLE / FRAME_COUNT)
+  const direction = biteCount % 2 === 0 ? -1 : 1
+
+  return {
+    x: Number((Math.sin(angle) * baseOffset * joltLevel * direction).toFixed(3)),
+    y: Number((-Math.cos(angle) * baseOffset * joltLevel).toFixed(3)),
+  }
+}
+
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   active?: boolean
   text?: string
@@ -151,8 +168,10 @@ function StarLoading({
 }: StarLoadingProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const timerRef = useRef<number | null>(null)
+  const joltTimerRef = useRef<number | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [hiddenSlices, setHiddenSlices] = useState(0)
+  const [joltIndex, setJoltIndex] = useState(2)
 
   useEffect(() => {
     let cancelled = false
@@ -180,10 +199,15 @@ function StarLoading({
         window.clearTimeout(timerRef.current)
         timerRef.current = null
       }
+      if (joltTimerRef.current !== null) {
+        window.clearTimeout(joltTimerRef.current)
+        joltTimerRef.current = null
+      }
       return
     }
 
     setHiddenSlices(0)
+    setJoltIndex(2)
   }, [active])
 
   useEffect(() => {
@@ -202,6 +226,39 @@ function StarLoading({
       }
     }
   }, [active, hiddenSlices])
+
+  useEffect(() => {
+    if (hiddenSlices <= 0 || hiddenSlices >= FRAME_COUNT) {
+      setJoltIndex(2)
+      return
+    }
+
+    setJoltIndex(0)
+
+    return () => {
+      if (joltTimerRef.current !== null) {
+        window.clearTimeout(joltTimerRef.current)
+        joltTimerRef.current = null
+      }
+    }
+  }, [hiddenSlices])
+
+  useEffect(() => {
+    if (joltIndex >= BITE_JOLT_LEVELS.length - 1) {
+      return
+    }
+
+    joltTimerRef.current = window.setTimeout(() => {
+      setJoltIndex((current) => Math.min(current + 1, BITE_JOLT_LEVELS.length - 1))
+    }, BITE_JOLT_DECAY_DURATION)
+
+    return () => {
+      if (joltTimerRef.current !== null) {
+        window.clearTimeout(joltTimerRef.current)
+        joltTimerRef.current = null
+      }
+    }
+  }, [joltIndex])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -246,14 +303,17 @@ function StarLoading({
 
   const resolvedText = text === undefined ? DEFAULT_TEXT : text
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
+  const joltOffset = getBunJoltOffset(size, hiddenSlices, BITE_JOLT_LEVELS[joltIndex])
   const rootStyle = useMemo(
     () =>
       ({
         ...style,
         '--star-loading-size': `${size}px`,
         '--star-loading-gap': `${gap}px`,
+        '--star-loading-jolt-x': `${joltOffset.x}px`,
+        '--star-loading-jolt-y': `${joltOffset.y}px`,
       }) as CSSProperties,
-    [gap, size, style]
+    [gap, joltOffset.x, joltOffset.y, size, style]
   )
 
   return (

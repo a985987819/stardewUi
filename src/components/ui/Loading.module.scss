@@ -1,6 +1,8 @@
 .loading {
   --star-loading-size: 28px;
   --star-loading-gap: 8px;
+  --star-loading-jolt-x: 0px;
+  --star-loading-jolt-y: 0px;
 
   display: inline-flex;
   flex-direction: column;
@@ -33,6 +35,8 @@
     width: var(--star-loading-size);
     height: var(--star-loading-size);
     flex: 0 0 var(--star-loading-size);
+    transform: translate(var(--star-loading-jolt-x), var(--star-loading-jolt-y));
+    transition: transform 0.06s steps(2);
   }
 
   &__text {

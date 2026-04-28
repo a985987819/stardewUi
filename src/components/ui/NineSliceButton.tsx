@@ -57,6 +57,7 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
 
 const cls = (...classNames: Array<string | false | undefined>) => classNames.filter(Boolean).join(' ')
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
+const DEFAULT_BUTTON_IMAGE_SRC = '/defaultBtn.png'
 
 const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
@@ -120,11 +121,12 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const isDisabled = disabled || loading
     const effectiveVariant =
       isDisabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+    const renderedVariant = variant === 'default' ? 'default' : effectiveVariant
     const loadingSize = size === 'small' ? 14 : size === 'large' ? 18 : 16
 
     const usesSeasonalBackground = Boolean(theme) && variant === 'default'
     const usesPlainDefaultBackground = !theme && variant === 'default' && !backgroundSrc
-    const resolvedBackgroundSrc = usesPlainDefaultBackground ? '/defaultBtn.png' : backgroundSrc ?? '/btnImg.png'
+    const resolvedBackgroundSrc = backgroundSrc ?? '/btnImg.png'
     const [isHovered, setIsHovered] = useState(false)
     const [isPressed, setIsPressed] = useState(false)
     const [seasonalImageVersion, setSeasonalImageVersion] = useState(0)
@@ -199,6 +201,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
           '--nine-slice-button-default-disabled-overlay': isDisabled
             ? 'rgba(240, 230, 210, 0.6)'
             : 'transparent',
+          fontWeight: isPressed ? 700 : style?.fontWeight,
         } as CSSProperties
       }
 
@@ -206,7 +209,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     }, [isDisabled, plainDefaultColor, seasonalState, style, theme, usesPlainDefaultBackground, usesSeasonalBackground])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
-      enabled: !usesSeasonalBackground,
+      enabled: !usesSeasonalBackground && !usesPlainDefaultBackground,
       src: resolvedBackgroundSrc,
       insets: backgroundInsets,
       className: styles['nine-slice-button__canvas'],
@@ -415,8 +418,9 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         onPointerUp={handlePointerUp}
         className={cls(
           styles['nine-slice-button'],
-          styles[`nine-slice-button--${effectiveVariant}`],
+          styles[`nine-slice-button--${renderedVariant}`],
           usesSeasonalBackground ? styles['nine-slice-button--seasonal'] : undefined,
+          usesPlainDefaultBackground ? styles['nine-slice-button--plain-default'] : undefined,
           styles[`nine-slice-button--${size}`],
           block ? styles['nine-slice-button--block'] : undefined,
           className
@@ -429,6 +433,19 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
               className={cls(
                 styles['nine-slice-button__canvas'],
                 styles['nine-slice-button__canvas--seasonal']
+              )}
+              aria-hidden
+            />
+          </span>
+        ) : null}
+        {usesPlainDefaultBackground ? (
+          <span className={styles['nine-slice-button__bg']}>
+            <img
+              src={DEFAULT_BUTTON_IMAGE_SRC}
+              alt=""
+              className={cls(
+                styles['nine-slice-button__plain-default-image'],
+                isPressed ? styles['nine-slice-button__plain-default-image--pressed'] : undefined
               )}
               aria-hidden
             />

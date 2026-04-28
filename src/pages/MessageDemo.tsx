@@ -1,9 +1,8 @@
 import StarComponentPage from '../components/layout/ComponentPage'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarApiTable from '../components/layout/ApiTable'
+import { StarNineSliceButton } from '../components/ui'
 import { message } from '../components/ui/Message'
-import { classNames } from '../utils/classNames'
-import appStyles from '../styles/global.module.scss'
 
 const messageApiData = [
   { property: 'content', description: '提示内容', type: 'string', default: '-', required: true },
@@ -66,34 +65,46 @@ function StarMessageDemoPage() {
     >
       <StarComponentDemo id="basic" title="基础用法" description="五种不同类型的消息提示。" code={basicCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className={appStyles.demoButton} onClick={showNormal}>普通提示</button>
-          <button className={appStyles.demoButton} style={{ background: '#E0F7FA', color: '#2E4057' }} onClick={showInfo}>信息提示</button>
-          <button className={appStyles.demoButton} style={{ background: '#E6F2D9', color: '#2F5233' }} onClick={showSuccess}>成功提示</button>
-          <button className={appStyles.demoButton} style={{ background: '#FFF2D5', color: '#6B4226' }} onClick={showWarning}>警告提示</button>
-          <button className={appStyles.demoButton} style={{ background: '#FFD1E3', color: '#5C3A57' }} onClick={showError}>错误提示</button>
+          <StarNineSliceButton onClick={showNormal}>普通提示</StarNineSliceButton>
+          <StarNineSliceButton onClick={showInfo}>信息提示</StarNineSliceButton>
+          <StarNineSliceButton onClick={showSuccess}>成功提示</StarNineSliceButton>
+          <StarNineSliceButton onClick={showWarning}>警告提示</StarNineSliceButton>
+          <StarNineSliceButton onClick={showError}>错误提示</StarNineSliceButton>
         </div>
       </StarComponentDemo>
 
       <StarComponentDemo id="duration" title="持续时间" description="设置消息显示的持续时间。" code={durationCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showSuccess}>默认 3 秒</button>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showLong}>5 秒关闭</button>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showPersistent}>不自动关闭</button>
+          <StarNineSliceButton variant="primary" onClick={showSuccess}>
+            默认 3 秒
+          </StarNineSliceButton>
+          <StarNineSliceButton variant="primary" onClick={showLong}>
+            5 秒关闭
+          </StarNineSliceButton>
+          <StarNineSliceButton variant="primary" onClick={showPersistent}>
+            不自动关闭
+          </StarNineSliceButton>
         </div>
       </StarComponentDemo>
 
       <StarComponentDemo id="position" title="显示位置" description="通过 `position` 指定消息出现的位置。" code={positionCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showTop}>顶部居中</button>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showBottomLeft}>左下角</button>
-          <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={showBottomRight}>右下角</button>
+          <StarNineSliceButton variant="primary" onClick={showTop}>
+            顶部居中
+          </StarNineSliceButton>
+          <StarNineSliceButton variant="primary" onClick={showBottomLeft}>
+            左下角
+          </StarNineSliceButton>
+          <StarNineSliceButton variant="primary" onClick={showBottomRight}>
+            右下角
+          </StarNineSliceButton>
         </div>
       </StarComponentDemo>
 
       <StarComponentDemo id="config" title="配置对象" description="使用配置对象方式调用，也支持位置配置。" code={configCode}>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button
-            className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)}
+          <StarNineSliceButton
+            variant="primary"
             onClick={() =>
               message({
                 content: '使用配置对象的消息',
@@ -104,7 +115,7 @@ function StarMessageDemoPage() {
             }
           >
             配置对象调用
-          </button>
+          </StarNineSliceButton>
         </div>
       </StarComponentDemo>
 

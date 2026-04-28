@@ -1,6 +1,7 @@
 import StarComponentPage from '../components/layout/ComponentPage'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarApiTable from '../components/layout/ApiTable'
+import { StarNineSliceButton } from '../components/ui'
 import { StarCard, type CardColor } from '../components/ui/Card'
 
 const cardApiData = [
@@ -21,10 +22,10 @@ const colorOptions: Array<{ value: CardColor; label: string; desc: string }> = [
   { value: 'wooden-cabin', label: '木屋农舍', desc: '棕橙 + 浅杏色' },
   { value: 'lake-night', label: '湖畔夜色', desc: '湖蓝 + 浅青白' },
   { value: 'flower-festival', label: '花田节日', desc: '粉紫 + 浅粉白' },
-  { value: 'mine-starry', label: '矿洞星夜', desc: '静蓝 + 冷白' },
+  { value: 'mine-starry', label: '矿洞星夜', desc: '靛蓝 + 冷白' },
   { value: 'farmland', label: '耕地收获', desc: '泥棕 + 奶油白' },
   { value: 'orchard-grass', label: '果园草地', desc: '草绿 + 浅青绿' },
-  { value: 'workshop-ore', label: '工坊矿石', desc: '灰蓝 + 亮黄' },
+  { value: 'workshop-ore', label: '工坊矿石', desc: '铁蓝 + 亮黄' },
   { value: 'night-celebration', label: '节庆夜空', desc: '宝蓝 + 淡紫白' },
 ]
 
@@ -45,7 +46,7 @@ const basicCode = `<StarCard>
 </StarCard>`
 
 const titleCode = `<StarCard title="默认卡片" showTitle>
-  标题会展示在卡片左上角的标签区域。
+  标题会显示在卡片左上角的标签区域。
 </StarCard>`
 
 const variantCode = `<StarCard variant="default" title="默认卡片" showTitle>
@@ -69,12 +70,12 @@ const withFooterCode = `<StarCard
   showTitle
   footer={
     <div style={{ display: 'flex', gap: '8px' }}>
-      <button className="stardew-btn">取消</button>
-      <button className="stardew-btn stardew-btn--primary">确认</button>
+      <StarNineSliceButton>取消</StarNineSliceButton>
+      <StarNineSliceButton variant="primary">确认</StarNineSliceButton>
     </div>
   }
 >
-  卡片可以承载操作区和内容区。
+  卡片可以同时承载操作区和内容区。
 </StarCard>`
 
 const sizeCode = `<StarCard size="small" title="小卡片" showTitle>
@@ -117,7 +118,7 @@ function StarCardDemoPage() {
 
       <StarComponentDemo id="title" title="可选标题" description="通过 showTitle 打开标题区，标题显示在卡片左上角标签位。" code={titleCode}>
         <StarCard title="默认卡片" showTitle>
-          标题会展示在卡片左上角的标签区域。
+          标题会显示在卡片左上角的标签区域。
         </StarCard>
       </StarComponentDemo>
 
@@ -149,7 +150,7 @@ function StarCardDemoPage() {
 
       <StarComponentDemo id="hoverable" title="悬停效果" description="hoverable 会让卡片在鼠标悬停时轻微抬起。" code={hoverableCode}>
         <StarCard hoverable title="可悬停卡片" showTitle>
-          鼠标悬停时会有轻微的抬起动效，点击时会有按压反馈。
+          鼠标悬停时会有轻微的抬起动画效果，点击时会有按压反馈。
         </StarCard>
       </StarComponentDemo>
 
@@ -173,8 +174,8 @@ function StarCardDemoPage() {
           showTitle
           footer={
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button className="stardew-btn">取消</button>
-              <button className="stardew-btn stardew-btn--primary">确认</button>
+              <StarNineSliceButton>取消</StarNineSliceButton>
+              <StarNineSliceButton variant="primary">确认</StarNineSliceButton>
             </div>
           }
         >

@@ -40,7 +40,7 @@ const buttonApiData = [
 ]
 
 const tocItems = [
-  { id: 'basic', title: '按钮类型', level: 1 },
+  { id: 'basic', title: '默认按钮', level: 1 },
   { id: 'theme', title: '季节主题', level: 1 },
   { id: 'size', title: '按钮尺寸', level: 1 },
   { id: 'disabled', title: '禁用状态', level: 1 },
@@ -49,17 +49,14 @@ const tocItems = [
 ]
 
 const basicCode = `<StarNineSliceButton>默认按钮</StarNineSliceButton>
-<StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
-<StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
-<StarNineSliceButton variant="text">文本按钮</StarNineSliceButton>
-<StarNineSliceButton variant="link">链接按钮</StarNineSliceButton>`
+<StarNineSliceButton>确认</StarNineSliceButton>
+<StarNineSliceButton>删除</StarNineSliceButton>`
 
-const sizeCode = `<StarNineSliceButton variant="primary" size="small">小按钮</StarNineSliceButton>
-<StarNineSliceButton variant="primary">默认按钮</StarNineSliceButton>
-<StarNineSliceButton variant="primary" size="large">大按钮</StarNineSliceButton>`
+const sizeCode = `<StarNineSliceButton size="small">小按钮</StarNineSliceButton>
+<StarNineSliceButton>默认按钮</StarNineSliceButton>
+<StarNineSliceButton size="large">大按钮</StarNineSliceButton>`
 
-const disabledCode = `<StarNineSliceButton variant="primary" disabled>禁用主要按钮</StarNineSliceButton>
-<StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
+const disabledCode = `<StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
 <StarNineSliceButton theme="winter" disabled>冬季禁用按钮</StarNineSliceButton>`
 
 const themeCode = `<StarNineSliceButton theme="spring">春季默认按钮</StarNineSliceButton>
@@ -80,26 +77,24 @@ function StarButtonDemoPage() {
   return (
     <StarComponentPage
       title="Button 按钮"
-      description="按钮用于触发一个操作或事件，是用户界面中最基础的交互元素。"
+      description="默认按钮使用完整按钮图资源渲染，适合项目中的常见点击操作。"
       toc={tocItems}
     >
       <StarComponentDemo
         id="basic"
-        title="按钮类型"
-        description="支持多种不同类型的按钮。"
+        title="默认按钮"
+        description="项目中的常见点击按钮默认都使用这一套按钮写法。"
         code={basicCode}
       >
         <StarNineSliceButton>默认按钮</StarNineSliceButton>
-        <StarNineSliceButton variant="primary">主要按钮</StarNineSliceButton>
-        <StarNineSliceButton variant="dashed">虚线按钮</StarNineSliceButton>
-        <StarNineSliceButton variant="text">文本按钮</StarNineSliceButton>
-        <StarNineSliceButton variant="link">链接按钮</StarNineSliceButton>
+        <StarNineSliceButton>确认</StarNineSliceButton>
+        <StarNineSliceButton>删除</StarNineSliceButton>
       </StarComponentDemo>
 
       <StarComponentDemo
         id="theme"
         title="季节主题"
-        description="通过 theme 属性切换春夏秋冬四种默认按钮风格，并同步支持 small、loading、disabled、block 等完整状态。"
+        description="通过 theme 属性切换春夏秋冬四种默认按钮风格，并保持 small、loading、disabled、block 等状态能力。"
         code={themeCode}
       >
         <div className={styles['button-theme-grid']}>
@@ -128,30 +123,13 @@ function StarButtonDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo
-        id="size"
-        title="按钮尺寸"
-        description="提供三种尺寸的按钮。"
-        code={sizeCode}
-      >
-        <StarNineSliceButton variant="primary" size="small">
-          小按钮
-        </StarNineSliceButton>
-        <StarNineSliceButton variant="primary">默认按钮</StarNineSliceButton>
-        <StarNineSliceButton variant="primary" size="large">
-          大按钮
-        </StarNineSliceButton>
+      <StarComponentDemo id="size" title="按钮尺寸" description="提供三种尺寸的默认按钮。" code={sizeCode}>
+        <StarNineSliceButton size="small">小按钮</StarNineSliceButton>
+        <StarNineSliceButton>默认按钮</StarNineSliceButton>
+        <StarNineSliceButton size="large">大按钮</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo
-        id="disabled"
-        title="禁用状态"
-        description="按钮的禁用状态。"
-        code={disabledCode}
-      >
-        <StarNineSliceButton variant="primary" disabled>
-          禁用主要按钮
-        </StarNineSliceButton>
+      <StarComponentDemo id="disabled" title="禁用状态" description="默认按钮的禁用状态。" code={disabledCode}>
         <StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
         <StarNineSliceButton theme="winter" disabled>
           冬季禁用按钮
@@ -161,7 +139,7 @@ function StarButtonDemoPage() {
       <StarComponentDemo
         id="multi"
         title="多实例场景"
-        description="同一页面多个按钮可复用同一图片缓存并独立绘制。"
+        description="同一页面多个默认按钮可以复用同一份图资源并独立绘制。"
         code={multiInstanceCode}
       >
         <div className={styles['demo-multi-buttons']}>

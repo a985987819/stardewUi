@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import StarComponentPage from '../components/layout/ComponentPage'
-import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarApiTable from '../components/layout/ApiTable'
-import { StarTypewriter } from '../components/ui'
-import { classNames } from '../utils/classNames'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarComponentPage from '../components/layout/ComponentPage'
+import { StarNineSliceButton, StarTypewriter } from '../components/ui'
 import appStyles from '../styles/global.module.scss'
 
 const typewriterApiData = [
@@ -21,7 +20,7 @@ const tocItems = [
   { id: 'api', title: 'API', level: 1 },
 ]
 
-const basicCode = `<StarTypewriter text="你好，欢迎来到星露谷！" />`
+const basicCode = `<StarTypewriter text="你好，欢迎来到星露谷。" />`
 
 const speedCode = `<StarTypewriter text="快速打字效果" speed={50} />
 <StarTypewriter text="慢速打字效果" speed={150} />`
@@ -43,11 +42,11 @@ function StarTypewriterDemoPage() {
     >
       <StarComponentDemo id="basic" title="基础用法" description="最简单的打字机效果。" code={basicCode}>
         <div className={appStyles.typewriterDemoBox}>
-          <StarTypewriter text="你好，欢迎来到星露谷！这是一个美丽的农场世界。" key={key} />
+          <StarTypewriter text="你好，欢迎来到星露谷，这里是一片适合播种与收获的农场。" key={key} />
         </div>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={restart} style={{ marginTop: '12px' }}>
+        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
           重新播放
-        </button>
+        </StarNineSliceButton>
       </StarComponentDemo>
 
       <StarComponentDemo id="speed" title="不同速度" description="自定义打字速度。" code={speedCode}>
@@ -65,18 +64,18 @@ function StarTypewriterDemoPage() {
             <StarTypewriter text="这是慢速打字效果，每个字符间隔 150 毫秒。" speed={150} key={`slow-${key}`} />
           </div>
         </div>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={restart} style={{ marginTop: '12px' }}>
+        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
           重新播放
-        </button>
+        </StarNineSliceButton>
       </StarComponentDemo>
 
       <StarComponentDemo id="delay" title="延迟开始" description="设置开始打字前的延迟时间。" code={delayCode}>
         <div className={appStyles.typewriterDemoBox}>
           <StarTypewriter text="这段文字会在 1 秒后开始逐字出现..." startDelay={1000} key={`delay-${key}`} />
         </div>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={restart} style={{ marginTop: '12px' }}>
+        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
           重新播放
-        </button>
+        </StarNineSliceButton>
       </StarComponentDemo>
 
       <div id="api" className="component-page-api">

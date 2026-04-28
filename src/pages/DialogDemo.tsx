@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import StarComponentPage from '../components/layout/ComponentPage'
-import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarApiTable from '../components/layout/ApiTable'
-import { StarDialog } from '../components/ui'
-import { classNames } from '../utils/classNames'
-import appStyles from '../styles/global.module.scss'
+import StarComponentDemo from '../components/layout/ComponentDemo'
+import StarComponentPage from '../components/layout/ComponentPage'
+import { StarDialog, StarNineSliceButton } from '../components/ui'
 
 const dialogApiData = [
   { property: 'open', description: '是否显示弹窗', type: 'boolean', default: 'false', required: true },
@@ -15,7 +13,7 @@ const dialogApiData = [
   { property: 'actions', description: '操作按钮，传 null 隐藏按钮', type: 'DialogAction[] | null', default: '[确认, 取消]' },
   { property: 'maskClosable', description: '点击遮罩层是否关闭', type: 'boolean', default: 'true' },
   { property: 'typewriter', description: '是否启用打字机效果', type: 'boolean', default: 'true' },
-  { property: 'typewriterSpeed', description: '打字机速度（毫秒/字符）', type: 'number', default: '30' },
+  { property: 'typewriterSpeed', description: '打字速度（毫秒/字符）', type: 'number', default: '30' },
   { property: 'onClose', description: '关闭回调', type: '() => void', default: '-' },
 ]
 
@@ -45,9 +43,9 @@ const paginationCode = `const [open, setOpen] = useState(false)
   open={open}
   title="任务对话"
   content={[
-    '你好！我是村里的铁匠。',
+    '你好，我是村里的铁匠。',
     '我听说你在农场工作得很努力。',
-    '如果你需要升级工具，可以来找我。'
+    '如果你需要升级工具，随时可以来找我。',
   ]}
   image="/avatar.png"
   name="克林特"
@@ -103,13 +101,11 @@ function StarDialogDemoPage() {
   return (
     <StarComponentPage
       title="Dialog 弹窗"
-      description="星露谷风格的对话弹窗组件，支持分页内容和打字机效果。"
+      description="星露谷风格的对话弹窗组件，支持分页内容和打字机动画效果。"
       toc={tocItems}
     >
-      <StarComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机效果。" code={basicCode}>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setBasicOpen(true)}>
-          打开基础弹窗
-        </button>
+      <StarComponentDemo id="basic" title="基础用法" description="最简单的弹窗用法，带打字机动画效果。" code={basicCode}>
+        <StarNineSliceButton onClick={() => setBasicOpen(true)}>打开基础弹窗</StarNineSliceButton>
         <StarDialog
           open={basicOpen}
           title="欢迎来到星露谷"
@@ -121,14 +117,12 @@ function StarDialogDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="pagination" title="分页对话" description="支持多页内容，按箭头切换。" code={paginationCode}>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setPaginationOpen(true)}>
-          打开分页弹窗
-        </button>
+        <StarNineSliceButton onClick={() => setPaginationOpen(true)}>打开分页弹窗</StarNineSliceButton>
         <StarDialog
           open={paginationOpen}
           title="任务对话"
           content={[
-            '你好！我是村里的铁匠克林特。',
+            '你好，我是村里的铁匠克林特。',
             '我听说你在农场工作得很努力，这很不错。',
             '如果你需要升级工具，随时可以来找我。',
           ]}
@@ -139,9 +133,7 @@ function StarDialogDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="custom-actions" title="自定义按钮" description="自定义操作按钮和样式。" code={customActionsCode}>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setCustomOpen(true)}>
-          打开自定义按钮弹窗
-        </button>
+        <StarNineSliceButton onClick={() => setCustomOpen(true)}>打开自定义按钮弹窗</StarNineSliceButton>
         <StarDialog
           open={customOpen}
           title="确认操作"
@@ -157,9 +149,7 @@ function StarDialogDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="no-actions" title="无操作按钮" description="隐藏操作按钮，仅用于展示信息。" code={noActionsCode}>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoActionOpen(true)}>
-          打开无按钮弹窗
-        </button>
+        <StarNineSliceButton onClick={() => setNoActionOpen(true)}>打开无按钮弹窗</StarNineSliceButton>
         <StarDialog
           open={noActionOpen}
           title="提示"
@@ -173,9 +163,7 @@ function StarDialogDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="no-typewriter" title="禁用打字机" description="直接显示内容，无打字动画。" code={noTypewriterCode}>
-        <button className={classNames(appStyles.demoButton, appStyles.demoButtonPrimary)} onClick={() => setNoTypewriterOpen(true)}>
-          打开无打字机弹窗
-        </button>
+        <StarNineSliceButton onClick={() => setNoTypewriterOpen(true)}>打开无打字机弹窗</StarNineSliceButton>
         <StarDialog
           open={noTypewriterOpen}
           title="无打字机效果"

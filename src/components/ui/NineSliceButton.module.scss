@@ -29,6 +29,20 @@
     height: 100%;
   }
 
+  &__plain-default-image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    image-rendering: pixelated;
+  }
+
+  &__plain-default-image--pressed {
+    transform: translate(1px, 1px);
+  }
+
   &__canvas--seasonal {
     image-rendering: pixelated;
   }
@@ -75,6 +89,12 @@
     &:disabled .nine-slice-button__bg::after {
       background: var(--nine-slice-button-default-disabled-overlay, transparent);
     }
+  }
+
+  &--plain-default {
+    min-width: 98px;
+    min-height: 34px;
+    padding: 9px 22px 11px;
   }
 
   &--seasonal {
@@ -136,6 +156,12 @@
     }
   }
 
+  &--plain-default.nine-slice-button--small {
+    min-width: 84px;
+    min-height: 30px;
+    padding: 8px 18px 10px;
+  }
+
   &--large {
     @apply text-base;
     padding: 16px 22px;
@@ -143,6 +169,12 @@
     .nine-slice-button__content {
       gap: 10px;
     }
+  }
+
+  &--plain-default.nine-slice-button--large {
+    min-width: 116px;
+    min-height: 40px;
+    padding: 12px 28px 14px;
   }
 
   &--block {
