@@ -1,5 +1,6 @@
-import { type HTMLAttributes, type ReactNode } from 'react'
+import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
+import { getCardLighting } from '../../utils/cardLighting'
 import styles from './Card.module.scss'
 
 export type CardColor =
@@ -26,6 +27,20 @@ export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'tit
   showTitle?: boolean
 }
 
+const CARD_EDGE_COLORS: Record<CardColor | 'default', string> = {
+  default: '#fa9305',
+  'night-village': '#2f1e27',
+  'forest-farm': '#48652c',
+  'wooden-cabin': '#6f3a18',
+  'lake-night': '#274d70',
+  'flower-festival': '#82445f',
+  'mine-starry': '#34458a',
+  farmland: '#7a4824',
+  'orchard-grass': '#355123',
+  'workshop-ore': '#39434c',
+  'night-celebration': '#202f76',
+}
+
 function StarCard({
   title,
   children,
@@ -38,9 +53,18 @@ function StarCard({
   hoverable = false,
   showTitle = false,
   onClick,
+  style,
   ...rest
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
+  const lighting = getCardLighting(CARD_EDGE_COLORS[color ?? 'default'])
+  const cardStyle = {
+    ...style,
+    '--card-top-highlight': lighting.topHighlight,
+    '--card-right-edge-shadow': lighting.rightEdgeShadow,
+    '--card-divider-shadow': lighting.dividerShadow,
+    '--card-title-text-shadow': lighting.titleTextShadow,
+  } as CSSProperties
 
   const cardClass = classNames(
     styles['stardew-card'],
@@ -54,13 +78,11 @@ function StarCard({
   )
 
   return (
-    <div {...rest} className={cardClass} onClick={onClick}>
+    <div {...rest} className={cardClass} style={cardStyle} onClick={onClick}>
       <span className={styles['stardew-card__frame']} aria-hidden />
       {hasTitle ? (
         <div className={styles['stardew-card__header']}>
-          <div className={styles['stardew-card__title-tag']}>
-            <h3 className={styles['stardew-card__title']}>{title}</h3>
-          </div>
+          <h3 className={styles['stardew-card__title']}>{title}</h3>
           {headerExtra ? <div className={styles['stardew-card__extra']}>{headerExtra}</div> : null}
         </div>
       ) : null}
