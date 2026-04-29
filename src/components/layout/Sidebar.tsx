@@ -31,7 +31,7 @@ const bilingualLabels: Record<string, { zh: string; en: string }> = {
   'sidebar.tab': { zh: '选项卡', en: 'Tab' },
 }
 
-function useMenuItems(lang: 'zh' | 'en'): MenuItem[] {
+function useMenuItems(): MenuItem[] {
   const getBilingualLabel = (key: string): { zh: string; en: string } => {
     return bilingualLabels[key] || { zh: key, en: key }
   }
@@ -74,10 +74,10 @@ function useMenuItems(lang: 'zh' | 'en'): MenuItem[] {
 
 function StarSidebar() {
   const location = useLocation()
-  const { t, lang } = useI18n()
+  const { t } = useI18n()
   const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
   const [searchQuery, setSearchQuery] = useState('')
-  const menuItems = useMenuItems(lang)
+  const menuItems = useMenuItems()
 
   const toggleExpand = (path: string) => {
     setExpandedKeys((prev) => (prev.includes(path) ? prev.filter((key) => key !== path) : [...prev, path]))

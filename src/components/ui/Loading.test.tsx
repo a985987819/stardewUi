@@ -2,7 +2,8 @@ import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
 import { act } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import StarLoading, { getBunJoltOffset } from './Loading'
+import StarLoading from './Loading'
+import { getBunJoltOffset } from './loadingMath'
 
 const context2dMock = {
   clearRect: vi.fn(),

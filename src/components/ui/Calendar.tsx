@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   addMonths,
   buildCalendarCells,
@@ -109,11 +109,12 @@ function Calendar({
 
   const cells = useMemo(() => buildCalendarCells(monthTimestamp), [monthTimestamp])
   const itemsByDay = useMemo(() => groupCalendarItemsByDay(items), [items])
-  const activeItems = activeDayTimestamp !== null ? itemsByDay[activeDayTimestamp] ?? [] : []
-
-  useEffect(() => {
-    setActiveDayTimestamp(null)
-  }, [monthTimestamp])
+  const visibleDayTimestamps = useMemo(() => new Set(cells.map((cell) => cell.dateTimestamp)), [cells])
+  const resolvedActiveDayTimestamp =
+    activeDayTimestamp !== null && visibleDayTimestamps.has(activeDayTimestamp)
+      ? activeDayTimestamp
+      : null
+  const activeItems = resolvedActiveDayTimestamp !== null ? itemsByDay[resolvedActiveDayTimestamp] ?? [] : []
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setTooltipPosition({ x: e.clientX + 12, y: e.clientY + 12 })
@@ -210,7 +211,7 @@ function Calendar({
             top: tooltipPosition.y,
           }}
         >
-          <div className={styles['calendar__details-title']}>{formatDayLabel(activeDayTimestamp as number)}</div>
+          <div className={styles['calendar__details-title']}>{formatDayLabel(resolvedActiveDayTimestamp as number)}</div>
           <ul className={styles['calendar__details-list']}>
             {activeItems.map((item, index) => (
               <li key={`${item.title}-${index}`} className={styles['calendar__details-item']}>

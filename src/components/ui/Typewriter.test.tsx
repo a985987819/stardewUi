@@ -117,16 +117,19 @@ describe('Typewriter', () => {
     })
   })
 
-  describe('完成回调', () => {
-    it('应该在打字完成后调用onComplete', async () => {
+  describe('外部完成触发', () => {
+    it('completeTrigger变化时应该立即显示完整文本', async () => {
       const onComplete = vi.fn()
-      render(<Typewriter text="Callback" speed={10} onComplete={onComplete} />)
+      const { rerender } = render(<Typewriter text="Triggered" speed={50} completeTrigger={0} onComplete={onComplete} />)
 
       await act(async () => {
-        vi.advanceTimersByTime(500)
+        vi.advanceTimersByTime(60)
       })
 
+      rerender(<Typewriter text="Triggered" speed={50} completeTrigger={1} onComplete={onComplete} />)
+
       await waitFor(() => {
+        expect(screen.getByText('Triggered')).toBeInTheDocument()
         expect(onComplete).toHaveBeenCalledTimes(1)
       })
     })

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
+import { getBunJoltOffset } from './loadingMath'
 import styles from './Loading.module.scss'
 
 const FRAME_COUNT = 12
@@ -120,27 +121,11 @@ function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteC
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
   bites.forEach(({ x, y, radiusX, radiusY, rotation, arcStart, arcEnd }) => {
-    // Draw only the inward bite edge between the two tangency points.
     ctx.beginPath()
     ctx.ellipse(x, y, radiusX, radiusY, rotation, arcStart, arcEnd)
     ctx.stroke()
   })
   ctx.restore()
-}
-
-export function getBunJoltOffset(size: number, biteCount: number, joltLevel: number) {
-  if (biteCount <= 0 || joltLevel <= 0) {
-    return { x: 0, y: 0 }
-  }
-
-  const baseOffset = Math.max(0.45, size * 0.035)
-  const angle = START_ANGLE + (biteCount - 1) * (FULL_CIRCLE / FRAME_COUNT)
-  const direction = biteCount % 2 === 0 ? -1 : 1
-
-  return {
-    x: Number((Math.sin(angle) * baseOffset * joltLevel * direction).toFixed(3)),
-    y: Number((-Math.cos(angle) * baseOffset * joltLevel).toFixed(3)),
-  }
 }
 
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
@@ -166,6 +151,46 @@ function StarLoading({
   role,
   ...rest
 }: StarLoadingProps) {
+  const resolvedText = text === undefined ? DEFAULT_TEXT : text
+  const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
+
+  return (
+    <LoadingSession
+      key={`${active ? 'active' : 'inactive'}-${size}-${resolvedText}`}
+      {...rest}
+      active={active}
+      text={resolvedText}
+      size={size}
+      gap={gap}
+      center={center}
+      block={block}
+      fill={fill}
+      className={className}
+      style={style}
+      role={isAriaHidden ? undefined : role ?? 'status'}
+      ariaLabel={isAriaHidden ? undefined : resolvedText || DEFAULT_TEXT}
+    />
+  )
+}
+
+function LoadingSession({
+  active,
+  text,
+  size,
+  gap,
+  center,
+  block,
+  fill,
+  className,
+  style,
+  role,
+  ariaLabel,
+  ...rest
+}: Omit<StarLoadingProps, 'text' | 'role'> & {
+  text: string
+  role?: string
+  ariaLabel?: string
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const timerRef = useRef<number | null>(null)
   const joltTimerRef = useRef<number | null>(null)
@@ -206,17 +231,12 @@ function StarLoading({
       return
     }
 
-    setHiddenSlices(0)
-    setJoltIndex(2)
-  }, [active])
-
-  useEffect(() => {
-    if (!active) {
-      return
-    }
-
     timerRef.current = window.setTimeout(() => {
-      setHiddenSlices((current) => (current >= FRAME_COUNT ? 0 : current + 1))
+      setHiddenSlices((current) => {
+        const nextHiddenSlices = current >= FRAME_COUNT ? 0 : current + 1
+        setJoltIndex(nextHiddenSlices <= 0 || nextHiddenSlices >= FRAME_COUNT ? 2 : 0)
+        return nextHiddenSlices
+      })
     }, FRAME_DURATION)
 
     return () => {
@@ -226,22 +246,6 @@ function StarLoading({
       }
     }
   }, [active, hiddenSlices])
-
-  useEffect(() => {
-    if (hiddenSlices <= 0 || hiddenSlices >= FRAME_COUNT) {
-      setJoltIndex(2)
-      return
-    }
-
-    setJoltIndex(0)
-
-    return () => {
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
-    }
-  }, [hiddenSlices])
 
   useEffect(() => {
     if (joltIndex >= BITE_JOLT_LEVELS.length - 1) {
@@ -301,8 +305,6 @@ function StarLoading({
     applyBiteMasks(ctx, targetSize, hiddenSlices)
   }, [hiddenSlices, image, size])
 
-  const resolvedText = text === undefined ? DEFAULT_TEXT : text
-  const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
   const joltOffset = getBunJoltOffset(size, hiddenSlices, BITE_JOLT_LEVELS[joltIndex])
   const rootStyle = useMemo(
     () =>
@@ -327,11 +329,11 @@ function StarLoading({
         className
       )}
       style={rootStyle}
-      role={isAriaHidden ? undefined : role ?? 'status'}
-      aria-label={isAriaHidden ? undefined : resolvedText || DEFAULT_TEXT}
+      role={role}
+      aria-label={ariaLabel}
     >
       <canvas ref={canvasRef} className={styles['loading__canvas']} aria-hidden />
-      {resolvedText ? <span className={styles['loading__text']}>{resolvedText}</span> : null}
+      {text ? <span className={styles['loading__text']}>{text}</span> : null}
     </div>
   )
 }

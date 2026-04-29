@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { classNames } from '../../utils/classNames'
 import styles from './Typewriter.module.scss'
 
@@ -18,6 +18,27 @@ function StarTypewriter({
   onComplete,
   startDelay = 0,
   completeTrigger = 0,
+}: StarTypewriterProps) {
+  return (
+    <TypewriterSession
+      key={`${text}-${speed}-${startDelay}`}
+      text={text}
+      speed={speed}
+      className={className}
+      onComplete={onComplete}
+      startDelay={startDelay}
+      completeTrigger={completeTrigger}
+    />
+  )
+}
+
+function TypewriterSession({
+  text,
+  speed,
+  className,
+  onComplete,
+  startDelay,
+  completeTrigger,
 }: StarTypewriterProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [isComplete, setIsComplete] = useState(false)
@@ -46,12 +67,6 @@ function StarTypewriter({
   }, [text, clearAllTimers, onComplete])
 
   useEffect(() => {
-    clearAllTimers()
-    setDisplayedText('')
-    setIsComplete(false)
-    setIsStarted(false)
-    indexRef.current = 0
-
     startTimerRef.current = setTimeout(() => {
       setIsStarted(true)
 
@@ -66,7 +81,7 @@ function StarTypewriter({
     }, startDelay)
 
     return clearAllTimers
-  }, [text, speed, startDelay, clearAllTimers, completeTyping])
+  }, [clearAllTimers, completeTyping, speed, startDelay, text])
 
   useEffect(() => {
     if (previousCompleteTriggerRef.current === completeTrigger) {
@@ -75,8 +90,16 @@ function StarTypewriter({
 
     previousCompleteTriggerRef.current = completeTrigger
 
-    if (!isComplete) {
+    if (isComplete) {
+      return
+    }
+
+    const completeTimer = window.setTimeout(() => {
       completeTyping()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(completeTimer)
     }
   }, [completeTrigger, completeTyping, isComplete])
 
