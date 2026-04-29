@@ -131,7 +131,7 @@ describe('Card', () => {
     })
 
     it('应该有clickable样式当提供onClick时', () => {
-      const { container } = render(<Card onClick={() => {}}>内容</Card>)
+      const { container } = render(<Card onClick={() => { }}>内容</Card>)
       expect(container.firstChild).toHaveClass(styles['stardew-card--clickable'])
     })
   })
