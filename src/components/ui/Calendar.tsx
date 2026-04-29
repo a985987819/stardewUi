@@ -103,6 +103,7 @@ function Calendar({
 }: StarCalendarProps) {
   const [internalMonth, setInternalMonth] = useState(() => getInitialMonth(value, defaultValue))
   const [activeDayTimestamp, setActiveDayTimestamp] = useState<number | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const isControlled = value !== undefined
   const monthTimestamp = isControlled ? getMonthStartTimestamp(value) : internalMonth
 
@@ -113,6 +114,10 @@ function Calendar({
   useEffect(() => {
     setActiveDayTimestamp(null)
   }, [monthTimestamp])
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setTooltipPosition({ x: e.clientX + 12, y: e.clientY + 12 })
+  }
 
   const changeMonth = (offset: number) => {
     const nextMonth = addMonths(monthTimestamp, offset)
@@ -158,32 +163,37 @@ function Calendar({
       <div className={styles['calendar__toolbar']}>
         <StarNineSliceButton
           type="button"
+          variant="concise"
           size="small"
           aria-label="Previous month"
           onClick={() => changeMonth(-1)}
         >
-          ‹
+          &lt;
         </StarNineSliceButton>
         <div className={styles['calendar__month']}>{formatMonthLabel(monthTimestamp)}</div>
         <StarNineSliceButton
           type="button"
+          variant="concise"
           size="small"
           aria-label="Next month"
           onClick={() => changeMonth(1)}
         >
-          ›
+          &gt;
         </StarNineSliceButton>
       </div>
 
       <CalendarGrid
-        monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
         onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}
         renderCellContent={renderCellContent}
         getCellButtonProps={(cell) => ({
           'aria-label': formatDayLabel(cell.dateTimestamp),
-          onMouseEnter: () => setActiveDayTimestamp(cell.dateTimestamp),
+          onMouseEnter: (e: React.MouseEvent) => {
+            setActiveDayTimestamp(cell.dateTimestamp)
+            handleMouseMove(e)
+          },
+          onMouseMove: handleMouseMove,
           onMouseLeave: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
           onFocus: () => setActiveDayTimestamp(cell.dateTimestamp),
           onBlur: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
@@ -191,7 +201,15 @@ function Calendar({
       />
 
       {activeItems.length > 0 ? (
-        <div className={styles['calendar__details']} role="status" aria-live="polite">
+        <div
+          className={styles['calendar__details']}
+          role="status"
+          aria-live="polite"
+          style={{
+            left: tooltipPosition.x,
+            top: tooltipPosition.y,
+          }}
+        >
           <div className={styles['calendar__details-title']}>{formatDayLabel(activeDayTimestamp as number)}</div>
           <ul className={styles['calendar__details-list']}>
             {activeItems.map((item, index) => (

@@ -375,25 +375,26 @@ function DatePicker({
       <div className={styles['date-picker__toolbar']}>
         <StarNineSliceButton
           type="button"
+          variant="concise"
           size="small"
           aria-label="Previous month"
           onClick={() => changeMonth(-1)}
         >
-          {'<'}
+          &lt;
         </StarNineSliceButton>
         <div className={styles['date-picker__month']}>{formatMonthLabel(monthTimestamp)}</div>
         <StarNineSliceButton
           type="button"
+          variant="concise"
           size="small"
           aria-label="Next month"
           onClick={() => changeMonth(1)}
         >
-          {'>'}
+          &gt;
         </StarNineSliceButton>
       </div>
 
       <CalendarGrid
-        monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
         onSelectDay={handleSelectDay}

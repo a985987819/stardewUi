@@ -1,31 +1,25 @@
+@use "./CalendarCommon.module.scss" as common;
+
 .calendar {
-  display: grid;
-  gap: 16px;
-  max-width: 320px;
-  margin: 0 auto;
+  @include common.calendar-container;
+  position: relative;
 }
 
 .calendar__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  @include common.calendar-toolbar;
 }
 
 .calendar__month {
-  flex: 1;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #4e342e;
+  @include common.calendar-month-label;
 }
 
 .calendar__markers {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px;
-  margin-top: 2px;
+  justify-content: center;
+  gap: 1px;
+  margin-top: 1px;
   width: 100%;
 }
 
@@ -33,42 +27,49 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 12px;
-  min-height: 12px;
-  border-radius: 2px;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 1px;
   background: #f4c46a;
   color: #4e342e;
   overflow: hidden;
-  font-size: 9px;
+  font-size: 7px;
 }
 
 .calendar__marker-image {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   object-fit: cover;
   image-rendering: pixelated;
 }
 
 .calendar__marker-dot {
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 1px;
   background: currentColor;
 }
 
 .calendar__marker-summary {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 700;
   color: #6d4c41;
 }
 
 .calendar__details {
+  position: fixed;
   padding: 12px;
   border: 2px solid #2c2c2c;
+  border-radius: 4px;
   background: #fbebc2;
   color: #4e342e;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  max-width: 250px;
 }
 
 .calendar__details-title {

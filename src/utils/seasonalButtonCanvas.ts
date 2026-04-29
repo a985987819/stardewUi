@@ -1,3 +1,5 @@
+import { resolveAssetPath } from './githubPages'
+
 type HTMLImageWithSize = HTMLImageElement & {
   naturalWidth: number
   naturalHeight: number
@@ -40,7 +42,8 @@ type DrawSeasonalButtonOptions = {
 const imageCache = new Map<string, Promise<LoadedImage>>()
 
 const loadImage = (src: string) => {
-  const cached = imageCache.get(src)
+  const resolvedSrc = resolveAssetPath(src)
+  const cached = imageCache.get(resolvedSrc)
   if (cached) {
     return cached
   }
@@ -56,13 +59,13 @@ const loadImage = (src: string) => {
       })
     }
     img.onerror = () => {
-      imageCache.delete(src)
-      reject(new Error(`Failed to load seasonal button image: ${src}`))
+      imageCache.delete(resolvedSrc)
+      reject(new Error(`Failed to load seasonal button image: ${resolvedSrc}`))
     }
-    img.src = src
+    img.src = resolvedSrc
   })
 
-  imageCache.set(src, loading)
+  imageCache.set(resolvedSrc, loading)
   return loading
 }
 

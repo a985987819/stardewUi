@@ -1,23 +1,15 @@
+@use "./CalendarCommon.module.scss" as common;
+
 .date-picker {
-  display: grid;
-  gap: 16px;
-  max-width: 320px;
-  margin: 0 auto;
+  @include common.calendar-container;
 }
 
 .date-picker__toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  @include common.calendar-toolbar;
 }
 
 .date-picker__month {
-  flex: 1;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #4e342e;
+  @include common.calendar-month-label;
 }
 
 .date-picker__cell--selected button,
@@ -28,7 +20,7 @@
 }
 
 .date-picker__cell--in-range button {
-  background: #fff1bf;
+  background: #fdbc6e;
 }
 
 .date-picker__cell--range-start button,

@@ -1,5 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
+import { resolveAssetPath } from '../../utils/githubPages'
 import styles from './EmptyState.module.scss'
 
 export type EmptyStateDirection = 'horizontal' | 'vertical'
@@ -13,7 +14,7 @@ export interface StarEmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>
   direction?: EmptyStateDirection
 }
 
-const DEFAULT_IMAGE_SRC = '/noData.png'
+const DEFAULT_IMAGE_SRC = resolveAssetPath('/noData.png')
 const DEFAULT_IMAGE_ALT = '暂无数据'
 const DEFAULT_MESSAGE = '没有更多数据了'
 

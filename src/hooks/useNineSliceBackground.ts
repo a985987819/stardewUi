@@ -1,5 +1,6 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { calculateNineSliceLayout, drawNineSlice, type NineSliceInsets } from '../utils/nineSliceCanvas'
+import { resolveAssetPath } from '../utils/githubPages'
 
 type HTMLImageWithSize = HTMLImageElement & {
   naturalWidth: number
@@ -27,7 +28,8 @@ export type NineSliceBackgroundOptions = {
 const imageCache = new Map<string, Promise<LoadedImage>>()
 
 const loadImage = (src: string) => {
-  const cached = imageCache.get(src)
+  const resolvedSrc = resolveAssetPath(src)
+  const cached = imageCache.get(resolvedSrc)
   if (cached) {
     return cached
   }
@@ -43,13 +45,13 @@ const loadImage = (src: string) => {
       })
     }
     img.onerror = () => {
-      imageCache.delete(src)
-      reject(new Error(`Failed to load nine-slice image: ${src}`))
+      imageCache.delete(resolvedSrc)
+      reject(new Error(`Failed to load nine-slice image: ${resolvedSrc}`))
     }
-    img.src = src
+    img.src = resolvedSrc
   })
 
-  imageCache.set(src, loading)
+  imageCache.set(resolvedSrc, loading)
   return loading
 }
 
