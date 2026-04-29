@@ -14,7 +14,9 @@
       "Bash(ls:*)",
       "Read(//c/Users/123/.agents/**)",
       "Bash(printf '\\\\n--- agents skills ---\\\\n')",
-      "Read(//c/Users/123/.agents/skills/**)"
+      "Read(//c/Users/123/.agents/skills/**)",
+      "Bash(bunx tsc:*)",
+      "Bash(bunx vite:*)"
     ]
   }
 }
