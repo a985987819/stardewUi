@@ -11,12 +11,13 @@ describe('component demo frame styles', () => {
     expect(scss).not.toContain('overflow-hidden')
   })
 
-  it('implements the card skewed outline with an after pseudo-element', () => {
+  it('implements the card outer frame with pseudo-elements instead of an outline node', () => {
     const cardTsx = readFileSync(resolve(process.cwd(), 'src/components/ui/Card.tsx'), 'utf8')
     const cardScss = readFileSync(resolve(process.cwd(), 'src/components/ui/Card.module.scss'), 'utf8')
 
-    expect(cardTsx).not.toContain("stardew-card__outline")
+    expect(cardTsx).not.toContain('stardew-card__outline')
+    expect(cardScss).toContain('&::before')
     expect(cardScss).toContain('&::after')
-    expect(cardScss).toContain('inset: -8px')
+    expect(cardScss).toContain('inset: calc(var(--card-frame-ring-width) * -1)')
   })
 })

@@ -19,4 +19,23 @@ describe('Card title area', () => {
 
     expect(screen.getByRole('heading', { name: '默认卡片' })).toBeInTheDocument()
   })
+
+  it('renders header extra only alongside title area', () => {
+    const { rerender } = render(
+      <Card title="默认卡片" headerExtra={<span>额外操作</span>}>
+        内容
+      </Card>
+    )
+
+    expect(screen.queryByText('额外操作')).not.toBeInTheDocument()
+
+    rerender(
+      <Card title="默认卡片" showTitle headerExtra={<span>额外操作</span>}>
+        内容
+      </Card>
+    )
+
+    expect(screen.getByRole('heading', { name: '默认卡片' })).toBeInTheDocument()
+    expect(screen.getByText('额外操作')).toBeInTheDocument()
+  })
 })

@@ -1,75 +1,85 @@
-$panel-bg: #ffc675;
-$panel-bg-light: #ffe0b2;
-$panel-bg-dark: #ffb74d;
-$border-dark: #d7770f;
-$border-light: #9d4100;
-$shadow-color: rgba(0, 0, 0, 0.3);
-$inner-glow: rgba(255, 255, 255, 0.18);
-
 .stardew-card {
-  --card-bg: #{$panel-bg};
-  --card-bg-light: #{$panel-bg-light};
-  --card-bg-dark: #{$panel-bg-dark};
-  --card-border-dark: #{$border-dark};
-  --card-border-light: #{$border-light};
-  --card-text: #4d2608;
-  --card-text-secondary: #6a350b;
-  --card-section-bg: rgba(255, 255, 255, 0.12);
-  --card-title-tag-bg: rgba(255, 239, 190, 0.82);
+  --card-corner-step: 1px;
+  --card-corner-size: 3px;
+  --card-frame-border-width: 4px;
+  --card-frame-ring-width: 2px;
+  --card-inline-shadow-width: 2px;
+  --card-header-padding-x: 14px;
+  --card-header-padding-y: 10px;
+  --card-body-padding-x: 12px;
+  --card-body-padding-y: 10px;
 
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
   overflow: visible;
-  background: var(--card-bg);
-  border: 6px solid var(--card-border-dark);
-  border-radius: 8px;
+  color: var(--card-text-primary);
+  background: var(--card-body-stripe-4);
+  border: var(--card-frame-border-width) solid var(--card-frame-border-base);
+  clip-path: polygon(
+    3px 0,
+    calc(100% - 3px) 0,
+    calc(100% - 1px) 1px,
+    100% 3px,
+    100% calc(100% - 3px),
+    calc(100% - 1px) calc(100% - 1px),
+    calc(100% - 3px) 100%,
+    3px 100%,
+    1px calc(100% - 1px),
+    0 calc(100% - 3px),
+    0 3px,
+    1px 1px
+  );
+  box-shadow:
+    inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
+    inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
   transition:
     transform 0.1s steps(2),
     box-shadow 0.1s steps(2);
 
-  &__frame,
-  &__outline {
-    position: absolute;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  &__frame {
-    inset: 1px;
-    border: 2px solid var(--card-border-light);
-    border-radius: 4px;
-    box-shadow:
-      inset -2px 4px 0 rgba(216, 154, 106, 0.92),
-      inset -3px 4px 0 rgba(216, 154, 106, 0.92);
-  }
-
+  &::before,
   &::after {
     content: '';
     position: absolute;
-    inset: -8px;
-    border: 3px solid var(--card-border-light);
-    border-radius: 12px;
     pointer-events: none;
-    z-index: 0;
+    clip-path: inherit;
+  }
+
+  &::before {
+    inset: calc(var(--card-frame-ring-width) * -1);
+    border: var(--card-frame-ring-width) solid var(--card-frame-border-outer);
+    z-index: -2;
+  }
+
+  &::after {
+    inset: var(--card-frame-ring-width);
+    border: var(--card-frame-ring-width) solid var(--card-frame-border-inner);
+    box-shadow:
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+    z-index: -1;
   }
 
   &--default,
   &--elevated {
     box-shadow:
-      0 6px 8px $shadow-color,
-      inset 0 1px 0 $inner-glow;
+      0 6px 8px rgba(0, 0, 0, 0.28),
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
   }
 
   &--outlined {
-    box-shadow: inset 0 1px 0 $inner-glow;
+    box-shadow:
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
   }
 
   &--elevated {
     box-shadow:
       0 10px 14px rgba(0, 0, 0, 0.28),
       0 4px 0 rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 $inner-glow;
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
   }
 
   &--small {
@@ -86,9 +96,6 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
   &--hoverable:hover {
     transform: translate(-2px, -2px);
-    box-shadow:
-      0 12px 18px rgba(0, 0, 0, 0.26),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   &--clickable {
@@ -96,45 +103,54 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
     &:active {
       transform: translate(2px, 2px);
-      box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
   }
 
   &__header,
   &__body,
-  &__footer {
+  &__footer,
+  &__image,
+  &__meta {
     position: relative;
     z-index: 1;
   }
 
   &__header {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
     gap: 12px;
-    min-height: 72px;
-    padding: 14px 16px 16px;
-    border-bottom: 3px solid rgba(157, 65, 0, 0.26);
+    justify-content: flex-start;
+    padding: var(--card-header-padding-y) var(--card-header-padding-x);
+    color: var(--card-text-primary);
+    background: linear-gradient(
+      180deg,
+      var(--card-header-stripe-1) 0%,
+      var(--card-header-stripe-1) 25%,
+      var(--card-header-stripe-2) 25%,
+      var(--card-header-stripe-2) 50%,
+      var(--card-header-stripe-3) 50%,
+      var(--card-header-stripe-3) 75%,
+      var(--card-header-stripe-4) 75%,
+      var(--card-header-stripe-4) 100%
+    );
+    border-bottom: var(--card-frame-border-width) solid var(--card-header-border-base);
+    box-shadow:
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-header-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-header-shadow-right),
+      inset 0 calc(var(--card-frame-ring-width) * -1) 0 var(--card-header-border-inner);
   }
 
-  &__title-tag {
-    display: inline-flex;
-    align-items: center;
-    min-height: 52px;
-    padding: 8px 16px;
-    background: var(--card-title-tag-bg);
-    border: 3px solid rgba(215, 119, 15, 0.9);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  &__title,
+  &__meta-title {
+    margin: 0;
+    color: var(--card-text-primary);
+    text-shadow: 1px 1px 0 var(--card-text-shadow);
   }
 
   &__title {
-    margin: 0;
     font-size: calc(1.05em + 4px);
     font-weight: 700;
-    color: var(--card-text);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+    line-height: 1.6rem;
   }
 
   &__extra {
@@ -142,17 +158,44 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     align-items: center;
     gap: 8px;
     margin-left: auto;
-    padding-top: 6px;
   }
 
   &__body {
-    padding: 18px;
+    padding: var(--card-body-padding-y) var(--card-body-padding-x);
     color: var(--card-text-secondary);
-    line-height: 1.6;
+    background: linear-gradient(
+      180deg,
+      var(--card-body-stripe-1) 0%,
+      var(--card-body-stripe-1) 12.5%,
+      var(--card-body-stripe-2) 12.5%,
+      var(--card-body-stripe-2) 25%,
+      var(--card-body-stripe-3) 25%,
+      var(--card-body-stripe-3) 37.5%,
+      var(--card-body-stripe-4) 37.5%,
+      var(--card-body-stripe-4) 50%,
+      var(--card-body-stripe-5) 50%,
+      var(--card-body-stripe-5) 62.5%,
+      var(--card-body-stripe-6) 62.5%,
+      var(--card-body-stripe-6) 75%,
+      var(--card-body-stripe-7) 75%,
+      var(--card-body-stripe-7) 87.5%,
+      var(--card-body-stripe-8) 87.5%,
+      var(--card-body-stripe-8) 100%
+    );
+    box-shadow:
+      inset 0 var(--card-inline-shadow-width) 0 var(--card-body-highlight-top),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-body-shadow-right),
+      inset 0 0 0 var(--card-frame-ring-width) var(--card-body-border-inner);
   }
 
   &--with-title &__body {
-    padding-top: 20px;
+    padding-top: var(--card-body-padding-y);
+  }
+
+  &__body-content {
+    position: relative;
+    z-index: 1;
+    text-shadow: 1px 1px 0 var(--card-text-shadow);
   }
 
   &__footer {
@@ -161,16 +204,15 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 18px 16px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(157, 65, 0, 0.08));
-    border-top: 2px solid rgba(157, 65, 0, 0.26);
+    color: var(--card-text-primary);
+    border-top: var(--card-frame-ring-width) solid var(--card-body-border-outer);
+    background: linear-gradient(180deg, var(--card-body-stripe-3), var(--card-body-stripe-8));
   }
 
   &__image {
-    position: relative;
-    z-index: 1;
     width: 100%;
     overflow: hidden;
-    border-bottom: 3px solid rgba(157, 65, 0, 0.35);
+    border-bottom: var(--card-frame-ring-width) solid var(--card-body-border-outer);
 
     img {
       display: block;
@@ -185,127 +227,9 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     padding: 10px 0;
   }
 
-  &__meta-title {
-    margin: 0 0 4px;
-    font-size: 1em;
-    font-weight: 700;
-    color: var(--card-text);
-  }
-
   &__meta-desc {
     margin: 0;
-    font-size: 0.9em;
-    line-height: 1.5;
     color: var(--card-text-secondary);
-  }
-
-  &--color-night-village {
-    --card-bg: #5d4951;
-    --card-bg-light: #7a626b;
-    --card-bg-dark: #3d2c35;
-    --card-border-dark: #2f1e27;
-    --card-border-light: #dcbf8b;
-    --card-text: #fff1d6;
-    --card-text-secondary: #f6e5c5;
-    --card-title-tag-bg: rgba(255, 241, 214, 0.92);
-  }
-
-  &--color-forest-farm {
-    --card-bg: #94b56d;
-    --card-bg-light: #b8cf8e;
-    --card-bg-dark: #6f8f47;
-    --card-border-dark: #48652c;
-    --card-border-light: #f0e4be;
-    --card-text: #243611;
-    --card-text-secondary: #334a18;
-    --card-title-tag-bg: rgba(233, 244, 200, 0.88);
-  }
-
-  &--color-wooden-cabin {
-    --card-bg: #b97845;
-    --card-bg-light: #d69560;
-    --card-bg-dark: #93562a;
-    --card-border-dark: #6f3a18;
-    --card-border-light: #ffe0b4;
-    --card-text: #fff1d8;
-    --card-text-secondary: #ffe4b8;
-    --card-title-tag-bg: rgba(255, 230, 184, 0.88);
-  }
-
-  &--color-lake-night {
-    --card-bg: #678bb0;
-    --card-bg-light: #87a9ca;
-    --card-bg-dark: #446a92;
-    --card-border-dark: #274d70;
-    --card-border-light: #d9ecff;
-    --card-text: #f5fbff;
-    --card-text-secondary: #e2f1fb;
-    --card-title-tag-bg: rgba(230, 243, 255, 0.88);
-  }
-
-  &--color-flower-festival {
-    --card-bg: #d18a9f;
-    --card-bg-light: #e6afbf;
-    --card-bg-dark: #ad6880;
-    --card-border-dark: #82445f;
-    --card-border-light: #ffe3ee;
-    --card-text: #fff8fb;
-    --card-text-secondary: #fde8ef;
-    --card-title-tag-bg: rgba(255, 231, 240, 0.9);
-  }
-
-  &--color-mine-starry {
-    --card-bg: #7a89c9;
-    --card-bg-light: #9da9dd;
-    --card-bg-dark: #596ab3;
-    --card-border-dark: #34458a;
-    --card-border-light: #edf1ff;
-    --card-text: #fffef5;
-    --card-text-secondary: #f2f0db;
-    --card-title-tag-bg: rgba(242, 245, 255, 0.9);
-  }
-
-  &--color-farmland {
-    --card-bg: #c48e5d;
-    --card-bg-light: #ddb07f;
-    --card-bg-dark: #a56a3d;
-    --card-border-dark: #7a4824;
-    --card-border-light: #ffe5bd;
-    --card-text: #fff2dc;
-    --card-text-secondary: #f8e0bc;
-    --card-title-tag-bg: rgba(255, 238, 208, 0.88);
-  }
-
-  &--color-orchard-grass {
-    --card-bg: #7ea163;
-    --card-bg-light: #a0c17f;
-    --card-bg-dark: #5b7c42;
-    --card-border-dark: #355123;
-    --card-border-light: #e9f7d1;
-    --card-text: #f6ffe9;
-    --card-text-secondary: #e1f0cb;
-    --card-title-tag-bg: rgba(236, 248, 215, 0.88);
-  }
-
-  &--color-workshop-ore {
-    --card-bg: #808a93;
-    --card-bg-light: #a0aab3;
-    --card-bg-dark: #5f6972;
-    --card-border-dark: #39434c;
-    --card-border-light: #eff4f8;
-    --card-text: #fff7b5;
-    --card-text-secondary: #f4e98e;
-    --card-title-tag-bg: rgba(244, 248, 252, 0.88);
-  }
-
-  &--color-night-celebration {
-    --card-bg: #5868c8;
-    --card-bg-light: #7f8be0;
-    --card-bg-dark: #3848a2;
-    --card-border-dark: #202f76;
-    --card-border-light: #dde3ff;
-    --card-text: #eef1ff;
-    --card-text-secondary: #dce0fb;
-    --card-title-tag-bg: rgba(234, 239, 255, 0.88);
+    text-shadow: 1px 1px 0 var(--card-text-shadow);
   }
 }
