@@ -1,88 +1,9 @@
-import { useState } from 'react'
-import StarApiTable from '../components/layout/ApiTable'
+﻿import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarNineSliceButton, StarTypewriter } from '../components/ui'
-import appStyles from '../styles/global.module.scss'
-
-const typewriterApiData = [
-  { property: 'text', description: '要显示的文本内容', type: 'string', default: '-', required: true },
-  { property: 'speed', description: '打字速度（毫秒/字符）', type: 'number', default: '100' },
-  { property: 'startDelay', description: '开始打字前的延迟时间', type: 'number', default: '0' },
-  { property: 'className', description: '自定义类名', type: 'string', default: '-' },
-  { property: 'onComplete', description: '打字完成回调', type: '() => void', default: '-' },
-]
-
-const tocItems = [
-  { id: 'basic', title: '基础用法', level: 1 },
-  { id: 'speed', title: '不同速度', level: 1 },
-  { id: 'delay', title: '延迟开始', level: 1 },
-  { id: 'api', title: 'API', level: 1 },
-]
-
-const basicCode = `<StarTypewriter text="你好，欢迎来到星露谷。" />`
-
-const speedCode = `<StarTypewriter text="快速打字效果" speed={50} />
-<StarTypewriter text="慢速打字效果" speed={150} />`
-
-const delayCode = `<StarTypewriter
-  text="延迟 1 秒后开始打字"
-  startDelay={1000}
-/>`
-
-function StarTypewriterDemoPage() {
-  const [key, setKey] = useState(0)
-  const restart = () => setKey((value) => value + 1)
-
-  return (
-    <StarComponentPage
-      title="Typewriter 打字机"
-      description="打字机效果组件，模拟文本逐字出现的动画效果，点击文本可快速完成显示。"
-      toc={tocItems}
-    >
-      <StarComponentDemo id="basic" title="基础用法" description="最简单的打字机效果。" code={basicCode}>
-        <div className={appStyles.typewriterDemoBox}>
-          <StarTypewriter text="你好，欢迎来到星露谷，这里是一片适合播种与收获的农场。" key={key} />
-        </div>
-        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
-          重新播放
-        </StarNineSliceButton>
-      </StarComponentDemo>
-
-      <StarComponentDemo id="speed" title="不同速度" description="自定义打字速度。" code={speedCode}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className={appStyles.typewriterDemoBox}>
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>快速（50ms）</div>
-            <StarTypewriter text="这是快速打字效果，每个字符间隔 50 毫秒。" speed={50} key={`fast-${key}`} />
-          </div>
-          <div className={appStyles.typewriterDemoBox}>
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>默认（100ms）</div>
-            <StarTypewriter text="这是默认打字速度，每个字符间隔 100 毫秒。" speed={100} key={`default-${key}`} />
-          </div>
-          <div className={appStyles.typewriterDemoBox}>
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-secondary)', fontSize: '12px' }}>慢速（150ms）</div>
-            <StarTypewriter text="这是慢速打字效果，每个字符间隔 150 毫秒。" speed={150} key={`slow-${key}`} />
-          </div>
-        </div>
-        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
-          重新播放
-        </StarNineSliceButton>
-      </StarComponentDemo>
-
-      <StarComponentDemo id="delay" title="延迟开始" description="设置开始打字前的延迟时间。" code={delayCode}>
-        <div className={appStyles.typewriterDemoBox}>
-          <StarTypewriter text="这段文字会在 1 秒后开始逐字出现..." startDelay={1000} key={`delay-${key}`} />
-        </div>
-        <StarNineSliceButton onClick={restart} style={{ marginTop: '12px' }}>
-          重新播放
-        </StarNineSliceButton>
-      </StarComponentDemo>
-
-      <div id="api" className="component-page-api">
-        <StarApiTable data={typewriterApiData} />
-      </div>
-    </StarComponentPage>
-  )
-}
-
+import { StarTypewriter } from '../components/ui'
+import { useI18n, type Lang } from '../i18n'
+const copy = { zh: { title: 'Typewriter 打字机', desc: '打字机让文本逐字出现，适合 NPC 台词、教程提示和任务说明。', toc: ['基础打字', '速度', '延迟开始', 'API'], demos: [['基础打字', '像 NPC 说话一样逐字显示。'], ['速度', '不同速度适合不同情绪。'], ['延迟开始', '可以在动画或场景进入后再开始。']] }, en: { title: 'Typewriter', desc: 'Typewriter reveals text character by character for NPC lines, tutorials, and quest notes.', toc: ['Basic Typing', 'Speed', 'Start Delay', 'API'], demos: [['Basic Typing', 'Reveal text like NPC speech.'], ['Speed', 'Different speeds support different moods.'], ['Start Delay', 'Begin after a scene or animation enters.']] } } satisfies Record<Lang, any>
+const apiData = { zh: [{ property: 'text', description: '要显示的文本', type: 'string', default: '-', required: true }, { property: 'speed', description: '每个字符间隔', type: 'number', default: '100' }, { property: 'startDelay', description: '开始延迟', type: 'number', default: '0' }], en: [{ property: 'text', description: 'Text to reveal.', type: 'string', default: '-', required: true }, { property: 'speed', description: 'Delay per character.', type: 'number', default: '100' }, { property: 'startDelay', description: 'Start delay.', type: 'number', default: '0' }] }
+function StarTypewriterDemoPage() { const { lang } = useI18n(); const t = copy[lang]; const toc = t.toc.map((title: string, i: number) => ({ id: ['basic','speed','delay','api'][i], title, level: 1 })); const line = lang === 'zh' ? '早上好，今天适合给防风草浇水，也适合去镇上交朋友。' : 'Good morning. Today is good for watering parsnips and making friends in town.'; return <StarComponentPage title={t.title} description={t.desc} toc={toc}><StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]}><StarTypewriter text={line} /></StarComponentDemo><StarComponentDemo id="speed" title={t.demos[1][0]} description={t.demos[1][1]}><StarTypewriter text={line} speed={35} /></StarComponentDemo><StarComponentDemo id="delay" title={t.demos[2][0]} description={t.demos[2][1]}><StarTypewriter text={line} startDelay={600} /></StarComponentDemo><div id="api" className="component-page-api"><StarApiTable title="Typewriter API" data={apiData[lang]} /></div></StarComponentPage> }
 export default StarTypewriterDemoPage

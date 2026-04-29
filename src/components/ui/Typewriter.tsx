@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+﻿import { useState, useEffect, useCallback, useRef } from 'react'
 import { classNames } from '../../utils/classNames'
 import styles from './Typewriter.module.scss'
 
@@ -90,7 +90,7 @@ function StarTypewriter({
     <span
       className={classNames(styles.typewriter, !isComplete && isStarted && styles['typewriter--typing'], className)}
       onClick={handleClick}
-      title={!isComplete && isStarted ? '点击快速显示全部' : undefined}
+      title={!isComplete && isStarted ? 'Click to reveal all text' : undefined}
     >
       {displayedText}
       {!isComplete && isStarted ? <span className={styles['typewriter__cursor']}>|</span> : null}
@@ -99,3 +99,5 @@ function StarTypewriter({
 }
 
 export default StarTypewriter
+
+

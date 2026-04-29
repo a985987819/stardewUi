@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
@@ -35,7 +35,6 @@ const TITLE_NEXT = '下一页'
 const TITLE_PREV_DISABLED = '已是第一页'
 const TITLE_NEXT_DISABLED = '已是最后一页'
 const WAITING_TEXT = '等待标题完成...'
-
 function StarDialog({
   open,
   title,
@@ -306,3 +305,4 @@ function StarDialog({
 }
 
 export default StarDialog
+

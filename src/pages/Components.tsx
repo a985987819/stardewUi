@@ -15,113 +15,123 @@ import {
   Type,
 } from 'lucide-react'
 import StarCard from '../components/ui/Card'
-import { useI18n } from '../i18n'
+import { useI18n, type Lang } from '../i18n'
 import styles from './Components.module.scss'
 
 interface ComponentInfo {
   path: string
-  titleZh: string
-  titleEn: string
-  descZh: string
-  descEn: string
+  title: Record<Lang, string>
+  desc: Record<Lang, string>
   icon: React.ReactNode
 }
 
 const components: ComponentInfo[] = [
   {
     path: '/components/button',
-    titleZh: '按钮',
-    titleEn: 'Button',
-    descZh: '九宫格动作按钮样式和变体。',
-    descEn: 'Nine-slice action button styles and variants.',
+    title: { zh: '按钮', en: 'Button' },
+    desc: {
+      zh: '像工具栏一样可靠的九宫格按钮，适合确认、交易、升级和危险操作。',
+      en: 'Nine-slice action buttons for confirms, trades, upgrades, and dangerous moves.',
+    },
     icon: <MousePointer size={20} />,
   },
   {
     path: '/components/calendar',
-    titleZh: '日历',
-    titleEn: 'Calendar',
-    descZh: '带标记、详情和自定义图标的月度网格。',
-    descEn: 'Month grid with markers, details, and custom icons.',
+    title: { zh: '日历', en: 'Calendar' },
+    desc: {
+      zh: '把节日、收获日和村民生日钉在月历上，别再错过花舞节。',
+      en: 'Pin festivals, harvest days, and birthdays to a month grid so the Flower Dance is never missed.',
+    },
     icon: <CalendarDays size={20} />,
   },
   {
     path: '/components/date-picker',
-    titleZh: '日期选择',
-    titleEn: 'DatePicker',
-    descZh: '单日期和范围选择，支持标准化时间戳。',
-    descEn: 'Single-date and range selection with normalized timestamps.',
+    title: { zh: '日期选择', en: 'DatePicker' },
+    desc: {
+      zh: '选择播种日或规划一段采矿假期，并返回稳定的标准化时间戳。',
+      en: 'Choose a planting day or a mining vacation range with normalized timestamps.',
+    },
     icon: <CalendarRange size={20} />,
   },
   {
     path: '/components/title',
-    titleZh: '标题',
-    titleEn: 'Title',
-    descZh: '装饰性标题横幅，支持尺寸和对齐选项。',
-    descEn: 'Decorative title banners with size and alignment options.',
+    title: { zh: '标题', en: 'Title' },
+    desc: {
+      zh: '像镇口木牌一样醒目的标题横幅，用来标记章节、任务和活动入口。',
+      en: 'Town-sign style title banners for chapters, quests, and event entrances.',
+    },
     icon: <Heading1 size={20} />,
   },
   {
     path: '/components/card',
-    titleZh: '卡片',
-    titleEn: 'Card',
-    descZh: '灵活的内容容器，支持标题、页脚和颜色变体。',
-    descEn: 'Flexible content container with title, footer, and color variants.',
+    title: { zh: '卡片', en: 'Card' },
+    desc: {
+      zh: '像公告栏纸条一样承载任务、物品、提示和操作区。',
+      en: 'Notice-board cards for quests, items, hints, and action panels.',
+    },
     icon: <Square size={20} />,
   },
   {
     path: '/components/dialog',
-    titleZh: '对话框',
-    titleEn: 'Dialog',
-    descZh: '用于故事和交互流程的对话面板模式。',
-    descEn: 'Conversation panel patterns for story and interaction flows.',
+    title: { zh: '对话框', en: 'Dialog' },
+    desc: {
+      zh: '用于 NPC 台词、剧情提示和确认流程的像素对话面板。',
+      en: 'Pixel dialog panels for NPC lines, story prompts, and confirmation flows.',
+    },
     icon: <MessageSquare size={20} />,
   },
   {
     path: '/components/popup',
-    titleZh: '弹窗',
-    titleEn: 'Popup',
-    descZh: '带方向定位的锚定气泡弹窗。',
-    descEn: 'Anchored speech-bubble popups with directional placement.',
+    title: { zh: '弹窗', en: 'Popup' },
+    desc: {
+      zh: '像气泡提示一样贴近目标，适合展示奖励、状态和小提示。',
+      en: 'Anchored bubble popups for rewards, statuses, and compact hints.',
+    },
     icon: <MessageSquareMore size={20} />,
   },
   {
     path: '/components/typewriter',
-    titleZh: '打字机',
-    titleEn: 'Typewriter',
-    descZh: '对话式内容的渐进式文本显示动画。',
-    descEn: 'Incremental text reveal animation for dialog-style content.',
+    title: { zh: '打字机', en: 'Typewriter' },
+    desc: {
+      zh: '让文本像 NPC 逐字说话一样出现，适合剧情、引导和成就提示。',
+      en: 'Reveal text like NPC dialog for story beats, onboarding, and achievements.',
+    },
     icon: <Type size={20} />,
   },
   {
     path: '/components/loading',
-    titleZh: '加载',
-    titleEn: 'Loading',
-    descZh: '基于 Canvas 的加载指示器，适用于按钮、面板和页面。',
-    descEn: 'Canvas-based loading indicator for buttons, panels, and pages.',
+    title: { zh: '加载', en: 'Loading' },
+    desc: {
+      zh: '包子被一口口吃掉的加载反馈，让等待也像小游戏。',
+      en: 'A bun-bite loading indicator that turns waiting into a tiny game loop.',
+    },
     icon: <LoaderCircle size={20} />,
   },
   {
     path: '/components/message',
-    titleZh: '消息',
-    titleEn: 'Message',
-    descZh: '轻量级全局状态和反馈通知。',
-    descEn: 'Lightweight global status and feedback notifications.',
+    title: { zh: '消息', en: 'Message' },
+    desc: {
+      zh: '像右下角收获提示一样，轻量展示成功、警告和错误反馈。',
+      en: 'Lightweight success, warning, and error feedback like a harvest toast.',
+    },
     icon: <Bell size={20} />,
   },
   {
     path: '/components/empty-state',
-    titleZh: '空状态',
-    titleEn: 'EmptyState',
-    descZh: '空白列表、搜索和详情区域的占位布局。',
-    descEn: 'Placeholder layouts for blank lists, searches, and detail areas.',
+    title: { zh: '空状态', en: 'EmptyState' },
+    desc: {
+      zh: '背包空了、搜索没结果、任务板暂无委托时，用它保持页面友好。',
+      en: 'Friendly placeholders for empty backpacks, no search results, and quiet quest boards.',
+    },
     icon: <Inbox size={20} />,
   },
   {
     path: '/components/tab',
-    titleZh: '选项卡',
-    titleEn: 'Tab',
-    descZh: '带图标、自定义选中样式和顶部/底部放置的选项卡导航。',
-    descEn: 'Tabbed navigation with icons, custom active styles, and top/bottom placement.',
+    title: { zh: '选项卡', en: 'Tab' },
+    desc: {
+      zh: '用季节、区域或任务分类切换内容，像翻看农场手册。',
+      en: 'Switch content by season, location, or quest type like flipping through a farm manual.',
+    },
     icon: <LayoutList size={20} />,
   },
 ]
@@ -144,14 +154,8 @@ function StarComponentsPage() {
             <StarCard className={styles['components-card']} hoverable>
               <div className={styles['components-card-icon']}>{item.icon}</div>
               <div className={styles['components-card-content']}>
-                <h3>
-                  {item.titleZh}
-                  {lang === 'en' && <span style={{ opacity: 0.6, marginLeft: '8px' }}>{item.titleEn}</span>}
-                </h3>
-                <p>
-                  {item.descZh}
-                  {lang === 'en' && <span style={{ opacity: 0.6, display: 'block', marginTop: '4px' }}>{item.descEn}</span>}
-                </p>
+                <h3>{item.title[lang]}</h3>
+                <p>{item.desc[lang]}</p>
               </div>
               <ChevronRight size={20} className={styles['components-card-arrow']} />
             </StarCard>

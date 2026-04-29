@@ -74,6 +74,7 @@ const DEFAULT_COLOR_MAP: ButtonColorMap = {
   warning: { bg: '#C28A45', text: '#FFF2D5' },
   danger: { bg: '#C62828', text: '#FFF2D5' },
   disabled: { bg: '#B0A999', text: '#E0D9C6' },
+  concise: { bg: '#F5E6CC', text: '#3A2E39' },
 }
 
 const drawDashedBorder = (

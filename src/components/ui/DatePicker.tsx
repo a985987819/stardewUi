@@ -395,6 +395,7 @@ function DatePicker({
       </div>
 
       <CalendarGrid
+        monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
         onSelectDay={handleSelectDay}

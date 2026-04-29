@@ -1,197 +1,125 @@
-import { Pickaxe } from 'lucide-react'
+﻿import { Pickaxe } from 'lucide-react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
 import { StarNineSliceButton, type NineSliceButtonTheme } from '../components/ui'
+import { useI18n, type Lang } from '../i18n'
 import styles from './ButtonDemo.module.scss'
 
-const seasonalThemes: Array<{ key: NineSliceButtonTheme; label: string }> = [
-  { key: 'spring', label: '春季' },
-  { key: 'summer', label: '夏季' },
-  { key: 'autumn', label: '秋季' },
-  { key: 'winter', label: '冬季' },
+const seasonalThemes: Array<{ key: NineSliceButtonTheme; zh: string; en: string }> = [
+  { key: 'spring', zh: '春天', en: 'Spring' },
+  { key: 'summer', zh: '夏天', en: 'Summer' },
+  { key: 'autumn', zh: '秋天', en: 'Autumn' },
+  { key: 'winter', zh: '冬天', en: 'Winter' },
 ]
 
-
-const buttonApiData = [
-  {
-    property: 'variant',
-    description: '按钮类型',
-    type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'",
-    default: "'default'",
+const copy = {
+  zh: {
+    title: 'Button 按钮',
+    desc: '像素按钮用于提交、取消、采集、升级等高频动作。季节主题能让同一个操作在不同页面里拥有不同情绪。',
+    toc: ['默认按钮', '季节主题', '按钮尺寸', '颜色推导', '图标按钮', '禁用状态', '多实例场景', 'API'],
+    demo: {
+      basic: ['默认按钮', '常规按钮使用浅米色背景和像素边框，适合日常操作。'],
+      theme: ['季节主题', '春天适合播种，夏天适合冒险，秋天适合收获，冬天适合整理背包。'],
+      size: ['按钮尺寸', 'small、medium、large 对应不同层级的操作入口。'],
+      color: ['颜色推导', '传入 color 后会推导边框和文字色，像给工具刷上新漆。'],
+      icon: ['图标按钮', '图标可以强调动作意图，例如拿起镐子去矿洞。'],
+      disabled: ['禁用状态', '当体力不足或任务未解锁时，禁用态会保留形状但降低权重。'],
+      multi: ['多实例场景', '同一页面里可以放置多个按钮，用作背包、商店或任务列表操作。'],
+    },
+    labels: ['默认按钮', '确认交易', '丢弃物品', '小按钮', '大按钮', '木质边框', '森林边框', '湖蓝边框', '工具', '收藏', '禁用按钮', '加载按钮', '块级按钮'],
   },
-  { property: 'size', description: '按钮尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
-  { property: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
-  { property: 'block', description: '是否为块级按钮', type: 'boolean', default: 'false' },
-  { property: 'loading', description: '是否显示加载状态', type: 'boolean', default: 'false' },
-  { property: 'icon', description: '按钮图标，支持 ReactNode 或 string', type: 'ReactNode | string', default: '-' },
-  { property: 'color', description: '默认按钮外边框颜色，会联动计算内边框与文字颜色', type: 'string', default: '-' },
-  {
-    property: 'appearance',
-    description: '按钮外观，显式声明为 classical 时才使用经典九宫格按钮',
-    type: "'regular' | 'classical'",
-    default: "'regular'",
+  en: {
+    title: 'Button',
+    desc: 'Pixel buttons handle frequent actions such as submit, cancel, gather, and upgrade. Seasonal themes give the same action a different mood per page.',
+    toc: ['Default Button', 'Season Themes', 'Sizes', 'Color Derivation', 'Icon Button', 'Disabled State', 'Multiple Instances', 'API'],
+    demo: {
+      basic: ['Default Button', 'Regular buttons use a cream background and pixel border for everyday actions.'],
+      theme: ['Season Themes', 'Spring plants, summer quests, autumn harvests, and winter inventory checks all get distinct button moods.'],
+      size: ['Sizes', 'small, medium, and large map to different action priorities.'],
+      color: ['Color Derivation', 'Passing color derives border and text colors like repainting a trusted tool.'],
+      icon: ['Icon Button', 'Icons sharpen intent, such as grabbing a pickaxe before entering the mine.'],
+      disabled: ['Disabled State', 'When stamina is low or a quest is locked, disabled buttons keep shape while lowering priority.'],
+      multi: ['Multiple Instances', 'Render many independent buttons for backpacks, shops, and quest lists.'],
+    },
+    labels: ['Default', 'Confirm Trade', 'Trash Item', 'Small', 'Large', 'Wood Border', 'Forest Border', 'Lake Border', 'Tool', 'Favorite', 'Disabled', 'Loading', 'Block Button'],
   },
-  {
-    property: 'theme',
-    description: '季节主题，仅对默认按钮生效',
-    type: "'spring' | 'summer' | 'autumn' | 'winter'",
-    default: '-',
-  },
-  { property: 'backgroundSrc', description: '自定义九宫格背景图地址', type: 'string', default: '-' },
-  {
-    property: 'backgroundInsets',
-    description: '九宫格切片边距',
-    type: '{ top: number; right: number; bottom: number; left: number }',
-    default: '{ top: 8, right: 8, bottom: 8, left: 8 }',
-  },
-  { property: 'onClick', description: '点击事件回调', type: '(event: MouseEvent) => void', default: '-' },
-  { property: 'children', description: '按钮内容', type: 'ReactNode', default: '-', required: true },
-]
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demo: Record<string, [string, string]>; labels: string[] }>
 
-const tocItems = [
-  { id: 'basic', title: '默认按钮', level: 1 },
-  { id: 'theme', title: '季节主题', level: 1 },
-  { id: 'size', title: '按钮尺寸', level: 1 },
-  { id: 'color', title: '颜色推导', level: 1 },
-  { id: 'icon', title: '图标按钮', level: 1 },
-  { id: 'disabled', title: '禁用状态', level: 1 },
-  { id: 'multi', title: '多实例场景', level: 1 },
-  { id: 'api', title: 'API', level: 1 },
-]
+const apiData = {
+  zh: [
+    { property: 'variant', description: '按钮类型', type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'", default: "'default'" },
+    { property: 'size', description: '按钮尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
+    { property: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
+    { property: 'loading', description: '是否显示加载状态', type: 'boolean', default: 'false' },
+    { property: 'theme', description: '季节主题，仅对默认按钮生效', type: "'spring' | 'summer' | 'autumn' | 'winter'", default: '-' },
+    { property: 'onClick', description: '点击事件回调', type: '(event: MouseEvent) => void', default: '-' },
+  ],
+  en: [
+    { property: 'variant', description: 'Button visual variant.', type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'", default: "'default'" },
+    { property: 'size', description: 'Button size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
+    { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
+    { property: 'loading', description: 'Shows loading state.', type: 'boolean', default: 'false' },
+    { property: 'theme', description: 'Seasonal theme for default buttons.', type: "'spring' | 'summer' | 'autumn' | 'winter'", default: '-' },
+    { property: 'onClick', description: 'Click callback.', type: '(event: MouseEvent) => void', default: '-' },
+  ],
+}
 
-const basicCode = `<StarNineSliceButton>默认按钮</StarNineSliceButton>
-<StarNineSliceButton>确认</StarNineSliceButton>
-<StarNineSliceButton>删除</StarNineSliceButton>`
-
-const sizeCode = `<StarNineSliceButton size="small">小按钮</StarNineSliceButton>
-<StarNineSliceButton>默认按钮</StarNineSliceButton>
-<StarNineSliceButton size="large">大按钮</StarNineSliceButton>`
-
-const colorCode = `<StarNineSliceButton color="#8B4513">木质边框</StarNineSliceButton>
-<StarNineSliceButton color="#2E6F40">森林边框</StarNineSliceButton>
-<StarNineSliceButton color="#355C9A">湖蓝边框</StarNineSliceButton>`
-
-const iconCode = `<StarNineSliceButton icon={<Pickaxe size={18} />}>工具</StarNineSliceButton>
-<StarNineSliceButton icon="★">收藏</StarNineSliceButton>`
-
-const disabledCode = `<StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
-<StarNineSliceButton theme="winter" disabled>冬季禁用按钮</StarNineSliceButton>`
-
-const themeCode = `<StarNineSliceButton theme="spring">春季默认按钮</StarNineSliceButton>
-<StarNineSliceButton theme="summer">夏季默认按钮</StarNineSliceButton>
-<StarNineSliceButton theme="autumn">秋季默认按钮</StarNineSliceButton>
-<StarNineSliceButton theme="winter">冬季默认按钮</StarNineSliceButton>
-
-<StarNineSliceButton theme="spring" size="small">春季小按钮</StarNineSliceButton>
-<StarNineSliceButton theme="summer" loading>夏季加载按钮</StarNineSliceButton>
-<StarNineSliceButton theme="autumn" disabled>秋季禁用按钮</StarNineSliceButton>
-<StarNineSliceButton theme="winter" block>冬季块级按钮</StarNineSliceButton>`
-
-const multiInstanceCode = `{Array.from({ length: 10 }).map((_, index) => (
-  <StarNineSliceButton key={index}>按钮 {index + 1}</StarNineSliceButton>
-))}`
+const code = `<StarNineSliceButton theme="spring">Plant Seeds</StarNineSliceButton>`
 
 function StarButtonDemoPage() {
+  const { lang } = useI18n()
+  const t = copy[lang]
+  const toc = t.toc.map((title, index) => ({ id: ['basic', 'theme', 'size', 'color', 'icon', 'disabled', 'multi', 'api'][index], title, level: 1 }))
+  const label = (index: number) => t.labels[index]
+
   return (
-    <StarComponentPage
-      title="Button 按钮"
-      description="默认按钮现在由 SCSS 直接绘制双层边框和圆角背景，并支持从 color 推导内边框与可读文字颜色。"
-      toc={tocItems}
-    >
-      <StarComponentDemo
-        id="basic"
-        title="默认按钮"
-        description="常规默认按钮使用浅米色背景、深色外边框和浅色内边框，并会根据 hover / active / disabled 自动切换文字色。"
-        code={basicCode}
-      >
-        <StarNineSliceButton>默认按钮</StarNineSliceButton>
-        <StarNineSliceButton>确认</StarNineSliceButton>
-        <StarNineSliceButton>删除</StarNineSliceButton>
+    <StarComponentPage title={t.title} description={t.desc} toc={toc}>
+      <StarComponentDemo id="basic" title={t.demo.basic[0]} description={t.demo.basic[1]} code={code}>
+        <StarNineSliceButton>{label(0)}</StarNineSliceButton>
+        <StarNineSliceButton variant="primary">{label(1)}</StarNineSliceButton>
+        <StarNineSliceButton variant="danger">{label(2)}</StarNineSliceButton>
       </StarComponentDemo>
-
-      <StarComponentDemo
-        id="theme"
-        title="季节主题"
-        description="theme 属性仍然走独立的季节背景渲染，不受默认按钮 SCSS 绘制逻辑影响。"
-        code={themeCode}
-      >
+      <StarComponentDemo id="theme" title={t.demo.theme[0]} description={t.demo.theme[1]} code={code}>
         <div className={styles['button-theme-grid']}>
-          {seasonalThemes.map((item) => (
-            <div key={item.key} className={styles['button-theme-card']}>
-              <p className={styles['button-theme-title']}>{item.label}</p>
-              <div className={styles['button-theme-actions']}>
-                <StarNineSliceButton theme={item.key}>{item.label}默认按钮</StarNineSliceButton>
-                <StarNineSliceButton theme={item.key} size="small">
-                  {item.label}小按钮
-                </StarNineSliceButton>
-                <StarNineSliceButton theme={item.key} loading>
-                  {item.label}加载按钮
-                </StarNineSliceButton>
-                <StarNineSliceButton theme={item.key} disabled>
-                  {item.label}禁用按钮
-                </StarNineSliceButton>
+          {seasonalThemes.map((item) => {
+            const season = item[lang]
+            return (
+              <div key={item.key} className={styles['button-theme-card']}>
+                <p className={styles['button-theme-title']}>{season}</p>
+                <div className={styles['button-theme-actions']}>
+                  <StarNineSliceButton theme={item.key}>{season}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} size="small">{label(3)}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} loading>{label(11)}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} disabled>{label(10)}</StarNineSliceButton>
+                </div>
               </div>
-              <div className={styles['button-theme-block']}>
-                <StarNineSliceButton theme={item.key} block>
-                  {item.label}块级按钮
-                </StarNineSliceButton>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </StarComponentDemo>
-
-      <StarComponentDemo id="size" title="按钮尺寸" description="默认按钮会随内容宽高自适应，small / medium / large 仅调整内边距和字号。" code={sizeCode}>
-        <StarNineSliceButton size="small">小按钮</StarNineSliceButton>
-        <StarNineSliceButton>默认按钮</StarNineSliceButton>
-        <StarNineSliceButton size="large">大按钮</StarNineSliceButton>
+      <StarComponentDemo id="size" title={t.demo.size[0]} description={t.demo.size[1]} code={code}>
+        <StarNineSliceButton size="small">{label(3)}</StarNineSliceButton>
+        <StarNineSliceButton>{label(0)}</StarNineSliceButton>
+        <StarNineSliceButton size="large">{label(4)}</StarNineSliceButton>
       </StarComponentDemo>
-
-      <StarComponentDemo
-        id="color"
-        title="颜色推导"
-        description="传入 color 后，这个颜色会作为默认按钮的外边框，并自动推导出更浅的内边框和对比度足够的文字颜色。"
-        code={colorCode}
-      >
-        <StarNineSliceButton color="#8B4513">木质边框</StarNineSliceButton>
-        <StarNineSliceButton color="#2E6F40">森林边框</StarNineSliceButton>
-        <StarNineSliceButton color="#355C9A">湖蓝边框</StarNineSliceButton>
+      <StarComponentDemo id="color" title={t.demo.color[0]} description={t.demo.color[1]} code={code}>
+        <StarNineSliceButton color="#8B4513">{label(5)}</StarNineSliceButton>
+        <StarNineSliceButton color="#2E6F40">{label(6)}</StarNineSliceButton>
+        <StarNineSliceButton color="#355C9A">{label(7)}</StarNineSliceButton>
       </StarComponentDemo>
-
-      <StarComponentDemo
-        id="icon"
-        title="图标按钮"
-        description="icon 支持 ReactNode 或 string。传入后按钮会切换为方形垂直布局，文字在上、图标在下。"
-        code={iconCode}
-      >
-        <StarNineSliceButton icon={<Pickaxe size={18} />}>工具</StarNineSliceButton>
-        <StarNineSliceButton icon="★">收藏</StarNineSliceButton>
+      <StarComponentDemo id="icon" title={t.demo.icon[0]} description={t.demo.icon[1]} code={code}>
+        <StarNineSliceButton icon={<Pickaxe size={18} />}>{label(8)}</StarNineSliceButton>
+        <StarNineSliceButton icon="☆">{label(9)}</StarNineSliceButton>
       </StarComponentDemo>
-
-      <StarComponentDemo id="disabled" title="禁用状态" description="禁用态会保留双层边框结构，并叠加半透明背景降低视觉权重。" code={disabledCode}>
-        <StarNineSliceButton disabled>禁用默认按钮</StarNineSliceButton>
-        <StarNineSliceButton theme="winter" disabled>
-          冬季禁用按钮
-        </StarNineSliceButton>
+      <StarComponentDemo id="disabled" title={t.demo.disabled[0]} description={t.demo.disabled[1]} code={code}>
+        <StarNineSliceButton disabled>{label(10)}</StarNineSliceButton>
+        <StarNineSliceButton theme="winter" disabled>{label(10)}</StarNineSliceButton>
       </StarComponentDemo>
-
-      <StarComponentDemo
-        id="multi"
-        title="多实例场景"
-        description="同一页面多个默认按钮可以独立渲染，不依赖任何背景图片资源。"
-        code={multiInstanceCode}
-      >
-        <div className={styles['demo-multi-buttons']}>
-          {Array.from({ length: 10 }).map((_, index) => (
-            <StarNineSliceButton key={`multi-${index}`}>按钮 {index + 1}</StarNineSliceButton>
-          ))}
-        </div>
+      <StarComponentDemo id="multi" title={t.demo.multi[0]} description={t.demo.multi[1]} code={code}>
+        <div className={styles['demo-multi-buttons']}>{Array.from({ length: 8 }).map((_, index) => <StarNineSliceButton key={index}>{`${label(0)} ${index + 1}`}</StarNineSliceButton>)}</div>
       </StarComponentDemo>
-
-      <div id="api" className="component-page-api">
-        <StarApiTable data={buttonApiData} />
-      </div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

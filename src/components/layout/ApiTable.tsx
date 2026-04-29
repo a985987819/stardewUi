@@ -1,4 +1,4 @@
-import { useCallback, type MouseEvent } from 'react'
+﻿import { useCallback, type MouseEvent } from 'react'
 import { StarCard } from '../ui/Card'
 import { message } from '../ui/Message'
 import { useI18n } from '../../i18n'
@@ -34,45 +34,41 @@ function StarApiTable({ title, data }: ApiTableProps) {
     { title: t('api.default'), dataIndex: 'default', width: 120 },
   ]
 
-  const handleCopy = useCallback(async (event: MouseEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement
-    const textToCopy = target.textContent || ''
+  const handleCopy = useCallback(
+    async (event: MouseEvent<HTMLElement>) => {
+      const target = event.target as HTMLElement
+      const cleanText = (target.textContent || '').replace(/^\s*[|\s]\s*|\s*[|\s]\s*$/g, '').trim()
+      if (!cleanText) return
 
-    if (!textToCopy.trim()) return
+      try {
+        await navigator.clipboard.writeText(cleanText)
+        message.success(`${t('copy.success')}: ${cleanText}`)
+      } catch (err) {
+        console.error('Copy failed:', err)
+        message.error(t('copy.error'))
+      }
+    },
+    [t]
+  )
 
-    const cleanText = textToCopy.replace(/^\s*[|\s]\s*|\s*[|\s]\s*$/g, '').trim()
-    if (!cleanText) return
-
-    try {
-      await navigator.clipboard.writeText(cleanText)
-      message.success(`已复制: ${cleanText}`)
-    } catch (err) {
-      console.error('复制失败:', err)
-      message.error('复制失败')
-    }
-  }, [])
+  const renderCopyable = (value: string, className?: string) => (
+    <span className={className ? `${styles['api-table-copyable']} ${className}` : styles['api-table-copyable']} onClick={handleCopy} title={t('copy.title')}>
+      {value}
+    </span>
+  )
 
   const renderTypeValue = (value: string) => {
-    if (value.includes('|')) {
-      const parts = value.split('|')
-      return (
-        <>
-          {parts.map((part, index) => (
-            <span key={`${part.trim()}-${index}`}>
-              <span className={`${styles['api-table-copyable']} ${styles['api-table-type-part']}`} onClick={handleCopy} title="点击复制">
-                {part.trim()}
-              </span>
-              {index < parts.length - 1 ? <span className={styles['api-table-type-separator']}> | </span> : null}
-            </span>
-          ))}
-        </>
-      )
-    }
+    if (!value.includes('|')) return renderCopyable(value)
 
     return (
-      <span className={styles['api-table-copyable']} onClick={handleCopy} title="点击复制">
-        {value}
-      </span>
+      <>
+        {value.split('|').map((part, index, parts) => (
+          <span key={`${part.trim()}-${index}`}>
+            {renderCopyable(part.trim(), styles['api-table-type-part'])}
+            {index < parts.length - 1 ? <span className={styles['api-table-type-separator']}> | </span> : null}
+          </span>
+        ))}
+      </>
     )
   }
 
@@ -81,22 +77,19 @@ function StarApiTable({ title, data }: ApiTableProps) {
 
     if (column.dataIndex === 'property') {
       return (
-        <code className={`${styles['api-table-name']} ${styles['api-table-copyable']}`} onClick={handleCopy} title="点击复制">
+        <code className={`${styles['api-table-name']} ${styles['api-table-copyable']}`} onClick={handleCopy} title={t('copy.title')}>
           {value}
           {record.required ? <span className={styles['api-table-required']}>*</span> : null}
         </code>
       )
     }
 
-    if (column.dataIndex === 'type') {
-      return renderTypeValue(String(value))
-    }
+    if (column.dataIndex === 'type') return renderTypeValue(String(value))
 
     if (column.dataIndex === 'default') {
       if (!value) return <span className={styles['api-table-empty']}>-</span>
-
       return (
-        <code className={styles['api-table-copyable']} onClick={handleCopy} title="点击复制">
+        <code className={styles['api-table-copyable']} onClick={handleCopy} title={t('copy.title')}>
           {value}
         </code>
       )

@@ -1,4 +1,4 @@
-import { type HTMLAttributes, type ReactNode } from 'react'
+﻿import { type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import { resolveAssetPath } from '../../utils/githubPages'
 import styles from './EmptyState.module.scss'
@@ -31,11 +31,7 @@ function StarEmptyState({
   return (
     <div
       {...rest}
-      className={classNames(
-        styles['stardew-empty-state'],
-        styles[`stardew-empty-state--${direction}`],
-        className
-      )}
+      className={classNames(styles['stardew-empty-state'], styles[`stardew-empty-state--${direction}`], className)}
     >
       {showImage ? (
         <div className={styles['stardew-empty-state__image-wrap']}>
