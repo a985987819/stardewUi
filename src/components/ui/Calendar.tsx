@@ -184,6 +184,7 @@ function Calendar({
       </div>
 
       <CalendarGrid
+        monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
         onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}

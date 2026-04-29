@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
+﻿import { useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
 import { getBunJoltOffset } from './loadingMath'
 import styles from './Loading.module.scss'
 
 const FRAME_COUNT = 12
 const FRAME_DURATION = 240
-const DEFAULT_TEXT = '请稍候'
+const DEFAULT_TEXT = '正在加载...'
 const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
 const FULL_CIRCLE = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
@@ -176,8 +176,8 @@ function StarLoading({
 function LoadingSession({
   active,
   text,
-  size,
-  gap,
+  size = 28,
+  gap = 8,
   center,
   block,
   fill,
@@ -339,3 +339,5 @@ function LoadingSession({
 }
 
 export default StarLoading
+
+

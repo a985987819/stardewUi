@@ -12,7 +12,7 @@ export type CalendarGridCellButtonProps = Omit<
 >
 
 export interface CalendarGridProps {
-  monthLabel: string
+  monthLabel?: string
   cells: CalendarCell[]
   showOutsideDays?: boolean
   onSelectDay?: (dayTimestamp: number) => void
@@ -46,7 +46,7 @@ function CalendarGrid({
 
   return (
     <div className={styles['calendar-grid']}>
-      <span className={styles['calendar-grid__month-label']}>{monthLabel}</span>
+      {monthLabel ? <span className={styles['calendar-grid__month-label']}>{monthLabel}</span> : null}
       <div className={styles['calendar-grid__grid']} role="grid" aria-label={monthLabel}>
         <div className={styles['calendar-grid__rowgroup']} role="rowgroup">
           <div className={styles['calendar-grid__row']} role="row">

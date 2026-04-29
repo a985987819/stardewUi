@@ -1,4 +1,4 @@
-import { Globe } from 'lucide-react'
+﻿import { Globe } from 'lucide-react'
 import { useI18n, type Lang } from '../../i18n'
 import styles from './LangSwitch.module.scss'
 
@@ -16,6 +16,7 @@ function StarLangSwitch() {
       type="button"
       onClick={toggleLang}
       title={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+      aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
     >
       <Globe size={18} />
       <span className={styles['lang-switch-text']}>{lang === 'zh' ? 'EN' : '中'}</span>
