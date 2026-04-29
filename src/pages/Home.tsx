@@ -2,27 +2,30 @@ import { Link } from 'react-router-dom'
 import { Package, Code, BookOpen, ArrowRight } from 'lucide-react'
 import StarCard from '../components/ui/Card'
 import { classNames } from '../utils/classNames'
+import { useI18n } from '../i18n'
 import styles from './Home.module.scss'
 
-const features = [
-  {
-    title: '丰富的组件',
-    description: '提供多种高质量 UI 组件，覆盖常见业务场景。',
-    icon: <Package size={28} />,
-  },
-  {
-    title: 'TypeScript',
-    description: '完整的类型定义，提升项目集成和维护体验。',
-    icon: <Code size={28} />,
-  },
-  {
-    title: '完善的文档',
-    description: '提供清晰示例和 API 说明，降低上手成本。',
-    icon: <BookOpen size={28} />,
-  },
-]
-
 function StarHomePage() {
+  const { t } = useI18n()
+
+  const features = [
+    {
+      title: t('home.feature1.title'),
+      description: t('home.feature1.desc'),
+      icon: <Package size={28} />,
+    },
+    {
+      title: t('home.feature2.title'),
+      description: t('home.feature2.desc'),
+      icon: <Code size={28} />,
+    },
+    {
+      title: t('home.feature3.title'),
+      description: t('home.feature3.desc'),
+      icon: <BookOpen size={28} />,
+    },
+  ]
+
   return (
     <div className={styles.home}>
       <StarCard className={styles['home-hero-card']}>
@@ -30,14 +33,12 @@ function StarHomePage() {
           <div className={styles['home-hero-content']}>
             <h1 className={styles['home-title']}>
               StardewValley UI
-              <span className={styles['home-title-badge']}>React 组件库</span>
+              <span className={styles['home-title-badge']}>{t('home.badge')}</span>
             </h1>
-            <p className={styles['home-desc']}>
-              一套基于 React 的星露谷风格 UI 组件集合，提供更统一、更有氛围感的界面基础。
-            </p>
+            <p className={styles['home-desc']}>{t('home.desc')}</p>
             <div className={styles['home-actions']}>
               <Link to="/guide" className={classNames(styles['home-btn'], styles['home-btn-primary'])}>
-                开始使用
+                {t('home.start')}
                 <ArrowRight size={18} />
               </Link>
               <a
@@ -46,7 +47,7 @@ function StarHomePage() {
                 rel="noopener noreferrer"
                 className={classNames(styles['home-btn'], styles['home-btn-secondary'])}
               >
-                GitHub
+                {t('home.github')}
               </a>
             </div>
           </div>

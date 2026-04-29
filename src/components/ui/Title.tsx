@@ -9,6 +9,7 @@ import {
   useRef,
 } from 'react'
 import { classNames } from '../../utils/classNames'
+import { resolveAssetPath } from '../../utils/githubPages'
 import styles from './Title.module.scss'
 
 export type TitleSize = 'small' | 'medium' | 'large'
@@ -72,7 +73,8 @@ const setRefValue = <T,>(ref: ForwardedRef<T>, value: T) => {
 }
 
 const loadImage = (src: string) => {
-  const cached = IMAGE_CACHE.get(src)
+  const resolvedSrc = resolveAssetPath(src)
+  const cached = IMAGE_CACHE.get(resolvedSrc)
   if (cached) return cached
 
   const loading = new Promise<LoadedImage>((resolve, reject) => {
@@ -80,13 +82,13 @@ const loadImage = (src: string) => {
     image.decoding = 'async'
     image.onload = () => resolve({ element: image, width: image.naturalWidth, height: image.naturalHeight })
     image.onerror = () => {
-      IMAGE_CACHE.delete(src)
-      reject(new Error(`Failed to load title background: ${src}`))
+      IMAGE_CACHE.delete(resolvedSrc)
+      reject(new Error(`Failed to load title background: ${resolvedSrc}`))
     }
-    image.src = src
+    image.src = resolvedSrc
   })
 
-  IMAGE_CACHE.set(src, loading)
+  IMAGE_CACHE.set(resolvedSrc, loading)
   return loading
 }
 

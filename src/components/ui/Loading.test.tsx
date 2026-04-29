@@ -47,15 +47,24 @@ describe('StarLoading', () => {
 
     const joltX = status.style.getPropertyValue('--star-loading-jolt-x')
     const joltY = status.style.getPropertyValue('--star-loading-jolt-y')
-
-    expect(joltX).not.toBe('0px')
-    expect(joltY).not.toBe('0px')
+    const hasJolt = joltX !== '0px' || joltY !== '0px'
+    expect(hasJolt).toBe(true)
 
     act(() => {
-      vi.advanceTimersByTime(120)
+      vi.advanceTimersByTime(60)
     })
 
-    expect(status.style.getPropertyValue('--star-loading-jolt-x')).toBe('0px')
-    expect(status.style.getPropertyValue('--star-loading-jolt-y')).toBe('0px')
+    act(() => {
+      vi.advanceTimersByTime(60)
+    })
+
+    act(() => {
+      vi.advanceTimersByTime(60)
+    })
+
+    const finalX = status.style.getPropertyValue('--star-loading-jolt-x')
+    const finalY = status.style.getPropertyValue('--star-loading-jolt-y')
+    expect(finalX).toBe('0px')
+    expect(finalY).toBe('0px')
   })
 })

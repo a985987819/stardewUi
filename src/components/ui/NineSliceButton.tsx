@@ -20,6 +20,7 @@ import {
   type SeasonalButtonVisualState,
 } from '../../utils/seasonalButtonCanvas'
 import { createDefaultButtonPalette } from '../../utils/defaultButtonTheme'
+import { resolveAssetPath } from '../../utils/githubPages'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
 
@@ -32,6 +33,7 @@ type NineSliceButtonVariant =
   | 'dashed'
   | 'text'
   | 'link'
+  | 'concise'
 type NineSliceButtonSize = 'small' | 'medium' | 'large'
 export type NineSliceButtonTheme = 'spring' | 'summer' | 'autumn' | 'winter'
 
@@ -64,7 +66,7 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
 const cls = (...classNames: Array<string | false | undefined>) => classNames.filter(Boolean).join(' ')
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 const ICON_BUTTON_INSETS = { top: 80, right: 200, bottom: 80, left: 200 }
-const DEFAULT_BUTTON_IMAGE_SRC = '/defaultBtn.png'
+const DEFAULT_BUTTON_IMAGE_SRC = resolveAssetPath('/defaultBtn.png')
 
 const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
@@ -123,17 +125,18 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
   ) => {
     const isDisabled = disabled || loading
     const effectiveVariant =
-      isDisabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' ? 'disabled' : variant
+      isDisabled && variant !== 'text' && variant !== 'link' && variant !== 'dashed' && variant !== 'concise' ? 'disabled' : variant
     const renderedVariant = variant === 'default' ? 'default' : effectiveVariant
     const loadingSize = size === 'small' ? 14 : size === 'large' ? 18 : 16
     const hasIcon = icon !== undefined && icon !== null
+    const isConcise = variant === 'concise'
 
     const usesSeasonalBackground = Boolean(theme) && variant === 'default'
-    const usesRegularBackground = !usesSeasonalBackground && appearance !== 'classical' && !backgroundSrc
+    const usesRegularBackground = !isConcise && !usesSeasonalBackground && appearance !== 'classical' && !backgroundSrc
     const usesPlainDefaultBackground = usesRegularBackground && variant === 'default'
     const usesRegularImageBackground = usesRegularBackground && !usesPlainDefaultBackground && !hasIcon
     const usesRegularNineSliceBackground = usesRegularBackground && !usesPlainDefaultBackground && hasIcon
-    const resolvedBackgroundSrc = backgroundSrc ?? '/btnImg.png'
+    const resolvedBackgroundSrc = backgroundSrc ? resolveAssetPath(backgroundSrc) : resolveAssetPath('/btnImg.png')
     const activeBackgroundSrc = usesRegularNineSliceBackground ? DEFAULT_BUTTON_IMAGE_SRC : resolvedBackgroundSrc
     const activeBackgroundInsets = usesRegularNineSliceBackground ? ICON_BUTTON_INSETS : backgroundInsets
     const [isHovered, setIsHovered] = useState(false)

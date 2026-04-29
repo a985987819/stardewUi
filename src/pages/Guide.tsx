@@ -1,10 +1,11 @@
 import StarCodeBlock from '../components/layout/CodeBlock'
+import { useI18n } from '../i18n'
 import styles from './Guide.module.scss'
 
 const installCode = `npm install stardew-valley-ui
-# 或
+# or
 yarn add stardew-valley-ui
-# 或
+# or
 pnpm add stardew-valley-ui`
 
 const usageCode = `import { StarNineSliceButton } from 'stardew-valley-ui'
@@ -24,27 +25,29 @@ export default defineConfig({
 })`
 
 function StarGuidePage() {
+  const { t } = useI18n()
+
   return (
     <div className={styles['guide-section']}>
-      <h2>安装</h2>
-      <p>使用 npm、yarn 或 pnpm 安装组件库：</p>
+      <h2>{t('guide.install')}</h2>
+      <p>{t('guide.installDesc')}</p>
       <StarCodeBlock code={installCode} language="bash" />
 
-      <h2>使用</h2>
-      <p>在你的项目中导入并使用组件：</p>
+      <h2>{t('guide.usage')}</h2>
+      <p>{t('guide.usageDesc')}</p>
       <StarCodeBlock code={usageCode} language="tsx" />
 
-      <h2>配置</h2>
-      <p>如果你使用 Vite，请确保正确配置 PostCSS：</p>
+      <h2>{t('guide.config')}</h2>
+      <p>{t('guide.configDesc')}</p>
       <StarCodeBlock code={viteConfigCode} language="ts" />
 
-      <h2>特性</h2>
+      <h2>{t('guide.features')}</h2>
       <ul>
-        <li>基于 React 开发</li>
-        <li>完整的 TypeScript 类型支持</li>
-        <li>支持像素风主题定制</li>
-        <li>提供多种可复用基础组件</li>
-        <li>适合文档站和游戏风格界面</li>
+        <li>{t('guide.feature1')}</li>
+        <li>{t('guide.feature2')}</li>
+        <li>{t('guide.feature3')}</li>
+        <li>{t('guide.feature4')}</li>
+        <li>{t('guide.feature5')}</li>
       </ul>
     </div>
   )

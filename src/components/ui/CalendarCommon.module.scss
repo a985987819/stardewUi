@@ -1,0 +1,41 @@
+// 日历组件和日期选择组件的共享样式变量
+
+// 容器尺寸
+$calendar-max-width: 640px;
+$calendar-gap: 16px;
+$calendar-padding: 18px;
+
+// 工具栏
+$toolbar-gap: 12px;
+$month-font-size: 18px;
+$month-font-weight: 700;
+$month-color: #4e342e;
+
+// 混合器：日历容器基础样式
+@mixin calendar-container {
+  display: grid;
+  gap: $calendar-gap;
+  max-width: $calendar-max-width;
+  margin: 0 auto;
+  background-image: url("/calenderBg.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  padding: $calendar-padding;
+}
+
+// 混合器：工具栏样式
+@mixin calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $toolbar-gap;
+}
+
+// 混合器：月份标签样式
+@mixin calendar-month-label {
+  flex: 1;
+  text-align: center;
+  font-size: $month-font-size;
+  font-weight: $month-font-weight;
+  color: $month-color;
+}

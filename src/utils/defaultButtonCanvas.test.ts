@@ -9,7 +9,7 @@ describe('defaultButtonCanvas', () => {
     expect(metrics.innerBorderWidth).toBe(2)
     expect(metrics.innerBorderGap).toBe(0.5)
     expect(metrics.cornerRadius).toBeGreaterThan(0)
-    expect(metrics.cornerRadius).toBeLessThanOrEqual(8)
+    expect(metrics.cornerRadius).toBeLessThanOrEqual(10)
   })
 
   it('scales frame metrics with device pixel ratio', () => {

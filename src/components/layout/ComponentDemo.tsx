@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { StarCard } from '../ui/Card'
 import StarCodeBlock from './CodeBlock'
+import { useI18n } from '../../i18n'
 import styles from './ComponentDemo.module.scss'
 
 interface ComponentDemoProps {
@@ -22,6 +23,7 @@ function StarComponentDemo({
   id,
 }: ComponentDemoProps) {
   const [showCode, setShowCode] = useState(defaultShowCode)
+  const { t } = useI18n()
 
   return (
     <StarCard
@@ -33,7 +35,7 @@ function StarComponentDemo({
         code ? (
           <button className={styles['component-demo-toggle']} type="button" onClick={() => setShowCode(!showCode)}>
             {showCode ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            <span>{showCode ? '隐藏代码' : '显示代码'}</span>
+            <span>{showCode ? t('demo.hideCode') : t('demo.showCode')}</span>
           </button>
         ) : null
       }

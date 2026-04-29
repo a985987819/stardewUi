@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { ExternalLink, Menu } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import { useI18n } from '../../i18n'
+import StarLangSwitch from './LangSwitch'
 import styles from './Header.module.scss'
 
 function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { t } = useI18n()
 
   const navItems = [
-    { path: '/guide', label: '指南' },
-    { path: '/components', label: '组件' },
-    { path: '/api', label: 'API' },
+    { path: '/guide', label: t('nav.guide') },
+    { path: '/components', label: t('nav.components') },
+    { path: '/api', label: t('nav.api') },
   ]
 
   return (
@@ -36,6 +39,7 @@ function StarHeader() {
         </nav>
 
         <div className={styles['doc-header-actions']}>
+          <StarLangSwitch />
           <a href="https://github.com" target="_blank" rel="noopener noreferrer" className={styles['doc-header-github']}>
             <ExternalLink size={20} />
           </a>

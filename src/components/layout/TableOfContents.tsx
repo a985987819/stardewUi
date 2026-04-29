@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { classNames } from '../../utils/classNames'
+import { useI18n } from '../../i18n'
 import styles from './TableOfContents.module.scss'
 
 interface TocItem {
@@ -13,6 +14,7 @@ interface TableOfContentsProps {
 }
 
 function StarTableOfContents({ items }: TableOfContentsProps) {
+  const { t } = useI18n()
   const [activeId, setActiveId] = useState<string>('')
 
   useEffect(() => {
@@ -48,7 +50,7 @@ function StarTableOfContents({ items }: TableOfContentsProps) {
 
   return (
     <nav className={styles['table-of-contents']}>
-      <h3 className={styles['toc-title']}>目录</h3>
+      <h3 className={styles['toc-title']}>{t('toc.title')}</h3>
       <ul className={styles['toc-list']}>
         {items.map((item) => (
           <li

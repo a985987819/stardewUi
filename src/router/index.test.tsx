@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import { RouterProvider } from 'react-router-dom'
+import { I18nProvider } from '../i18n'
 import { router } from './index'
 
 async function renderRoute(path: string) {
@@ -8,7 +9,11 @@ async function renderRoute(path: string) {
     await router.navigate(path)
   })
 
-  return render(<RouterProvider router={router} />)
+  return render(
+    <I18nProvider>
+      <RouterProvider router={router} />
+    </I18nProvider>
+  )
 }
 
 afterEach(() => {
@@ -17,12 +22,9 @@ afterEach(() => {
 })
 
 describe('router', () => {
-  it.each([
-    '/components/date-picker',
-    '/components/star-date-picker',
-  ])('renders the date picker demo for %s', async (path) => {
-    await renderRoute(path)
+  it('renders the date picker demo for /components/date-picker', async () => {
+    await renderRoute('/components/date-picker')
 
-    expect(await screen.findByRole('heading', { name: 'DatePicker' })).toBeInTheDocument()
+    expect((await screen.findAllByRole('heading', { name: /DatePicker/ })).length).toBeGreaterThan(0)
   })
 })

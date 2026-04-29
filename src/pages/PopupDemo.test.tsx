@@ -1,10 +1,15 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { I18nProvider } from '../i18n'
 import PopupDemo from './PopupDemo'
 
 describe('PopupDemo', () => {
   it('opens the popup from the clicked placement button instead of a separate center trigger', async () => {
-    render(<PopupDemo />)
+    render(
+      <I18nProvider>
+        <PopupDemo />
+      </I18nProvider>
+    )
 
     const section = document.getElementById('all-placement') ?? document.body
     const trigger = within(section).getByRole('button', { name: 'top-start' })

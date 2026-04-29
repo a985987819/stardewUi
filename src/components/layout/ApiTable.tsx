@@ -1,6 +1,7 @@
 import { useCallback, type MouseEvent } from 'react'
 import { StarCard } from '../ui/Card'
 import { message } from '../ui/Message'
+import { useI18n } from '../../i18n'
 import styles from './ApiTable.module.scss'
 
 interface ApiColumn {
@@ -24,12 +25,13 @@ interface ApiTableProps {
   data: ApiTableData[]
 }
 
-function StarApiTable({ title = 'API', data }: ApiTableProps) {
+function StarApiTable({ title, data }: ApiTableProps) {
+  const { t } = useI18n()
   const columns: ApiColumn[] = [
-    { title: '属性', dataIndex: 'property', width: 150 },
-    { title: '说明', dataIndex: 'description' },
-    { title: '类型', dataIndex: 'type', width: 280 },
-    { title: '默认值', dataIndex: 'default', width: 120 },
+    { title: t('api.property'), dataIndex: 'property', width: 150 },
+    { title: t('api.description'), dataIndex: 'description' },
+    { title: t('api.type'), dataIndex: 'type', width: 280 },
+    { title: t('api.default'), dataIndex: 'default', width: 120 },
   ]
 
   const handleCopy = useCallback(async (event: MouseEvent<HTMLElement>) => {
@@ -104,7 +106,7 @@ function StarApiTable({ title = 'API', data }: ApiTableProps) {
   }
 
   return (
-    <StarCard className={styles['api-table-wrapper']} showTitle title={title}>
+    <StarCard className={styles['api-table-wrapper']} showTitle title={title ?? t('api.title')}>
       <div className={styles['api-table-scroll']}>
         <table className={styles['api-table']}>
           <thead>

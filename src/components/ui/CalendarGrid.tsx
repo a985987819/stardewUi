@@ -12,7 +12,6 @@ export type CalendarGridCellButtonProps = Omit<
 >
 
 export interface CalendarGridProps {
-  monthLabel: string
   cells: CalendarCell[]
   showOutsideDays?: boolean
   onSelectDay?: (dayTimestamp: number) => void
@@ -33,7 +32,6 @@ function chunkCells(cells: CalendarCell[]): CalendarCell[][] {
 }
 
 function CalendarGrid({
-  monthLabel,
   cells,
   showOutsideDays = true,
   onSelectDay,
@@ -46,11 +44,7 @@ function CalendarGrid({
 
   return (
     <div className={styles['calendar-grid']}>
-      <div className={styles['calendar-grid__header']}>
-        <h2 className={styles['calendar-grid__month-label']}>{monthLabel}</h2>
-      </div>
-
-      <div className={styles['calendar-grid__grid']} role="grid" aria-label={monthLabel}>
+      <div className={styles['calendar-grid__grid']} role="grid">
         <div className={styles['calendar-grid__rowgroup']} role="rowgroup">
           <div className={styles['calendar-grid__row']} role="row">
             {WEEKDAY_LABELS.map((label) => (
