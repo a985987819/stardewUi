@@ -1,9 +1,9 @@
 .stardew-card {
   --card-corner-step: 1px;
   --card-corner-size: 3px;
-  --card-frame-border-width: 4px;
-  --card-frame-ring-width: 2px;
-  --card-inline-shadow-width: 2px;
+  --card-frame-border-width: 6px;
+  --card-frame-ring-width: 4px;
+  --card-inline-shadow-width: 4px;
   --card-header-padding-x: 14px;
   --card-header-padding-y: 10px;
   --card-body-padding-x: 12px;
@@ -32,14 +32,15 @@
   );
   box-shadow:
     inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-    inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+    inset calc(var(--card-inline-shadow-width) * -1) 0 0
+      var(--card-frame-shadow-right);
   transition:
     transform 0.1s steps(2),
     box-shadow 0.1s steps(2);
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     pointer-events: none;
     clip-path: inherit;
@@ -56,7 +57,8 @@
     border: var(--card-frame-ring-width) solid var(--card-frame-border-inner);
     box-shadow:
       inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-frame-shadow-right);
     z-index: -1;
   }
 
@@ -65,13 +67,15 @@
     box-shadow:
       0 6px 8px rgba(0, 0, 0, 0.28),
       inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-frame-shadow-right);
   }
 
   &--outlined {
     box-shadow:
       inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-frame-shadow-right);
   }
 
   &--elevated {
@@ -79,7 +83,8 @@
       0 10px 14px rgba(0, 0, 0, 0.28),
       0 4px 0 rgba(0, 0, 0, 0.12),
       inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-frame-shadow-right);
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-frame-shadow-right);
   }
 
   &--small {
@@ -133,11 +138,14 @@
       var(--card-header-stripe-4) 75%,
       var(--card-header-stripe-4) 100%
     );
-    border-bottom: var(--card-frame-border-width) solid var(--card-header-border-base);
+    border-bottom: var(--card-frame-border-width) solid
+      var(--card-header-border-base);
     box-shadow:
       inset 0 var(--card-inline-shadow-width) 0 var(--card-header-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-header-shadow-right),
-      inset 0 calc(var(--card-frame-ring-width) * -1) 0 var(--card-header-border-inner);
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-header-shadow-right),
+      inset 0 calc(var(--card-frame-ring-width) * -1) 0
+        var(--card-header-border-inner);
   }
 
   &__title,
@@ -163,28 +171,11 @@
   &__body {
     padding: var(--card-body-padding-y) var(--card-body-padding-x);
     color: var(--card-text-secondary);
-    background: linear-gradient(
-      180deg,
-      var(--card-body-stripe-1) 0%,
-      var(--card-body-stripe-1) 12.5%,
-      var(--card-body-stripe-2) 12.5%,
-      var(--card-body-stripe-2) 25%,
-      var(--card-body-stripe-3) 25%,
-      var(--card-body-stripe-3) 37.5%,
-      var(--card-body-stripe-4) 37.5%,
-      var(--card-body-stripe-4) 50%,
-      var(--card-body-stripe-5) 50%,
-      var(--card-body-stripe-5) 62.5%,
-      var(--card-body-stripe-6) 62.5%,
-      var(--card-body-stripe-6) 75%,
-      var(--card-body-stripe-7) 75%,
-      var(--card-body-stripe-7) 87.5%,
-      var(--card-body-stripe-8) 87.5%,
-      var(--card-body-stripe-8) 100%
-    );
+    background: var(--card-body-stripe-4);
     box-shadow:
       inset 0 var(--card-inline-shadow-width) 0 var(--card-body-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0 var(--card-body-shadow-right),
+      inset calc(var(--card-inline-shadow-width) * -1) 0 0
+        var(--card-body-shadow-right),
       inset 0 0 0 var(--card-frame-ring-width) var(--card-body-border-inner);
   }
 
@@ -206,13 +197,18 @@
     padding: 12px 18px 16px;
     color: var(--card-text-primary);
     border-top: var(--card-frame-ring-width) solid var(--card-body-border-outer);
-    background: linear-gradient(180deg, var(--card-body-stripe-3), var(--card-body-stripe-8));
+    background: linear-gradient(
+      180deg,
+      var(--card-body-stripe-3),
+      var(--card-body-stripe-8)
+    );
   }
 
   &__image {
     width: 100%;
     overflow: hidden;
-    border-bottom: var(--card-frame-ring-width) solid var(--card-body-border-outer);
+    border-bottom: var(--card-frame-ring-width) solid
+      var(--card-body-border-outer);
 
     img {
       display: block;

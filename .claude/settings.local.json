@@ -7,7 +7,14 @@
       "Bash(bun run:*)",
       "Bash(npm run:*)",
       "Bash(git:*)",
-      "Bash(npm:*)"
+      "Bash(npm:*)",
+      "Read(//c/Users/123/.claude/**)",
+      "Bash(printf '\\\\n--- skills ---\\\\n')",
+      "Bash(pwd:*)",
+      "Bash(ls:*)",
+      "Read(//c/Users/123/.agents/**)",
+      "Bash(printf '\\\\n--- agents skills ---\\\\n')",
+      "Read(//c/Users/123/.agents/skills/**)"
     ]
   }
 }

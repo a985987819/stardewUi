@@ -7,13 +7,7 @@
   }
 
   &-preview {
-    @apply flex min-h-[100px] flex-wrap items-center justify-center gap-4 rounded-[4px] px-5 py-8;
-    background: rgba(255, 248, 235, 0.28);
-    border: 3px solid rgba(157, 65, 0, 0.18);
-
-    .has-code & {
-      margin-bottom: 18px;
-    }
+    @apply flex min-h-[100px] flex-wrap items-center justify-center gap-4 px-5 py-8;
   }
 
   &-toggle {
@@ -35,12 +29,11 @@
   }
 
   &-code {
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 3px solid rgba(157, 65, 0, 0.22);
+    @apply mt-5 flex justify-center;
   }
 
   &-code-block {
+    width: min(100%, 960px);
     border: none;
     box-shadow: none;
   }
