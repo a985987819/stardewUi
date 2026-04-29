@@ -7,13 +7,17 @@
   }
 
   &-preview {
-    @apply flex min-h-[100px] flex-wrap items-center justify-center gap-4 rounded-[4px] px-5 py-8;
-    background: rgba(255, 248, 235, 0.28);
-    border: 3px solid rgba(157, 65, 0, 0.18);
+    @apply flex min-h-[100px] flex-wrap items-center justify-center gap-4 px-5 py-8;
 
     .has-code & {
       margin-bottom: 18px;
     }
+  }
+
+  &-toggle-wrapper {
+    @apply flex justify-center;
+    margin-top: 8px;
+    margin-bottom: 8px;
   }
 
   &-toggle {

@@ -31,17 +31,17 @@ function StarComponentDemo({
       className={code ? `${styles['component-demo']} ${styles['has-code']}` : styles['component-demo']}
       showTitle
       title={title}
-      headerExtra={
-        code ? (
+    >
+      {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
+      <div className={styles['component-demo-preview']}>{children}</div>
+      {code ? (
+        <div className={styles['component-demo-toggle-wrapper']}>
           <button className={styles['component-demo-toggle']} type="button" onClick={() => setShowCode(!showCode)}>
             {showCode ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             <span>{showCode ? t('demo.hideCode') : t('demo.showCode')}</span>
           </button>
-        ) : null
-      }
-    >
-      {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
-      <div className={styles['component-demo-preview']}>{children}</div>
+        </div>
+      ) : null}
       {showCode && code ? (
         <div className={styles['component-demo-code']}>
           <StarCodeBlock code={code} language="tsx" className={styles['component-demo-code-block']} />
