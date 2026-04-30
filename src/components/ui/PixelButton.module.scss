@@ -1,0 +1,52 @@
+.pixel-button {
+  --button-custom-bg: #ffffff;
+  --button-custom-text: #c2c2c2;
+  --button-custom-shadow: #a8a8a8;
+  --button-custom-border: #000;
+  --bg-button: #f0f0f0;
+  --border-button: #000;
+  --shadow-button: #000;
+  --text-button: #000;
+
+  position: relative;
+  display: inline-block;
+  margin: 0.5rem 0.75rem;
+  padding: 0.5rem;
+  font-family: Minecraft, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--button-custom-text, var(--text-button, #000));
+  background-color: var(--button-custom-bg, var(--bg-button, #f0f0f0));
+  border: 5px solid transparent;
+  border-color: var(--button-custom-border, var(--border-button, #000));
+  border-image-source: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%3E%3Cpath%20d%3D%22M3%201h1v1h-1zM4%201h1v1h-1zM2%202h1v1h-1zM5%202h1v1h-1zM1%203h1v1h-1zM6%203h1v1h-1zM1%204h1v1h-1zM6%204h1v1h-1zM2%205h1v1h-1zM5%205h1v1h-1zM3%206h1v1h-1zM4%206h1v1h-1z%22%20fill%3D%22%23000%22%2F%3E%3C%2Fsvg%3E");
+  border-image-outset: 2;
+  border-image-repeat: stretch;
+  border-image-slice: 3;
+  border-image-width: 2;
+  border-style: solid;
+  box-shadow:
+    2px 2px 0 2px var(--button-custom-shadow, var(--shadow-button, #000)),
+    -2px -2px 0 2px var(--button-custom-bg, var(--bg-button, #f0f0f0));
+  cursor: pointer;
+  transition: transform 0.1s steps(2);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow:
+      1px 1px 0 1px var(--button-custom-shadow, var(--shadow-button, #000)),
+      -1px -1px 0 1px var(--button-custom-bg, var(--bg-button, #f0f0f0));
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
