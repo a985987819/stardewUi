@@ -1,0 +1,91 @@
+.stardew-switch {
+  --switch-track-width: 44px;
+  --switch-track-height: 24px;
+  --switch-thumb-size: 20px;
+  --switch-track-clip: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+  --switch-thumb-clip: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+  --switch-on-color: #4ade80;
+  --switch-off-color: #9ca3af;
+  --switch-thumb-color: #ffffff;
+  --switch-thumb-translate: 0;
+  --switch-border-width: 3px;
+  --switch-border-color: #5a3a1a;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.1s steps(2);
+
+  &:focus-visible {
+    outline: 2px solid var(--switch-on-color);
+    outline-offset: 2px;
+  }
+
+  &:active:not(.stardew-switch--disabled) {
+    transform: translate(1px, 1px);
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &__track {
+    position: relative;
+    display: block;
+    width: var(--switch-track-width);
+    height: var(--switch-track-height);
+    background: var(--switch-off-color);
+    border: var(--switch-border-width) solid var(--switch-border-color);
+    clip-path: var(--switch-track-clip);
+    transition: background 0.15s steps(3);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.3),
+      inset -2px 0 0 rgba(0, 0, 0, 0.1);
+  }
+
+  &--checked &__track {
+    background: var(--switch-on-color);
+  }
+
+  &__thumb {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--switch-border-width) + 2px);
+    transform: translateY(-50%) translateX(var(--switch-thumb-translate));
+    width: var(--switch-thumb-size);
+    height: var(--switch-thumb-size);
+    background: var(--switch-thumb-color);
+    border: 2px solid var(--switch-border-color);
+    clip-path: var(--switch-thumb-clip);
+    transition: transform 0.15s steps(3);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.5),
+      inset -1px 0 0 rgba(0, 0, 0, 0.05);
+  }
+
+  &--small {
+    --switch-track-width: 36px;
+    --switch-track-height: 20px;
+    --switch-thumb-size: 16px;
+  }
+
+  &--medium {
+    --switch-track-width: 44px;
+    --switch-track-height: 24px;
+    --switch-thumb-size: 20px;
+  }
+
+  &--large {
+    --switch-track-width: 52px;
+    --switch-track-height: 28px;
+    --switch-thumb-size: 24px;
+  }
+}
