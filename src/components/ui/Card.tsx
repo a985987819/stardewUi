@@ -200,21 +200,13 @@ function StarCard({
       <span className={styles['stardew-card__frame']} aria-hidden />
       {hasTitle ? (
         <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
-          <CardSurfaceCanvas stripes={palette.headerStripes} slot="card-header-surface" />
-          <span
-            data-slot="card-header-overlay"
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              boxShadow: `inset -4px 0 0 var(--card-right-edge-shadow), inset 0 2px 0 var(--card-top-highlight), inset 0 -3px 0 var(--card-divider-shadow)`,
-            }}
-          />
+          {/* <CardSurfaceCanvas stripes={palette.headerStripes} slot="card-header-surface" /> */}
           <h3 className={styles['stardew-card__title']}>{title}</h3>
           {headerExtra ? <div className={styles['stardew-card__extra']}>{headerExtra}</div> : null}
         </div>
       ) : null}
       <div className={styles['stardew-card__body']}>
-        <CardSurfaceCanvas stripes={palette.bodyStripes} slot="card-body-surface" />
+        {/* <CardSurfaceCanvas stripes={palette.bodyStripes} slot="card-body-surface" /> */}
         <span
           data-slot="card-body-overlay"
           aria-hidden
