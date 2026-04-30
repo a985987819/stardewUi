@@ -62,50 +62,48 @@ function createSurfaceClipPath(
   }
 
   const stepCount = level * 3
-  const topStartX = horizontalInset - stepSize
-  const bottomStartX = topStartX
-  const rightStartY = sideEdgeInset - stepSize
-  const leftStartY = rightStartY
+  const cutInset = Math.min(horizontalInset - stepSize, sideEdgeInset - stepSize)
   const points: string[] = []
 
-  points.push(`${topStartX}px 0`)
-  points.push(`calc(100% - ${topStartX}px) 0`)
+  points.push(`${cutInset}px 0`)
+  points.push(`calc(100% - ${cutInset}px) 0`)
 
   for (let index = 0; index < stepCount; index += 1) {
-    const x = topStartX - stepSize * index
-    const nextX = topStartX - stepSize * (index + 1)
+    const x = cutInset - stepSize * index
+    const nextX = cutInset - stepSize * (index + 1)
     const y = stepSize * (index + 1)
     points.push(`calc(100% - ${x}px) ${y}px`)
     points.push(`calc(100% - ${nextX}px) ${y}px`)
   }
 
-  points.push(`100% ${rightStartY}px`)
+  points.push(`100% calc(100% - ${cutInset}px)`)
 
   for (let index = 0; index < stepCount; index += 1) {
     const x = stepSize * (index + 1)
-    const y = rightStartY + stepSize * index
-    points.push(`calc(100% - ${x}px) ${y}px`)
-    points.push(`calc(100% - ${x}px) ${y + stepSize}px`)
+    const y = cutInset - stepSize * index
+    const nextY = cutInset - stepSize * (index + 1)
+    points.push(`calc(100% - ${x}px) calc(100% - ${y}px)`)
+    points.push(`calc(100% - ${x}px) calc(100% - ${nextY}px)`)
   }
 
-  points.push(`calc(100% - ${bottomStartX}px) 100%`)
-  points.push(`${bottomStartX}px 100%`)
+  points.push(`${cutInset}px 100%`)
 
   for (let index = 0; index < stepCount; index += 1) {
-    const x = bottomStartX - stepSize * index
-    const nextX = bottomStartX - stepSize * (index + 1)
+    const x = cutInset - stepSize * index
+    const nextX = cutInset - stepSize * (index + 1)
     const y = stepSize * (index + 1)
     points.push(`${x}px calc(100% - ${y}px)`)
     points.push(`${nextX}px calc(100% - ${y}px)`)
   }
 
-  points.push(`0 calc(100% - ${leftStartY}px)`)
+  points.push(`0 ${cutInset}px`)
 
   for (let index = 0; index < stepCount; index += 1) {
     const x = stepSize * (index + 1)
-    const y = leftStartY + stepSize * index
-    points.push(`${x}px calc(100% - ${y}px)`)
-    points.push(`${x}px calc(100% - ${y + stepSize}px)`)
+    const y = cutInset - stepSize * index
+    const nextY = cutInset - stepSize * (index + 1)
+    points.push(`${x}px ${y}px`)
+    points.push(`${x}px ${nextY}px`)
   }
 
   return `polygon(${points.join(', ')})`
