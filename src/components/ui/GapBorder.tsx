@@ -20,12 +20,20 @@ interface CornerStep {
   style: CSSProperties
 }
 
+function getCornerStepCount(level: number): number {
+  if (level <= 0) {
+    return 0
+  }
+
+  return level * 2 - 1
+}
+
 function createCornerSteps(level: number, stepSize: number, horizontalInset: number, stepStartOffset: number): CornerStep[] {
   if (level <= 0) {
     return []
   }
 
-  const stepCount = level * 3
+  const stepCount = getCornerStepCount(level)
   const corners: CornerName[] = ['top-left', 'top-right', 'bottom-right', 'bottom-left']
 
   return corners.flatMap((corner) =>
@@ -61,7 +69,7 @@ function createSurfaceClipPath(
     return `polygon(${cornerGap}px 0, calc(100% - ${cornerGap}px) 0, 100% ${cornerGap}px, 100% calc(100% - ${cornerGap}px), calc(100% - ${cornerGap}px) 100%, ${cornerGap}px 100%, 0 calc(100% - ${cornerGap}px), 0 ${cornerGap}px)`
   }
 
-  const stepCount = level * 3
+  const stepCount = getCornerStepCount(level)
   const cutInset = Math.min(horizontalInset - stepSize, sideEdgeInset - stepSize)
   const points: string[] = []
 
@@ -123,8 +131,8 @@ function StarGapBorder({
   ...rest
 }: StarGapBorderProps) {
   const resolvedCornerLevel = cornerLevel ?? 0
-  const stepCount = resolvedCornerLevel * 3
-  const horizontalInset = cornerGap + resolvedCornerLevel * 24
+  const stepCount = getCornerStepCount(resolvedCornerLevel)
+  const horizontalInset = cornerGap + stepCount * borderThickness
   const stepStartOffset = cornerGap
   const sideEdgeInset = cornerGap + stepCount * borderThickness
   const cornerSteps = createCornerSteps(resolvedCornerLevel, borderThickness, horizontalInset, stepStartOffset)
