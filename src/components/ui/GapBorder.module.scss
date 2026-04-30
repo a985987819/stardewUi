@@ -1,0 +1,65 @@
+.gap-border {
+  --gap-border-color: #5f4322;
+  --gap-border-background: #f7efc5;
+  --gap-border-thickness: 8px;
+  --gap-border-corner-gap: 8px;
+  --gap-border-content-padding: 24px;
+
+  position: relative;
+  display: block;
+
+  &__edge {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    background: var(--gap-border-color);
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  &__edge--top,
+  &__edge--bottom {
+    left: var(--gap-border-corner-gap);
+    width: calc(100% - (var(--gap-border-corner-gap) * 2));
+    height: var(--gap-border-thickness);
+  }
+
+  &__edge--top {
+    top: 0;
+  }
+
+  &__edge--bottom {
+    bottom: 0;
+  }
+
+  &__edge--left,
+  &__edge--right {
+    top: var(--gap-border-corner-gap);
+    height: calc(100% - (var(--gap-border-corner-gap) * 2));
+    width: var(--gap-border-thickness);
+  }
+
+  &__edge--left {
+    left: 0;
+  }
+
+  &__edge--right {
+    right: 0;
+  }
+
+  &__surface {
+    position: relative;
+    z-index: 1;
+    margin: var(--gap-border-thickness);
+    min-width: 0;
+    min-height: 0;
+    background: var(--gap-border-background);
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
+  }
+
+  &__content {
+    min-width: 0;
+    min-height: 0;
+    padding: var(--gap-border-content-padding);
+  }
+}

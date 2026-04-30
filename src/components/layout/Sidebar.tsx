@@ -38,6 +38,7 @@ const menuItems: MenuItem[] = [
       { path: '/components/message', labelZh: '消息', labelEn: 'Message' },
       { path: '/components/empty-state', labelZh: '空状态', labelEn: 'EmptyState' },
       { path: '/components/tab', labelZh: '选项卡', labelEn: 'Tab' },
+      { path: '/components/gap-border', labelZh: '缺口边框', labelEn: 'Gap Border' },
     ],
   },
 ]

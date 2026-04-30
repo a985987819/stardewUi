@@ -11,6 +11,7 @@ import {
   MessageSquare,
   MessageSquareMore,
   MousePointer,
+  ScanLine,
   Square,
   Type,
 } from 'lucide-react'
@@ -133,6 +134,15 @@ const components: ComponentInfo[] = [
       en: 'Switch content by season, location, or quest type like flipping through a farm manual.',
     },
     icon: <LayoutList size={20} />,
+  },
+  {
+    path: '/components/gap-border',
+    title: { zh: '缺口边框', en: 'Gap Border' },
+    desc: {
+      zh: '四边分开绘制并在四角留白，形成故意断开的像素边框。',
+      en: 'Separate edge segments leave corner gaps for an intentionally broken pixel border.',
+    },
+    icon: <ScanLine size={20} />,
   },
 ]
 

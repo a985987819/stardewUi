@@ -1,3 +1,5 @@
+export { default as StarGapBorder } from './GapBorder'
+export type { StarGapBorderProps } from './GapBorder'
 export { StarCard, StarCardImage, StarCardMeta } from './Card'
 export { default as StarDialog } from './Dialog'
 export { default as StarEmptyState } from './EmptyState'

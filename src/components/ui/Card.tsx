@@ -1,14 +1,6 @@
-import {
-  type CSSProperties,
-  type HTMLAttributes,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import { createCardPalette } from '../../utils/cardLighting'
-import { drawCardSurfaceStripes } from '../../utils/cardSurfaceCanvas'
 import styles from './Card.module.scss'
 
 const DEFAULT_CARD_EDGE_COLOR = '#fa9305'
@@ -43,90 +35,6 @@ export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'tit
 
 function isPresetCardColor(color?: CardThemeColor): color is CardColor {
   return Boolean(color && color in CARD_EDGE_COLORS)
-}
-
-interface CardSurfaceCanvasProps {
-  stripes: readonly string[]
-  slot: 'card-header-surface' | 'card-body-surface'
-}
-
-function CardSurfaceCanvas({ stripes, slot }: CardSurfaceCanvasProps) {
-  const hostRef = useRef<HTMLSpanElement | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-
-  const draw = useCallback(() => {
-    const host = hostRef.current
-    const canvas = canvasRef.current
-
-    if (!host || !canvas) {
-      return
-    }
-
-    const width = Math.round(host.clientWidth)
-    const height = Math.round(host.clientHeight)
-
-    if (width <= 0 || height <= 0) {
-      return
-    }
-
-    const dpr = window.devicePixelRatio || 1
-    const targetWidth = Math.max(1, Math.round(width * dpr))
-    const targetHeight = Math.max(1, Math.round(height * dpr))
-
-    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-      canvas.width = targetWidth
-      canvas.height = targetHeight
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-    }
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return
-    }
-
-    drawCardSurfaceStripes(ctx, {
-      width: targetWidth,
-      height: targetHeight,
-      stripes,
-    })
-  }, [stripes])
-
-  useEffect(() => {
-    draw()
-  }, [draw])
-
-  useEffect(() => {
-    const host = hostRef.current
-    if (!host) {
-      return
-    }
-
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', draw)
-      return () => {
-        window.removeEventListener('resize', draw)
-      }
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      draw()
-    })
-
-    resizeObserver.observe(host)
-    window.addEventListener('resize', draw)
-
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', draw)
-    }
-  }, [draw])
-
-  return (
-    <span ref={hostRef} data-slot={slot} className={styles['stardew-card__surface']} aria-hidden>
-      <canvas ref={canvasRef} className={styles['stardew-card__surface-canvas']} />
-    </span>
-  )
 }
 
 function StarCard({

@@ -1,0 +1,15 @@
+.gap-border-box {
+  width: min(100%, 420px);
+  margin: 0 auto;
+}
+
+.gap-border-content {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4c371c;
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: center;
+}
