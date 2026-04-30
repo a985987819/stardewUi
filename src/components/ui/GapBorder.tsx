@@ -50,9 +50,15 @@ function createCornerSteps(level: number, stepSize: number, horizontalInset: num
   )
 }
 
-function createSurfaceClipPath(level: number, stepSize: number, horizontalInset: number, sideEdgeInset: number): string | undefined {
+function createSurfaceClipPath(
+  level: number,
+  stepSize: number,
+  horizontalInset: number,
+  sideEdgeInset: number,
+  cornerGap: number
+): string {
   if (level <= 0) {
-    return undefined
+    return `polygon(${cornerGap}px 0, calc(100% - ${cornerGap}px) 0, 100% ${cornerGap}px, 100% calc(100% - ${cornerGap}px), calc(100% - ${cornerGap}px) 100%, ${cornerGap}px 100%, 0 calc(100% - ${cornerGap}px), 0 ${cornerGap}px)`
   }
 
   const stepCount = level * 3
@@ -124,7 +130,13 @@ function StarGapBorder({
   const stepStartOffset = cornerGap
   const sideEdgeInset = cornerGap + stepCount * borderThickness
   const cornerSteps = createCornerSteps(resolvedCornerLevel, borderThickness, horizontalInset, stepStartOffset)
-  const surfaceClipPath = createSurfaceClipPath(resolvedCornerLevel, borderThickness, horizontalInset, sideEdgeInset)
+  const surfaceClipPath = createSurfaceClipPath(
+    resolvedCornerLevel,
+    borderThickness,
+    horizontalInset,
+    sideEdgeInset,
+    cornerGap
+  )
 
   const componentStyle = {
     ...style,
@@ -134,7 +146,7 @@ function StarGapBorder({
     '--gap-border-horizontal-inset': `${horizontalInset}px`,
     '--gap-border-vertical-inset': `${sideEdgeInset}px`,
     '--gap-border-content-padding': `${contentPadding}px`,
-    ...(surfaceClipPath ? { '--gap-border-surface-clip-path': surfaceClipPath } : {}),
+    '--gap-border-surface-clip-path': surfaceClipPath,
   } as CSSProperties
 
   return (

@@ -5,6 +5,7 @@
   --gap-border-horizontal-inset: 8px;
   --gap-border-vertical-inset: 8px;
   --gap-border-content-padding: 24px;
+  --gap-border-surface-clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
 
   position: relative;
   display: block;
@@ -61,6 +62,7 @@
     min-width: 0;
     min-height: 0;
     background: var(--gap-border-background);
+    clip-path: var(--gap-border-surface-clip-path);
     box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
     pointer-events: none;
   }
