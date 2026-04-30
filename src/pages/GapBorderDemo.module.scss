@@ -3,6 +3,11 @@
   margin: 0 auto;
 }
 
+.gap-border-level-grid {
+  display: grid;
+  gap: 20px;
+}
+
 .gap-border-content {
   min-height: 180px;
   display: flex;

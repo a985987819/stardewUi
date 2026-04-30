@@ -2,15 +2,17 @@
   --gap-border-color: #5f4322;
   --gap-border-background: #f7efc5;
   --gap-border-thickness: 8px;
-  --gap-border-corner-gap: 8px;
+  --gap-border-horizontal-inset: 8px;
+  --gap-border-vertical-inset: 8px;
   --gap-border-content-padding: 24px;
 
   position: relative;
   display: block;
 
-  &__edge {
+  &__edge,
+  &__step {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     display: block;
     background: var(--gap-border-color);
     image-rendering: pixelated;
@@ -19,8 +21,8 @@
 
   &__edge--top,
   &__edge--bottom {
-    left: var(--gap-border-corner-gap);
-    width: calc(100% - (var(--gap-border-corner-gap) * 2));
+    left: var(--gap-border-horizontal-inset);
+    width: calc(100% - (var(--gap-border-horizontal-inset) * 2));
     height: var(--gap-border-thickness);
   }
 
@@ -34,8 +36,8 @@
 
   &__edge--left,
   &__edge--right {
-    top: var(--gap-border-corner-gap);
-    height: calc(100% - (var(--gap-border-corner-gap) * 2));
+    top: var(--gap-border-vertical-inset);
+    height: calc(100% - (var(--gap-border-vertical-inset) * 2));
     width: var(--gap-border-thickness);
   }
 
@@ -47,19 +49,28 @@
     right: 0;
   }
 
+  &__step {
+    width: var(--gap-border-thickness);
+    height: var(--gap-border-thickness);
+  }
+
   &__surface {
-    position: relative;
+    position: absolute;
+    inset: var(--gap-border-thickness);
     z-index: 1;
-    margin: var(--gap-border-thickness);
     min-width: 0;
     min-height: 0;
     background: var(--gap-border-background);
     box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
+    pointer-events: none;
   }
 
   &__content {
+    position: relative;
+    z-index: 2;
     min-width: 0;
     min-height: 0;
+    margin: var(--gap-border-thickness);
     padding: var(--gap-border-content-padding);
   }
 }
