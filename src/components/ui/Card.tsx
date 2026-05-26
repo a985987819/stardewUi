@@ -138,8 +138,6 @@ function CardSurfaceCanvas({ stripes, slot }: CardSurfaceCanvasProps) {
     if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
       canvas.width = targetWidth
       canvas.height = targetHeight
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
     }
 
     const ctx = canvas.getContext('2d')
