@@ -47,6 +47,37 @@ function StarDialog({
   typewriterSpeed = 100,
   onClose,
 }: StarDialogProps) {
+  const [currentPage, setCurrentPage] = useState(0)
+  const [titleKey, setTitleKey] = useState(0)
+  const [contentKey, setContentKey] = useState(0)
+  const [titleComplete, setTitleComplete] = useState(false)
+  const [contentComplete, setContentComplete] = useState(false)
+  const [titleCompleteTrigger, setTitleCompleteTrigger] = useState(0)
+  const [contentCompleteTrigger, setContentCompleteTrigger] = useState(0)
+
+  const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
+  const totalPages = pages.length
+  const isFirstPage = currentPage === 0
+  const isLastPage = currentPage >= totalPages - 1
+
+  useEffect(() => {
+    if (open) {
+      setCurrentPage(0)
+      setTitleComplete(!title || !typewriter)
+      setContentComplete(!typewriter)
+      setTitleKey((k) => k + 1)
+      setContentKey((k) => k + 1)
+    }
+  }, [open, title, typewriter])
+
+  useEffect(() => {
+    setContentKey((k) => k + 1)
+    setContentComplete(!typewriter)
+    if (!isFirstPage) {
+      setTitleComplete(true)
+    }
+  }, [currentPage, isFirstPage, typewriter])
+
   useEffect(() => {
     if (!open) return
 
@@ -58,73 +89,11 @@ function StarDialog({
     }
   }, [open])
 
-  if (!open) return null
-
-  const portalTarget = document.querySelector('[data-star-app="true"]') ?? document.body
-  const dialogLabel = typeof title === 'string' ? title : undefined
-
-  return createPortal(
-    <DialogSession
-      title={title}
-      content={content}
-      image={image}
-      name={name}
-      actions={actions}
-      maskClosable={maskClosable}
-      typewriter={typewriter}
-      typewriterSpeed={typewriterSpeed}
-      onClose={onClose}
-      dialogLabel={dialogLabel}
-    />,
-    portalTarget
-  )
-}
-
-function DialogSession({
-  title,
-  content,
-  image,
-  name,
-  actions,
-  maskClosable,
-  typewriter,
-  typewriterSpeed,
-  onClose,
-  dialogLabel,
-}: Omit<StarDialogProps, 'open'> & { dialogLabel?: string }) {
-  const [currentPage, setCurrentPage] = useState(0)
-  const [contentKey, setContentKey] = useState(0)
-  const [titleComplete, setTitleComplete] = useState(!title || !typewriter)
-  const [contentComplete, setContentComplete] = useState(!typewriter)
-  const [titleCompleteTrigger, setTitleCompleteTrigger] = useState(0)
-  const [contentCompleteTrigger, setContentCompleteTrigger] = useState(0)
-
-  const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
-  const totalPages = pages.length
-  const isFirstPage = currentPage === 0
-  const isLastPage = currentPage >= totalPages - 1
-  const hasSidebar = Boolean(image || name)
-
-  const resetTypingState = useCallback(
-    (page: number) => {
-      setContentKey((k) => k + 1)
-      setContentComplete(!typewriter)
-      if (page > 0) {
-        setTitleComplete(true)
-      }
-    },
-    [typewriter]
-  )
-
   const handlePrev = useCallback(() => {
     if (!isFirstPage) {
-      setCurrentPage((page) => {
-        const nextPage = Math.max(page - 1, 0)
-        resetTypingState(nextPage)
-        return nextPage
-      })
+      setCurrentPage((page) => Math.max(page - 1, 0))
     }
-  }, [isFirstPage, resetTypingState])
+  }, [isFirstPage])
 
   const handleNext = useCallback(() => {
     if (typewriter && (!titleComplete || !contentComplete)) {
@@ -138,13 +107,9 @@ function DialogSession({
     }
 
     if (!isLastPage) {
-      setCurrentPage((page) => {
-        const nextPage = Math.min(page + 1, totalPages - 1)
-        resetTypingState(nextPage)
-        return nextPage
-      })
+      setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
     }
-  }, [contentComplete, isLastPage, resetTypingState, titleComplete, totalPages, typewriter])
+  }, [contentComplete, isLastPage, titleComplete, totalPages, typewriter])
 
   const handleOverlayClick = useCallback(() => {
     if (maskClosable) {
@@ -176,6 +141,8 @@ function DialogSession({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!open) return
+
       if (e.key === 'Escape' && maskClosable) {
         onClose?.()
       }
@@ -191,7 +158,7 @@ function DialogSession({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNext, handlePrev, maskClosable, onClose])
+  }, [handleNext, handlePrev, maskClosable, onClose, open])
 
   const defaultActions: DialogAction[] = [
     { label: LABEL_CONFIRM, variant: 'primary', onClick: onClose },
@@ -211,7 +178,7 @@ function DialogSession({
   if (!portalTarget) return null
   const dialogLabel = typeof title === 'string' ? title : undefined
 
-  return (
+  return createPortal(
     <div
       className={classNames(styles['stardew-dialog-overlay'], maskClosable && styles['stardew-dialog-overlay--clickable'])}
       onClick={handleOverlayClick}
@@ -233,6 +200,7 @@ function DialogSession({
               <StarTypewriter
                 text={title}
                 speed={typewriterSpeed}
+                key={`title-${titleKey}`}
                 onComplete={handleTitleComplete}
                 completeTrigger={titleCompleteTrigger}
               />
@@ -332,10 +300,11 @@ function DialogSession({
                 ) : null}
               </div>
             ) : null}
-          </div>
+            </div>
         </StarCard>
       </div>
-    </div>
+    </div>,
+    portalTarget
   )
 }
 

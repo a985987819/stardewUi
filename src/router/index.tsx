@@ -18,6 +18,7 @@ import StarLoadingDemoPage from '../pages/LoadingDemo'
 import StarTabDemoPage from '../pages/TabDemo'
 import StarGapBorderDemoPage from '../pages/GapBorderDemo'
 import StarPixelButtonDemoPage from '../pages/PixelButtonDemo'
+import StarPixelStepButtonDemoPage from '../pages/PixelStepButtonDemo'
 
 export const router = createBrowserRouter(
   [
@@ -42,6 +43,7 @@ export const router = createBrowserRouter(
         { path: 'components/tab', element: <StarTabDemoPage /> },
         { path: 'components/gap-border', element: <StarGapBorderDemoPage /> },
         { path: 'components/pixel-button', element: <StarPixelButtonDemoPage /> },
+        { path: 'components/pixel-step-button', element: <StarPixelStepButtonDemoPage /> },
       ],
     },
     {

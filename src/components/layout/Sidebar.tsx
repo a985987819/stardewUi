@@ -38,7 +38,8 @@ const menuItems: MenuItem[] = [
       { path: '/components/message', labelZh: '消息', labelEn: 'Message' },
       { path: '/components/empty-state', labelZh: '空状态', labelEn: 'EmptyState' },
       { path: '/components/tab', labelZh: '选项卡', labelEn: 'Tab' },
-      { path: '/components/step-btn', labelZh: '阶梯按钮', labelEn: 'StepBtn' },
+      { path: '/components/gap-border', labelZh: '缺口边框', labelEn: 'Gap Border' },
+      { path: '/components/pixel-step-button', labelZh: '阶梯断角按钮', labelEn: 'PixelStepButton' },
     ],
   },
 ]

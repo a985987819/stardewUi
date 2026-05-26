@@ -1,23 +1,14 @@
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import {
-  createStepButtonPalette,
-  type StepButtonPalette,
-} from '../../utils/stepButtonTheme'
-import styles from './StarStepBtn.module.scss'
+import styles from './PixelStepButton.module.scss'
 
-export type StepBtnTheme = 'spring' | 'summer' | 'autumn' | 'winter'
-
-export interface StarStepBtnProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children?: ReactNode
+export interface PixelStepButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode
   color?: string
-  theme?: StepBtnTheme
   size?: 'small' | 'medium' | 'large'
   steps?: number
   loading?: boolean
   block?: boolean
-  icon?: ReactNode
-  disabled?: boolean
 }
 
 type CornerName = 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'
@@ -119,60 +110,42 @@ function createSurfaceClipPath(
 }
 
 const SIZE_CONFIG = {
-  small: { stepSize: 5, borderThickness: 3, cornerGap: 2, fontSize: 13, minH: 30, px: 12, py: 4 },
-  medium: { stepSize: 6, borderThickness: 4, cornerGap: 2, fontSize: 15, minH: 38, px: 18, py: 6 },
-  large: { stepSize: 7, borderThickness: 5, cornerGap: 3, fontSize: 17, minH: 46, px: 24, py: 8 },
+  small: { stepSize: 6, borderThickness: 4, cornerGap: 2, fontSize: 13, minH: 32, px: 14, py: 5 },
+  medium: { stepSize: 8, borderThickness: 5, cornerGap: 3, fontSize: 15, minH: 40, px: 20, py: 7 },
+  large: { stepSize: 10, borderThickness: 6, cornerGap: 4, fontSize: 17, minH: 48, px: 26, py: 9 },
 } as const
 
-function computeMinHeight(level: number, cfg: typeof SIZE_CONFIG.medium): number {
-  const stepCount = getCornerStepCount(level)
-  const cutInset = cfg.cornerGap + stepCount * cfg.stepSize
-  const needed = (cutInset + cfg.borderThickness) * 2
-  return Math.max(cfg.minH, needed)
-}
-
-function StarStepBtn({
+function PixelStepButton({
   children,
   color,
-  theme,
   size = 'medium',
   steps = 1,
   loading = false,
   block = false,
-  icon,
   disabled,
   className,
   style,
   ...rest
-}: StarStepBtnProps) {
+}: PixelStepButtonProps) {
   const isDisabled = disabled || loading
-  const hasIcon = icon !== undefined && icon !== null
-  const level = Math.max(1, Math.round(steps))
   const cfg = SIZE_CONFIG[size]
+  const level = Math.max(1, Math.round(steps))
   const stepCount = getCornerStepCount(level)
-  const dynamicMinH = computeMinHeight(level, cfg)
   const cornerSteps = createCornerSteps(level, cfg.stepSize, cfg.cornerGap)
   const surfaceClipPath = createSurfaceClipPath(level, cfg.stepSize, cfg.cornerGap)
   const horizontalInset = cfg.cornerGap + stepCount * cfg.stepSize
 
-  const palette: StepButtonPalette = createStepButtonPalette(color, theme)
-
   const buttonStyle = {
     ...style,
-    '--sb-fill': palette.fill,
-    '--sb-fill-hover': palette.fillHover,
-    '--sb-fill-active': palette.fillActive,
-    '--sb-border': palette.border,
-    '--sb-text': palette.text,
-    '--sb-text-shadow': palette.textShadow,
-    '--sb-border-thickness': `${cfg.borderThickness}px`,
-    '--sb-h-inset': `${horizontalInset}px`,
-    '--sb-v-inset': `${horizontalInset}px`,
-    '--sb-surface-clip': surfaceClipPath,
-    '--sb-font-size': `${cfg.fontSize}px`,
-    '--sb-min-h': `${dynamicMinH}px`,
-    '--sb-px': `${cfg.px}px`,
-    '--sb-py': `${cfg.py}px`,
+    '--ps-btn-color': color ?? '#7a5c3a',
+    '--ps-btn-border-thickness': `${cfg.borderThickness}px`,
+    '--ps-btn-horizontal-inset': `${horizontalInset}px`,
+    '--ps-btn-vertical-inset': `${horizontalInset}px`,
+    '--ps-btn-surface-clip': surfaceClipPath,
+    '--ps-btn-font-size': `${cfg.fontSize}px`,
+    '--ps-btn-min-h': `${cfg.minH}px`,
+    '--ps-btn-px': `${cfg.px}px`,
+    '--ps-btn-py': `${cfg.py}px`,
   } as CSSProperties
 
   return (
@@ -181,40 +154,37 @@ function StarStepBtn({
       disabled={isDisabled}
       aria-busy={loading || undefined}
       className={classNames(
-        styles['sb'],
-        isDisabled && styles['sb--disabled'],
-        loading && styles['sb--loading'],
-        block && styles['sb--block'],
-        hasIcon && styles['sb--icon'],
+        styles['ps-btn'],
+        isDisabled && styles['ps-btn--disabled'],
+        loading && styles['ps-btn--loading'],
+        block && styles['ps-btn--block'],
         className
       )}
       style={buttonStyle}
       {...rest}
     >
-      <span className={styles['sb__edge']} data-edge="top" aria-hidden />
-      <span className={styles['sb__edge']} data-edge="right" aria-hidden />
-      <span className={styles['sb__edge']} data-edge="bottom" aria-hidden />
-      <span className={styles['sb__edge']} data-edge="left" aria-hidden />
+      <span className={styles['ps-btn__edge']} data-edge="top" aria-hidden />
+      <span className={styles['ps-btn__edge']} data-edge="right" aria-hidden />
+      <span className={styles['ps-btn__edge']} data-edge="bottom" aria-hidden />
+      <span className={styles['ps-btn__edge']} data-edge="left" aria-hidden />
       {cornerSteps.map(({ key, style: stepStyle }) => (
-        <span key={key} className={styles['sb__step']} style={stepStyle} aria-hidden />
+        <span key={key} className={styles['ps-btn__step']} style={stepStyle} aria-hidden />
       ))}
-      <span className={styles['sb__surface']} aria-hidden />
-      <span className={styles['sb__content']}>
+      <span className={styles['ps-btn__surface']} aria-hidden />
+      <span className={styles['ps-btn__highlight']} aria-hidden />
+      <span className={styles['ps-btn__content']}>
         {loading ? (
-          <span className={styles['sb__spinner']} aria-hidden>
-            <span className={styles['sb__spinner-dot']} />
-            <span className={styles['sb__spinner-dot']} />
-            <span className={styles['sb__spinner-dot']} />
+          <span className={styles['ps-btn__spinner']} aria-hidden>
+            <span className={styles['ps-btn__spinner-dot']} />
+            <span className={styles['ps-btn__spinner-dot']} />
+            <span className={styles['ps-btn__spinner-dot']} />
           </span>
         ) : null}
-        {hasIcon ? <span className={styles['sb__icon']} aria-hidden>{icon}</span> : null}
-        {children !== undefined && children !== null ? (
-          <span className={styles['sb__label']}>{children}</span>
-        ) : null}
+        <span className={styles['ps-btn__label']}>{children}</span>
       </span>
     </button>
   )
 }
 
-export { StarStepBtn }
-export default StarStepBtn
+export { PixelStepButton }
+export default PixelStepButton

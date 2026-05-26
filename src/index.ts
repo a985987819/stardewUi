@@ -37,7 +37,3 @@ export {
 export {
   resolveAssetPath,
 } from './utils/githubPages'
-export {
-  createStepButtonPalette,
-  type StepButtonPalette,
-} from './utils/stepButtonTheme'
