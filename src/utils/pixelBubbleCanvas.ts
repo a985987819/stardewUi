@@ -213,7 +213,7 @@ export const flipBubblePlacement = (placement: BubblePlacement = 'none'): Bubble
     left: 'right',
   }
 
-  const oppositeSide = oppositeSideMap[side!]
+  const oppositeSide = side ? oppositeSideMap[side] : 'bottom'
   return align === 'center' ? oppositeSide : `${oppositeSide}-${align}`
 }
 

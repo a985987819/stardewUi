@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { classNames } from '../../utils/classNames'
 import StarCard from './Card'
@@ -73,6 +73,10 @@ function renderMessages() {
 }
 
 function getContainer() {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
   if (!messageContainer) {
     messageContainer = document.createElement('div')
     messageContainer.id = 'star-message-root'
@@ -87,7 +91,10 @@ export function message(props: MessageProps | string, options?: MessageOptions |
   const resolvedOptions = typeof options === 'number' ? { duration: options } : options
   const config: MessageProps = typeof props === 'string' ? { content: props, ...resolvedOptions } : { ...props, ...resolvedOptions }
   const id = `message-${++messageId}`
-  getContainer()
+  const root = getContainer()
+  if (!root) {
+    return { close: () => {} }
+  }
   messages.set(id, { ...config, id })
   renderMessages()
   return { close: () => { messages.delete(id); renderMessages() } }

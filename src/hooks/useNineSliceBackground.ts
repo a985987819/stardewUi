@@ -28,6 +28,10 @@ export type NineSliceBackgroundOptions = {
 const imageCache = new Map<string, Promise<LoadedImage>>()
 
 const loadImage = (src: string) => {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('Cannot load images in non-browser environment'))
+  }
+
   const resolvedSrc = resolveAssetPath(src)
   const cached = imageCache.get(resolvedSrc)
   if (cached) {

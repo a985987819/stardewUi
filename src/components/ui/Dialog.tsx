@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
@@ -171,7 +171,11 @@ function StarDialog({
 
   if (!open) return null
 
-  const portalTarget = document.querySelector('[data-star-app="true"]') ?? document.body
+  const portalTarget = typeof document !== 'undefined'
+    ? (document.querySelector('[data-star-app="true"]') ?? document.body)
+    : null
+
+  if (!portalTarget) return null
   const dialogLabel = typeof title === 'string' ? title : undefined
 
   return createPortal(
