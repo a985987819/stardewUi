@@ -39,12 +39,11 @@
   }
 
   &-code {
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 3px solid rgba(157, 65, 0, 0.22);
+    @apply mt-5 flex justify-center;
   }
 
   &-code-block {
+    width: min(100%, 960px);
     border: none;
     box-shadow: none;
   }

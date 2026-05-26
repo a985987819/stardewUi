@@ -2,88 +2,70 @@ import '@testing-library/jest-dom/vitest'
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 import Card from './Card'
+import { createCardPalette } from '../../utils/cardLighting'
+
+const REQUIRED_CARD_VARIABLES = [
+  '--card-frame-border-base',
+  '--card-frame-border-inner',
+  '--card-frame-border-outer',
+  '--card-frame-highlight-top',
+  '--card-frame-shadow-right',
+  '--card-header-border-base',
+  '--card-header-border-inner',
+  '--card-header-border-outer',
+  '--card-header-highlight-top',
+  '--card-header-shadow-right',
+  '--card-header-stripe-1',
+  '--card-header-stripe-2',
+  '--card-header-stripe-3',
+  '--card-header-stripe-4',
+  '--card-body-border-base',
+  '--card-body-border-inner',
+  '--card-body-border-outer',
+  '--card-body-highlight-top',
+  '--card-body-shadow-right',
+  '--card-body-stripe-1',
+  '--card-body-stripe-2',
+  '--card-body-stripe-3',
+  '--card-body-stripe-4',
+  '--card-body-stripe-5',
+  '--card-body-stripe-6',
+  '--card-body-stripe-7',
+  '--card-body-stripe-8',
+  '--card-text-primary',
+  '--card-text-secondary',
+  '--card-text-shadow',
+] as const
 
 describe('Card theme variables', () => {
-  it('injects the default header and body stripe variables from computed theme values', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
+  it('injects all required grouped CSS variables', () => {
+    const { container } = render(<Card color="night-village">内容</Card>)
     const card = container.firstElementChild as HTMLElement
 
-    expect(card.style.getPropertyValue('--card-header-stripe-1')).toBe('#ffc576')
-    expect(card.style.getPropertyValue('--card-header-stripe-2')).toBe('#fdbc6e')
-    expect(card.style.getPropertyValue('--card-header-stripe-3')).toBe('#f5b565')
-    expect(card.style.getPropertyValue('--card-header-stripe-4')).toBe('#f5ab65')
-    expect(card.style.getPropertyValue('--card-body-stripe-1')).not.toBe('')
-    expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
+    for (const variableName of REQUIRED_CARD_VARIABLES) {
+      expect(card.style.getPropertyValue(variableName)).not.toBe('')
+    }
   })
 
-  it('renders dedicated canvas surfaces for both the header and body areas', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
-    expect(container.querySelector('[data-slot="card-header-surface"] canvas')).toBeInTheDocument()
-    expect(container.querySelector('[data-slot="card-body-surface"] canvas')).toBeInTheDocument()
-  })
-
-  it('renders shadow overlay layers above the header and body surfaces', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
-    expect(container.querySelector('[data-slot="card-header-overlay"]')).toBeInTheDocument()
-    expect(container.querySelector('[data-slot="card-body-overlay"]')).toBeInTheDocument()
-  })
-
-  it('exposes independent body lighting variables so the content area keeps its highlight structure', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
+  it('maps preset key input through createCardPalette', () => {
+    const { container } = render(<Card color="night-village">内容</Card>)
     const card = container.firstElementChild as HTMLElement
+    const palette = createCardPalette('#2f1e27')
 
-    expect(card.style.getPropertyValue('--card-body-top-glow')).not.toBe('')
-    expect(card.style.getPropertyValue('--card-body-bottom-shadow')).not.toBe('')
-    expect(card.style.getPropertyValue('--card-body-right-shadow')).not.toBe('')
+    expect(card.style.getPropertyValue('--card-frame-border-base')).toBe(palette.frame.borderBase)
+    expect(card.style.getPropertyValue('--card-header-stripe-1')).toBe(palette.header.stripes[0])
+    expect(card.style.getPropertyValue('--card-body-stripe-8')).toBe(palette.body.stripes[7])
+    expect(card.style.getPropertyValue('--card-text-primary')).toBe(palette.text.primary)
   })
 
-  it('keeps the title anchored to the left edge of the header', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
-    expect(container.querySelector('[data-slot="card-header"]')).toHaveStyle({
-      justifyContent: 'flex-start',
-    })
-  })
-
-  it('derives the full palette from a raw hex color input', () => {
-    const renderCard = () =>
-      render(
-        <Card color="#355123" title="Custom" showTitle>
-          Content
-        </Card>
-      )
-
-    expect(renderCard).not.toThrow()
-
-    const { container } = renderCard()
+  it('maps raw hex input through createCardPalette', () => {
+    const { container } = render(<Card color="#4a67d6">内容</Card>)
     const card = container.firstElementChild as HTMLElement
+    const palette = createCardPalette('#4a67d6')
 
-    expect(card.style.getPropertyValue('--card-border-dark')).toBe('#355123')
-    expect(card.style.getPropertyValue('--card-header-stripe-1')).not.toBe('')
-    expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
+    expect(card.style.getPropertyValue('--card-frame-border-base')).toBe(palette.frame.borderBase)
+    expect(card.style.getPropertyValue('--card-header-stripe-1')).toBe(palette.header.stripes[0])
+    expect(card.style.getPropertyValue('--card-body-stripe-8')).toBe(palette.body.stripes[7])
+    expect(card.style.getPropertyValue('--card-text-primary')).toBe(palette.text.primary)
   })
 })

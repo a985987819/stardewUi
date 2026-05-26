@@ -77,7 +77,8 @@ export const useNineSliceBackground = ({
   const hostRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const imageRef = useRef<LoadedImage | null>(null)
-  const [isReady, setIsReady] = useState(false)
+  const resolvedSrc = useMemo(() => resolveAssetPath(src), [src])
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
 
   const setHostRef = useCallback((node: HTMLElement | null) => {
     hostRef.current = node
@@ -154,14 +155,12 @@ export const useNineSliceBackground = ({
 
   useEffect(() => {
     if (!enabled) {
-      setIsReady(false)
       imageRef.current = null
       return
     }
 
     let cancelled = false
 
-    setIsReady(false)
     imageRef.current = null
 
     loadImage(src)
@@ -170,18 +169,20 @@ export const useNineSliceBackground = ({
           return
         }
         imageRef.current = loaded
-        setIsReady(true)
+        setLoadedSrc(resolvedSrc)
       })
       .catch(() => {
         if (!cancelled) {
-          setIsReady(false)
+          setLoadedSrc((current) => (current === resolvedSrc ? null : current))
         }
       })
 
     return () => {
       cancelled = true
     }
-  }, [enabled, src])
+  }, [enabled, resolvedSrc, src])
+
+  const isReady = enabled && loadedSrc === resolvedSrc
 
   useEffect(() => {
     if (!isReady) {
