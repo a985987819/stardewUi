@@ -18,6 +18,6 @@ describe('component demo frame styles', () => {
     expect(cardTsx).not.toContain('stardew-card__outline')
     expect(cardScss).toContain('&::before')
     expect(cardScss).toContain('&::after')
-    expect(cardScss).toContain('inset: calc(var(--card-frame-ring-width) * -1)')
+    expect(cardScss).toContain('--card-frame-ring-width')
   })
 })

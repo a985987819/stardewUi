@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useCallback, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { classNames } from '../../utils/classNames'
@@ -10,7 +11,7 @@ export type MessagePosition = 'top' | 'bottom-left' | 'bottom-right'
 
 export interface MessageOptions { position?: MessagePosition; bottom?: MessageBottom; duration?: number }
 export interface MessageProps { content: string; type?: MessageType; position?: MessagePosition; bottom?: MessageBottom; duration?: number; onClose?: () => void }
-interface MessageRecord extends MessageProps { id: string }
+export interface MessageRecord extends MessageProps { id: string }
 
 const placements: MessagePosition[] = ['top', 'bottom-left', 'bottom-right']
 const iconMap: Record<MessageType, string> = { normal: '💬', info: '📌', success: '✅', warning: '⚠️', error: '❌' }

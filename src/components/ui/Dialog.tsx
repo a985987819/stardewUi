@@ -60,6 +60,7 @@ function StarDialog({
   const isFirstPage = currentPage === 0
   const isLastPage = currentPage >= totalPages - 1
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (open) {
       setCurrentPage(0)
@@ -77,6 +78,7 @@ function StarDialog({
       setTitleComplete(true)
     }
   }, [currentPage, isFirstPage, typewriter])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!open) return

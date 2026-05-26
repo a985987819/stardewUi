@@ -152,6 +152,7 @@ export const useNineSliceBackground = ({
     })
   }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!enabled) {
       setIsReady(false)
@@ -182,6 +183,7 @@ export const useNineSliceBackground = ({
       cancelled = true
     }
   }, [enabled, src])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!isReady) {

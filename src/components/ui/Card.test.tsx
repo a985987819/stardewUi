@@ -12,10 +12,10 @@ describe('Card', () => {
     expect(screen.getByText('底部内容')).toBeInTheDocument()
   })
 
-  it('does not render canvas elements', () => {
+  it('renders canvas surface elements', () => {
     const { container } = render(<Card>内容</Card>)
 
-    expect(container.querySelector('canvas')).not.toBeInTheDocument()
+    expect(container.querySelector('canvas')).toBeInTheDocument()
   })
 
   it('applies clickable and hoverable classes based on interaction props', () => {
