@@ -12,8 +12,8 @@ describe('Card', () => {
     expect(screen.getByText('底部内容')).toBeInTheDocument()
   })
 
-  it('renders canvas surface elements', () => {
-    const { container } = render(<Card>内容</Card>)
+  it('renders header canvas surface when title is shown', () => {
+    const { container } = render(<Card showTitle title="标题">内容</Card>)
 
     expect(container.querySelector('canvas')).toBeInTheDocument()
   })

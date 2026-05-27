@@ -92,9 +92,9 @@ describe('StarBtn', () => {
     expect(parseFloat(inset2)).toBeGreaterThan(parseFloat(inset1))
   })
 
-  it('allows steps up to 3 for icon buttons', () => {
+  it('clamps icon buttons to max 2 steps', () => {
     const { container } = render(<StarBtn steps={3} icon={<span />}>S3</StarBtn>)
     const steps = container.querySelectorAll(`.${styles['star-btn__step']}`)
-    expect(steps).toHaveLength(20)
+    expect(steps).toHaveLength(12)
   })
 })

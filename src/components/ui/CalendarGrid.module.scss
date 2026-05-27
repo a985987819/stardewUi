@@ -71,7 +71,7 @@
   width: 100%;
   height: 100%;
   min-height: auto;
-  padding: 2px;
+  padding: 3px;
   border: none;
   background: transparent;
   color: inherit;
@@ -87,10 +87,10 @@
   display: inline-flex;
   justify-content: flex-start;
   align-items: flex-start;
-  width: calc(100% / 9);
-  height: calc(100% / 9);
+  width: calc(100% / 7);
+  height: calc(100% / 7);
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   line-height: 1;
 }
 
@@ -100,8 +100,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: calc(100% / 9 * 3);
-  gap: 1px;
+  flex: 1;
+  gap: 2px;
 }
 
 .calendar-grid__cell--outside-month .calendar-grid__button {
@@ -111,6 +111,11 @@
 
 .calendar-grid__cell--today .calendar-grid__button {
   background: rgba(255, 243, 205, 0.5);
+}
+
+.calendar-grid__cell--selected .calendar-grid__button {
+  background: #f4c46a;
+  color: #4e342e;
 }
 
 .calendar-grid__cell--disabled .calendar-grid__button,

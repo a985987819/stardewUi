@@ -73,11 +73,10 @@ const SIZE_CONFIG = {
   large: { stepSize: 10, borderThickness: 6, cornerGap: 4, fontSize: 17, minH: 48, px: 26, py: 9 },
 } as const
 
-function clampSteps(requestedSteps: number, size: StarBtnSize, hasIcon: boolean): number {
+function clampSteps(requestedSteps: number, size: StarBtnSize): number {
   const cfg = SIZE_CONFIG[size]
-  const maxSteps = hasIcon ? 3 : 2
-  const minDim = hasIcon ? cfg.minH * 1.5 : cfg.minH
-  const maxBySize = Math.floor(minDim / (cfg.stepSize * 2))
+  const maxSteps = 2
+  const maxBySize = Math.floor(cfg.minH / (cfg.stepSize * 2))
   return Math.max(1, Math.min(requestedSteps, maxSteps, maxBySize))
 }
 
@@ -97,7 +96,7 @@ function StarBtn({
 }: StarBtnProps) {
   const isDisabled = disabled || loading
   const hasIcon = icon !== undefined && icon !== null
-  const level = clampSteps(stepsProp, size, hasIcon)
+  const level = clampSteps(stepsProp, size)
   const cfg = SIZE_CONFIG[size]
   const stepCount = getCornerStepCount(level)
   const cornerSteps = createCornerSteps(level, cfg.stepSize, cfg.cornerGap)
@@ -122,7 +121,7 @@ function StarBtn({
     '--btn-horizontal-inset': `${horizontalInset}px`,
     '--btn-vertical-inset': `${horizontalInset}px`,
     '--btn-font-size': `${cfg.fontSize}px`,
-    '--btn-min-h': hasIcon ? `${Math.round(cfg.minH * 1.5)}px` : `${cfg.minH}px`,
+    '--btn-min-h': `${cfg.minH}px`,
     '--btn-px': `${cfg.px}px`,
     '--btn-py': `${cfg.py}px`,
   } as CSSProperties

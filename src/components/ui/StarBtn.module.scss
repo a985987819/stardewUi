@@ -47,8 +47,7 @@
 
   &--icon {
     .star-btn__content {
-      flex-direction: column;
-      text-align: center;
+      gap: 6px;
     }
   }
 
@@ -165,7 +164,10 @@
 
 .star-btn__fill {
   position: absolute;
-  inset: var(--btn-border-thickness);
+  top: var(--btn-vertical-inset);
+  right: var(--btn-horizontal-inset);
+  bottom: var(--btn-vertical-inset);
+  left: var(--btn-horizontal-inset);
   z-index: 1;
   min-width: 0;
   min-height: 0;
@@ -176,7 +178,10 @@
 
 .star-btn__highlight {
   position: absolute;
-  inset: var(--btn-border-thickness);
+  top: var(--btn-vertical-inset);
+  right: var(--btn-horizontal-inset);
+  bottom: var(--btn-vertical-inset);
+  left: var(--btn-horizontal-inset);
   z-index: 2;
   min-width: 0;
   min-height: 0;

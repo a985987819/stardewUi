@@ -4,6 +4,9 @@ import {
   buildCalendarCells,
   getMonthStartTimestamp,
   groupCalendarItemsByDay,
+  isDayInRange,
+  isSameDay,
+  normalizeToDayTimestamp,
   type CalendarCell,
   type CalendarInput,
 } from '../../utils/calendar'
@@ -23,10 +26,20 @@ export interface CalendarItem {
   meta?: ReactNode
 }
 
+export interface CalendarRangeValue {
+  startTimestamp: number | null
+  endTimestamp: number | null
+}
+
 export interface StarCalendarProps {
   value?: number
   defaultValue?: number
   onMonthChange?: (monthTimestamp: number) => void
+  selectedDate?: number
+  onSelectDate?: (dayTimestamp: number) => void
+  selectedRange?: CalendarRangeValue
+  onSelectRange?: (range: CalendarRangeValue) => void
+  isDisabled?: (dayTimestamp: number) => boolean
   items?: CalendarItem[]
   maxVisibleMarkers?: number
   iconMap?: Record<string, ReactNode | string>
@@ -95,6 +108,11 @@ function Calendar({
   value,
   defaultValue,
   onMonthChange,
+  selectedDate,
+  onSelectDate,
+  selectedRange,
+  onSelectRange,
+  isDisabled,
   items = [],
   maxVisibleMarkers = DEFAULT_MAX_VISIBLE_MARKERS,
   iconMap,
@@ -110,6 +128,7 @@ function Calendar({
   const cells = useMemo(() => buildCalendarCells(monthTimestamp), [monthTimestamp])
   const itemsByDay = useMemo(() => groupCalendarItemsByDay(items), [items])
   const visibleDayTimestamps = useMemo(() => new Set(cells.map((cell) => cell.dateTimestamp)), [cells])
+  const normalizedSelectedDate = selectedDate !== undefined ? normalizeToDayTimestamp(selectedDate) : null
   const resolvedActiveDayTimestamp =
     activeDayTimestamp !== null && visibleDayTimestamps.has(activeDayTimestamp)
       ? activeDayTimestamp
@@ -187,19 +206,66 @@ function Calendar({
         monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
-        onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}
+        isDisabled={isDisabled}
+        onSelectDay={(dayTimestamp) => {
+          setActiveDayTimestamp(dayTimestamp)
+          onSelectDate?.(dayTimestamp)
+          if (onSelectRange && selectedRange) {
+            const { startTimestamp, endTimestamp } = selectedRange
+            if (startTimestamp === null || endTimestamp !== null) {
+              onSelectRange({ startTimestamp: normalizeToDayTimestamp(dayTimestamp), endTimestamp: null })
+            } else {
+              const normalized = normalizeToDayTimestamp(dayTimestamp)
+              const [sortedStart, sortedEnd] = normalized < startTimestamp
+                ? [normalized, startTimestamp]
+                : [startTimestamp, normalized]
+              onSelectRange({ startTimestamp: sortedStart, endTimestamp: sortedEnd })
+            }
+          }
+        }}
         renderCellContent={renderCellContent}
-        getCellButtonProps={(cell) => ({
-          'aria-label': formatDayLabel(cell.dateTimestamp),
-          onMouseEnter: (e: React.MouseEvent) => {
-            setActiveDayTimestamp(cell.dateTimestamp)
-            handleMouseMove(e)
-          },
-          onMouseMove: handleMouseMove,
-          onMouseLeave: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
-          onFocus: () => setActiveDayTimestamp(cell.dateTimestamp),
-          onBlur: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
-        })}
+        getCellStateClassName={(cell) => {
+          if (normalizedSelectedDate !== null && isSameDay(cell.dateTimestamp, normalizedSelectedDate)) {
+            return styles['calendar__cell--selected']
+          }
+          if (selectedRange) {
+            const { startTimestamp, endTimestamp } = selectedRange
+            const isRangeStart = startTimestamp !== null && isSameDay(cell.dateTimestamp, startTimestamp)
+            const isRangeEnd = endTimestamp !== null && isSameDay(cell.dateTimestamp, endTimestamp)
+            const inRange = startTimestamp !== null && isDayInRange(cell.dateTimestamp, startTimestamp, endTimestamp ?? startTimestamp)
+            return classNames(
+              isRangeStart && styles['calendar__cell--range-start'],
+              isRangeEnd && styles['calendar__cell--range-end'],
+              inRange && styles['calendar__cell--in-range'],
+            )
+          }
+          return undefined
+        }}
+        getCellButtonProps={(cell) => {
+          const isSelected = normalizedSelectedDate !== null && isSameDay(cell.dateTimestamp, normalizedSelectedDate)
+          let rangePosition: string | undefined
+          let inRange = false
+          if (selectedRange) {
+            const { startTimestamp, endTimestamp } = selectedRange
+            if (startTimestamp !== null && isSameDay(cell.dateTimestamp, startTimestamp)) rangePosition = 'start'
+            else if (endTimestamp !== null && isSameDay(cell.dateTimestamp, endTimestamp)) rangePosition = 'end'
+            inRange = startTimestamp !== null && isDayInRange(cell.dateTimestamp, startTimestamp, endTimestamp ?? startTimestamp)
+          }
+          return {
+            'aria-label': formatDayLabel(cell.dateTimestamp),
+            'data-selected': isSelected || rangePosition ? 'true' : undefined,
+            'data-range-position': rangePosition,
+            'data-in-range': inRange ? 'true' : undefined,
+            onMouseEnter: (e: React.MouseEvent) => {
+              setActiveDayTimestamp(cell.dateTimestamp)
+              handleMouseMove(e)
+            },
+            onMouseMove: handleMouseMove,
+            onMouseLeave: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
+            onFocus: () => setActiveDayTimestamp(cell.dateTimestamp),
+            onBlur: () => setActiveDayTimestamp((current) => (current === cell.dateTimestamp ? null : current)),
+          }
+        }}
       />
 
       {activeItems.length > 0 ? (

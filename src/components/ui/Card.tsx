@@ -226,7 +226,7 @@ function StarCard({
   return (
     <div {...rest} className={cardClass} onClick={onClick} style={cardStyle}>
       {hasTitle ? (
-        <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
+        <div data-slot="card-header" className={styles['stardew-card__header']}>
           <CardSurfaceCanvas stripes={palette.header.stripes} slot="card-header-surface" />
           <span
             data-slot="card-header-overlay"
@@ -241,7 +241,6 @@ function StarCard({
         </div>
       ) : null}
       <div className={styles['stardew-card__body']}>
-        <CardSurfaceCanvas stripes={palette.body.stripes} slot="card-body-surface" />
         <span
           data-slot="card-body-overlay"
           aria-hidden
