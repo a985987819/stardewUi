@@ -1,0 +1,36 @@
+.gap-border-corners {
+  --gap-border-color: #5f4322;
+  --gap-border-background: #f7efc5;
+  --gap-border-thickness: 8px;
+  --gap-border-horizontal-inset: 8px;
+  --gap-border-vertical-inset: 8px;
+  --gap-border-surface-clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  &__step {
+    position: absolute;
+    z-index: 3;
+    display: block;
+    width: var(--gap-border-thickness);
+    height: var(--gap-border-thickness);
+    background: var(--gap-border-color);
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  &__surface {
+    position: absolute;
+    inset: var(--gap-border-thickness);
+    z-index: 1;
+    min-width: 0;
+    min-height: 0;
+    background: var(--gap-border-background);
+    clip-path: var(--gap-border-surface-clip-path);
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.28);
+    pointer-events: none;
+  }
+}
