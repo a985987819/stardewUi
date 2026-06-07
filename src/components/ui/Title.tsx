@@ -155,6 +155,7 @@ const StarTitle = forwardRef<HTMLDivElement, StarTitleProps>(
     const hostRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const imageRef = useRef<LoadedImage | null>(null)
+    const rafRef = useRef<number | null>(null)
     const HeadingTag = as
     const layout = useMemo(() => getTitleLayout(children, size), [children, size])
 
@@ -233,22 +234,29 @@ const StarTitle = forwardRef<HTMLDivElement, StarTitleProps>(
       }
     }, [draw])
 
+    const scheduleDraw = useCallback(() => {
+      if (rafRef.current !== null) return
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null
+        draw()
+      })
+    }, [draw])
+
     useEffect(() => {
       const host = hostRef.current
       if (!host) return
 
-      const resizeObserver = new ResizeObserver(() => {
-        draw()
-      })
-
+      const resizeObserver = new ResizeObserver(scheduleDraw)
       resizeObserver.observe(host)
-      window.addEventListener('resize', draw)
 
       return () => {
         resizeObserver.disconnect()
-        window.removeEventListener('resize', draw)
+        if (rafRef.current !== null) {
+          cancelAnimationFrame(rafRef.current)
+          rafRef.current = null
+        }
       }
-    }, [draw])
+    }, [scheduleDraw])
 
     const titleText = useMemo(() => normalizeLines(children).join('\n'), [children])
     const titleStyle = {

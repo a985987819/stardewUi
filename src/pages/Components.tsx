@@ -11,10 +11,8 @@ import {
   MessageSquare,
   MessageSquareMore,
   MousePointer,
-  ScanLine,
   Square,
   Type,
-  Joystick,
 } from 'lucide-react'
 import StarCard from '../components/ui/Card'
 import { useI18n, type Lang } from '../i18n'
@@ -135,24 +133,6 @@ const components: ComponentInfo[] = [
       en: 'Switch content by season, location, or quest type like flipping through a farm manual.',
     },
     icon: <LayoutList size={20} />,
-  },
-  {
-    path: '/components/gap-border',
-    title: { zh: '缺口边框', en: 'Gap Border' },
-    desc: {
-      zh: '四边分开绘制并在四角留白，形成故意断开的像素边框。',
-      en: 'Separate edge segments leave corner gaps for an intentionally broken pixel border.',
-    },
-    icon: <ScanLine size={20} />,
-  },
-  {
-    path: '/components/pixel-button',
-    title: { zh: '像素按钮', en: 'PixelButton' },
-    desc: {
-      zh: '锯齿边框的复古像素按钮，支持自定义配色和立体阴影效果。',
-      en: 'Retro pixel button with锯齿边框, supporting custom colors and 3D shadow effects.',
-    },
-    icon: <Joystick size={20} />,
   },
 ]
 

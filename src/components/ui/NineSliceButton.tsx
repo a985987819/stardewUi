@@ -146,6 +146,9 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const defaultCanvasRef = useRef<HTMLCanvasElement | null>(null)
     const seasonalCanvasRef = useRef<HTMLCanvasElement | null>(null)
     const seasonalImageRef = useRef<Awaited<ReturnType<typeof loadSeasonalButtonImage>> | null>(null)
+    const defaultRafRef = useRef<number | null>(null)
+    const seasonalRafRef = useRef<number | null>(null)
+    const dashedRafRef = useRef<number | null>(null)
 
     const seasonalState: SeasonalButtonVisualState = isDisabled
       ? 'disabled'
@@ -290,14 +293,24 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         })
       }
 
+      const scheduleRedraw = () => {
+        if (defaultRafRef.current !== null) return
+        defaultRafRef.current = requestAnimationFrame(() => {
+          defaultRafRef.current = null
+          redraw()
+        })
+      }
+
       redraw()
-      const observer = new ResizeObserver(redraw)
+      const observer = new ResizeObserver(scheduleRedraw)
       observer.observe(canvas)
-      window.addEventListener('resize', redraw)
 
       return () => {
         observer.disconnect()
-        window.removeEventListener('resize', redraw)
+        if (defaultRafRef.current !== null) {
+          cancelAnimationFrame(defaultRafRef.current)
+          defaultRafRef.current = null
+        }
       }
     }, [plainDefaultPalette, usesPlainDefaultBackground])
 
@@ -380,13 +393,21 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       }
 
       redraw()
-      const observer = new ResizeObserver(redraw)
+      const observer = new ResizeObserver(() => {
+        if (seasonalRafRef.current !== null) return
+        seasonalRafRef.current = requestAnimationFrame(() => {
+          seasonalRafRef.current = null
+          redraw()
+        })
+      })
       observer.observe(canvas)
-      window.addEventListener('resize', redraw)
 
       return () => {
         observer.disconnect()
-        window.removeEventListener('resize', redraw)
+        if (seasonalRafRef.current !== null) {
+          cancelAnimationFrame(seasonalRafRef.current)
+          seasonalRafRef.current = null
+        }
       }
     }, [seasonalImageVersion, seasonalState, theme, usesSeasonalBackground])
 
@@ -428,13 +449,21 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       }
 
       redraw()
-      const observer = new ResizeObserver(redraw)
+      const observer = new ResizeObserver(() => {
+        if (dashedRafRef.current !== null) return
+        dashedRafRef.current = requestAnimationFrame(() => {
+          dashedRafRef.current = null
+          redraw()
+        })
+      })
       observer.observe(canvas)
-      window.addEventListener('resize', redraw)
 
       return () => {
         observer.disconnect()
-        window.removeEventListener('resize', redraw)
+        if (dashedRafRef.current !== null) {
+          cancelAnimationFrame(dashedRafRef.current)
+          dashedRafRef.current = null
+        }
       }
     }, [dashedVariant])
 

@@ -200,16 +200,6 @@ function DialogSession({
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
   const showActions = isLastPage && finalActions.length > 0
-  const hasSidebar = Boolean(image || name)
-
-  if (!open) return null
-
-  const portalTarget = typeof document !== 'undefined'
-    ? (document.querySelector('[data-star-app="true"]') ?? document.body)
-    : null
-
-  if (!portalTarget) return null
-  const dialogLabel = typeof title === 'string' ? title : undefined
 
   return (
     <div
