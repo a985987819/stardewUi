@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { StarCard } from '../ui/Card'
 import StarCodeBlock from './CodeBlock'
 import { useI18n } from '../../i18n'
 import styles from './ComponentDemo.module.scss'
@@ -26,12 +25,11 @@ function StarComponentDemo({
   const { t } = useI18n()
 
   return (
-    <StarCard
+    <div
       id={id}
       className={code ? `${styles['component-demo']} ${styles['has-code']}` : styles['component-demo']}
-      showTitle
-      title={title}
     >
+      <div className={styles['component-demo-title']}>{title}</div>
       {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
       <div className={styles['component-demo-preview']}>{children}</div>
       {code ? (
@@ -47,7 +45,7 @@ function StarComponentDemo({
           <StarCodeBlock code={code} language="tsx" className={styles['component-demo-code-block']} />
         </div>
       ) : null}
-    </StarCard>
+    </div>
   )
 }
 

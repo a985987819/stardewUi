@@ -1,4 +1,4 @@
-import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import { createCardPalette } from '../../utils/cardLighting'
 import styles from './Card.module.scss'
@@ -70,90 +70,6 @@ function isPresetCardColor(color?: CardThemeColor): color is CardColor {
   return Boolean(color && color in CARD_EDGE_COLORS)
 }
 
-interface CardSurfaceCanvasProps {
-  stripes: readonly string[]
-  slot: 'card-header-surface' | 'card-body-surface'
-}
-
-function CardSurfaceCanvas({ stripes, slot }: CardSurfaceCanvasProps) {
-  const hostRef = useRef<HTMLSpanElement | null>(null)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-
-  const draw = useCallback(() => {
-    const host = hostRef.current
-    const canvas = canvasRef.current
-
-    if (!host || !canvas) {
-      return
-    }
-
-    const width = Math.round(host.clientWidth)
-    const height = Math.round(host.clientHeight)
-
-    if (width <= 0 || height <= 0) {
-      return
-    }
-
-    const dpr = window.devicePixelRatio || 1
-    const targetWidth = Math.max(1, Math.round(width * dpr))
-    const targetHeight = Math.max(1, Math.round(height * dpr))
-
-    if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-      canvas.width = targetWidth
-      canvas.height = targetHeight
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-    }
-
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return
-    }
-
-    drawCardSurfaceStripes(ctx, {
-      width: targetWidth,
-      height: targetHeight,
-      stripes,
-    })
-  }, [stripes])
-
-  useEffect(() => {
-    draw()
-  }, [draw])
-
-  useEffect(() => {
-    const host = hostRef.current
-    if (!host) {
-      return
-    }
-
-    if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', draw)
-      return () => {
-        window.removeEventListener('resize', draw)
-      }
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      draw()
-    })
-
-    resizeObserver.observe(host)
-    window.addEventListener('resize', draw)
-
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener('resize', draw)
-    }
-  }, [draw])
-
-  return (
-    <span ref={hostRef} data-slot={slot} className={styles['stardew-card__surface']} aria-hidden>
-      <canvas ref={canvasRef} className={styles['stardew-card__surface-canvas']} />
-    </span>
-  )
-}
-
 function StarCard({
   title,
   children,
@@ -171,6 +87,40 @@ function StarCard({
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
   const baseColor = isPresetCardColor(color) ? CARD_EDGE_COLORS[color] : color ?? DEFAULT_CARD_EDGE_COLOR
+  const palette = useMemo(() => createCardPalette(baseColor), [baseColor])
+
+  const cardCssVars = useMemo((): CardCssVariables => ({
+    '--card-frame-border-base': palette.frame.borderBase,
+    '--card-frame-border-inner': palette.frame.borderInner,
+    '--card-frame-border-outer': palette.frame.borderOuter,
+    '--card-frame-highlight-top': palette.frame.highlightTop,
+    '--card-frame-shadow-right': palette.frame.shadowRight,
+    '--card-header-border-base': palette.header.borderBase,
+    '--card-header-border-inner': palette.header.borderInner,
+    '--card-header-border-outer': palette.header.borderOuter,
+    '--card-header-highlight-top': palette.header.highlightTop,
+    '--card-header-shadow-right': palette.header.shadowRight,
+    '--card-header-stripe-1': palette.header.stripes[0],
+    '--card-header-stripe-2': palette.header.stripes[1],
+    '--card-header-stripe-3': palette.header.stripes[2],
+    '--card-header-stripe-4': palette.header.stripes[3],
+    '--card-body-border-base': palette.body.borderBase,
+    '--card-body-border-inner': palette.body.borderInner,
+    '--card-body-border-outer': palette.body.borderOuter,
+    '--card-body-highlight-top': palette.body.highlightTop,
+    '--card-body-shadow-right': palette.body.shadowRight,
+    '--card-body-stripe-1': palette.body.stripes[0],
+    '--card-body-stripe-2': palette.body.stripes[1],
+    '--card-body-stripe-3': palette.body.stripes[2],
+    '--card-body-stripe-4': palette.body.stripes[3],
+    '--card-body-stripe-5': palette.body.stripes[4],
+    '--card-body-stripe-6': palette.body.stripes[5],
+    '--card-body-stripe-7': palette.body.stripes[6],
+    '--card-body-stripe-8': palette.body.stripes[7],
+    '--card-text-primary': palette.text.primary,
+    '--card-text-secondary': palette.text.secondary,
+    '--card-text-shadow': palette.text.shadow,
+  }), [palette])
 
   const cardClass = classNames(
     styles['stardew-card'],
@@ -183,15 +133,17 @@ function StarCard({
   )
 
   const cardStyle: CSSProperties = {
-    ...toCardCssVariables(baseColor),
+    ...cardCssVars,
     ...style,
   }
 
   return (
     <div {...rest} className={cardClass} onClick={onClick} style={cardStyle}>
       {hasTitle ? (
-        <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
-          <CardSurfaceCanvas stripes={palette.headerStripes} slot="card-header-surface" />
+        <div
+          data-slot="card-header"
+          className={styles['stardew-card__header']}
+        >
           <span
             data-slot="card-header-overlay"
             aria-hidden
@@ -202,10 +154,9 @@ function StarCard({
           />
           <h3 className={styles['stardew-card__title']}>{title}</h3>
           {headerExtra ? <div className={styles['stardew-card__extra']}>{headerExtra}</div> : null}
-        </header>
+        </div>
       ) : null}
       <div className={styles['stardew-card__body']}>
-        <CardSurfaceCanvas stripes={palette.bodyStripes} slot="card-body-surface" />
         <span
           data-slot="card-body-overlay"
           aria-hidden
@@ -215,7 +166,7 @@ function StarCard({
           }}
         />
         <div className={styles['stardew-card__body-content']}>{children}</div>
-      </section>
+      </div>
       {footer ? <footer className={styles['stardew-card__footer']}>{footer}</footer> : null}
     </div>
   )

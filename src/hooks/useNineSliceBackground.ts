@@ -77,6 +77,7 @@ export const useNineSliceBackground = ({
   const hostRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const imageRef = useRef<LoadedImage | null>(null)
+  const rafRef = useRef<number | null>(null)
   const resolvedSrc = useMemo(() => resolveAssetPath(src), [src])
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
 
@@ -153,6 +154,16 @@ export const useNineSliceBackground = ({
     })
   }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
 
+  const scheduleDraw = useCallback(() => {
+    if (rafRef.current !== null) {
+      return
+    }
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      draw()
+    })
+  }, [draw])
+
   useEffect(() => {
     if (!enabled) {
       imageRef.current = null
@@ -201,23 +212,17 @@ export const useNineSliceBackground = ({
       return
     }
 
-    const resizeObserver = new ResizeObserver(() => {
-      draw()
-    })
-
+    const resizeObserver = new ResizeObserver(scheduleDraw)
     resizeObserver.observe(host)
-
-    const handleWindowResize = () => {
-      draw()
-    }
-
-    window.addEventListener('resize', handleWindowResize)
 
     return () => {
       resizeObserver.disconnect()
-      window.removeEventListener('resize', handleWindowResize)
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
     }
-  }, [autoRedraw, draw])
+  }, [autoRedraw, scheduleDraw])
 
   const canvasProps = useMemo(
     () => ({
