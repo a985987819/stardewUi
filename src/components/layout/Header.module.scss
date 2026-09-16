@@ -1,7 +1,22 @@
+@use "../../styles/PixelFrame.module.scss" as gap;
+
 .doc-header {
   @apply fixed top-0 left-0 right-0 h-[60px] z-[100];
-  background: var(--color-bg-secondary);
-  border-bottom: 4px solid var(--color-border-dark);
+  // The panel background lives on a pseudo layer rather than the header itself:
+  // `clip-path` clips every descendant, and the mobile nav is a fixed-position
+  // child of this element, so clipping the header would eat the open menu.
+  background: transparent;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    // Gap frame: fill + the broken border, clipped so the corner breaks stay open.
+    @include gap.gap-frame-fill(var(--color-bg-secondary), var(--color-border-dark), gap.$doc-frame-width);
+    clip-path: var(--doc-gap-clip);
+    pointer-events: none;
+  }
 
   &-container {
     @apply max-w-[1400px] mx-auto h-full flex items-center justify-between px-6;

@@ -1,9 +1,16 @@
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import { createCardPalette } from '../../utils/cardLighting'
+import { CARD_DEFAULT_THEME_COLOR, createCardPalette } from '../../utils/cardLighting'
+import { createGapFrameClipPath } from '../../utils/pixelCorners'
 import styles from './Card.module.scss'
 
-const DEFAULT_CARD_EDGE_COLOR = '#fa9305'
+/**
+ * Thickness of the card's outer gap frame. Must stay in sync with the
+ * `$card-frame-width` token in `Card.module.scss` — the CSS draws the edges and
+ * corner blocks, this number generates the clip that cuts the matching corner
+ * gap out of the fill layer.
+ */
+const CARD_FRAME_WIDTH = 6
 
 const CARD_EDGE_COLORS = {
   'night-village': '#2f1e27',
@@ -53,19 +60,34 @@ function StarCard({
   ...rest
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
-  const baseColor = isPresetCardColor(color) ? CARD_EDGE_COLORS[color] : color ?? DEFAULT_CARD_EDGE_COLOR
+  const baseColor = isPresetCardColor(color) ? CARD_EDGE_COLORS[color] : color ?? CARD_DEFAULT_THEME_COLOR
   const palette = createCardPalette(baseColor)
+  // Continuous gap-border corner (`cornerLevel = 1`): the fill is clipped to
+  // the ring's inner edge, and the frame's 2× thickness corner blocks close the
+  // ring on top — no corner is ever left open to the page.
+  const gapClipPath = createGapFrameClipPath(CARD_FRAME_WIDTH)
   const cardStyle = {
     ...style,
     '--card-bg': palette.background,
     '--card-bg-light': palette.backgroundLight,
     '--card-bg-dark': palette.backgroundDark,
+    '--card-border': palette.border,
     '--card-border-dark': palette.borderDark,
     '--card-border-light': palette.borderLight,
     '--card-inner-border': palette.innerBorder,
+    '--card-border-highlight': palette.borderHighlight,
+    '--card-border-inner-shadow': palette.borderInnerShadow,
+    '--card-border-outer-glow': palette.borderOuterGlow,
+    '--card-outer-shadow': palette.outerShadow,
+    '--card-outer-shadow-hover': palette.outerShadowHover,
+    '--card-outer-shadow-active': palette.outerShadowActive,
+    '--card-inner-glow': palette.innerGlow,
+    '--card-gap-clip': gapClipPath,
     '--card-text': palette.text,
     '--card-text-secondary': palette.textSecondary,
     '--card-section-bg': palette.sectionBackground,
+    // Legacy aliases, kept so inline styles written against the old variable
+    // names keep working.
     '--card-top-highlight': palette.topHighlight,
     '--card-right-edge-shadow': palette.rightEdgeShadow,
     '--card-divider-shadow': palette.dividerShadow,
@@ -105,6 +127,14 @@ function StarCard({
 
   return (
     <div {...rest} className={cardClass} style={cardStyle} onClick={onClick}>
+      {/* Decorative layers, all absolutely positioned so they never take part in
+          the card's layout (`consumer` classes like `display: flex` on the card
+          root must keep reaching the real children).
+          - `__plate` = the fill, clipped so each corner loses the gap square
+          - `__frame` = the inner light line, deliberately square
+          - `__border` = the gap frame (edges + corner blocks), stacked above the
+            content so anything running into the frame is covered, not drawn over */}
+      <span className={styles['stardew-card__plate']} aria-hidden />
       <span className={styles['stardew-card__frame']} aria-hidden />
       {hasTitle ? (
         <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
@@ -126,6 +156,7 @@ function StarCard({
         <div className={styles['stardew-card__body-content']}>{children}</div>
       </div>
       {footer ? <div className={styles['stardew-card__footer']}>{footer}</div> : null}
+      <span className={styles['stardew-card__border']} aria-hidden />
     </div>
   )
 }

@@ -1,17 +1,50 @@
-$shadow-color: rgba(0, 0, 0, 0.3);
-$inner-glow: rgba(255, 255, 255, 0.18);
+@use "../../styles/PixelFrame.module.scss" as gap;
+
+// 卡片外框是「连续缺口边框」(`StarGapBorder` 的 cornerLevel = 1)：每条边两端收进
+// 1 倍边框厚度，角上补一个 2 倍厚度的方块把环封死，四角不透出页面背景。
+// 厚度 6px，必须与 TS 里的 `CARD_FRAME_WIDTH` 一致（`Card.tsx` 用它生成
+// `--card-gap-clip`）。
+$card-frame-width: 6px;
+// 内部这圈亮线不参与缺口造型，保持直角。
+$card-line-width: 4px;
+// 外圈装饰光环离卡片的距离，与 `Card.tsx` 的 halo 用同一套厚度 4px。
+$card-halo-gap: 10px;
+$card-halo-width: 4px;
 
 .stardew-card {
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
   overflow: visible;
-  background: var(--card-bg);
-  border: 6px solid var(--card-border-dark);
-  border-radius: 8px;
+  // 透明边框只为几何：它让 padding box（`__plate` / `__frame` 的定位基准）
+  // 和 `::after` 光环的位置与历史上完全一致。
+  border: $card-frame-width solid transparent;
+  background: transparent;
   transition:
     transform 0.1s steps(2),
     box-shadow 0.1s steps(2);
+
+  // 填色层。铺满整张卡片，四角被 `--card-gap-clip` 切掉缺口；被边框压住的
+  // 部分不可见，所以可视范围正好是缺口边框的内侧。
+  &__plate {
+    position: absolute;
+    inset: calc(-1 * #{$card-frame-width});
+    box-sizing: border-box;
+    background: var(--card-bg);
+    clip-path: var(--card-gap-clip);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // 外框的边 + 角块。单独一层放在内容之上，这样内容万一顶到框上会被压住。
+  // 放在 `__plate` 里会让 clip 把角块一起裁掉，所以必须是独立元素。
+  &__border {
+    position: absolute;
+    inset: calc(-1 * #{$card-frame-width});
+    @include gap.gap-frame-only(var(--card-border-dark), $card-frame-width);
+    pointer-events: none;
+    z-index: 3;
+  }
 
   &__frame,
   &__outline {
@@ -20,41 +53,42 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     z-index: 0;
   }
 
+  // 内部亮线：直角，不做阶梯 / 缺口造型。角上的方形部分会被 `__border`
+  // 的角块盖住（角块 6px 刚好覆盖这 4px 亮线的直角）。
   &__frame {
     inset: 0px;
-    border: 4px solid var(--card-border-light);
-    border-radius: 2px;
+    box-sizing: border-box;
+    background: transparent;
+    border: $card-line-width solid var(--card-border-light);
+    border-radius: 0;
     box-shadow:
-      inset -4px 0 0 var(--card-right-edge-shadow),
-      inset 0 2px 0 var(--card-top-highlight);
+      inset -#{$card-line-width} 0 0 var(--card-border-outer-glow),
+      inset 0 2px 0 var(--card-border-highlight);
   }
 
+  // 外圈装饰光环，同样是缺口边框（但只画框、不填色，所以不需要 clip）。
   &::after {
     content: "";
     position: absolute;
-    inset: -10px;
-    border: 4px solid var(--card-border-light);
-    border-radius: 12px;
+    inset: calc(-1 * #{$card-halo-gap});
+    @include gap.gap-frame-only(var(--card-border-light), $card-halo-width);
     pointer-events: none;
     z-index: 0;
   }
 
   &--default,
   &--elevated {
-    box-shadow:
-      0 6px 8px $shadow-color,
-      inset 0 1px 0 $inner-glow;
+    box-shadow: 0 6px 8px var(--card-outer-shadow);
   }
 
   &--outlined {
-    box-shadow: inset 0 1px 0 $inner-glow;
+    box-shadow: none;
   }
 
   &--elevated {
     box-shadow:
-      0 10px 14px rgba(0, 0, 0, 0.28),
-      0 4px 0 rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 $inner-glow;
+      0 10px 14px var(--card-outer-shadow),
+      0 4px 0 var(--card-outer-shadow-active);
   }
 
   &--small {
@@ -71,9 +105,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
   &--hoverable:hover {
     transform: translate(-2px, -2px);
-    box-shadow:
-      0 12px 18px rgba(0, 0, 0, 0.26),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 18px var(--card-outer-shadow-hover);
   }
 
   &--clickable {
@@ -81,9 +113,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
     &:active {
       transform: translate(2px, 2px);
-      box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 6px var(--card-outer-shadow-active);
     }
   }
 
@@ -105,7 +135,7 @@ $inner-glow: rgba(255, 255, 255, 0.18);
       linear-gradient(
         90deg,
         transparent calc(100% - 24px),
-        var(--card-right-edge-shadow) 4
+        var(--card-border-outer-glow) 4
       ),
       linear-gradient(
         180deg,
@@ -119,8 +149,8 @@ $inner-glow: rgba(255, 255, 255, 0.18);
         var(--card-header-stripe-4) 100%
       );
     box-shadow:
-      inset 0 2px 0 var(--card-top-highlight),
-      inset 0 -3px 0 var(--card-divider-shadow);
+      inset 0 2px 0 var(--card-border-highlight),
+      inset 0 -3px 0 var(--card-border-inner-shadow);
 
     > * {
       padding: 12px 8px;
@@ -161,9 +191,9 @@ $inner-glow: rgba(255, 255, 255, 0.18);
       z-index: 2;
       pointer-events: none;
       box-shadow:
-        inset 0 4px 0 var(--card-top-highlight),
-        inset 0px 0 0 var(--card-right-edge-shadow),
-        inset 0 6px 0 var(--card-divider-shadow);
+        inset 0 4px 0 var(--card-border-highlight),
+        inset 0px 0 0 var(--card-border-outer-glow),
+        inset 0 6px 0 var(--card-border-inner-shadow);
     }
   }
 

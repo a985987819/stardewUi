@@ -14,48 +14,23 @@
 }
 
 .calendar__markers {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1px;
-  margin-top: 1px;
-  width: 100%;
+  @include common.calendar-marker-row;
 }
 
 .calendar__marker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 8px;
-  min-height: 8px;
-  border-radius: 1px;
-  background: #f4c46a;
-  color: #4e342e;
-  overflow: hidden;
-  font-size: 7px;
+  @include common.calendar-marker;
 }
 
 .calendar__marker-image {
-  display: block;
-  width: 8px;
-  height: 8px;
-  object-fit: cover;
-  image-rendering: pixelated;
+  @include common.calendar-marker-image;
 }
 
 .calendar__marker-dot {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 1px;
-  background: currentColor;
+  @include common.calendar-marker-dot;
 }
 
 .calendar__marker-summary {
-  font-size: 7px;
-  font-weight: 700;
-  color: #6d4c41;
+  @include common.calendar-marker-summary;
 }
 
 .calendar__details {

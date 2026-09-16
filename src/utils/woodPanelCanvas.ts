@@ -4,11 +4,16 @@ import {
   type BubblePlacement,
   type BubbleSide,
 } from './pixelBubbleCanvas'
+import {
+  buildGapFrameInnerRects,
+  buildGapFrameRects,
+  type PixelPoint,
+  type PixelRect,
+} from './pixelCorners'
 import { WOOD_PANEL_THEME, type WoodPanelTheme } from './woodPanelTheme'
 
-type Point = { x: number; y: number }
+type Point = PixelPoint
 type Rect = { x: number; y: number; width: number; height: number }
-type Corner = 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left'
 
 export interface DrawWoodPanelOptions {
   width: number
@@ -19,15 +24,9 @@ export interface DrawWoodPanelOptions {
   borderWidth?: number
   /** Thickness of the inner bevel ring, in device pixels. */
   frameWidth?: number
-  /** Staircase segments per corner. 3 gives the "三级阶梯" corner. */
-  cornerSteps?: number
-  /** Preferred size of one staircase segment, in device pixels. */
-  stepSize?: number
   arrowWidth?: number
   arrowDepth?: number
 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   if (!points.length) {
@@ -44,43 +43,36 @@ const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   ctx.closePath()
 }
 
-/**
- * Staircase that climbs from the left edge up to the top edge, clockwise.
- * The first point sits on the left edge, the last one on the top edge.
- */
-const buildCornerStair = (steps: number, step: number): Point[] => {
-  const span = steps * step
-  const points: Point[] = []
-
-  for (let index = 0; index < steps; index += 1) {
-    points.push({ x: index * step, y: span - index * step })
-    points.push({ x: (index + 1) * step, y: span - index * step })
+const fillPolygon = (ctx: CanvasRenderingContext2D, points: Point[], color: string) => {
+  if (!points.length) {
+    return
   }
 
-  points.push({ x: span, y: 0 })
-
-  return points
+  tracePolygon(ctx, points)
+  ctx.fillStyle = color
+  ctx.fill()
 }
 
-/**
- * Places a local staircase at one corner while keeping the polygon clockwise,
- * so the four corners can simply be concatenated in order.
- */
-const mapStairToCorner = (stair: Point[], corner: Corner, rect: Rect): Point[] => {
-  const right = rect.x + rect.width
-  const bottom = rect.y + rect.height
-
-  switch (corner) {
-    case 'top-left':
-      return stair.map(({ x, y }) => ({ x: rect.x + x, y: rect.y + y }))
-    case 'top-right':
-      return [...stair].reverse().map(({ x, y }) => ({ x: right - x, y: rect.y + y }))
-    case 'bottom-right':
-      return stair.map(({ x, y }) => ({ x: right - x, y: bottom - y }))
-    default:
-      return [...stair].reverse().map(({ x, y }) => ({ x: rect.x + x, y: bottom - y }))
+const fillRect = (ctx: CanvasRenderingContext2D, rect: PixelRect, color: string) => {
+  if (rect.width <= 0 || rect.height <= 0) {
+    return
   }
+
+  ctx.fillStyle = color
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height)
 }
+
+const translate = (points: Point[], dx: number, dy: number): Point[] =>
+  points.map(({ x, y }) => ({ x: x + dx, y: y + dy }))
+
+const translateRects = (rects: PixelRect[], dx: number, dy: number): PixelRect[] =>
+  rects.map((rect) => ({ ...rect, x: rect.x + dx, y: rect.y + dy }))
+
+const insetPolygon = (points: Point[], inset: number, width: number, height: number): Point[] =>
+  points.map(({ x, y }) => ({
+    x: Math.min(width, Math.max(0, x < width / 2 ? x + inset : x - inset)),
+    y: Math.min(height, Math.max(0, y < height / 2 ? y + inset : y - inset)),
+  }))
 
 const getArrowCenter = (rect: Rect, side: BubbleSide, align: BubbleAlign, arrowWidth: number, span: number) => {
   const safeInset = span + arrowWidth / 2 + 2
@@ -91,7 +83,7 @@ const getArrowCenter = (rect: Rect, side: BubbleSide, align: BubbleAlign, arrowW
 
     if (align === 'start') return Math.min(min, max)
     if (align === 'end') return Math.max(min, max)
-    return rect.x + rect.width / 2
+    return (min + max) / 2
   }
 
   const min = rect.y + safeInset
@@ -99,42 +91,41 @@ const getArrowCenter = (rect: Rect, side: BubbleSide, align: BubbleAlign, arrowW
 
   if (align === 'start') return Math.min(min, max)
   if (align === 'end') return Math.max(min, max)
-  return rect.y + rect.height / 2
+  return (min + max) / 2
 }
 
-/**
- * Pixel arrow pointing away from the panel. Traversed in the same direction the
- * owning edge is walked, so the points can be spliced straight into the outline.
- */
+/** The five-point triangle that pokes out of one side of the panel. */
 const buildArrowPoints = (side: BubbleSide, rect: Rect, center: number, half: number, depth: number): Point[] => {
+  const left = rect.x
   const right = rect.x + rect.width
+  const top = rect.y
   const bottom = rect.y + rect.height
-  const shoulder = Math.max(1, Math.round(half / 2))
+  const shoulder = half * 0.55
 
   switch (side) {
     case 'top':
       return [
-        { x: center - half, y: rect.y },
-        { x: center - shoulder, y: rect.y - depth / 2 },
-        { x: center, y: rect.y - depth },
-        { x: center + shoulder, y: rect.y - depth / 2 },
-        { x: center + half, y: rect.y },
+        { x: center - half, y: top },
+        { x: center - shoulder, y: top - depth / 2 },
+        { x: center, y: top - depth },
+        { x: center + shoulder, y: top - depth / 2 },
+        { x: center + half, y: top },
       ]
     case 'bottom':
       return [
-        { x: center + half, y: bottom },
-        { x: center + shoulder, y: bottom + depth / 2 },
-        { x: center, y: bottom + depth },
-        { x: center - shoulder, y: bottom + depth / 2 },
         { x: center - half, y: bottom },
+        { x: center - shoulder, y: bottom + depth / 2 },
+        { x: center, y: bottom + depth },
+        { x: center + shoulder, y: bottom + depth / 2 },
+        { x: center + half, y: bottom },
       ]
     case 'left':
       return [
-        { x: rect.x, y: center + half },
-        { x: rect.x - depth / 2, y: center + shoulder },
-        { x: rect.x - depth, y: center },
-        { x: rect.x - depth / 2, y: center - shoulder },
-        { x: rect.x, y: center - half },
+        { x: left, y: center - half },
+        { x: left - depth / 2, y: center - shoulder },
+        { x: left - depth, y: center },
+        { x: left - depth / 2, y: center + shoulder },
+        { x: left, y: center + half },
       ]
     default:
       return [
@@ -147,158 +138,53 @@ const buildArrowPoints = (side: BubbleSide, rect: Rect, center: number, half: nu
   }
 }
 
-/**
- * Caps the corner staircase so opposite corners never overlap and the arrow
- * always has a straight edge to sit on.
- */
-const resolveCornerSpan = (
-  rect: Rect,
-  side: BubbleSide | null,
-  steps: number,
-  preferredStep: number,
-  arrowWidth: number
-) => {
-  const minSide = Math.min(rect.width, rect.height)
-  const edgeLength = side === 'top' || side === 'bottom' ? rect.width : rect.height
-
-  let limit = Math.floor(minSide / 3)
-
-  if (side) {
-    limit = Math.min(limit, Math.floor((edgeLength - arrowWidth - 6) / 2))
-  }
-
-  const wanted = steps * preferredStep
-
-  return Math.max(steps, Math.min(wanted, Math.max(steps, limit)))
-}
-
-const buildPanelPolygon = (
-  rect: Rect,
-  side: BubbleSide | null,
-  align: BubbleAlign,
-  steps: number,
-  step: number,
-  arrowWidth: number,
-  arrowDepth: number
-): Point[] => {
-  const stair = buildCornerStair(steps, step)
-  const span = steps * step
-  const right = rect.x + rect.width
-  const bottom = rect.y + rect.height
-
-  const hasArrow = Boolean(side) && arrowDepth > 0 && arrowWidth > 0
-  const edgeLength = side === 'top' || side === 'bottom' ? rect.width : rect.height
-  const canHostArrow = hasArrow && edgeLength - span * 2 >= arrowWidth + 2
-
-  const points: Point[] = []
-
-  points.push(...mapStairToCorner(stair, 'top-left', rect))
-
-  if (side === 'top' && canHostArrow) {
-    const center = getArrowCenter(rect, side, align, arrowWidth, span)
-    const start = clamp(center - arrowWidth / 2, rect.x + span, right - span)
-    const end = clamp(center + arrowWidth / 2, rect.x + span, right - span)
-    points.push(...buildArrowPoints(side, rect, (start + end) / 2, (end - start) / 2, arrowDepth))
-  }
-
-  points.push(...mapStairToCorner(stair, 'top-right', rect))
-
-  if (side === 'right' && canHostArrow) {
-    const center = getArrowCenter(rect, side, align, arrowWidth, span)
-    const start = clamp(center - arrowWidth / 2, rect.y + span, bottom - span)
-    const end = clamp(center + arrowWidth / 2, rect.y + span, bottom - span)
-    points.push(...buildArrowPoints(side, rect, (start + end) / 2, (end - start) / 2, arrowDepth))
-  }
-
-  points.push(...mapStairToCorner(stair, 'bottom-right', rect))
-
-  if (side === 'bottom' && canHostArrow) {
-    const center = getArrowCenter(rect, side, align, arrowWidth, span)
-    const start = clamp(center - arrowWidth / 2, rect.x + span, right - span)
-    const end = clamp(center + arrowWidth / 2, rect.x + span, right - span)
-    points.push(...buildArrowPoints(side, rect, (start + end) / 2, (end - start) / 2, arrowDepth))
-  }
-
-  points.push(...mapStairToCorner(stair, 'bottom-left', rect))
-
-  if (side === 'left' && canHostArrow) {
-    const center = getArrowCenter(rect, side, align, arrowWidth, span)
-    const start = clamp(center - arrowWidth / 2, rect.y + span, bottom - span)
-    const end = clamp(center + arrowWidth / 2, rect.y + span, bottom - span)
-    points.push(...buildArrowPoints(side, rect, (start + end) / 2, (end - start) / 2, arrowDepth))
-  }
-
-  return points
+interface WoodPanelGeometry {
+  /** The panel body, excluding the arrow's protrusion. */
+  bodyRect: Rect
+  /** Border thickness — also the corner gap and the block size. */
+  thickness: number
+  /** Outer (dark) band of the frame. */
+  borderWidth: number
+  /** Inner (lit) band of the frame. */
+  frameWidth: number
+  /** The four shortened edges and the four corner blocks. */
+  frameRects: PixelRect[]
+  /** The inner band of every edge and block. */
+  bevelRects: PixelRect[]
+  /** The surface stencil, in canvas coordinates. */
+  surfacePoints: Point[]
+  arrowPoints: Point[]
+  side: BubbleSide | null
+  width: number
+  height: number
+  theme: WoodPanelTheme
 }
 
 /**
- * CSS `clip-path` matching the surface rectangle of the drawn panel.
+ * Resolves the gap-border geometry of the panel.
  *
- * The canvas paints the frame, but the popup's header/body/footer are DOM
- * elements with their own backgrounds. Without this clip they would square off
- * the staircase corners the canvas just carved. Generated from the same
- * geometry as `buildCornerStair` so the two never drift apart.
+ * House style (`StarGapBorder`, `cornerLevel = 1`): with a frame thickness `t`,
+ * every edge stops `2t` short of each corner, a `t x t` block bridges the break
+ * at `(t, t)`, and the `2t x 2t` corner square is left open. The surface loses a
+ * matching `t` step per corner. Here `t` is the whole frame
+ * (`borderWidth + frameWidth`), so the bevel band ends up inside the edges.
  */
-export const getWoodPanelSurfaceClipPath = (cornerSteps: number, stepSize: number): string => {
-  const steps = Math.max(1, Math.round(cornerSteps))
-  const step = Math.max(1, stepSize)
-  const stair = buildCornerStair(steps, step)
-  const points: string[] = []
-
-  const at = (value: number) => `${value}px`
-  const fromEnd = (value: number) => `calc(100% - ${value}px)`
-
-  // Walked clockwise, corner by corner, to mirror the canvas polygon exactly.
-  for (const { x, y } of stair) {
-    points.push(`${at(x)} ${at(y)}`)
-  }
-
-  for (let index = stair.length - 1; index >= 0; index -= 1) {
-    points.push(`${fromEnd(stair[index].x)} ${at(stair[index].y)}`)
-  }
-
-  for (const { x, y } of stair) {
-    points.push(`${fromEnd(x)} ${fromEnd(y)}`)
-  }
-
-  for (let index = stair.length - 1; index >= 0; index -= 1) {
-    points.push(`${at(stair[index].x)} ${fromEnd(stair[index].y)}`)
-  }
-
-  return `polygon(${points.join(', ')})`
-}
-
-const insetPolygon = (points: Point[], inset: number, width: number, height: number): Point[] =>
-  points.map(({ x, y }) => ({
-    x: Math.min(width, Math.max(0, x < width / 2 ? x + inset : x - inset)),
-    y: Math.min(height, Math.max(0, y < height / 2 ? y + inset : y - inset)),
-  }))
-
-const fillPolygon = (ctx: CanvasRenderingContext2D, points: Point[], color: string) => {
-  tracePolygon(ctx, points)
-  ctx.fillStyle = color
-  ctx.fill()
-}
-
-export const drawWoodPanel = (ctx: CanvasRenderingContext2D, options: DrawWoodPanelOptions) => {
-  const {
-    width,
-    height,
-    placement = 'none',
-    theme = WOOD_PANEL_THEME,
-    borderWidth = 6,
-    frameWidth = 4,
-    cornerSteps = 3,
-    stepSize = 6,
-    arrowWidth = 26,
-    arrowDepth = 12,
-  } = options
-
+const resolveWoodPanelGeometry = ({
+  width,
+  height,
+  placement = 'none',
+  theme = WOOD_PANEL_THEME,
+  borderWidth = 6,
+  frameWidth = 4,
+  arrowWidth = 26,
+  arrowDepth = 12,
+}: DrawWoodPanelOptions): WoodPanelGeometry | null => {
   if (width <= 0 || height <= 0) {
-    return
+    return null
   }
 
   const { side, align } = resolveBubblePlacement(placement)
+  const thickness = borderWidth + frameWidth
 
   // The arrow lives in the panel's own box, exactly like `drawPixelBubble`, so
   // the body rect shrinks by the arrow depth on whichever side carries it.
@@ -309,61 +195,156 @@ export const drawWoodPanel = (ctx: CanvasRenderingContext2D, options: DrawWoodPa
     height: height - (side === 'top' || side === 'bottom' ? arrowDepth : 0),
   }
 
-  const span = resolveCornerSpan(bodyRect, side, cornerSteps, stepSize, arrowWidth)
-  const step = span / cornerSteps
-  const outer = buildPanelPolygon(bodyRect, side, align, cornerSteps, step, arrowWidth, arrowDepth)
+  if (bodyRect.width <= 0 || bodyRect.height <= 0) {
+    return null
+  }
 
-  if (outer.length === 0) {
+  const frameRects = translateRects(buildGapFrameRects(bodyRect.width, bodyRect.height, thickness), bodyRect.x, bodyRect.y)
+  const bevelRects = translateRects(
+    buildGapFrameInnerRects(bodyRect.width, bodyRect.height, thickness, frameWidth),
+    bodyRect.x,
+    bodyRect.y
+  )
+  // The surface runs edge to edge underneath the frame; the frame (and the
+  // corner blocks on it) paint over everything that reaches into the ring.
+  const surfaceWidth = Math.max(0, bodyRect.width - thickness * 2)
+  const surfaceHeight = Math.max(0, bodyRect.height - thickness * 2)
+  const surfacePoints = translate(
+    [
+      { x: 0, y: 0 },
+      { x: surfaceWidth, y: 0 },
+      { x: surfaceWidth, y: surfaceHeight },
+      { x: 0, y: surfaceHeight },
+    ],
+    bodyRect.x + thickness,
+    bodyRect.y + thickness
+  )
+
+  const arrowPoints: Point[] = []
+  const edgeLength = side === 'top' || side === 'bottom' ? bodyRect.width : bodyRect.height
+  const span = thickness * 2
+  const canHostArrow = Boolean(side) && arrowDepth > 0 && arrowWidth > 0 && edgeLength - span * 2 >= arrowWidth + 2
+
+  if (side && canHostArrow) {
+    const center = getArrowCenter(bodyRect, side, align, arrowWidth, span)
+    arrowPoints.push(...buildArrowPoints(side, bodyRect, center, arrowWidth / 2, arrowDepth))
+  }
+
+  return {
+    bodyRect,
+    thickness,
+    borderWidth,
+    frameWidth,
+    frameRects,
+    bevelRects,
+    surfacePoints,
+    arrowPoints,
+    side,
+    width,
+    height,
+    theme,
+  }
+}
+
+/**
+ * Draws the panel: gap frame, surface and grain.
+ *
+ * This is the *back* layer. `drawWoodPanelFrame` re-draws the frame on top of the
+ * content, because DOM children with their own backgrounds would otherwise poke
+ * out of the corner breaks.
+ */
+export const drawWoodPanel = (ctx: CanvasRenderingContext2D, options: DrawWoodPanelOptions) => {
+  const geometry = resolveWoodPanelGeometry(options)
+  if (!geometry) {
     return
   }
 
-  const inset = borderWidth + frameWidth
-  const innerRect: Rect = {
-    x: bodyRect.x + inset,
-    y: bodyRect.y + inset,
-    width: Math.max(0, bodyRect.width - inset * 2),
-    height: Math.max(0, bodyRect.height - inset * 2),
-  }
-
-  const hairline = Math.max(1, Math.round(borderWidth / 3))
+  const { bodyRect, thickness, frameRects, bevelRects, surfacePoints, arrowPoints, width, height, theme } = geometry
 
   ctx.clearRect(0, 0, width, height)
   ctx.imageSmoothingEnabled = false
 
-  fillPolygon(ctx, outer, theme.border)
-  fillPolygon(ctx, insetPolygon(outer, borderWidth, width, height), theme.frame)
-  fillPolygon(ctx, insetPolygon(outer, inset, width, height), theme.surface)
-
-  if (innerRect.width <= 0 || innerRect.height <= 0) {
-    return
-  }
-
+  // Surface + grain, clipped to the stepped surface stencil. Grain bands run
+  // edge to edge inside it, like the card body stripes.
   ctx.save()
-  tracePolygon(ctx, outer)
+  tracePolygon(ctx, surfacePoints)
   ctx.clip()
 
-  const bandHeight = Math.max(hairline, Math.round(innerRect.height / 12))
+  fillRect(ctx, bodyRect, theme.surface)
+
+  const grainTop = bodyRect.y + thickness
+  const grainLeft = bodyRect.x + thickness
+  const grainHeight = Math.max(0, bodyRect.height - thickness * 2)
+  const grainWidth = Math.max(0, bodyRect.width - thickness * 2)
+  const bandHeight = Math.max(1, Math.round(grainHeight / 12))
   let bandIndex = 0
 
-  for (let y = innerRect.y; y < innerRect.y + innerRect.height; y += bandHeight) {
+  for (let y = grainTop; y < grainTop + grainHeight; y += bandHeight) {
     ctx.fillStyle = theme.grain[bandIndex % theme.grain.length]
-    ctx.fillRect(innerRect.x, Math.round(y), innerRect.width, bandHeight)
+    ctx.fillRect(grainLeft, Math.round(y), grainWidth, bandHeight)
     bandIndex += 1
   }
 
-  // Three uneven streaks keep the grain from reading as a regular gradient.
-  ctx.fillStyle = theme.bottomShade
-
-  for (const ratio of [0.24, 0.52, 0.78]) {
-    ctx.fillRect(innerRect.x, Math.round(innerRect.y + innerRect.height * ratio), innerRect.width, hairline)
-  }
-
   ctx.fillStyle = theme.topHighlight
-  ctx.fillRect(innerRect.x, innerRect.y, innerRect.width, hairline)
-  ctx.fillRect(innerRect.x, innerRect.y, hairline, innerRect.height)
-
-  ctx.fillStyle = theme.bottomShade
-  ctx.fillRect(innerRect.x, innerRect.y + innerRect.height - hairline, innerRect.width, hairline)
+  ctx.fillRect(grainLeft, grainTop, grainWidth, Math.max(1, Math.round(thickness / 6)))
 
   ctx.restore()
+
+  // Frame: edges and blocks in the border colour, then their lit inner bands.
+  for (const rect of frameRects) {
+    fillRect(ctx, rect, theme.border)
+  }
+
+  for (const rect of bevelRects) {
+    fillRect(ctx, rect, theme.frame)
+  }
+
+  // Arrow: a border-coloured wedge with the bevel band inset into it, so it
+  // reads as part of the frame rather than a sticker on top of it.
+  if (arrowPoints.length) {
+    fillPolygon(ctx, arrowPoints, theme.border)
+    fillPolygon(
+      ctx,
+      insetPolygon(arrowPoints, geometry.borderWidth, bodyRect.x + bodyRect.width, bodyRect.y + bodyRect.height),
+      theme.frame
+    )
+  }
+}
+
+/**
+ * Draws only the frame — edges, blocks and arrow — leaving the surface
+ * transparent.
+ *
+ * Rendered on a second canvas stacked *above* the DOM content, so the frame owns
+ * the top layer. Content that reaches into the frame (a header whose square
+ * corner runs into a stepped corner, an image, anything a consumer drops in) is
+ * covered by the frame instead of poking out of it.
+ */
+export const drawWoodPanelFrame = (ctx: CanvasRenderingContext2D, options: DrawWoodPanelOptions) => {
+  const geometry = resolveWoodPanelGeometry(options)
+  if (!geometry) {
+    return
+  }
+
+  const { bodyRect, borderWidth, frameRects, bevelRects, arrowPoints, width, height, theme } = geometry
+
+  ctx.clearRect(0, 0, width, height)
+  ctx.imageSmoothingEnabled = false
+
+  for (const rect of frameRects) {
+    fillRect(ctx, rect, theme.border)
+  }
+
+  for (const rect of bevelRects) {
+    fillRect(ctx, rect, theme.frame)
+  }
+
+  if (arrowPoints.length) {
+    fillPolygon(ctx, arrowPoints, theme.border)
+    fillPolygon(
+      ctx,
+      insetPolygon(arrowPoints, borderWidth, bodyRect.x + bodyRect.width, bodyRect.y + bodyRect.height),
+      theme.frame
+    )
+  }
 }

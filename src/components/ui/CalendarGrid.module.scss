@@ -1,3 +1,5 @@
+@use "./CalendarCommon.module.scss" as common;
+
 .calendar-grid {
   display: grid;
   gap: 0;
@@ -6,10 +8,9 @@
 .calendar-grid__grid {
   display: grid;
   gap: 0;
-  border: 2px solid #2c2c2c;
+  border: common.$grid-line;
   border-radius: 2px;
   overflow: hidden;
-  
 }
 
 .calendar-grid__rowgroup {
@@ -19,28 +20,31 @@
 
 .calendar-grid__row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  // `minmax(0, 1fr)` instead of `1fr`: the auto minimum of `1fr` lets a wide
+  // child force the whole grid past its container, which is how the two
+  // calendars ended up at different widths.
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .calendar-grid__weekday {
-  padding: 0;
-  text-align: center;
-  font-weight: 600;
-  border-bottom: 2px solid #2c2c2c;
-  background: transparent;
-  min-width: 0;
-  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(100% / 9 * 6);
+  height: common.$weekday-height;
+  min-width: 0;
+  padding: 0;
+  text-align: center;
+  font-size: common.$weekday-font-size;
+  font-weight: 600;
+  border-bottom: common.$grid-line;
+  background: transparent;
 }
 
 .calendar-grid__cell {
   min-width: 0;
-  aspect-ratio: 1 / 1;
-  border-right: 2px solid #2c2c2c;
-  border-bottom: 2px solid #2c2c2c;
+  height: common.$cell-height;
+  border-right: common.$grid-line;
+  border-bottom: common.$grid-line;
 }
 
 .calendar-grid__cell:nth-child(7n) {
@@ -51,15 +55,21 @@
   border-bottom: none;
 }
 
+/**
+ * Cell body: one row for the date, one row for the status markers. Both live in
+ * px tokens from `CalendarCommon`, so a cell can never end up too small to hold
+ * its own icons.
+ */
 .calendar-grid__button {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  gap: 2px;
   width: 100%;
   height: 100%;
   min-height: auto;
-  padding: 2px;
+  padding: common.$cell-padding;
   border: none;
   background: transparent;
   color: inherit;
@@ -72,28 +82,16 @@
 }
 
 .calendar-grid__day-number {
-  display: inline-flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: calc(100% / 9);
-  height: calc(100% / 9);
-  font-weight: 600;
-  font-size: 1.4rem;
-  line-height: 1;
+  @include common.calendar-day-number;
 }
 
 .calendar-grid__content {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  @include common.calendar-marker-row;
   justify-content: center;
-  width: 100%;
-  height: calc(100% / 9 * 3);
-  gap: 1px;
 }
 
 .calendar-grid__cell--outside-month .calendar-grid__button {
-  opacity: 0.6;
+  opacity: common.$outside-day-opacity;
   background: transparent;
 }
 

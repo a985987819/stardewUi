@@ -21,10 +21,10 @@
   }
 
   /**
-   * Content box of the canvas panel. It lines up with the drawn wood surface,
-   * so the sections below run edge to edge exactly like the card
-   * header/body/footer. The clip keeps their square corners tucked inside the
-   * staircase the canvas carved (see `getWoodPanelSurfaceClipPath`).
+   * Content box of the canvas panel. It lines up with the drawn surface, so the
+   * sections below run edge to edge exactly like the card header/body/footer.
+   * The clip keeps their square corners tucked inside the gap frame the canvas
+   * drew (`createInsetSteppedRectClipPath` in `Popup.tsx`).
    */
   &__surface {
     min-width: 204px;

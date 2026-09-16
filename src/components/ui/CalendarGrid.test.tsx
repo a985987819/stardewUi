@@ -12,7 +12,11 @@ describe('CalendarGrid', () => {
 
     render(<CalendarGrid monthLabel={MAY_2024_LABEL} cells={cells} />)
 
-    expect(screen.getByText(MAY_2024_LABEL)).toBeInTheDocument()
+    // The month label is the grid's accessible name only: the toolbar of both
+    // Calendar and DatePicker already renders it, and duplicating it here was
+    // what made the two components size differently.
+    expect(screen.getByRole('grid', { name: MAY_2024_LABEL })).toBeInTheDocument()
+    expect(screen.queryByText(MAY_2024_LABEL)).toBeNull()
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual(
       WEEKDAY_LABELS,
     )

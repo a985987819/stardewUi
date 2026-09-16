@@ -1,9 +1,47 @@
+/**
+ * The complete light-and-shade story of a card, all derived from one theme
+ * color by walking the HSL wheel:
+ *
+ * | role                | how it is derived                                   | where it lands |
+ * | ------------------- | --------------------------------------------------- | -------------- |
+ * | `border`            | the theme color itself                              | 6px outer frame |
+ * | `borderHighlight`   | hue pulled in, saturation dropped, lightness down   | top/upper bevel |
+ * | `borderInnerShadow` | hue pulled in, saturation kept, lightness down      | lower divider  |
+ * | `borderOuterGlow`   | hue pulled in, saturation halved, lightness up      | right edge gleam |
+ * | `outerShadow`       | theme color crushed dark + desaturated, then alpha  | drop shadow    |
+ * | `innerGlow`         | theme hue lifted to a pale tint, then alpha         | inner top light |
+ *
+ * Light tints and dark shades are always computed from the *same* hue as the
+ * input, so a blue theme produces a cold shadow and a pale blue inner light
+ * instead of a neutral grey one.
+ */
 export interface CardLighting {
-  rightEdgeShadow: string
-  topHighlight: string
-  dividerShadow: string
+  /** 边框：主题色本体，卡片最外层 6px 描边。 */
+  border: string
+  /** 边框高光：受光侧（上沿与内框上边）的提亮色。 */
+  borderHighlight: string
+  /** 边框内阴影：背光侧（下沿与内框下边）的压暗色。 */
+  borderInnerShadow: string
+  /** 边框外高光：右侧受光边缘的亮边。 */
+  borderOuterGlow: string
+  /** 外阴影：卡片投在页面上的投影色（已含 alpha）。 */
+  outerShadow: string
+  /** 外阴影（悬停抬升时使用）。 */
+  outerShadowHover: string
+  /** 外阴影（按下沉时使用）。 */
+  outerShadowActive: string
+  /** 内高光：卡片内部表面的顶部提亮（已含 alpha）。 */
+  innerGlow: string
+  /** 标题文字的像素投影色（已含 alpha）。 */
   titleTextShadow: string
+  /** 顶部标题区木纹的 4 段条纹。 */
   headerStripes: [string, string, string, string]
+  /** @deprecated 旧命名，等价于 `borderOuterGlow`。 */
+  rightEdgeShadow: string
+  /** @deprecated 旧命名，等价于 `borderHighlight`。 */
+  topHighlight: string
+  /** @deprecated 旧命名，等价于 `borderInnerShadow`。 */
+  dividerShadow: string
 }
 
 export interface CardPalette extends CardLighting {
@@ -253,21 +291,71 @@ function generateBodyStripes(baseColor: string): [string, string, string, string
   ) as [string, string, string, string, string, string, string, string]
 }
 
-export function getCardLighting(edgeColor: string): CardLighting {
-  const textShadowColor = shiftColor(edgeColor, -5, 0.92, -0.18)
+/** Fallback theme color, matching the classic Stardew wood/gold card. */
+export const CARD_DEFAULT_THEME_COLOR = '#fa9305'
 
-  return {
-    rightEdgeShadow: shiftColor(edgeColor, -9, 0.58, 0.118),
-    topHighlight: shiftColor(edgeColor, -6, 0.75, -0.15),
-    dividerShadow: shiftColor(edgeColor, -6, 0.9, -0.08),
-    titleTextShadow: toRgba(hexToRgb(textShadowColor), 0.28),
-    headerStripes: generateHeaderStripes(edgeColor),
+/**
+ * Accepts `#rgb`, `#rrggbb` or the same without the leading `#`, and falls back
+ * to the default theme color instead of throwing — a bad value typed into a
+ * theme input should never blank out the page.
+ */
+export function resolveCardThemeColor(themeColor?: string): string {
+  if (!themeColor) {
+    return CARD_DEFAULT_THEME_COLOR
+  }
+
+  try {
+    return rgbToHex(hexToRgb(themeColor))
+  } catch {
+    return CARD_DEFAULT_THEME_COLOR
   }
 }
 
-export function createCardPalette(edgeColor: string): CardPalette {
-  const borderDark = rgbToHex(hexToRgb(edgeColor))
-  const lighting = getCardLighting(borderDark)
+/**
+ * Theme color -> lighting helper. Everything the card needs to fake a light
+ * source is computed here from the theme color's HSL triplet, so callers only
+ * ever pass one color in.
+ */
+export function getCardLighting(themeColor: string): CardLighting {
+  const border = resolveCardThemeColor(themeColor)
+  const titleShadowColor = shiftColor(border, -5, 0.92, -0.18)
+
+  const borderHighlight = shiftColor(border, -6, 0.75, -0.15)
+  const borderInnerShadow = shiftColor(border, -6, 0.9, -0.08)
+  const borderOuterGlow = shiftColor(border, -9, 0.58, 0.118)
+
+  // The shadow keeps the theme hue but is dimmed and drained of saturation, so
+  // it reads as "this card's own shadow" rather than a generic grey smudge. The
+  // inner glow does the mirror trick: same hue, lifted to a pale tint.
+  // Lightness is shifted rather than mixed towards pure black, so dark themes
+  // keep a trace of their hue instead of collapsing to #000.
+  const shadowSeed = shiftColor(border, -6, 0.72, -0.16)
+  const glowSeed = shiftColor(border, 4, 0.34, 0.42)
+
+  return {
+    border,
+    borderHighlight,
+    borderInnerShadow,
+    borderOuterGlow,
+    outerShadow: toRgba(hexToRgb(shadowSeed), 0.3),
+    outerShadowHover: toRgba(hexToRgb(shadowSeed), 0.26),
+    outerShadowActive: toRgba(hexToRgb(shadowSeed), 0.2),
+    innerGlow: toRgba(hexToRgb(glowSeed), 0.22),
+    titleTextShadow: toRgba(hexToRgb(titleShadowColor), 0.28),
+    headerStripes: generateHeaderStripes(border),
+    rightEdgeShadow: borderOuterGlow,
+    topHighlight: borderHighlight,
+    dividerShadow: borderInnerShadow,
+  }
+}
+
+/**
+ * Full CSS-variable palette for `<StarCard color={theme}>`: the lighting map
+ * above plus every surface, text and stripe the card paints.
+ */
+export function createCardPalette(themeColor?: string): CardPalette {
+  const lighting = getCardLighting(themeColor ?? CARD_DEFAULT_THEME_COLOR)
+  const borderDark = lighting.border
   const background = shiftColor(borderDark, 0.18, 1.039, 0.23)
   const backgroundLight = shiftColor(borderDark, -0.1, 1.035, 0.255)
   const backgroundDark = shiftColor(borderDark, -4.3, 0.93, 0.19)
@@ -297,7 +385,7 @@ export function createCardPalette(edgeColor: string): CardPalette {
   const sectionBackground = toRgba(hexToRgb(isLightSurface ? '#ffffff' : '#fff7ef'), isLightSurface ? 0.12 : 0.1)
   const bodyTopGlow = toRgba(hexToRgb(backgroundLight), isLightSurface ? 0.34 : 0.22)
   const bodyBottomShadow = toRgba(hexToRgb(borderDark), isLightSurface ? 0.16 : 0.28)
-  const bodyRightShadow = toRgba(hexToRgb(lighting.rightEdgeShadow), isLightSurface ? 0.9 : 0.72)
+  const bodyRightShadow = toRgba(hexToRgb(lighting.borderOuterGlow), isLightSurface ? 0.9 : 0.72)
   const bodyLeftGlow = toRgba(hexToRgb(backgroundLight), isLightSurface ? 0.5 : 0.34)
 
   return {

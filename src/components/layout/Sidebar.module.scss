@@ -1,7 +1,12 @@
+@use "../../styles/PixelFrame.module.scss" as gap;
+
 .doc-sidebar {
   @apply fixed top-[60px] left-0 bottom-0 w-[260px] overflow-y-auto py-6;
-  background: var(--color-bg-sidebar);
-  border-right: 4px solid var(--color-border-dark);
+  // Same gap frame as the header, so the two panels read as one chrome. The
+  // clip keeps the corner breaks open; the frame layers are background images,
+  // so they stay put while the nav scrolls.
+  @include gap.gap-frame-fill(var(--color-bg-sidebar), var(--color-border-dark), gap.$doc-frame-width);
+  clip-path: var(--doc-gap-clip);
 
   &-nav {
     @apply flex flex-col gap-1;

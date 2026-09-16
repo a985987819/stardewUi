@@ -30,7 +30,10 @@ function CalendarGrid({ cells, monthLabel, showOutsideDays = true, onSelectDay, 
 
   return (
     <div className={styles['calendar-grid']}>
-      {monthLabel ? <div className={styles['calendar-grid__month-label']}>{monthLabel}</div> : null}
+      {/* `monthLabel` is used as the grid's accessible name only. Both Calendar
+          and DatePicker already show the month in their toolbar, so rendering it
+          here as well duplicated the label (and its unstyled width was what
+          pushed the date picker wider than the calendar). */}
       <div className={styles['calendar-grid__grid']} role="grid" aria-label={monthLabel}>
         <div className={styles['calendar-grid__rowgroup']} role="rowgroup">
           <div className={styles['calendar-grid__row']} role="row">

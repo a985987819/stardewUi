@@ -3,6 +3,10 @@
   --star-loading-gap: 8px;
   --star-loading-jolt-x: 0px;
   --star-loading-jolt-y: 0px;
+  --star-loading-jolt-rotate: 0deg;
+  --star-loading-jolt-scale: 1;
+  --star-loading-jolt-duration: 300ms;
+  --star-loading-jolt-easing: cubic-bezier(0.34, 1.46, 0.64, 1);
 
   display: inline-flex;
   flex-direction: column;
@@ -30,13 +34,21 @@
     align-items: center;
   }
 
+  /**
+   * The chew is a real eased transition, not `steps(2)`: the component hands
+   * over a fresh impulse on every bite (recoil + squash + twist), then settles
+   * back to rest with a slight overshoot so it reads as a soft bounce.
+   */
   &__canvas {
     display: block;
     width: var(--star-loading-size);
     height: var(--star-loading-size);
     flex: 0 0 var(--star-loading-size);
-    transform: translate(var(--star-loading-jolt-x), var(--star-loading-jolt-y));
-    transition: transform 0.06s steps(2);
+    transform-origin: 50% 50%;
+    transform: translate(var(--star-loading-jolt-x), var(--star-loading-jolt-y))
+      rotate(var(--star-loading-jolt-rotate)) scale(var(--star-loading-jolt-scale));
+    transition: transform var(--star-loading-jolt-duration) var(--star-loading-jolt-easing);
+    will-change: transform;
   }
 
   &__text {

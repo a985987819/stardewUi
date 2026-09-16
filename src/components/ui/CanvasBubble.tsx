@@ -12,6 +12,7 @@ import { classNames } from '../../utils/classNames'
 import {
   drawPixelBubble,
   drawWoodPanel,
+  drawWoodPanelFrame,
   resolveBubblePlacement,
   type BubblePlacement,
 } from '../../utils'
@@ -31,12 +32,8 @@ export interface StarCanvasBubbleProps extends HTMLAttributes<HTMLDivElement> {
   borderColor?: string
   borderWidth?: number
   cornerSize?: number
-  /** Wood texture only: staircase segments per corner (3 = three-level corner). */
-  stairSteps?: number
   /** Wood texture only: thickness of the inner bevel ring. */
   frameWidth?: number
-  /** Wood texture only: size of one grain band, in CSS pixels. */
-  grainSize?: number
   arrowWidth?: number
   arrowDepth?: number
   contentPadding?: number
@@ -63,9 +60,7 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
       borderColor = '#2f3440',
       borderWidth = 4,
       cornerSize = 10,
-      stairSteps = 3,
       frameWidth = 4,
-      grainSize = 6,
       arrowWidth = 20,
       arrowDepth = 12,
       contentPadding = 14,
@@ -79,6 +74,7 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
   ) => {
     const hostRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const frameCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
     const setHostRef = useCallback(
       (node: HTMLDivElement | null) => {
@@ -107,30 +103,48 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
       const targetWidth = Math.max(1, Math.round(width * dpr))
       const targetHeight = Math.max(1, Math.round(height * dpr))
 
-      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-        canvas.width = targetWidth
-        canvas.height = targetHeight
-        canvas.style.width = `${width}px`
-        canvas.style.height = `${height}px`
+      const sizeCanvas = (target: HTMLCanvasElement) => {
+        if (target.width !== targetWidth || target.height !== targetHeight) {
+          target.width = targetWidth
+          target.height = targetHeight
+          target.style.width = `${width}px`
+          target.style.height = `${height}px`
+        }
+
+        const context = target.getContext('2d')
+        if (!context) {
+          return null
+        }
+
+        context.clearRect(0, 0, targetWidth, targetHeight)
+        return context
       }
 
-      const ctx = canvas.getContext('2d')
+      const ctx = sizeCanvas(canvas)
+      const frameCtx = frameCanvasRef.current ? sizeCanvas(frameCanvasRef.current) : null
+
       if (!ctx) {
         return
       }
 
       if (texture === 'wood') {
-        drawWoodPanel(ctx, {
+        const woodOptions = {
           width: targetWidth,
           height: targetHeight,
           placement: bubblePlacement,
           borderWidth: borderWidth * dpr,
           frameWidth: frameWidth * dpr,
-          cornerSteps: stairSteps,
-          stepSize: grainSize * dpr,
           arrowWidth: arrowWidth * dpr,
           arrowDepth: arrowDepth * dpr,
-        })
+        }
+
+        drawWoodPanel(ctx, woodOptions)
+
+        // Second pass on the overlay canvas, above the DOM content.
+        if (frameCtx) {
+          drawWoodPanelFrame(frameCtx, woodOptions)
+        }
+
         return
       }
 
@@ -154,8 +168,6 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
       cornerSize,
       fillColor,
       frameWidth,
-      grainSize,
-      stairSteps,
       texture,
     ])
 
@@ -205,6 +217,13 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
         <div className={classNames(styles['canvas-bubble__content'], contentClassName)} style={contentStyle}>
           {children}
         </div>
+        {texture === 'wood' ? (
+          <canvas
+            ref={frameCanvasRef}
+            className={classNames(styles['canvas-bubble__canvas'], styles['canvas-bubble__canvas--frame'])}
+            aria-hidden
+          />
+        ) : null}
       </div>
     )
   }

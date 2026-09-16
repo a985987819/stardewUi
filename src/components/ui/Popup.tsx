@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type HTML
 import {
   classNames,
   flipBubblePlacement,
-  getWoodPanelSurfaceClipPath,
+  resolveBubblePlacement,
   WOOD_PANEL_THEME,
   type BubblePlacement,
 } from '../../utils'
+import { createInsetRectClipPath } from '../../utils/pixelCorners'
 import StarCanvasBubble from './CanvasBubble'
 import StarNineSliceButton from './NineSliceButton'
 import styles from './Popup.module.scss'
@@ -33,14 +34,15 @@ export interface StarPopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
 }
 
 /**
- * Frame geometry of the wood dialog. The canvas draws the frame from these
- * numbers and the content clip-path is generated from the same pair, so the
+ * Frame geometry of the panel. The canvas draws the gap frame from these numbers
+ * and the content clip-path is generated from the same pair, so the
  * header/footer backgrounds can never cut a different corner than the frame.
+ *
+ * The frame is the continuous `cornerLevel = 1` house style: `2 × thickness`
+ * corner blocks close the ring, so no corner is ever left open.
  */
 const PANEL_BORDER_WIDTH = 6
 const PANEL_FRAME_WIDTH = 4
-const PANEL_STAIR_STEPS = 3
-const PANEL_GRAIN_SIZE = 6
 const PANEL_ARROW_WIDTH = 26
 const PANEL_ARROW_DEPTH = 14
 
@@ -57,8 +59,29 @@ const panelCssVariables = {
   '--wood-panel-header-grain-2': WOOD_PANEL_THEME.headerGrain[1],
   '--wood-panel-header-grain-3': WOOD_PANEL_THEME.headerGrain[2],
   '--wood-panel-header-grain-4': WOOD_PANEL_THEME.headerGrain[3],
-  '--wood-panel-surface-clip-path': getWoodPanelSurfaceClipPath(PANEL_STAIR_STEPS, PANEL_GRAIN_SIZE),
 } as CSSProperties
+
+/** Distance from the bubble's box to the surface the canvas actually paints. */
+const PANEL_SURFACE_INSET = PANEL_BORDER_WIDTH + PANEL_FRAME_WIDTH
+
+/**
+ * The content wrapper is the bubble box, but the canvas paints its surface
+ * `border + bevel` inside it — and `arrowDepth` further in on the arrow side.
+ * The clip carries that offset so the header/footer never paint over the
+ * frame; the frame canvas on top covers any leftovers.
+ */
+const getSurfaceClipPath = (placement: PopupPlacement) => {
+  const { side } = resolveBubblePlacement(flipBubblePlacement(placement))
+  const arrowInset = PANEL_SURFACE_INSET + PANEL_ARROW_DEPTH
+  const insetFor = (target: typeof side) => (side === target ? arrowInset : PANEL_SURFACE_INSET)
+
+  return createInsetRectClipPath({
+    top: insetFor('top'),
+    right: insetFor('right'),
+    bottom: insetFor('bottom'),
+    left: insetFor('left'),
+  })
+}
 
 const getPopupPositionStyle = (placement: PopupPlacement, offset: number): CSSProperties => {
   switch (placement) {
@@ -192,6 +215,7 @@ function StarPopup({
   const bubbleWrapStyle = {
     ...getPopupPositionStyle(placement, offset),
     ...panelCssVariables,
+    '--wood-panel-surface-clip-path': getSurfaceClipPath(placement),
   } as CSSProperties
 
   return (
@@ -212,8 +236,6 @@ function StarPopup({
             bubblePlacement={bubblePlacement}
             borderWidth={PANEL_BORDER_WIDTH}
             frameWidth={PANEL_FRAME_WIDTH}
-            stairSteps={PANEL_STAIR_STEPS}
-            grainSize={PANEL_GRAIN_SIZE}
             arrowWidth={PANEL_ARROW_WIDTH}
             arrowDepth={PANEL_ARROW_DEPTH}
             contentPadding={0}

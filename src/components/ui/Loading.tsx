@@ -2,15 +2,19 @@
 import { classNames } from '../../utils/classNames'
 import {
   applyBiteMasks,
-  BITE_JOLT_DECAY_DURATION,
-  BITE_JOLT_LEVELS,
+  BITE_SETTLE_DURATION,
+  BITE_STRIKE_DURATION,
   drawLoadingFallback,
-  getBunJoltOffset,
+  getBiteImpulse,
   getBunRadius,
   loadLoadingImage,
   LOADING_DEFAULT_TEXT,
+  LOADING_EMPTY_HOLD_DURATION,
   LOADING_FRAME_COUNT,
   LOADING_FRAME_DURATION,
+  LOADING_VANISH_DURATION,
+  RESTING_IMPULSE,
+  VANISHING_IMPULSE,
 } from './loadingCanvas'
 import styles from './Loading.module.scss'
 
@@ -24,7 +28,14 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   fill?: boolean
 }
 
-const RESTING_JOLT_INDEX = BITE_JOLT_LEVELS.length - 1
+/** `strike` = a bite just landed (or the bun just reappeared), `rest` = settled. */
+type BiteStage = 'strike' | 'rest'
+/** `eating` -> bites around the circle, `vanishing` -> the crumb shrinks away, `gone` -> a beat of nothing. */
+type CycleStage = 'eating' | 'vanishing' | 'gone'
+
+const STRIKE_EASING = 'cubic-bezier(0.2, 0.9, 0.25, 1)'
+const SETTLE_EASING = 'cubic-bezier(0.34, 1.46, 0.64, 1)'
+const VANISH_EASING = 'cubic-bezier(0.55, 0, 0.75, 0.2)'
 
 function StarLoading({
   active = true,
@@ -42,7 +53,8 @@ function StarLoading({
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [hiddenSlices, setHiddenSlices] = useState(0)
-  const [joltIndex, setJoltIndex] = useState(RESTING_JOLT_INDEX)
+  const [biteStage, setBiteStage] = useState<BiteStage>('rest')
+  const [cycleStage, setCycleStage] = useState<CycleStage>('eating')
 
   useEffect(() => {
     let cancelled = false
@@ -75,7 +87,8 @@ function StarLoading({
 
     if (active) {
       setHiddenSlices(0)
-      setJoltIndex(RESTING_JOLT_INDEX)
+      setBiteStage('strike')
+      setCycleStage('eating')
     }
   }
 
@@ -83,33 +96,52 @@ function StarLoading({
 
   if (previousHiddenSlices !== hiddenSlices) {
     setPreviousHiddenSlices(hiddenSlices)
-    const isMidAnimation = hiddenSlices > 0 && hiddenSlices < LOADING_FRAME_COUNT
-    setJoltIndex(isMidAnimation ? 0 : RESTING_JOLT_INDEX)
+    // Each new bite is its own little impulse, so the chew is a sequence of
+    // easing-out reactions rather than one long shake.
+    setBiteStage('strike')
   }
 
+  if (cycleStage === 'eating' && hiddenSlices >= LOADING_FRAME_COUNT) {
+    setCycleStage('vanishing')
+  }
+
+  // Bite cadence. Kept independent of the strike/settle stage so a settling
+  // transition can never stretch the time between two bites.
   useEffect(() => {
     if (!active) {
       return
     }
 
-    const timer = window.setTimeout(() => {
-      setHiddenSlices((current) => (current >= LOADING_FRAME_COUNT ? 0 : current + 1))
-    }, LOADING_FRAME_DURATION)
+    if (cycleStage === 'vanishing') {
+      const timer = window.setTimeout(() => setCycleStage('gone'), LOADING_VANISH_DURATION)
+      return () => window.clearTimeout(timer)
+    }
 
-    return () => window.clearTimeout(timer)
-  }, [active, hiddenSlices])
-
-  useEffect(() => {
-    if (joltIndex >= RESTING_JOLT_INDEX) {
-      return
+    if (cycleStage === 'gone') {
+      const timer = window.setTimeout(() => {
+        setHiddenSlices(0)
+        setCycleStage('eating')
+      }, LOADING_EMPTY_HOLD_DURATION)
+      return () => window.clearTimeout(timer)
     }
 
     const timer = window.setTimeout(() => {
-      setJoltIndex((current) => Math.min(current + 1, RESTING_JOLT_INDEX))
-    }, BITE_JOLT_DECAY_DURATION)
+      setHiddenSlices((current) => Math.min(current + 1, LOADING_FRAME_COUNT))
+    }, LOADING_FRAME_DURATION)
 
     return () => window.clearTimeout(timer)
-  }, [joltIndex])
+  }, [active, cycleStage, hiddenSlices])
+
+  // One impulse at a time: settle shortly after it lands.
+  useEffect(() => {
+    if (biteStage !== 'strike' || cycleStage !== 'eating') {
+      return
+    }
+
+    const timer = window.setTimeout(() => setBiteStage('rest'), BITE_STRIKE_DURATION)
+
+    return () => window.clearTimeout(timer)
+  }, [biteStage, cycleStage])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -132,7 +164,9 @@ function StarLoading({
     }
 
     ctx.clearRect(0, 0, targetSize, targetSize)
-    if (hiddenSlices >= LOADING_FRAME_COUNT) {
+    // A beat of empty space between one bun vanishing and the next appearing,
+    // so the eating reads as "finished" instead of resetting mid-chew.
+    if (cycleStage === 'gone') {
       return
     }
 
@@ -150,21 +184,41 @@ function StarLoading({
     ctx.restore()
 
     applyBiteMasks(ctx, targetSize, hiddenSlices)
-  }, [hiddenSlices, image, size])
+  }, [cycleStage, hiddenSlices, image, size])
 
   const resolvedText = text === undefined ? LOADING_DEFAULT_TEXT : text
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
-  const joltOffset = getBunJoltOffset(size, hiddenSlices, BITE_JOLT_LEVELS[joltIndex])
+  const impulse = useMemo(() => {
+    if (cycleStage !== 'eating') {
+      return VANISHING_IMPULSE
+    }
+
+    return biteStage === 'strike' ? getBiteImpulse(size, hiddenSlices) : RESTING_IMPULSE
+  }, [biteStage, cycleStage, hiddenSlices, size])
+
+  const joltDuration =
+    cycleStage !== 'eating'
+      ? LOADING_VANISH_DURATION
+      : biteStage === 'strike'
+        ? BITE_STRIKE_DURATION
+        : BITE_SETTLE_DURATION
+  const joltEasing =
+    cycleStage !== 'eating' ? VANISH_EASING : biteStage === 'strike' ? STRIKE_EASING : SETTLE_EASING
+
   const rootStyle = useMemo(
     () =>
       ({
         ...style,
         '--star-loading-size': `${size}px`,
         '--star-loading-gap': `${gap}px`,
-        '--star-loading-jolt-x': `${joltOffset.x}px`,
-        '--star-loading-jolt-y': `${joltOffset.y}px`,
+        '--star-loading-jolt-x': `${impulse.x}px`,
+        '--star-loading-jolt-y': `${impulse.y}px`,
+        '--star-loading-jolt-rotate': `${impulse.rotate}deg`,
+        '--star-loading-jolt-scale': `${impulse.scale}`,
+        '--star-loading-jolt-duration': `${joltDuration}ms`,
+        '--star-loading-jolt-easing': joltEasing,
       }) as CSSProperties,
-    [gap, joltOffset.x, joltOffset.y, size, style]
+    [gap, impulse, joltDuration, joltEasing, size, style]
   )
 
   return (

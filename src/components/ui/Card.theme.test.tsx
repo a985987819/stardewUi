@@ -81,4 +81,65 @@ describe('Card theme variables', () => {
     expect(card.style.getPropertyValue('--card-header-stripe-1')).not.toBe('')
     expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
   })
+
+  it('exposes the border / highlight / inner-shadow / outer-shadow roles as theme variables', () => {
+    const { container } = render(
+      <Card color="#274d70" title="Custom" showTitle>
+        Content
+      </Card>
+    )
+
+    const card = container.firstElementChild as HTMLElement
+
+    expect(card.style.getPropertyValue('--card-border')).toBe('#274d70')
+    expect(card.style.getPropertyValue('--card-border-highlight')).toBe(
+      card.style.getPropertyValue('--card-top-highlight')
+    )
+    expect(card.style.getPropertyValue('--card-border-inner-shadow')).toBe(
+      card.style.getPropertyValue('--card-divider-shadow')
+    )
+    expect(card.style.getPropertyValue('--card-border-outer-glow')).toBe(
+      card.style.getPropertyValue('--card-right-edge-shadow')
+    )
+    expect(card.style.getPropertyValue('--card-outer-shadow')).toMatch(/^rgba\(/)
+    expect(card.style.getPropertyValue('--card-outer-shadow-hover')).toMatch(/^rgba\(/)
+    expect(card.style.getPropertyValue('--card-outer-shadow-active')).toMatch(/^rgba\(/)
+    expect(card.style.getPropertyValue('--card-inner-glow')).toMatch(/^rgba\(/)
+  })
+
+  it('clips the fill to the continuous ring and keeps the frame layers', () => {
+    const { container } = render(<Card>Content</Card>)
+    const card = container.firstElementChild as HTMLElement
+    const plate = card.querySelector('[class*="stardew-card__plate"]')
+    const frame = card.querySelector('[class*="stardew-card__frame"]')
+    const border = card.querySelector('[class*="stardew-card__border"]')
+    const clip = card.style.getPropertyValue('--card-gap-clip')
+
+    // Frame thickness 6px -> the fill is clipped to a rectangle inset by 6px on
+    // every side; the frame's 12px corner blocks close the ring on top of it.
+    expect(clip).toBe(
+      'polygon(6px 6px, calc(100% - 6px) 6px, calc(100% - 6px) calc(100% - 6px), 6px calc(100% - 6px))'
+    )
+
+    expect(plate).toBeInTheDocument()
+    expect(plate).toHaveAttribute('aria-hidden')
+    expect(frame).toBeInTheDocument()
+
+    // The outer frame is its own layer above the content: the inner light line
+    // must stay outside it, so anything reaching the frame gets covered.
+    expect(border).toBeInTheDocument()
+    expect(border).toHaveAttribute('aria-hidden')
+  })
+
+  it('falls back to the default theme instead of blanking out on an invalid color', () => {
+    const { container } = render(
+      <Card color="not-a-color" title="Custom" showTitle>
+        Content
+      </Card>
+    )
+
+    const card = container.firstElementChild as HTMLElement
+
+    expect(card.style.getPropertyValue('--card-border-dark')).toBe('#fa9305')
+  })
 })

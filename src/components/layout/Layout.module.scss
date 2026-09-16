@@ -1,3 +1,5 @@
+@use "../../styles/PixelFrame.module.scss" as gap;
+
 .doc-layout {
   @apply min-h-screen;
   background: var(--color-bg);
@@ -5,15 +7,37 @@
 
 .doc-main {
   @apply pt-[60px] min-h-screen;
+  position: relative;
   margin-left: 260px;
+
+  // The page board: a lighter panel in the same gap-frame style, sitting behind
+  // the whole content column, so the route content reads as notes pinned to a
+  // Stardew menu board instead of floating on a flat background.
+  //
+  // It is a decorative pseudo layer rather than a clip on `.doc-content`: the
+  // table of contents is a fixed-position child of that subtree, and a
+  // `clip-path` on an ancestor would slice it off.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 72px 20px 20px;
+    @include gap.gap-frame-fill(var(--color-bg-secondary), var(--color-border-dark), gap.$doc-frame-width);
+    clip-path: var(--doc-gap-clip);
+    pointer-events: none;
+  }
 
   @media (max-width: 1024px) {
     @apply ml-0;
+
+    &::before {
+      inset: 72px 12px 12px;
+    }
   }
 }
 
 .doc-content {
   @apply max-w-[1200px] mx-auto py-10 px-12;
+  position: relative;
 
   @media (max-width: 1024px) {
     @apply p-6;
