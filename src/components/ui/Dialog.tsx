@@ -60,23 +60,39 @@ function StarDialog({
   const isFirstPage = currentPage === 0
   const isLastPage = currentPage >= totalPages - 1
 
-  useEffect(() => {
+  // Restart the typewriter sequence when the dialog opens or its copy changes.
+  // These resets run during render rather than in effects: an effect would commit
+  // a frame showing the previous page's finished text before resetting, which
+  // cascades an extra render and produces a visible flash.
+  const [openSignature, setOpenSignature] = useState({ open, title, typewriter })
+
+  if (
+    openSignature.open !== open ||
+    openSignature.title !== title ||
+    openSignature.typewriter !== typewriter
+  ) {
+    setOpenSignature({ open, title, typewriter })
+
     if (open) {
       setCurrentPage(0)
       setTitleComplete(!title || !typewriter)
       setContentComplete(!typewriter)
-      setTitleKey((k) => k + 1)
-      setContentKey((k) => k + 1)
+      setTitleKey((key) => key + 1)
+      setContentKey((key) => key + 1)
     }
-  }, [open, title, typewriter])
+  }
 
-  useEffect(() => {
-    setContentKey((k) => k + 1)
+  const [pageSignature, setPageSignature] = useState({ currentPage, typewriter })
+
+  if (pageSignature.currentPage !== currentPage || pageSignature.typewriter !== typewriter) {
+    setPageSignature({ currentPage, typewriter })
+    setContentKey((key) => key + 1)
     setContentComplete(!typewriter)
+
     if (!isFirstPage) {
       setTitleComplete(true)
     }
-  }, [currentPage, isFirstPage, typewriter])
+  }
 
   useEffect(() => {
     if (!open) return

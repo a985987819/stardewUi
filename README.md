@@ -599,6 +599,116 @@ import { StarGapBorder } from 'stardew-valley-ui'
 | cornerGap | `number` | `8` | 角落间距 |
 | cornerLevel | `1 \| 2 \| 3` | - | 角落阶梯级别 |
 | contentPadding | `number` | `24` | 内容内边距 |
+| contentClassName | `string` | - | 内容区域类名 |
+
+---
+
+### StarGapBorderCorners - 缺角边框装饰
+
+独立的缺角边框装饰组件，可在任意 `position: relative` 容器中渲染边角效果。适合用于自定义容器边框、叠加层装饰等场景。
+
+```tsx
+import { StarGapBorderCorners } from 'stardew-valley-ui'
+
+// 在自定义容器中使用
+<div style={{ position: 'relative', width: 200, height: 100 }}>
+  <StarGapBorderCorners level={1} />
+  <div style={{ position: 'relative', zIndex: 2, padding: 16 }}>
+    内容区域
+  </div>
+</div>
+
+// 自定义颜色
+<div style={{ position: 'relative' }}>
+  <StarGapBorderCorners
+    level={2}
+    borderColor="#8B4513"
+    backgroundColor="#FFF8DC"
+    borderThickness={6}
+  />
+  <div style={{ position: 'relative', zIndex: 2 }}>内容</div>
+</div>
+
+// 不同阶梯级别
+<StarGapBorderCorners level={1} />  // 每角 1 个阶梯
+<StarGapBorderCorners level={2} />  // 每角 3 个阶梯
+<StarGapBorderCorners level={3} />  // 每角 5 个阶梯
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| level | `1 \| 2 \| 3` | `1` | 角落阶梯级别 |
+| borderColor | `string` | `'#5f4322'` | 边框颜色 |
+| backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
+| borderThickness | `number` | `8` | 边框粗细 |
+| cornerGap | `number` | `8` | 角落间距 |
+
+**注意**：父容器需要设置 `position: relative`，内容区域需要设置 `position: relative; z-index: 2` 以显示在边角装饰之上。
+
+---
+
+### createGapBorderCorners - 缺角边框计算函数
+
+纯函数，用于计算缺角边框的几何数据。适合需要自定义渲染逻辑的高级场景。
+
+```tsx
+import { createGapBorderCorners } from 'stardew-valley-ui'
+import type { GapBorderCornerData, CreateGapBorderCornersOptions } from 'stardew-valley-ui'
+
+// 计算边角数据
+const { cornerSteps, surfaceClipPath, cssVariables } = createGapBorderCorners({
+  level: 1,
+  borderColor: '#5f4322',
+  backgroundColor: '#f7efc5',
+  borderThickness: 8,
+  cornerGap: 8,
+})
+
+// cornerSteps: 阶梯方块的位置数组
+// surfaceClipPath: CSS clip-path polygon 字符串
+// cssVariables: CSS 自定义属性对象
+
+// 自定义渲染示例
+function CustomBorder({ children }) {
+  const { cornerSteps, cssVariables } = createGapBorderCorners({ level: 2 })
+
+  return (
+    <div style={{ position: 'relative', ...cssVariables }}>
+      {cornerSteps.map(({ key, style }) => (
+        <span
+          key={key}
+          style={{
+            position: 'absolute',
+            width: 8,
+            height: 8,
+            background: cssVariables['--gap-border-color'],
+            ...style,
+          }}
+        />
+      ))}
+      <div style={{ position: 'relative', zIndex: 2 }}>{children}</div>
+    </div>
+  )
+}
+```
+
+**返回值 `GapBorderCornerData`**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| cornerSteps | `{ key: string; style: CSSProperties }[]` | 阶梯方块位置数组 |
+| surfaceClipPath | `string` | CSS clip-path polygon 字符串 |
+| cssVariables | `CSSProperties` | CSS 自定义属性对象 |
+
+**参数 `CreateGapBorderCornersOptions`**：
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| level | `number` | `1` | 角落阶梯级别 |
+| borderColor | `string` | `'#5f4322'` | 边框颜色 |
+| backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
+| borderThickness | `number` | `8` | 边框粗细 |
+| cornerGap | `number` | `8` | 角落间距 |
 
 ---
 
@@ -782,6 +892,9 @@ import type {
   StarTabItem,
   SwitchProps,
   StarGapBorderProps,
+  StarGapBorderCornersProps,
+  GapBorderCornerData,
+  CreateGapBorderCornersOptions,
   PixelButtonProps,
 } from 'stardew-valley-ui'
 ```

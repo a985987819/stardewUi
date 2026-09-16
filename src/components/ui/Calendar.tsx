@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   addMonths,
   buildCalendarCells,
@@ -111,9 +111,15 @@ function Calendar({
   const itemsByDay = useMemo(() => groupCalendarItemsByDay(items), [items])
   const activeItems = activeDayTimestamp !== null ? itemsByDay[activeDayTimestamp] ?? [] : []
 
-  useEffect(() => {
+  // Drop the hovered day when the visible month changes. Adjusting state during
+  // render is React's recommended replacement for a "reset on prop change" effect
+  // and avoids committing an extra frame with a stale highlighted day.
+  const [syncedMonthTimestamp, setSyncedMonthTimestamp] = useState(monthTimestamp)
+
+  if (syncedMonthTimestamp !== monthTimestamp) {
+    setSyncedMonthTimestamp(monthTimestamp)
     setActiveDayTimestamp(null)
-  }, [monthTimestamp])
+  }
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setTooltipPosition({ x: e.clientX + 12, y: e.clientY + 12 })

@@ -76,8 +76,11 @@ export const useNineSliceBackground = ({
 }: NineSliceBackgroundOptions) => {
   const hostRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const imageRef = useRef<LoadedImage | null>(null)
-  const [isReady, setIsReady] = useState(false)
+
+  // The decoded image lives in state rather than a ref so that readiness is
+  // derived, not synchronised. Keeping it in a ref forced `setIsReady(false)`
+  // calls inside effects just to invalidate the cached image on prop changes.
+  const [loadedImage, setLoadedImage] = useState<LoadedImage | null>(null)
 
   const setHostRef = useCallback((node: HTMLElement | null) => {
     hostRef.current = node
@@ -86,7 +89,7 @@ export const useNineSliceBackground = ({
   const draw = useCallback(() => {
     const host = hostRef.current
     const canvas = canvasRef.current
-    const image = imageRef.current
+    const image = loadedImage
 
     if (!host || !canvas || !image) {
       return
@@ -150,31 +153,24 @@ export const useNineSliceBackground = ({
       insets: scaledInsets,
       clearBeforeDraw: false,
     })
-  }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
+  }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top, loadedImage])
 
   useEffect(() => {
     if (!enabled) {
-      setIsReady(false)
-      imageRef.current = null
       return
     }
 
     let cancelled = false
 
-    setIsReady(false)
-    imageRef.current = null
-
     loadImage(src)
       .then((loaded) => {
-        if (cancelled) {
-          return
+        if (!cancelled) {
+          setLoadedImage(loaded)
         }
-        imageRef.current = loaded
-        setIsReady(true)
       })
       .catch(() => {
         if (!cancelled) {
-          setIsReady(false)
+          setLoadedImage(null)
         }
       })
 
@@ -182,6 +178,8 @@ export const useNineSliceBackground = ({
       cancelled = true
     }
   }, [enabled, src])
+
+  const isReady = enabled && loadedImage !== null
 
   useEffect(() => {
     if (!isReady) {
@@ -191,7 +189,7 @@ export const useNineSliceBackground = ({
   }, [draw, isReady])
 
   useEffect(() => {
-    if (!autoRedraw) {
+    if (!autoRedraw || !isReady) {
       return
     }
 
@@ -216,7 +214,7 @@ export const useNineSliceBackground = ({
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleWindowResize)
     }
-  }, [autoRedraw, draw])
+  }, [autoRedraw, draw, isReady])
 
   const canvasProps = useMemo(
     () => ({

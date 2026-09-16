@@ -25,7 +25,15 @@ function StarTypewriter({
   const indexRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const startTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const previousCompleteTriggerRef = useRef(completeTrigger)
+
+  // Keeping the callback in a ref means `onComplete` never enters an effect's
+  // dependency list. An inline arrow at the call site previously changed identity
+  // on every parent render, which tore down and restarted the whole animation.
+  const onCompleteRef = useRef(onComplete)
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
 
   const clearAllTimers = useCallback(() => {
     if (timerRef.current) {
@@ -38,18 +46,40 @@ function StarTypewriter({
     }
   }, [])
 
-  const completeTyping = useCallback(() => {
-    clearAllTimers()
-    setDisplayedText(text)
-    setIsComplete(true)
-    onComplete?.()
-  }, [text, clearAllTimers, onComplete])
+  // Rewind the sequence when the animated content or its timing changes. Derived
+  // during render so the effect below only has to own the timers themselves.
+  const [animationSignature, setAnimationSignature] = useState({ text, speed, startDelay })
 
-  useEffect(() => {
-    clearAllTimers()
+  if (
+    animationSignature.text !== text ||
+    animationSignature.speed !== speed ||
+    animationSignature.startDelay !== startDelay
+  ) {
+    setAnimationSignature({ text, speed, startDelay })
     setDisplayedText('')
     setIsComplete(false)
     setIsStarted(false)
+  }
+
+  // `completeTrigger` is an external "reveal everything now" signal, typically
+  // bumped by a parent dialog/skip button.
+  const [previousCompleteTrigger, setPreviousCompleteTrigger] = useState(completeTrigger)
+
+  if (previousCompleteTrigger !== completeTrigger) {
+    setPreviousCompleteTrigger(completeTrigger)
+
+    if (!isComplete) {
+      setDisplayedText(text)
+      setIsComplete(true)
+    }
+  }
+
+  useEffect(() => {
+    if (isComplete) {
+      return
+    }
+
+    clearAllTimers()
     indexRef.current = 0
 
     startTimerRef.current = setTimeout(() => {
@@ -60,31 +90,32 @@ function StarTypewriter({
           setDisplayedText(text.slice(0, indexRef.current + 1))
           indexRef.current++
         } else {
-          completeTyping()
+          if (timerRef.current) {
+            clearInterval(timerRef.current)
+            timerRef.current = null
+          }
+          setIsComplete(true)
         }
       }, speed)
     }, startDelay)
 
     return clearAllTimers
-  }, [text, speed, startDelay, clearAllTimers, completeTyping])
+  }, [clearAllTimers, isComplete, speed, startDelay, text])
 
+  // Fire the completion callback exactly once per finished sequence. This is an
+  // external notification, so an effect is the right place for it.
   useEffect(() => {
-    if (previousCompleteTriggerRef.current === completeTrigger) {
-      return
+    if (isComplete) {
+      onCompleteRef.current?.()
     }
-
-    previousCompleteTriggerRef.current = completeTrigger
-
-    if (!isComplete) {
-      completeTyping()
-    }
-  }, [completeTrigger, completeTyping, isComplete])
+  }, [isComplete])
 
   const handleClick = useCallback(() => {
     if (!isComplete && isStarted) {
-      completeTyping()
+      setDisplayedText(text)
+      setIsComplete(true)
     }
-  }, [isComplete, isStarted, completeTyping])
+  }, [isComplete, isStarted, text])
 
   return (
     <span
@@ -99,5 +130,3 @@ function StarTypewriter({
 }
 
 export default StarTypewriter
-
-

@@ -1,109 +1,156 @@
-import { useCallback, useEffect, useState } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, type Root } from 'react-dom/client'
 import { classNames } from '../../utils/classNames'
-import StarCard from './Card'
+import StarMessageCard from './MessageCard'
+import {
+  MESSAGE_PLACEMENTS,
+  resolveMessagePlacement,
+  type MessageOptions,
+  type MessageProps,
+  type MessageRecord,
+} from './messageConfig'
 import styles from './Message.module.scss'
 
-export type MessageType = 'normal' | 'info' | 'success' | 'warning' | 'error'
-export type MessageBottom = 'left' | 'right'
-export type MessagePosition = 'top' | 'bottom-left' | 'bottom-right'
+export type {
+  MessageBottom,
+  MessageOptions,
+  MessagePosition,
+  MessageProps,
+  MessageType,
+} from './messageConfig'
 
-export interface MessageOptions { position?: MessagePosition; bottom?: MessageBottom; duration?: number }
-export interface MessageProps { content: string; type?: MessageType; position?: MessagePosition; bottom?: MessageBottom; duration?: number; onClose?: () => void }
-interface MessageRecord extends MessageProps { id: string }
+const MESSAGE_ROOT_ID = 'star-message-root'
 
-const placements: MessagePosition[] = ['top', 'bottom-left', 'bottom-right']
-const iconMap: Record<MessageType, string> = { normal: '💬', info: '📌', success: '✅', warning: '⚠️', error: '❌' }
-const themeMap: Record<MessageType, { fill: string; border: string; text: string }> = {
-  normal: { fill: '#F5E6CC', border: '#3A2E39', text: '#3A2E39' },
-  info: { fill: '#E0F7FA', border: '#2E4057', text: '#2E4057' },
-  success: { fill: '#E6F2D9', border: '#2F5233', text: '#2F5233' },
-  warning: { fill: '#FFF2D5', border: '#6B4226', text: '#6B4226' },
-  error: { fill: '#FFD1E3', border: '#5C3A57', text: '#5C3A57' },
-}
+type MessageContainer = HTMLDivElement & { __stardewMessageRoot?: Root }
 
-function resolvePlacement(position?: MessagePosition, bottom?: MessageBottom): MessagePosition {
-  if (position) return position
-  if (bottom === 'left') return 'bottom-left'
-  if (bottom === 'right') return 'bottom-right'
-  return 'top'
-}
-
-function StarMessageCard({ content, type = 'normal', duration = 3000, position, bottom, onClose }: MessageRecord) {
-  const [visible, setVisible] = useState(false)
-  const theme = themeMap[type]
-  const placement = resolvePlacement(position, bottom)
-
-  useEffect(() => {
-    const enterTimer = window.setTimeout(() => setVisible(true), 10)
-    const closeTimer = duration > 0 ? window.setTimeout(() => { setVisible(false); window.setTimeout(() => onClose?.(), 200) }, duration) : null
-    return () => { window.clearTimeout(enterTimer); if (closeTimer !== null) window.clearTimeout(closeTimer) }
-  }, [duration, onClose])
-
-  const handleClose = useCallback(() => { setVisible(false); window.setTimeout(() => onClose?.(), 200) }, [onClose])
-
-  return (
-    <StarCard className={classNames(styles['stardew-message'], styles[`stardew-message--${type}`], placement !== 'top' && styles['stardew-message--bottom'], visible && styles['stardew-message--visible'])} size="small">
-      <div className={styles['stardew-message__body']}>
-        <div className={styles['stardew-message__icon-box']} aria-hidden><span className={styles['stardew-message__icon']}>{iconMap[type]}</span></div>
-        <span className={styles['stardew-message__content']}>{content}</span>
-        <button type="button" aria-label="Close message" className={styles['stardew-message__close']} onClick={handleClose} style={{ color: theme.text }}>×</button>
-      </div>
-    </StarCard>
-  )
-}
-
-let messageContainer: HTMLDivElement | null = null
-let messageRoot: ReturnType<typeof createRoot> | null = null
+const messages = new Map<string, MessageRecord>()
 let messageId = 0
-const messages: Map<string, MessageRecord> = new Map()
+let cachedContainer: MessageContainer | null = null
+
+/**
+ * Resolves the portal host that toasts are rendered into.
+ *
+ * The React root is cached on the container element itself, not just in module
+ * scope. Vite re-evaluates this module on hot update, which used to reset the
+ * module-level cache while leaving the old node (and its root) in the document,
+ * so every reload appended another message layer and orphaned the previous one.
+ */
+function getMessageHost(): { container: MessageContainer; root: Root } | null {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  if (cachedContainer?.isConnected && cachedContainer.__stardewMessageRoot) {
+    return { container: cachedContainer, root: cachedContainer.__stardewMessageRoot }
+  }
+
+  const existing = document.getElementById(MESSAGE_ROOT_ID) as MessageContainer | null
+
+  if (existing?.__stardewMessageRoot) {
+    cachedContainer = existing
+    return { container: existing, root: existing.__stardewMessageRoot }
+  }
+
+  const container = (existing ?? document.createElement('div')) as MessageContainer
+  container.id = MESSAGE_ROOT_ID
+
+  if (!container.isConnected) {
+    const appRoot = document.querySelector('[class*="starApp"]')
+    ;(appRoot ?? document.body).appendChild(container)
+  }
+
+  const root = createRoot(container)
+  container.__stardewMessageRoot = root
+  cachedContainer = container
+
+  return { container, root }
+}
+
+/** Stable dismissal handler shared by every card, so cards never see a new prop identity. */
+function dismissMessage(id: string) {
+  const record = messages.get(id)
+
+  if (!record) {
+    return
+  }
+
+  messages.delete(id)
+  renderMessages()
+  record.onClose?.()
+}
 
 function renderMessages() {
-  if (!messageRoot) return
+  const host = getMessageHost()
+
+  if (!host) {
+    return
+  }
+
   const messageList = Array.from(messages.values())
-  messageRoot.render(
+
+  host.root.render(
     <div className={styles['stardew-message-layer']}>
-      {placements.map((placement) => {
-        const groupedMessages = messageList.filter((msg) => resolvePlacement(msg.position, msg.bottom) === placement)
-        if (groupedMessages.length === 0) return null
-        return <div key={placement} className={classNames(styles['stardew-message-container'], styles[`stardew-message-container--${placement}`])}>{groupedMessages.map((msg) => <StarMessageCard key={msg.id} {...msg} onClose={() => { messages.delete(msg.id); renderMessages(); msg.onClose?.() }} />)}</div>
+      {MESSAGE_PLACEMENTS.map((placement) => {
+        const groupedMessages = messageList.filter(
+          (msg) => resolveMessagePlacement(msg.position, msg.bottom) === placement
+        )
+
+        if (groupedMessages.length === 0) {
+          return null
+        }
+
+        return (
+          <div
+            key={placement}
+            className={classNames(
+              styles['stardew-message-container'],
+              styles[`stardew-message-container--${placement}`]
+            )}
+          >
+            {groupedMessages.map((msg) => (
+              <StarMessageCard
+                key={msg.id}
+                id={msg.id}
+                content={msg.content}
+                type={msg.type}
+                duration={msg.duration}
+                position={msg.position}
+                bottom={msg.bottom}
+                onDismiss={dismissMessage}
+              />
+            ))}
+          </div>
+        )
       })}
     </div>
   )
 }
 
-function getContainer() {
-  if (typeof document === 'undefined') {
-    return null
-  }
-
-  if (!messageContainer) {
-    messageContainer = document.createElement('div')
-    messageContainer.id = 'star-message-root'
-    const appRoot = document.querySelector('[class*="starApp"]')
-    ;(appRoot ?? document.body).appendChild(messageContainer)
-    messageRoot = createRoot(messageContainer)
-  }
-  return messageRoot
-}
-
 export function message(props: MessageProps | string, options?: MessageOptions | number) {
   const resolvedOptions = typeof options === 'number' ? { duration: options } : options
-  const config: MessageProps = typeof props === 'string' ? { content: props, ...resolvedOptions } : { ...props, ...resolvedOptions }
+  const config: MessageProps =
+    typeof props === 'string' ? { content: props, ...resolvedOptions } : { ...props, ...resolvedOptions }
   const id = `message-${++messageId}`
-  const root = getContainer()
-  if (!root) {
-    return { close: () => {} }
-  }
+
   messages.set(id, { ...config, id })
   renderMessages()
-  return { close: () => { messages.delete(id); renderMessages() } }
+
+  return {
+    close: () => {
+      messages.delete(id)
+      renderMessages()
+    },
+  }
 }
 
-message.normal = (content: string, options?: MessageOptions | number) => message({ content, type: 'normal' }, options)
-message.info = (content: string, options?: MessageOptions | number) => message({ content, type: 'info' }, options)
-message.success = (content: string, options?: MessageOptions | number) => message({ content, type: 'success' }, options)
-message.warning = (content: string, options?: MessageOptions | number) => message({ content, type: 'warning' }, options)
-message.error = (content: string, options?: MessageOptions | number) => message({ content, type: 'error' }, options)
+message.normal = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'normal' }, options)
+message.info = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'info' }, options)
+message.success = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'success' }, options)
+message.warning = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'warning' }, options)
+message.error = (content: string, options?: MessageOptions | number) =>
+  message({ content, type: 'error' }, options)
 
 export default message

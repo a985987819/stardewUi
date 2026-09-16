@@ -13,6 +13,16 @@ dist-ssr
 *.local
 .worktrees/
 
+# This project uses bun; keep a single lockfile so installs stay reproducible.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Local agent scratch space and probe files.
+.workbuddy/
+.tmp_*
+.commitmsg.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

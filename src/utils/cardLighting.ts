@@ -125,7 +125,7 @@ function rgbToHsl({ r, g, b }: Rgb): Hsl {
 
   const delta = max - min
   const saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min)
-  let hue = 0
+  let hue: number
 
   if (max === red) {
     hue = (green - blue) / delta + (green < blue ? 6 : 0)

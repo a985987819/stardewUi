@@ -21,26 +21,21 @@ describe('Card theme variables', () => {
     expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
   })
 
-  it('renders dedicated canvas surfaces for both the header and body areas', () => {
+  // The header and body used to each render a dedicated <canvas> surface layer.
+  // Those were dropped in the card styling rework: the header now gets its inset
+  // highlights from CSS, and only the body keeps an explicit overlay element.
+  it('keeps the header slot and the dedicated body overlay layer', () => {
     const { container } = render(
       <Card title="Quest Board" showTitle>
         Content
       </Card>
     )
 
-    expect(container.querySelector('[data-slot="card-header-surface"] canvas')).toBeInTheDocument()
-    expect(container.querySelector('[data-slot="card-body-surface"] canvas')).toBeInTheDocument()
-  })
+    expect(container.querySelector('[data-slot="card-header"]')).toBeInTheDocument()
 
-  it('renders shadow overlay layers above the header and body surfaces', () => {
-    const { container } = render(
-      <Card title="Quest Board" showTitle>
-        Content
-      </Card>
-    )
-
-    expect(container.querySelector('[data-slot="card-header-overlay"]')).toBeInTheDocument()
-    expect(container.querySelector('[data-slot="card-body-overlay"]')).toBeInTheDocument()
+    const bodyOverlay = container.querySelector('[data-slot="card-body-overlay"]')
+    expect(bodyOverlay).toBeInTheDocument()
+    expect(bodyOverlay).toHaveAttribute('aria-hidden')
   })
 
   it('exposes independent body lighting variables so the content area keeps its highlight structure', () => {

@@ -19,3 +19,8 @@
     @apply p-6;
   }
 }
+
+.doc-loading {
+  @apply flex items-center justify-center;
+  min-height: 40vh;
+}

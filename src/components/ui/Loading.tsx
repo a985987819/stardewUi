@@ -1,147 +1,18 @@
 ﻿import { useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
+import {
+  applyBiteMasks,
+  BITE_JOLT_DECAY_DURATION,
+  BITE_JOLT_LEVELS,
+  drawLoadingFallback,
+  getBunJoltOffset,
+  getBunRadius,
+  loadLoadingImage,
+  LOADING_DEFAULT_TEXT,
+  LOADING_FRAME_COUNT,
+  LOADING_FRAME_DURATION,
+} from './loadingCanvas'
 import styles from './Loading.module.scss'
-
-const FRAME_COUNT = 12
-const FRAME_DURATION = 240
-const DEFAULT_TEXT = '正在加载...'
-const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
-const FULL_CIRCLE = Math.PI * 2
-const START_ANGLE = -Math.PI / 2
-const BUN_EDGE_RATIO = 0
-const BITE_CENTER_DISTANCE_RATIO = 0.97
-const BITE_DEPTH_RATIO = 0.39
-const BITE_JOLT_LEVELS = [1, 0.55, 0] as const
-const BITE_JOLT_DECAY_DURATION = 60
-
-let loadingImagePromise: Promise<HTMLImageElement> | null = null
-
-function loadLoadingImage() {
-  if (!loadingImagePromise) {
-    loadingImagePromise = new Promise((resolve, reject) => {
-      const image = new Image()
-      image.decoding = 'async'
-      image.onload = () => resolve(image)
-      image.onerror = () => reject(new Error(`Failed to load loading image: ${LOADING_IMAGE_SRC}`))
-      image.src = LOADING_IMAGE_SRC
-    })
-  }
-
-  return loadingImagePromise
-}
-
-function getBunRadius(canvasSize: number) {
-  return canvasSize / 2 - canvasSize * BUN_EDGE_RATIO
-}
-
-function drawFallback(ctx: CanvasRenderingContext2D, size: number) {
-  const center = size / 2
-  const radius = getBunRadius(size)
-
-  ctx.fillStyle = '#f5d7a1'
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
-  ctx.fill()
-
-  ctx.strokeStyle = '#8b4c22'
-  ctx.lineWidth = Math.max(2, size * 0.08)
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
-  ctx.stroke()
-
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)'
-  ctx.beginPath()
-  ctx.arc(center - size * 0.12, center - size * 0.14, size * 0.17, 0, FULL_CIRCLE)
-  ctx.fill()
-}
-
-type BiteMask = {
-  x: number
-  y: number
-  radiusX: number
-  radiusY: number
-  rotation: number
-  arcStart: number
-  arcEnd: number
-}
-
-function createBiteMasks(canvasSize: number, biteCount: number): BiteMask[] {
-  const centerPoint = canvasSize / 2
-  const bunRadius = getBunRadius(canvasSize)
-  const stepAngle = FULL_CIRCLE / FRAME_COUNT
-  const halfStep = stepAngle / 2
-  const centerDistance = bunRadius * BITE_CENTER_DISTANCE_RATIO
-  const radiusY = bunRadius * BITE_DEPTH_RATIO
-  const radiusX = Math.tan(halfStep) * Math.sqrt(Math.max(centerDistance * centerDistance - radiusY * radiusY, 0))
-  const arcStart = Math.atan2(radiusY * Math.sin(halfStep), radiusX * Math.cos(halfStep))
-  const arcEnd = Math.PI - arcStart
-
-  return Array.from({ length: biteCount }, (_, index) => {
-    const angle = START_ANGLE + index * stepAngle
-
-    return {
-      x: centerPoint + Math.cos(angle) * centerDistance,
-      y: centerPoint + Math.sin(angle) * centerDistance,
-      radiusX,
-      radiusY,
-      rotation: angle + Math.PI / 2,
-      arcStart,
-      arcEnd,
-    }
-  })
-}
-
-function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteCount: number) {
-  if (biteCount <= 0) {
-    return
-  }
-
-  const centerPoint = canvasSize / 2
-  const bunRadius = getBunRadius(canvasSize)
-  const strokeWidth = Math.max(1.1, canvasSize * 0.03)
-  const bites = createBiteMasks(canvasSize, biteCount)
-
-  ctx.save()
-  ctx.globalCompositeOperation = 'destination-out'
-  bites.forEach(({ x, y, radiusX, radiusY, rotation }) => {
-    ctx.beginPath()
-    ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, FULL_CIRCLE)
-    ctx.fill()
-  })
-  ctx.restore()
-
-  ctx.save()
-  ctx.beginPath()
-  ctx.arc(centerPoint, centerPoint, bunRadius, 0, FULL_CIRCLE)
-  ctx.clip()
-
-  ctx.strokeStyle = 'rgb(105, 69, 51,0.3)'
-  ctx.lineWidth = strokeWidth
-  ctx.lineJoin = 'round'
-  ctx.lineCap = 'round'
-  bites.forEach(({ x, y, radiusX, radiusY, rotation, arcStart, arcEnd }) => {
-    // Draw only the inward bite edge between the two tangency points.
-    ctx.beginPath()
-    ctx.ellipse(x, y, radiusX, radiusY, rotation, arcStart, arcEnd)
-    ctx.stroke()
-  })
-  ctx.restore()
-}
-
-export function getBunJoltOffset(size: number, biteCount: number, joltLevel: number) {
-  if (biteCount <= 0 || joltLevel <= 0) {
-    return { x: 0, y: 0 }
-  }
-
-  const baseOffset = Math.max(0.45, size * 0.035)
-  const angle = START_ANGLE + (biteCount - 1) * (FULL_CIRCLE / FRAME_COUNT)
-  const direction = biteCount % 2 === 0 ? -1 : 1
-
-  return {
-    x: Number((Math.sin(angle) * baseOffset * joltLevel * direction).toFixed(3)),
-    y: Number((-Math.cos(angle) * baseOffset * joltLevel).toFixed(3)),
-  }
-}
 
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   active?: boolean
@@ -152,6 +23,8 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   block?: boolean
   fill?: boolean
 }
+
+const RESTING_JOLT_INDEX = BITE_JOLT_LEVELS.length - 1
 
 function StarLoading({
   active = true,
@@ -167,11 +40,9 @@ function StarLoading({
   ...rest
 }: StarLoadingProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const timerRef = useRef<number | null>(null)
-  const joltTimerRef = useRef<number | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [hiddenSlices, setHiddenSlices] = useState(0)
-  const [joltIndex, setJoltIndex] = useState(2)
+  const [joltIndex, setJoltIndex] = useState(RESTING_JOLT_INDEX)
 
   useEffect(() => {
     let cancelled = false
@@ -193,71 +64,51 @@ function StarLoading({
     }
   }, [])
 
+  // Resetting animation state when `active` flips used to happen inside an
+  // effect, which schedules an extra render pass and can visibly flicker. The
+  // React-recommended approach is to adjust state during render instead; React
+  // re-runs the component immediately without committing the intermediate tree.
+  const [previousActive, setPreviousActive] = useState(active)
+
+  if (previousActive !== active) {
+    setPreviousActive(active)
+
+    if (active) {
+      setHiddenSlices(0)
+      setJoltIndex(RESTING_JOLT_INDEX)
+    }
+  }
+
+  const [previousHiddenSlices, setPreviousHiddenSlices] = useState(hiddenSlices)
+
+  if (previousHiddenSlices !== hiddenSlices) {
+    setPreviousHiddenSlices(hiddenSlices)
+    const isMidAnimation = hiddenSlices > 0 && hiddenSlices < LOADING_FRAME_COUNT
+    setJoltIndex(isMidAnimation ? 0 : RESTING_JOLT_INDEX)
+  }
+
   useEffect(() => {
     if (!active) {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
       return
     }
 
-    setHiddenSlices(0)
-    setJoltIndex(2)
-  }, [active])
+    const timer = window.setTimeout(() => {
+      setHiddenSlices((current) => (current >= LOADING_FRAME_COUNT ? 0 : current + 1))
+    }, LOADING_FRAME_DURATION)
 
-  useEffect(() => {
-    if (!active) {
-      return
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      setHiddenSlices((current) => (current >= FRAME_COUNT ? 0 : current + 1))
-    }, FRAME_DURATION)
-
-    return () => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
-    }
+    return () => window.clearTimeout(timer)
   }, [active, hiddenSlices])
 
   useEffect(() => {
-    if (hiddenSlices <= 0 || hiddenSlices >= FRAME_COUNT) {
-      setJoltIndex(2)
+    if (joltIndex >= RESTING_JOLT_INDEX) {
       return
     }
 
-    setJoltIndex(0)
-
-    return () => {
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
-    }
-  }, [hiddenSlices])
-
-  useEffect(() => {
-    if (joltIndex >= BITE_JOLT_LEVELS.length - 1) {
-      return
-    }
-
-    joltTimerRef.current = window.setTimeout(() => {
-      setJoltIndex((current) => Math.min(current + 1, BITE_JOLT_LEVELS.length - 1))
+    const timer = window.setTimeout(() => {
+      setJoltIndex((current) => Math.min(current + 1, RESTING_JOLT_INDEX))
     }, BITE_JOLT_DECAY_DURATION)
 
-    return () => {
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
-    }
+    return () => window.clearTimeout(timer)
   }, [joltIndex])
 
   useEffect(() => {
@@ -281,19 +132,19 @@ function StarLoading({
     }
 
     ctx.clearRect(0, 0, targetSize, targetSize)
-    if (hiddenSlices >= FRAME_COUNT) {
+    if (hiddenSlices >= LOADING_FRAME_COUNT) {
       return
     }
 
     ctx.save()
     ctx.beginPath()
-    ctx.arc(targetSize / 2, targetSize / 2, getBunRadius(targetSize), 0, FULL_CIRCLE)
+    ctx.arc(targetSize / 2, targetSize / 2, getBunRadius(targetSize), 0, Math.PI * 2)
     ctx.clip()
 
     if (image) {
       ctx.drawImage(image, 0, 0, targetSize, targetSize)
     } else {
-      drawFallback(ctx, targetSize)
+      drawLoadingFallback(ctx, targetSize)
     }
 
     ctx.restore()
@@ -301,7 +152,7 @@ function StarLoading({
     applyBiteMasks(ctx, targetSize, hiddenSlices)
   }, [hiddenSlices, image, size])
 
-  const resolvedText = text === undefined ? DEFAULT_TEXT : text
+  const resolvedText = text === undefined ? LOADING_DEFAULT_TEXT : text
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
   const joltOffset = getBunJoltOffset(size, hiddenSlices, BITE_JOLT_LEVELS[joltIndex])
   const rootStyle = useMemo(
@@ -328,7 +179,7 @@ function StarLoading({
       )}
       style={rootStyle}
       role={isAriaHidden ? undefined : role ?? 'status'}
-      aria-label={isAriaHidden ? undefined : resolvedText || DEFAULT_TEXT}
+      aria-label={isAriaHidden ? undefined : resolvedText || LOADING_DEFAULT_TEXT}
     >
       <canvas ref={canvasRef} className={styles['loading__canvas']} aria-hidden />
       {resolvedText ? <span className={styles['loading__text']}>{resolvedText}</span> : null}
@@ -337,5 +188,3 @@ function StarLoading({
 }
 
 export default StarLoading
-
-

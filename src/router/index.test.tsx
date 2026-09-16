@@ -25,6 +25,10 @@ describe('router', () => {
   it('renders the date picker demo for /components/date-picker', async () => {
     await renderRoute('/components/date-picker')
 
-    expect((await screen.findAllByRole('heading', { name: /DatePicker/ })).length).toBeGreaterThan(0)
+    // Routed pages are code-split, so the chunk arrives asynchronously. The
+    // default 1s findBy timeout is too tight when the whole suite is running.
+    expect(
+      (await screen.findAllByRole('heading', { name: /DatePicker/ }, { timeout: 5000 })).length
+    ).toBeGreaterThan(0)
   })
 })

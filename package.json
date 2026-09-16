@@ -40,7 +40,8 @@
     "preview": "bunx vite preview",
     "test": "bunx vitest",
     "test:run": "bunx vitest run",
-    "test:coverage": "bunx vitest run --coverage"
+    "test:coverage": "bunx vitest run --coverage",
+    "test:smoke": "bun scripts/smoke-routes.mjs"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

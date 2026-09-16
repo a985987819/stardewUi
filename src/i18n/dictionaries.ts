@@ -1,39 +1,6 @@
-import { createContext, useCallback, useContext, type ReactNode } from 'react'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-
 export type Lang = 'zh' | 'en'
 
-interface I18nContextValue {
-  lang: Lang
-  setLang: (lang: Lang) => void
-  t: (key: string) => string
-}
-
-const I18nContext = createContext<I18nContextValue | null>(null)
-
-export function useI18n() {
-  const ctx = useContext(I18nContext)
-  if (!ctx) {
-    throw new Error('useI18n must be used within I18nProvider')
-  }
-  return ctx
-}
-
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useLocalStorage<Lang>('star-ui-lang', 'zh')
-
-  const t = useCallback(
-    (key: string) => {
-      const dict = dictionaries[lang]
-      return dict[key] ?? key
-    },
-    [lang]
-  )
-
-  return <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>
-}
-
-const zhDict: Record<string, string> = {
+export const zhDict: Record<string, string> = {
   'nav.guide': '指南',
   'nav.components': '组件',
   'nav.api': 'API',
@@ -94,7 +61,7 @@ const zhDict: Record<string, string> = {
   'copy.title': '点击复制',
 }
 
-const enDict: Record<string, string> = {
+export const enDict: Record<string, string> = {
   'nav.guide': 'Guide',
   'nav.components': 'Components',
   'nav.api': 'API',
@@ -158,7 +125,7 @@ const enDict: Record<string, string> = {
   'copy.title': 'Click to copy',
 }
 
-const dictionaries: Record<Lang, Record<string, string>> = {
+export const dictionaries: Record<Lang, Record<string, string>> = {
   zh: zhDict,
   en: enDict,
 }

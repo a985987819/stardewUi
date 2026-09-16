@@ -2,22 +2,26 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { GITHUB_PAGES_BASENAME } from '../utils/githubPages'
 import StarLayout from '../components/layout/Layout'
 import StarHomePage from '../pages/Home'
-import StarGuidePage from '../pages/Guide'
-import StarComponentsPage from '../pages/Components'
-import StarButtonDemoPage from '../pages/ButtonDemo'
-import StarCalendarDemoPage from '../pages/CalendarDemo'
-import StarCardDemoPage from '../pages/CardDemo'
-import StarDatePickerDemoPage from '../pages/DatePickerDemo'
-import StarDialogDemoPage from '../pages/DialogDemo'
-import StarEmptyStateDemoPage from '../pages/EmptyStateDemo'
-import StarPopupDemoPage from '../pages/PopupDemo'
-import StarTypewriterDemoPage from '../pages/TypewriterDemo'
-import StarMessageDemoPage from '../pages/MessageDemo'
-import StarTitleDemoPage from '../pages/TitleDemo'
-import StarLoadingDemoPage from '../pages/LoadingDemo'
-import StarTabDemoPage from '../pages/TabDemo'
-import StarGapBorderDemoPage from '../pages/GapBorderDemo'
-import StarPixelButtonDemoPage from '../pages/PixelButtonDemo'
+// Demo pages are code-split per route so the landing page only ships the shell.
+// `StarLayout` provides the Suspense boundary for these children.
+import {
+  StarButtonDemoPage,
+  StarCalendarDemoPage,
+  StarCardDemoPage,
+  StarComponentsPage,
+  StarDatePickerDemoPage,
+  StarDialogDemoPage,
+  StarEmptyStateDemoPage,
+  StarGapBorderDemoPage,
+  StarGuidePage,
+  StarLoadingDemoPage,
+  StarMessageDemoPage,
+  StarPixelButtonDemoPage,
+  StarPopupDemoPage,
+  StarTabDemoPage,
+  StarTitleDemoPage,
+  StarTypewriterDemoPage,
+} from './lazyPages'
 
 export const router = createBrowserRouter(
   [
