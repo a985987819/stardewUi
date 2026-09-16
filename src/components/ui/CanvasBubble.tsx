@@ -9,15 +9,34 @@ import {
   useRef,
 } from 'react'
 import { classNames } from '../../utils/classNames'
-import { drawPixelBubble, resolveBubblePlacement, type BubblePlacement } from '../../utils'
+import {
+  drawPixelBubble,
+  drawWoodPanel,
+  resolveBubblePlacement,
+  type BubblePlacement,
+} from '../../utils'
 import styles from './CanvasBubble.module.scss'
+
+/**
+ * `pixel` keeps the classic rounded bubble. `wood` swaps in the angular
+ * wood-grain dialog used by the popup: a single frame with staircase corners
+ * instead of two nested outlines.
+ */
+export type CanvasBubbleTexture = 'pixel' | 'wood'
 
 export interface StarCanvasBubbleProps extends HTMLAttributes<HTMLDivElement> {
   bubblePlacement?: BubblePlacement
+  texture?: CanvasBubbleTexture
   fillColor?: string
   borderColor?: string
   borderWidth?: number
   cornerSize?: number
+  /** Wood texture only: staircase segments per corner (3 = three-level corner). */
+  stairSteps?: number
+  /** Wood texture only: thickness of the inner bevel ring. */
+  frameWidth?: number
+  /** Wood texture only: size of one grain band, in CSS pixels. */
+  grainSize?: number
   arrowWidth?: number
   arrowDepth?: number
   contentPadding?: number
@@ -39,10 +58,14 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
   (
     {
       bubblePlacement = 'none',
+      texture = 'pixel',
       fillColor = '#f8f7f3',
       borderColor = '#2f3440',
       borderWidth = 4,
       cornerSize = 10,
+      stairSteps = 3,
+      frameWidth = 4,
+      grainSize = 6,
       arrowWidth = 20,
       arrowDepth = 12,
       contentPadding = 14,
@@ -96,6 +119,21 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
         return
       }
 
+      if (texture === 'wood') {
+        drawWoodPanel(ctx, {
+          width: targetWidth,
+          height: targetHeight,
+          placement: bubblePlacement,
+          borderWidth: borderWidth * dpr,
+          frameWidth: frameWidth * dpr,
+          cornerSteps: stairSteps,
+          stepSize: grainSize * dpr,
+          arrowWidth: arrowWidth * dpr,
+          arrowDepth: arrowDepth * dpr,
+        })
+        return
+      }
+
       drawPixelBubble(ctx, {
         width: targetWidth,
         height: targetHeight,
@@ -107,7 +145,19 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
         arrowWidth: arrowWidth * dpr,
         arrowDepth: arrowDepth * dpr,
       })
-    }, [arrowDepth, arrowWidth, borderColor, borderWidth, bubblePlacement, cornerSize, fillColor])
+    }, [
+      arrowDepth,
+      arrowWidth,
+      borderColor,
+      borderWidth,
+      bubblePlacement,
+      cornerSize,
+      fillColor,
+      frameWidth,
+      grainSize,
+      stairSteps,
+      texture,
+    ])
 
     useEffect(() => {
       draw()
@@ -134,15 +184,19 @@ const StarCanvasBubble = forwardRef<HTMLDivElement, StarCanvasBubbleProps>(
 
     const resolvedPlacement = useMemo(() => resolveBubblePlacement(bubblePlacement), [bubblePlacement])
 
+    // The wood texture adds an inner bevel ring, so content has to clear
+    // `borderWidth + frameWidth` instead of just the outer frame.
+    const edgeInset = texture === 'wood' ? borderWidth + frameWidth : borderWidth
+
     const contentStyle = useMemo(
       () =>
         ({
-          paddingTop: contentPadding + borderWidth + (resolvedPlacement.side === 'top' ? arrowDepth : 0),
-          paddingRight: contentPadding + borderWidth + (resolvedPlacement.side === 'right' ? arrowDepth : 0),
-          paddingBottom: contentPadding + borderWidth + (resolvedPlacement.side === 'bottom' ? arrowDepth : 0),
-          paddingLeft: contentPadding + borderWidth + (resolvedPlacement.side === 'left' ? arrowDepth : 0),
+          paddingTop: contentPadding + edgeInset + (resolvedPlacement.side === 'top' ? arrowDepth : 0),
+          paddingRight: contentPadding + edgeInset + (resolvedPlacement.side === 'right' ? arrowDepth : 0),
+          paddingBottom: contentPadding + edgeInset + (resolvedPlacement.side === 'bottom' ? arrowDepth : 0),
+          paddingLeft: contentPadding + edgeInset + (resolvedPlacement.side === 'left' ? arrowDepth : 0),
         }) satisfies CSSProperties,
-      [arrowDepth, borderWidth, contentPadding, resolvedPlacement.side]
+      [arrowDepth, contentPadding, edgeInset, resolvedPlacement.side]
     )
 
     return (

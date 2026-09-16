@@ -8,13 +8,21 @@ type Point = {
 type DefaultButtonPalette = ReturnType<typeof createDefaultButtonPalette>
 
 export type DefaultButtonFrameMetrics = {
-  cornerRadius: number
-  stepSize: number
+  /** Staircase segments per corner. */
+  cornerSteps: number
+  /** Size of one staircase segment, in device pixels. */
+  cornerStep: number
+  /** Total corner span: `cornerSteps * cornerStep`. */
+  cornerSpan: number
   outerBorderWidth: number
   innerBorderWidth: number
   innerBorderGap: number
   innerShadowOffsetY: number
 }
+
+/** Three-level pixel corner, matching the GapBorder `cornerLevel = 3` language. */
+export const DEFAULT_BUTTON_CORNER_STEPS = 3
+const MAX_CORNER_STEP = 6
 
 const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   if (!points.length) {
@@ -31,26 +39,33 @@ const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   ctx.closePath()
 }
 
-const clampInset = (value: number, width: number, height: number) =>
-  Math.min(value, Math.max(1, Math.floor(Math.min(width, height) / 2) - 1))
+/**
+ * Staircase that climbs from the vertical edge up to the horizontal edge.
+ * The first point sits on the vertical edge, the last one on the horizontal
+ * edge, so four of these concatenate into one clockwise polygon.
+ */
+const buildCornerStair = (steps: number, step: number): Point[] => {
+  const span = steps * step
+  const points: Point[] = []
 
-const buildButtonPolygon = (width: number, height: number, cornerRadius: number, stepSize: number): Point[] => {
-  const outerInset = clampInset(cornerRadius, width, height)
-  const innerInset = clampInset(Math.max(stepSize, Math.round(outerInset * 0.42)), width, height)
+  for (let index = 0; index < steps; index += 1) {
+    points.push({ x: index * step, y: span - index * step })
+    points.push({ x: (index + 1) * step, y: span - index * step })
+  }
+
+  points.push({ x: span, y: 0 })
+
+  return points
+}
+
+const buildButtonPolygon = (width: number, height: number, steps: number, step: number): Point[] => {
+  const stair = buildCornerStair(steps, step)
 
   return [
-    { x: outerInset, y: 0 },
-    { x: width - outerInset, y: 0 },
-    { x: width - innerInset, y: innerInset },
-    { x: width, y: outerInset },
-    { x: width, y: height - outerInset },
-    { x: width - innerInset, y: height - innerInset },
-    { x: width - outerInset, y: height },
-    { x: outerInset, y: height },
-    { x: innerInset, y: height - innerInset },
-    { x: 0, y: height - outerInset },
-    { x: 0, y: outerInset },
-    { x: innerInset, y: innerInset },
+    ...stair,
+    ...[...stair].reverse().map(({ x, y }) => ({ x: width - x, y })),
+    ...stair.map(({ x, y }) => ({ x: width - x, y: height - y })),
+    ...[...stair].reverse().map(({ x, y }) => ({ x, y: height - y })),
   ]
 }
 
@@ -63,10 +78,25 @@ const insetPolygon = (points: Point[], inset: number, width: number, height: num
 export const getDefaultButtonFrameMetrics = (width: number, height: number, dpr: number): DefaultButtonFrameMetrics => {
   const minSide = Math.max(1, Math.min(width, height))
   const scaledDpr = Math.max(1, dpr)
+  const steps = DEFAULT_BUTTON_CORNER_STEPS
+
+  // Two constraints keep the staircase readable on compact buttons: opposite
+  // corners must not overlap, and every riser stays on a whole device pixel so
+  // the corner rasterises crisp instead of smearing across half pixels.
+  const maxSpan = Math.floor(minSide / 3)
+  const cornerStep = Math.max(
+    1,
+    Math.min(
+      Math.round(minSide / (steps * 2.6)),
+      Math.round(MAX_CORNER_STEP * scaledDpr),
+      Math.floor(maxSpan / steps)
+    )
+  )
 
   return {
-    cornerRadius: clampInset(Math.round(10 * scaledDpr), width, height),
-    stepSize: Math.max(1, Math.round(Math.min(minSide / 8, 4 * scaledDpr))),
+    cornerSteps: steps,
+    cornerStep,
+    cornerSpan: cornerStep * steps,
     outerBorderWidth: 2 * scaledDpr,
     innerBorderWidth: 2 * scaledDpr,
     innerBorderGap: 0.5 * scaledDpr,
@@ -93,7 +123,7 @@ export const drawDefaultButtonBackground = (
   ctx.clearRect(0, 0, width, height)
   ctx.imageSmoothingEnabled = false
 
-  const outerPolygon = buildButtonPolygon(width, height, metrics.cornerRadius, metrics.stepSize)
+  const outerPolygon = buildButtonPolygon(width, height, metrics.cornerSteps, metrics.cornerStep)
   const fillPolygon = insetPolygon(outerPolygon, metrics.outerBorderWidth, width, height)
   const innerBorderPolygon = insetPolygon(
     outerPolygon,
@@ -125,11 +155,16 @@ export const drawDefaultButtonBackground = (
   ctx.lineJoin = 'miter'
   ctx.stroke()
 
+  // Keep the top highlight clear of the corner staircase, otherwise it would
+  // spill into the notch the polygon leaves behind.
+  const highlightInset = Math.max(metrics.outerBorderWidth * 2, metrics.cornerSpan)
+  const highlightHeight = Math.max(1, Math.round(2 * dpr))
+
   ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
   ctx.fillRect(
+    highlightInset,
     metrics.outerBorderWidth * 2,
-    metrics.outerBorderWidth * 2,
-    Math.max(0, width - metrics.outerBorderWidth * 4),
-    Math.max(1, Math.round(2 * dpr))
+    Math.max(0, width - highlightInset * 2),
+    highlightHeight
   )
 }

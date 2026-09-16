@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
-import { classNames, flipBubblePlacement, type BubblePlacement } from '../../utils'
+import {
+  classNames,
+  flipBubblePlacement,
+  getWoodPanelSurfaceClipPath,
+  WOOD_PANEL_THEME,
+  type BubblePlacement,
+} from '../../utils'
 import StarCanvasBubble from './CanvasBubble'
 import StarNineSliceButton from './NineSliceButton'
 import styles from './Popup.module.scss'
@@ -25,6 +31,34 @@ export interface StarPopupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   offset?: number
   children: ReactNode
 }
+
+/**
+ * Frame geometry of the wood dialog. The canvas draws the frame from these
+ * numbers and the content clip-path is generated from the same pair, so the
+ * header/footer backgrounds can never cut a different corner than the frame.
+ */
+const PANEL_BORDER_WIDTH = 6
+const PANEL_FRAME_WIDTH = 4
+const PANEL_STAIR_STEPS = 3
+const PANEL_GRAIN_SIZE = 6
+const PANEL_ARROW_WIDTH = 26
+const PANEL_ARROW_DEPTH = 14
+
+const panelCssVariables = {
+  '--wood-panel-text': WOOD_PANEL_THEME.text,
+  '--wood-panel-text-secondary': WOOD_PANEL_THEME.textSecondary,
+  '--wood-panel-title-shadow': WOOD_PANEL_THEME.titleShadow,
+  '--wood-panel-divider': WOOD_PANEL_THEME.divider,
+  '--wood-panel-top-highlight': WOOD_PANEL_THEME.topHighlight,
+  '--wood-panel-footer-top': WOOD_PANEL_THEME.footerTop,
+  '--wood-panel-footer-bottom': WOOD_PANEL_THEME.footerBottom,
+  '--wood-panel-footer-border': WOOD_PANEL_THEME.footerBorder,
+  '--wood-panel-header-grain-1': WOOD_PANEL_THEME.headerGrain[0],
+  '--wood-panel-header-grain-2': WOOD_PANEL_THEME.headerGrain[1],
+  '--wood-panel-header-grain-3': WOOD_PANEL_THEME.headerGrain[2],
+  '--wood-panel-header-grain-4': WOOD_PANEL_THEME.headerGrain[3],
+  '--wood-panel-surface-clip-path': getWoodPanelSurfaceClipPath(PANEL_STAIR_STEPS, PANEL_GRAIN_SIZE),
+} as CSSProperties
 
 const getPopupPositionStyle = (placement: PopupPlacement, offset: number): CSSProperties => {
   switch (placement) {
@@ -155,6 +189,11 @@ function StarPopup({
     </div>
   ) : null
 
+  const bubbleWrapStyle = {
+    ...getPopupPositionStyle(placement, offset),
+    ...panelCssVariables,
+  } as CSSProperties
+
   return (
     <div
       ref={containerRef}
@@ -166,36 +205,34 @@ function StarPopup({
     >
       <div className={styles['stardew-popup__trigger']}>{children}</div>
       {open ? (
-        <div className={styles['stardew-popup__bubble-wrap']} style={getPopupPositionStyle(placement, offset)}>
+        <div className={styles['stardew-popup__bubble-wrap']} style={bubbleWrapStyle}>
           <StarCanvasBubble
             className={styles['stardew-popup__bubble']}
+            texture="wood"
             bubblePlacement={bubblePlacement}
-            fillColor="#ffe0b2"
-            borderColor="#d7770f"
-            borderWidth={6}
-            cornerSize={14}
-            arrowWidth={24}
-            arrowDepth={14}
-            contentPadding={12}
+            borderWidth={PANEL_BORDER_WIDTH}
+            frameWidth={PANEL_FRAME_WIDTH}
+            stairSteps={PANEL_STAIR_STEPS}
+            grainSize={PANEL_GRAIN_SIZE}
+            arrowWidth={PANEL_ARROW_WIDTH}
+            arrowDepth={PANEL_ARROW_DEPTH}
+            contentPadding={0}
+            contentClassName={styles['stardew-popup__surface']}
           >
-            <div className={styles['stardew-popup__surface']}>
-              {title ? (
-                <div className={styles['stardew-popup__header']}>
-                  <div className={styles['stardew-popup__title-tag']}>
-                    <h3 className={styles['stardew-popup__title']}>{title}</h3>
-                  </div>
-                </div>
-              ) : null}
-              <div
-                className={classNames(
-                  styles['stardew-popup__body'],
-                  !title ? styles['stardew-popup__body--without-title'] : undefined
-                )}
-              >
-                {content}
+            {title ? (
+              <div className={styles['stardew-popup__header']}>
+                <h3 className={styles['stardew-popup__title']}>{title}</h3>
               </div>
-              {footer}
+            ) : null}
+            <div
+              className={classNames(
+                styles['stardew-popup__body'],
+                !title ? styles['stardew-popup__body--without-title'] : undefined
+              )}
+            >
+              {content}
             </div>
+            {footer}
           </StarCanvasBubble>
         </div>
       ) : null}

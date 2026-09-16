@@ -176,9 +176,12 @@ function StarDialog({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleNext, handlePrev, maskClosable, onClose, open])
 
+  // Confirm and cancel deliberately share the same default button. The darker
+  // `primary` treatment made the confirm action harder to read against the
+  // dialog surface, and the pair reads as one group again.
   const defaultActions: DialogAction[] = [
-    { label: LABEL_CONFIRM, variant: 'primary', onClick: onClose },
-    { label: LABEL_CANCEL, variant: 'default', onClick: onClose },
+    { label: LABEL_CONFIRM, onClick: onClose },
+    { label: LABEL_CANCEL, onClick: onClose },
   ]
 
   const finalActions = actions === null ? [] : actions ?? defaultActions

@@ -10,6 +10,9 @@ $tab-text-active: #9d4100;
 $tab-indicator: #fff8eb;
 $tab-indicator-shadow: rgba(255, 255, 255, 0.5);
 
+// Slight stepped pixel corner: two 3px risers per corner (6px total).
+$tab-step-span: 6px;
+
 .star-tab {
   display: flex;
   flex-direction: column;
@@ -21,8 +24,40 @@ $tab-indicator-shadow: rgba(255, 255, 255, 0.5);
   background: $tab-bg;
   overflow: hidden;
 
+  // Tabs keep their outer edge flat so the strip still reads as one row; only
+  // the corners facing the content are cut into steps.
+  --tab-item-clip-path: polygon(
+    0 #{$tab-step-span},
+    3px #{$tab-step-span},
+    3px 3px,
+    #{$tab-step-span} 3px,
+    #{$tab-step-span} 0,
+    calc(100% - #{$tab-step-span}) 0,
+    calc(100% - #{$tab-step-span}) 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) #{$tab-step-span},
+    100% #{$tab-step-span},
+    100% 100%,
+    0 100%
+  );
+
   &--bottom {
     flex-direction: column;
+
+    --tab-item-clip-path: polygon(
+      0 0,
+      100% 0,
+      100% calc(100% - #{$tab-step-span}),
+      calc(100% - 3px) calc(100% - #{$tab-step-span}),
+      calc(100% - 3px) calc(100% - 3px),
+      calc(100% - #{$tab-step-span}) calc(100% - 3px),
+      calc(100% - #{$tab-step-span}) 100%,
+      #{$tab-step-span} 100%,
+      #{$tab-step-span} calc(100% - 3px),
+      3px calc(100% - 3px),
+      3px calc(100% - #{$tab-step-span}),
+      0 calc(100% - #{$tab-step-span})
+    );
   }
 
   &__nav-wrapper {
@@ -64,9 +99,12 @@ $tab-indicator-shadow: rgba(255, 255, 255, 0.5);
     letter-spacing: 0.5px;
     cursor: pointer;
     white-space: nowrap;
+    clip-path: var(--tab-item-clip-path);
+    // `jump-start` matters here. The default `end` position holds the starting
+    // colour for the first half of the duration, which reads as a delayed hover.
     transition:
-      background 0.15s steps(2),
-      color 0.15s steps(2);
+      background 0.12s steps(2, jump-start),
+      color 0.12s steps(2, jump-start);
 
     &:hover:not(&--disabled):not(&--active) {
       background: $tab-bg-hover;

@@ -8,8 +8,11 @@
   background: transparent;
   color: var(--color-text);
   box-shadow: none;
+  // `jump-start` so the hover lift and the press sink respond on the first
+  // frame; the default `end` position holds the start pose for half the
+  // duration, which reads as lag.
   transition:
-    transform 0.08s steps(2),
+    transform 0.08s steps(2, jump-start),
     color 0.12s ease;
 
   &__bg {
@@ -130,6 +133,9 @@
     min-width: 98px;
     min-height: 34px;
     padding: 9px 22px 11px;
+    // The canvas draws the silhouette here, including the stepped corners.
+    // Leaving the shared radius on would clip those steps back into an arc.
+    border-radius: 0;
   }
 
   &--seasonal {
