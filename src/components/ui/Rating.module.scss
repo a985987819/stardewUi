@@ -1,5 +1,5 @@
 .star-rating {
-  --star-rating-color: #d9899a;
+  --star-rating-color: #e53935;
   --star-rating-empty-color: #cdbda8;
 
   display: inline-flex;
@@ -58,9 +58,10 @@
 
   &__glyph-fill {
     position: absolute;
-    inset: 0 auto 0 0;
-    overflow: hidden;
+    inset: 0;
     color: var(--star-rating-color);
+    -webkit-mask-image: linear-gradient(to right, #000 0 var(--star-rating-fill), transparent var(--star-rating-fill));
+    mask-image: linear-gradient(to right, #000 0 var(--star-rating-fill), transparent var(--star-rating-fill));
   }
 
   svg {

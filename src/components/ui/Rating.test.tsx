@@ -12,17 +12,15 @@ describe('Rating', () => {
     expect(screen.getAllByRole('button')).toHaveLength(5)
   })
 
-  it('chooses half points from the left side of an icon', () => {
+  it('selects a full icon first, then toggles that icon to a half with a double pointer action', () => {
     const onChange = vi.fn()
     render(<Rating allowHalf onChange={onChange} />)
 
     const secondHeart = screen.getAllByRole('button')[1]
-    Object.defineProperty(secondHeart, 'getBoundingClientRect', {
-      value: () => ({ left: 10, width: 20 }),
-    })
-    fireEvent.click(secondHeart, { clientX: 12 })
+    fireEvent.pointerUp(secondHeart, { isPrimary: true })
+    fireEvent.pointerUp(secondHeart, { isPrimary: true })
 
-    expect(onChange).toHaveBeenCalledWith(1.5)
+    expect(onChange.mock.calls).toEqual([[2], [1.5]])
   })
 
   it('supports keyboard increments with half points', () => {

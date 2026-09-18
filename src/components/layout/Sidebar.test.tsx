@@ -23,6 +23,8 @@ describe('Sidebar language rendering', () => {
     expect(screen.getByRole('link', { name: /指南 Guide/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /组件 Components/ })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /按钮 Button/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /评分 Rating/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /进度条 Progress/ })).toBeInTheDocument()
   })
 
   it('keeps bilingual route labels in English mode too', () => {
