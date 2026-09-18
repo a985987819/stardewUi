@@ -1,8 +1,11 @@
-export const DEFAULT_BUTTON_FILL = '#FDF4E6'
-export const DEFAULT_BUTTON_OUTER_BORDER = '#8B4513'
-export const DEFAULT_BUTTON_INNER_BORDER = '#D2B48C'
+// These are deliberately flat, high-contrast swatches. The stepped silhouette
+// is what supplies the pixel-art detail; gradients make the small blocks look
+// blurry rather than dimensional.
+export const DEFAULT_BUTTON_FILL = '#4B9DF2'
+export const DEFAULT_BUTTON_OUTER_BORDER = '#3C3C3C'
+export const DEFAULT_BUTTON_INNER_BORDER = '#2678BB'
 export const DEFAULT_BUTTON_DISABLED_TEXT = '#B0BEC5'
-export const DEFAULT_BUTTON_DISABLED_OVERLAY = 'rgba(240, 230, 210, 0.6)'
+export const DEFAULT_BUTTON_DISABLED_OVERLAY = 'rgba(218, 232, 245, 0.62)'
 
 type RgbColor = {
   r: number
@@ -105,31 +108,41 @@ export const getReadableButtonTextColor = (
   fillColor: string = DEFAULT_BUTTON_FILL
 ) => darkenUntilContrast(outerBorderColor, fillColor, 4.5)
 
-export const createDefaultButtonPalette = (outerBorderColor?: string) => {
-  if (!outerBorderColor) {
+export const createDefaultButtonPalette = (
+  outerBorderColor?: string,
+  fillColor = DEFAULT_BUTTON_FILL,
+  textColor?: string
+) => {
+  const fill = normalizeHexColor(fillColor)
+
+  if (!outerBorderColor && fill === DEFAULT_BUTTON_FILL && !textColor) {
     return {
       fill: DEFAULT_BUTTON_FILL,
       outerBorder: DEFAULT_BUTTON_OUTER_BORDER,
       innerBorder: DEFAULT_BUTTON_INNER_BORDER,
       text: {
-        normal: '#5D4037',
-        hover: '#3E2723',
-        active: '#2E1B15',
+        normal: '#FFFFFF',
+        hover: '#FFFFFF',
+        active: '#E1F0FF',
         disabled: DEFAULT_BUTTON_DISABLED_TEXT,
       },
       disabledOverlay: DEFAULT_BUTTON_DISABLED_OVERLAY,
     }
   }
 
-  const outerBorder = normalizeHexColor(outerBorderColor)
-  const normalText = getReadableButtonTextColor(outerBorder, DEFAULT_BUTTON_FILL)
-  const hoverText = darkenUntilContrast(mixColors(normalText, '#000000', 0.16), DEFAULT_BUTTON_FILL, 4.5)
-  const activeText = darkenUntilContrast(mixColors(normalText, '#000000', 0.3), DEFAULT_BUTTON_FILL, 4.5)
+  const outerBorder = normalizeHexColor(outerBorderColor ?? DEFAULT_BUTTON_OUTER_BORDER)
+  const normalText = textColor ? normalizeHexColor(textColor) : getReadableButtonTextColor(outerBorder, fill)
+  const hoverText = textColor
+    ? normalText
+    : darkenUntilContrast(mixColors(normalText, '#000000', 0.16), fill, 4.5)
+  const activeText = textColor
+    ? mixColors(normalText, '#D7EBFF', 0.72)
+    : darkenUntilContrast(mixColors(normalText, '#000000', 0.3), fill, 4.5)
 
   return {
-    fill: DEFAULT_BUTTON_FILL,
+    fill,
     outerBorder,
-    innerBorder: deriveInnerBorderColor(outerBorder, DEFAULT_BUTTON_FILL),
+    innerBorder: deriveInnerBorderColor(outerBorder, fill),
     text: {
       normal: normalText,
       hover: hoverText,
