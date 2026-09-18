@@ -9,32 +9,31 @@
  * Default baseUrl: http://127.0.0.1:5199/stardewUi
  */
 import { spawn } from 'node:child_process'
-import { mkdtempSync, rmSync, existsSync } from 'node:fs'
+import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const BASE_URL = (process.argv[2] ?? 'http://127.0.0.1:5199/stardewUi').replace(/\/$/, '')
 const PORT = 9333
 
-const ROUTES = [
-  '/',
-  '/guide',
-  '/components',
-  '/components/button',
-  '/components/calendar',
-  '/components/title',
-  '/components/card',
-  '/components/date-picker',
-  '/components/dialog',
-  '/components/empty-state',
-  '/components/popup',
-  '/components/typewriter',
-  '/components/loading',
-  '/components/message',
-  '/components/tab',
-  '/components/gap-border',
-  '/components/pixel-button',
-]
+/**
+ * Component routes are read from the catalogue instead of being listed by hand.
+ * A hand-written copy silently stops covering new components: this list had
+ * already missed `/components/rating` and `/components/progress`.
+ */
+function cataloguedRoutes() {
+  const source = readFileSync(new URL('../src/router/componentRegistry.tsx', import.meta.url), 'utf8')
+  const routePaths = [...source.matchAll(/routePath: '([^']+)'/g)].map(([, routePath]) => routePath)
+
+  if (routePaths.length === 0) {
+    console.error('No routePath entries found in src/router/componentRegistry.tsx')
+    process.exit(2)
+  }
+
+  return routePaths.map((routePath) => `/components/${routePath}`)
+}
+
+const ROUTES = ['/', '/guide', '/components', ...cataloguedRoutes()]
 
 const CANDIDATES = [
   process.env.CHROME_PATH,

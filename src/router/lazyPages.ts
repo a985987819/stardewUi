@@ -6,10 +6,15 @@ import { lazy } from 'react'
  * These live outside `router/index.tsx` because that module exports the router
  * itself: mixing component and non-component exports in one file disables Vite's
  * Fast Refresh for it and forces a full page reload on every edit.
+ *
+ * Naming contract: `Star<Component>DemoPage` -> `../pages/<Component>Demo`.
+ * `COMPONENT_ROUTES` in `./componentRegistry` references these exports, and
+ * `./componentRegistry.sync.test.tsx` fails the suite when the two drift apart.
+ * Append new entries at the end with `bun run gen:component <Name>`.
  */
 export const StarGuidePage = lazy(() => import('../pages/Guide'))
 export const StarComponentsPage = lazy(() => import('../pages/Components'))
-export const StarButtonDemoPage = lazy(() => import('../pages/ButtonDemo'))
+export const StarNineSliceButtonDemoPage = lazy(() => import('../pages/NineSliceButtonDemo'))
 export const StarCalendarDemoPage = lazy(() => import('../pages/CalendarDemo'))
 export const StarCardDemoPage = lazy(() => import('../pages/CardDemo'))
 export const StarDatePickerDemoPage = lazy(() => import('../pages/DatePickerDemo'))
@@ -25,3 +30,5 @@ export const StarGapBorderDemoPage = lazy(() => import('../pages/GapBorderDemo')
 export const StarPixelButtonDemoPage = lazy(() => import('../pages/PixelButtonDemo'))
 export const StarRatingDemoPage = lazy(() => import('../pages/RatingDemo'))
 export const StarProgressDemoPage = lazy(() => import('../pages/ProgressDemo'))
+export const StarSwitchDemoPage = lazy(() => import('../pages/SwitchDemo'))
+export const StarInputDemoPage = lazy(() => import('../pages/InputDemo'))

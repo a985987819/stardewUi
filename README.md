@@ -570,6 +570,56 @@ import { StarSwitch } from 'stardew-valley-ui'
 
 ---
 
+### StarInput - 输入框
+
+木框凹陷的像素输入框：4px 阶梯边框 + 顶部内阴影，支持受控/非受控、前后缀、一键清空与校验状态。
+
+```tsx
+import { StarInput } from 'stardew-valley-ui'
+import { Search } from 'lucide-react'
+
+// 非受控
+<StarInput label="农场名" placeholder="例如：鹈鹕农场" />
+
+// 受控
+const [name, setName] = useState('')
+<StarInput label="农场名" value={name} onChange={setName} />
+
+// 前缀 / 后缀 / 一键清空
+<StarInput label="搜索作物" prefix={<Search size={16} />} suffix="金币" allowClear />
+
+// 校验状态与字数限制
+<StarInput
+  label="农场名"
+  status="error"
+  message="名字最多 12 个字"
+  maxLength={12}
+  showCount
+/>
+
+// 尺寸与块级
+<StarInput size="large" block />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| value / defaultValue | `string` | `''` | 受控值或初始值 |
+| onChange | `(value: string) => void` | - | 文本变化回调（只回传文本，DOM 事件用 `onInput` / `onKeyDown`） |
+| label | `ReactNode` | - | 可见标题，用 for/id 绑定输入框 |
+| message | `ReactNode` | - | 字段下方的提示或校验文案 |
+| status | `'default' \| 'warning' \| 'error' \| 'success'` | `'default'` | 语义状态，决定边框与提示颜色 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 输入框尺寸（32 / 40 / 48px） |
+| color | `string` | `'#71964a'` | 强调色（聚焦、光标、清空按钮），覆盖 status |
+| prefix / suffix | `ReactNode` | - | 框内的前置 / 后置内容 |
+| allowClear | `boolean` | `false` | 显示一键清空按钮 |
+| showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
+| block | `boolean` | `false` | 撑满容器宽度 |
+| clearLabel | `string` | `'Clear'` | 清空按钮的无障碍名称 |
+
+其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`name`、`onFocus`…）会透传到内部的 `<input>`。
+
+---
+
 ### StarGapBorder - 缺角边框
 
 像素风缺角边框容器。
@@ -896,6 +946,9 @@ import type {
   GapBorderCornerData,
   CreateGapBorderCornersOptions,
   PixelButtonProps,
+  StarInputProps,
+  InputSize,
+  InputStatus,
 } from 'stardew-valley-ui'
 ```
 
@@ -942,6 +995,34 @@ bun run test:coverage
 ```bash
 bun run lint
 ```
+
+---
+
+## 新增组件
+
+组件目录 `src/router/componentRegistry.tsx` 是组件库的唯一数据源：**路由表、左侧导航、组件总览页、冒烟测试**都从它派生。
+所以新增组件的唯一手动步骤就是补一条目录条目，其余入口自动同步 —— 用脚手架一次做完：
+
+```bash
+# 生成组件 / 样式 / 单测 / 演示页，并把条目接入目录，最后自动跑一遍一致性校验
+bun run gen:component Switch \
+  --zh 开关 --en Switch --icon ToggleRight \
+  --desc-zh "像素药丸形状的开关，用来点亮灯或切换难度。" \
+  --desc-en "A pixel pill switch for lamps and difficulty toggles."
+
+# 只打印将要写入的内容，不落盘
+bun run gen:component Switch --dry-run
+```
+
+生成后需要做的是：实现组件、把演示页里的 `TODO` 换成真实文案与示例、补齐 API 表。
+
+如果手改目录，请务必跑一次守卫 —— 它会指出第几处漏了：
+
+```bash
+bun run check:components   # 秒级；校验目录 ↔ 懒加载 ↔ 演示页 ↔ 组件文件 ↔ 导出，并断言左侧导航渲染出每条路由
+```
+
+完整约定（命名、五方一致性契约、视觉与主题、文案、完成定义）见 [docs/component-conventions.md](docs/component-conventions.md)。
 
 ---
 

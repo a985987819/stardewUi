@@ -4,7 +4,7 @@ import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
 import { StarNineSliceButton, type NineSliceButtonTheme } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
-import styles from './ButtonDemo.module.scss'
+import styles from './NineSliceButtonDemo.module.scss'
 
 const seasonalThemes: Array<{ key: NineSliceButtonTheme; zh: string; en: string }> = [
   { key: 'spring', zh: '春天', en: 'Spring' },
@@ -71,7 +71,7 @@ const apiData = {
 
 const code = `<StarNineSliceButton theme="spring">Plant Seeds</StarNineSliceButton>`
 
-function StarButtonDemoPage() {
+function StarNineSliceButtonDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
   const toc = t.toc.map((title, index) => ({ id: ['basic', 'theme', 'size', 'color', 'icon', 'disabled', 'multi', 'api'][index], title, level: 1 }))
@@ -129,4 +129,4 @@ function StarButtonDemoPage() {
   )
 }
 
-export default StarButtonDemoPage
+export default StarNineSliceButtonDemoPage
