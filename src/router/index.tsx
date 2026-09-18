@@ -18,6 +18,8 @@ import {
   StarMessageDemoPage,
   StarPixelButtonDemoPage,
   StarPopupDemoPage,
+  StarProgressDemoPage,
+  StarRatingDemoPage,
   StarTabDemoPage,
   StarTitleDemoPage,
   StarTypewriterDemoPage,
@@ -46,6 +48,8 @@ export const router = createBrowserRouter(
         { path: 'components/tab', element: <StarTabDemoPage /> },
         { path: 'components/gap-border', element: <StarGapBorderDemoPage /> },
         { path: 'components/pixel-button', element: <StarPixelButtonDemoPage /> },
+        { path: 'components/rating', element: <StarRatingDemoPage /> },
+        { path: 'components/progress', element: <StarProgressDemoPage /> },
       ],
     },
     {

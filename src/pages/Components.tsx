@@ -11,6 +11,8 @@ import {
   MessageSquare,
   MessageSquareMore,
   MousePointer,
+  Heart,
+  Gauge,
   ScanLine,
   Square,
   Type,
@@ -153,6 +155,24 @@ const components: ComponentInfo[] = [
       en: 'Retro pixel button with锯齿边框, supporting custom colors and 3D shadow effects.',
     },
     icon: <Joystick size={20} />,
+  },
+  {
+    path: '/components/rating',
+    title: { zh: '评分', en: 'Rating' },
+    desc: {
+      zh: '用像素爱心或星星记录好感与评价，支持半格评分和禁用状态。',
+      en: 'Pixel hearts or stars for friendship and reviews, with half steps and disabled state.',
+    },
+    icon: <Heart size={20} />,
+  },
+  {
+    path: '/components/progress',
+    title: { zh: '进度条', en: 'Progress' },
+    desc: {
+      zh: '农场 HUD 风格的像素进度条，可自定义体力、危险或成熟度颜色。',
+      en: 'A farm-HUD pixel bar with colors for stamina, danger, or crop growth.',
+    },
+    icon: <Gauge size={20} />,
   },
 ]
 
