@@ -65,7 +65,9 @@ describe('NineSliceButton', () => {
     const button = screen.getByRole('button', { name: '默认按钮' })
     expect(button).toBeEnabled()
     expect(button.style.getPropertyValue('--nine-slice-button-primary-color')).toBe('')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#A38A6B')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
   })
 
   it('renders the default button with a dedicated canvas background', () => {
@@ -80,7 +82,8 @@ describe('NineSliceButton', () => {
     expect(canvas).not.toBeNull()
     expect(label).not.toBeNull()
     expect(getComputedStyle(label as Element).textShadow).not.toBe('none')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
   })
 
@@ -92,30 +95,35 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#2E6F40')
     expect(button.style.getPropertyValue('--nine-slice-button-default-inner-border')).not.toBe('')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).not.toBe('')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#4B9DF2')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
   })
 
   it('updates regular default text colors on hover and active states', () => {
     render(<NineSliceButton>状态按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '状态按钮' })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerEnter(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerDown(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#E1F0FF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
     expect(button.style.fontWeight).toBe('700')
 
     fireEvent.pointerUp(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerLeave(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFFFFF')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
   })
 
   it('applies the supplied spring normal background, border, and text colors', () => {
@@ -214,10 +222,10 @@ describe('NineSliceButton', () => {
 
     expect(button).toBeDisabled()
     expect(image).toBeNull()
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#4B9DF2')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe(
-      'rgba(218, 232, 245, 0.62)'
+      'rgba(238, 229, 213, 0.62)'
     )
   })
 

@@ -20,8 +20,8 @@ export type DefaultButtonFrameMetrics = {
   innerShadowOffsetY: number
 }
 
-/** Three-level pixel corner, matching the GapBorder `cornerLevel = 3` language. */
-export const DEFAULT_BUTTON_CORNER_STEPS = 3
+/** One clean square step per corner keeps the button silhouette compact. */
+export const DEFAULT_BUTTON_CORNER_STEPS = 1
 const MAX_CORNER_STEP = 6
 
 const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
@@ -80,9 +80,8 @@ export const getDefaultButtonFrameMetrics = (width: number, height: number, dpr:
   const scaledDpr = Math.max(1, dpr)
   const steps = DEFAULT_BUTTON_CORNER_STEPS
 
-  // Two constraints keep the staircase readable on compact buttons: opposite
-  // corners must not overlap, and every riser stays on a whole device pixel so
-  // the corner rasterises crisp instead of smearing across half pixels.
+  // Keep the single step legible on compact buttons and ensure it remains on a
+  // whole device pixel so the corner rasterises crisp rather than soft.
   const maxSpan = Math.floor(minSide / 3)
   const cornerStep = Math.max(
     1,

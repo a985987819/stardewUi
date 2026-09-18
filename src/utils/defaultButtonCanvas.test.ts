@@ -17,6 +17,7 @@ describe('defaultButtonCanvas', () => {
     expect(metrics.innerBorderWidth).toBe(2)
     expect(metrics.innerBorderGap).toBe(0.5)
     expect(metrics.cornerSteps).toBe(DEFAULT_BUTTON_CORNER_STEPS)
+    expect(metrics.cornerSteps).toBe(1)
     expect(metrics.cornerSpan).toBe(metrics.cornerStep * DEFAULT_BUTTON_CORNER_STEPS)
   })
 

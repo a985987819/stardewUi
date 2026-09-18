@@ -16,7 +16,11 @@ import { drawDefaultButtonBackground } from '../../utils/defaultButtonCanvas'
 import {
   SEASONAL_BUTTON_PALETTES,
 } from '../../utils/seasonalButtonCanvas'
-import { createDefaultButtonPalette } from '../../utils/defaultButtonTheme'
+import {
+  createDefaultButtonPalette,
+  DEFAULT_BUTTON_FILL,
+  DEFAULT_BUTTON_HOVER_FILL,
+} from '../../utils/defaultButtonTheme'
 import { resolveAssetPath } from '../../utils/githubPages'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
@@ -214,10 +218,17 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         )
       }
 
-      return steppedTone
-        ? createDefaultButtonPalette(steppedTone.border, steppedTone.bg, steppedTone.text)
-        : createDefaultButtonPalette(color)
-    }, [color, seasonalPalette, seasonalState, steppedTone, usesPlainDefaultBackground])
+      if (steppedTone) {
+        return createDefaultButtonPalette(steppedTone.border, steppedTone.bg, steppedTone.text)
+      }
+
+      // Custom colours keep their caller-provided fill. The built-in default
+      // alone changes from normal to the supplied warm hover swatch.
+      return createDefaultButtonPalette(
+        color,
+        !color && isHovered && !isDisabled ? DEFAULT_BUTTON_HOVER_FILL : DEFAULT_BUTTON_FILL
+      )
+    }, [color, isDisabled, isHovered, seasonalPalette, seasonalState, steppedTone, usesPlainDefaultBackground])
 
     const plainDefaultColor = useMemo(() => {
       if (!plainDefaultPalette) {

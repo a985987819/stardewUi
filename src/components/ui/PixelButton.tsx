@@ -12,10 +12,10 @@ export interface PixelButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
 
 function PixelButton({
   children,
-  bgColor = '#4b9df2',
-  textColor = '#ffffff',
-  borderColor = '#3c3c3c',
-  shadowColor = '#236ca9',
+  bgColor = '#e2d3b8',
+  textColor = '#4a2c1a',
+  borderColor = '#a38a6b',
+  shadowColor = '#b49c7e',
   className = '',
   ...rest
 }: PixelButtonProps) {

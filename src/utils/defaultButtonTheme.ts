@@ -1,11 +1,11 @@
-// These are deliberately flat, high-contrast swatches. The stepped silhouette
-// is what supplies the pixel-art detail; gradients make the small blocks look
-// blurry rather than dimensional.
-export const DEFAULT_BUTTON_FILL = '#4B9DF2'
-export const DEFAULT_BUTTON_OUTER_BORDER = '#3C3C3C'
-export const DEFAULT_BUTTON_INNER_BORDER = '#2678BB'
+// Keep the default button warm and restrained; the pixel step supplies its
+// character, while the fill remains a calm surface for everyday actions.
+export const DEFAULT_BUTTON_FILL = '#E2D3B8'
+export const DEFAULT_BUTTON_HOVER_FILL = '#E8D8C4'
+export const DEFAULT_BUTTON_OUTER_BORDER = '#A38A6B'
+export const DEFAULT_BUTTON_INNER_BORDER = '#C8B599'
 export const DEFAULT_BUTTON_DISABLED_TEXT = '#B0BEC5'
-export const DEFAULT_BUTTON_DISABLED_OVERLAY = 'rgba(218, 232, 245, 0.62)'
+export const DEFAULT_BUTTON_DISABLED_OVERLAY = 'rgba(238, 229, 213, 0.62)'
 
 type RgbColor = {
   r: number
@@ -115,15 +115,19 @@ export const createDefaultButtonPalette = (
 ) => {
   const fill = normalizeHexColor(fillColor)
 
-  if (!outerBorderColor && fill === DEFAULT_BUTTON_FILL && !textColor) {
+  if (
+    !outerBorderColor &&
+    !textColor &&
+    (fill === DEFAULT_BUTTON_FILL || fill === DEFAULT_BUTTON_HOVER_FILL)
+  ) {
     return {
-      fill: DEFAULT_BUTTON_FILL,
+      fill,
       outerBorder: DEFAULT_BUTTON_OUTER_BORDER,
       innerBorder: DEFAULT_BUTTON_INNER_BORDER,
       text: {
-        normal: '#FFFFFF',
-        hover: '#FFFFFF',
-        active: '#E1F0FF',
+        normal: '#4A2C1A',
+        hover: '#4A2C1A',
+        active: '#4A2C1A',
         disabled: DEFAULT_BUTTON_DISABLED_TEXT,
       },
       disabledOverlay: DEFAULT_BUTTON_DISABLED_OVERLAY,
