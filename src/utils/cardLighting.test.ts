@@ -96,3 +96,34 @@ describe('createCardPalette', () => {
     expect(palette.innerGlow).toMatch(/^rgba\(/)
   })
 })
+
+// Merged from the surface-colour entry point that landed while this branch was
+// reworking the card frame. Both entry points share one derivation path, so
+// these assertions also lock the funnel described in `deriveCardPaletteFromFrameSeed`.
+describe('deriveCardLightingFromSurface', () => {
+  it('derives every directional Card layer from the exact visible surface colour', () => {
+    const surface = '#7699b5'
+    const palette = cardLighting.deriveCardLightingFromSurface(surface)
+
+    expect(palette.background).toBe(surface)
+    expect(palette.headerStripes).toHaveLength(4)
+    expect(palette.bodyStripes).toHaveLength(8)
+    expect(palette.borderDark).not.toBe(surface)
+    expect(palette.topHighlight).not.toBe(surface)
+    expect(palette.rightEdgeShadow).not.toBe(surface)
+    expect(palette.footerTop).toMatch(/^rgba\(/)
+    expect(palette.bodyBottomShadow).toMatch(/^rgba\(/)
+  })
+
+  it('normalizes shorthand subject colours before using them as the surface anchor', () => {
+    expect(cardLighting.deriveCardLightingFromSurface('#d98').background).toBe('#dd9988')
+  })
+
+  it('keeps the inset frame as a deeper, hue-preserving shadow layer', () => {
+    const palette = cardLighting.deriveCardLightingFromSurface('#4988c3')
+
+    expect(palette.innerBorder).toBe('#1b364e')
+    expect(palette.innerBorder).not.toBe(palette.borderLight)
+    expect(palette.innerBorder).not.toBe(palette.borderDark)
+  })
+})

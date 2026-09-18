@@ -65,6 +65,14 @@ export interface CardPalette extends CardLighting {
   bodyStripes: [string, string, string, string, string, string, string, string]
 }
 
+/**
+ * A complete pixel-card lighting model derived from the visible body surface.
+ * `background` is the supplied subject colour; every other property maps to a
+ * specific rendered layer in `Card.module.scss` (frame, stripe, inset light,
+ * right-edge occlusion, footer, and typography).
+ */
+export type CardSurfaceLighting = CardPalette
+
 interface Rgb {
   r: number
   g: number
@@ -224,6 +232,36 @@ function shiftColor(hex: string, hueShift: number, saturationScale: number, ligh
   )
 }
 
+const SURFACE_FROM_EDGE_SHIFT = {
+  hue: 0.18,
+  saturation: 1.039,
+  lightness: 0.23,
+} as const
+
+/**
+ * Reconstructs the darker framing seed that sits beneath a body surface.
+ * The inverse is intentional: it preserves the existing Card hierarchy while
+ * making the public API start from the colour users actually see most.
+ */
+function deriveFrameSeedFromSurface(surfaceColor: string) {
+  const surface = rgbToHsl(hexToRgb(surfaceColor))
+  // Bright card surfaces can use the original fixed 0.23 lightness gap.
+  // Applying that gap to a naturally dark custom swatch would clamp its frame
+  // to pure black and erase its hue, so preserve at least 55% of its lightness.
+  const frameLightness = Math.max(
+    surface.l - SURFACE_FROM_EDGE_SHIFT.lightness,
+    surface.l * 0.55
+  )
+
+  return rgbToHex(
+    hslToRgb({
+      h: surface.h - SURFACE_FROM_EDGE_SHIFT.hue,
+      s: clamp(surface.s / SURFACE_FROM_EDGE_SHIFT.saturation),
+      l: clamp(frameLightness),
+    })
+  )
+}
+
 function getRelativeLuminance(hex: string) {
   const { r, g, b } = hexToRgb(hex)
   const toLinear = (channel: number) => {
@@ -312,6 +350,30 @@ export function resolveCardThemeColor(themeColor?: string): string {
 }
 
 /**
+ * Default *body* colour of `<StarCard>`. It is the surface that
+ * `SURFACE_FROM_EDGE_SHIFT` derives from `CARD_DEFAULT_THEME_COLOR`, so the
+ * edge-first and surface-first entry points agree on the default card.
+ */
+export const CARD_DEFAULT_SURFACE_COLOR = '#ffc675'
+
+/**
+ * Accepts `#rgb`, `#rrggbb` or the same without the leading `#`, and falls back
+ * to the default card surface instead of throwing — a bad value typed into a
+ * theme input should never blank out the page.
+ */
+export function resolveCardSurfaceColor(surfaceColor?: string): string {
+  if (!surfaceColor || !/^#?(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(surfaceColor.trim())) {
+    return CARD_DEFAULT_SURFACE_COLOR
+  }
+
+  try {
+    return rgbToHex(hexToRgb(surfaceColor))
+  } catch {
+    return CARD_DEFAULT_SURFACE_COLOR
+  }
+}
+
+/**
  * Theme color -> lighting helper. Everything the card needs to fake a light
  * source is computed here from the theme color's HSL triplet, so callers only
  * ever pass one color in.
@@ -350,13 +412,23 @@ export function getCardLighting(themeColor: string): CardLighting {
 }
 
 /**
- * Full CSS-variable palette for `<StarCard color={theme}>`: the lighting map
- * above plus every surface, text and stripe the card paints.
+ * Edge colour -> full palette.
+ *
+ * Internal, and deliberately the **only** derivation path: `createCardPalette`
+ * (edge colours) and `deriveCardLightingFromSurface` (body colours) both funnel
+ * through here, so the two public entry points cannot drift apart.
  */
-export function createCardPalette(themeColor?: string): CardPalette {
-  const lighting = getCardLighting(themeColor ?? CARD_DEFAULT_THEME_COLOR)
-  const borderDark = lighting.border
-  const background = shiftColor(borderDark, 0.18, 1.039, 0.23)
+function deriveCardPaletteFromFrameSeed(edgeColor: string): CardPalette {
+  // `resolveCardThemeColor` keeps a bad swatch on the default wood theme rather
+  // than throwing, which is what the public palette has always promised.
+  const borderDark = resolveCardThemeColor(edgeColor)
+  const lighting = getCardLighting(borderDark)
+  const background = shiftColor(
+    borderDark,
+    SURFACE_FROM_EDGE_SHIFT.hue,
+    SURFACE_FROM_EDGE_SHIFT.saturation,
+    SURFACE_FROM_EDGE_SHIFT.lightness
+  )
   const backgroundLight = shiftColor(borderDark, -0.1, 1.035, 0.255)
   const backgroundDark = shiftColor(borderDark, -4.3, 0.93, 0.19)
   const headerStripes = generateComputedHeaderStripes(borderDark)
@@ -376,7 +448,11 @@ export function createCardPalette(themeColor?: string): CardPalette {
     isLightSurface ? 2.6 : 2.2,
     isLightSurface ? 'darken' : 'lighten'
   )
-  const innerBorder = mixColors(borderDark, '#8b4513', 0.35)
+  // The inner frame is the occluding edge of the card, rather than another
+  // highlight. Keep it on the source hue and move it decisively toward shade:
+  // light/pastel themes otherwise end up with two pale frames and lose the
+  // top-left-light / bottom-right-shadow reading.
+  const innerBorder = mixColors(borderDark, '#000000', 0.3)
   const textSecondary = mixColors(text, background, isLightSurface ? 0.18 : 0.22)
   const footerTop = toRgba(hexToRgb(isLightSurface ? '#ffffff' : '#fff8ef'), isLightSurface ? 0.1 : 0.08)
   const footerBottom = toRgba(hexToRgb(borderLight), isLightSurface ? 0.08 : 0.14)
@@ -410,4 +486,36 @@ export function createCardPalette(themeColor?: string): CardPalette {
     bodyRightShadow,
     bodyLeftGlow,
   }
+}
+
+/**
+ * Derive all Card lighting from its main visible surface colour.
+ *
+ * This is the public, reusable API for any UI that needs the same Stardew-like
+ * light direction: top and left receive warm light, the right and bottom are
+ * occluded, and text/frame values retain readable contrast. The result can be
+ * consumed as CSS custom properties or by a Canvas renderer.
+ */
+export function deriveCardLightingFromSurface(surfaceColor: string): CardSurfaceLighting {
+  const background = resolveCardSurfaceColor(surfaceColor)
+  const palette = deriveCardPaletteFromFrameSeed(deriveFrameSeedFromSurface(background))
+
+  // Preserve the caller's exact body swatch. It is the semantic anchor for
+  // all derived layers, so rounding through HSL must never visibly drift it.
+  return {
+    ...palette,
+    background,
+  }
+}
+
+/**
+ * Full CSS-variable palette for `<StarCard color={theme}>`: the lighting map
+ * above plus every surface, text and stripe the card paints.
+ *
+ * Here `color` is the card's *edge/frame* colour (see `resolveCardThemeColor`
+ * for the accepted shapes). Reach for `deriveCardLightingFromSurface` when you
+ * are starting from the body swatch the user actually sees.
+ */
+export function createCardPalette(themeColor?: string): CardPalette {
+  return deriveCardPaletteFromFrameSeed(resolveCardThemeColor(themeColor))
 }

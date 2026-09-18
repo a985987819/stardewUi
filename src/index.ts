@@ -37,3 +37,11 @@ export {
 export {
   resolveAssetPath,
 } from './utils/githubPages'
+export {
+  deriveCardLightingFromSurface,
+  createCardPalette,
+  getCardLighting,
+  type CardLighting,
+  type CardPalette,
+  type CardSurfaceLighting,
+} from './utils/cardLighting'

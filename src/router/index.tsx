@@ -4,24 +4,8 @@ import StarLayout from '../components/layout/Layout'
 import StarHomePage from '../pages/Home'
 // Demo pages are code-split per route so the landing page only ships the shell.
 // `StarLayout` provides the Suspense boundary for these children.
-import {
-  StarButtonDemoPage,
-  StarCalendarDemoPage,
-  StarCardDemoPage,
-  StarComponentsPage,
-  StarDatePickerDemoPage,
-  StarDialogDemoPage,
-  StarEmptyStateDemoPage,
-  StarGapBorderDemoPage,
-  StarGuidePage,
-  StarLoadingDemoPage,
-  StarMessageDemoPage,
-  StarPixelButtonDemoPage,
-  StarPopupDemoPage,
-  StarTabDemoPage,
-  StarTitleDemoPage,
-  StarTypewriterDemoPage,
-} from './lazyPages'
+import { StarComponentsPage, StarGuidePage } from './lazyPages'
+import { COMPONENT_ROUTES } from './componentRegistry'
 
 export const router = createBrowserRouter(
   [
@@ -32,20 +16,10 @@ export const router = createBrowserRouter(
         { index: true, element: <StarHomePage /> },
         { path: 'guide', element: <StarGuidePage /> },
         { path: 'components', element: <StarComponentsPage /> },
-        { path: 'components/button', element: <StarButtonDemoPage /> },
-        { path: 'components/calendar', element: <StarCalendarDemoPage /> },
-        { path: 'components/title', element: <StarTitleDemoPage /> },
-        { path: 'components/card', element: <StarCardDemoPage /> },
-        { path: 'components/date-picker', element: <StarDatePickerDemoPage /> },
-        { path: 'components/dialog', element: <StarDialogDemoPage /> },
-        { path: 'components/empty-state', element: <StarEmptyStateDemoPage /> },
-        { path: 'components/popup', element: <StarPopupDemoPage /> },
-        { path: 'components/typewriter', element: <StarTypewriterDemoPage /> },
-        { path: 'components/loading', element: <StarLoadingDemoPage /> },
-        { path: 'components/message', element: <StarMessageDemoPage /> },
-        { path: 'components/tab', element: <StarTabDemoPage /> },
-        { path: 'components/gap-border', element: <StarGapBorderDemoPage /> },
-        { path: 'components/pixel-button', element: <StarPixelButtonDemoPage /> },
+        ...COMPONENT_ROUTES.map(({ routePath, element: Component }) => ({
+          path: `components/${routePath}`,
+          element: <Component />,
+        })),
       ],
     },
     {

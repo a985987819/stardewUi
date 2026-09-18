@@ -15,7 +15,9 @@ export type SeasonalButtonTheme = 'spring' | 'summer' | 'autumn' | 'winter'
 export type SeasonalButtonVisualState = 'normal' | 'hover' | 'active' | 'disabled'
 
 type SeasonalButtonPalette = {
-  fill: string
+  normalFill: string
+  pressedFill: string
+  disabledFill: string
   border: string
   text: Record<SeasonalButtonVisualState, string>
 }
@@ -71,43 +73,51 @@ const loadImage = (src: string) => {
 
 export const SEASONAL_BUTTON_PALETTES: Record<SeasonalButtonTheme, SeasonalButtonPalette> = {
   spring: {
-    fill: '#E8F5D9',
-    border: '#4CAF50',
+    normalFill: '#D9899A',
+    pressedFill: '#985565',
+    disabledFill: '#BDA6A0',
+    border: '#67412F',
     text: {
-      normal: '#2E7D32',
-      hover: '#1B5E20',
-      active: '#1B5E20',
-      disabled: '#B0BEC5',
+      normal: '#FFF4E7',
+      hover: '#FFF4E7',
+      active: '#FFF4E7',
+      disabled: '#FFF4E7',
     },
   },
   summer: {
-    fill: '#D4F1F9',
-    border: '#0288D1',
+    normalFill: '#6F9E4B',
+    pressedFill: '#456B32',
+    disabledFill: '#A5AE99',
+    border: '#4B3925',
     text: {
-      normal: '#01579B',
-      hover: '#004D80',
-      active: '#004D80',
-      disabled: '#B0BEC5',
+      normal: '#FFF4D6',
+      hover: '#FFF4D6',
+      active: '#FFF4D6',
+      disabled: '#FFF4D6',
     },
   },
   autumn: {
-    fill: '#FFE0B2',
-    border: '#E65100',
+    normalFill: '#B85C3E',
+    pressedFill: '#773A2D',
+    disabledFill: '#B7A69A',
+    border: '#563421',
     text: {
-      normal: '#BF360C',
-      hover: '#9E2C00',
-      active: '#9E2C00',
-      disabled: '#B0BEC5',
+      normal: '#FFF0D5',
+      hover: '#FFF0D5',
+      active: '#FFF0D5',
+      disabled: '#FFF0D5',
     },
   },
   winter: {
-    fill: '#F5F9FC',
-    border: '#2196F3',
+    normalFill: '#7699B5',
+    pressedFill: '#4E6B84',
+    disabledFill: '#AAB8BE',
+    border: '#435565',
     text: {
-      normal: '#0D47A1',
-      hover: '#0D47A1',
-      active: '#0D47A1',
-      disabled: '#CFD8DC',
+      normal: '#F5F8F6',
+      hover: '#F5F8F6',
+      active: '#F5F8F6',
+      disabled: '#F5F8F6',
     },
   },
 }
@@ -396,7 +406,12 @@ export const drawSeasonalButtonBackground = ({
     bottomHeight
   )
 
-  ctx.fillStyle = palette.fill
+  ctx.fillStyle =
+    state === 'active'
+      ? palette.pressedFill
+      : state === 'disabled'
+        ? palette.disabledFill
+        : palette.normalFill
   ctx.globalCompositeOperation = 'destination-over'
   ctx.fillRect(leftWidth, topHeight, centerWidth, centerHeight)
   ctx.globalCompositeOperation = 'source-over'

@@ -1,6 +1,9 @@
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import { CARD_DEFAULT_THEME_COLOR, createCardPalette } from '../../utils/cardLighting'
+import {
+  CARD_DEFAULT_SURFACE_COLOR,
+  deriveCardLightingFromSurface,
+} from '../../utils/cardLighting'
 import { createGapFrameClipPath } from '../../utils/pixelCorners'
 import styles from './Card.module.scss'
 
@@ -12,20 +15,25 @@ import styles from './Card.module.scss'
  */
 const CARD_FRAME_WIDTH = 6
 
-const CARD_EDGE_COLORS = {
-  'night-village': '#2f1e27',
-  'forest-farm': '#48652c',
-  'wooden-cabin': '#6f3a18',
-  'lake-night': '#274d70',
-  'flower-festival': '#82445f',
-  'mine-starry': '#34458a',
-  farmland: '#7a4824',
-  'orchard-grass': '#355123',
-  'workshop-ore': '#39434c',
-  'night-celebration': '#202f76',
+/**
+ * Preset **body** colours. `color` is the swatch the user sees most, and
+ * `deriveCardLightingFromSurface` derives the frame, stripes and directional
+ * light from it — so these are surfaces, not frame seeds.
+ */
+const CARD_SURFACE_COLORS = {
+  'night-village': '#774b62',
+  'forest-farm': '#82b651',
+  'wooden-cabin': '#d36c2a',
+  'lake-night': '#4988c3',
+  'flower-festival': '#bd7e99',
+  'mine-starry': '#6a7dc9',
+  farmland: '#cc7f47',
+  'orchard-grass': '#6aa545',
+  'workshop-ore': '#6b7e90',
+  'night-celebration': '#3d56ce',
 } as const
 
-export type CardColor = keyof typeof CARD_EDGE_COLORS
+export type CardColor = keyof typeof CARD_SURFACE_COLORS
 export type CardThemeColor = CardColor | string
 
 export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -41,7 +49,7 @@ export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'tit
 }
 
 function isPresetCardColor(color?: CardThemeColor): color is CardColor {
-  return Boolean(color && color in CARD_EDGE_COLORS)
+  return Boolean(color && color in CARD_SURFACE_COLORS)
 }
 
 function StarCard({
@@ -60,8 +68,10 @@ function StarCard({
   ...rest
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
-  const baseColor = isPresetCardColor(color) ? CARD_EDGE_COLORS[color] : color ?? CARD_DEFAULT_THEME_COLOR
-  const palette = createCardPalette(baseColor)
+  // `color` is the visible card body; the reusable lighting function derives the
+  // framing, stripe bands and directional light from that one swatch.
+  const surfaceColor = isPresetCardColor(color) ? CARD_SURFACE_COLORS[color] : color ?? CARD_DEFAULT_SURFACE_COLOR
+  const palette = deriveCardLightingFromSurface(surfaceColor)
   // Continuous gap-border corner (`cornerLevel = 1`): the fill is clipped to
   // the ring's inner edge, and the frame's 2× thickness corner blocks close the
   // ring on top — no corner is ever left open to the page.

@@ -64,7 +64,7 @@ describe('Card theme variables', () => {
     })
   })
 
-  it('derives the full palette from a raw hex color input', () => {
+  it('derives the full palette from a raw visible-surface color input', () => {
     const renderCard = () =>
       render(
         <Card color="#355123" title="Custom" showTitle>
@@ -77,7 +77,8 @@ describe('Card theme variables', () => {
     const { container } = renderCard()
     const card = container.firstElementChild as HTMLElement
 
-    expect(card.style.getPropertyValue('--card-border-dark')).toBe('#355123')
+    expect(card.style.getPropertyValue('--card-bg')).toBe('#355123')
+    expect(card.style.getPropertyValue('--card-border-dark')).not.toBe('#000000')
     expect(card.style.getPropertyValue('--card-header-stripe-1')).not.toBe('')
     expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
   })
@@ -91,7 +92,11 @@ describe('Card theme variables', () => {
 
     const card = container.firstElementChild as HTMLElement
 
-    expect(card.style.getPropertyValue('--card-border')).toBe('#274d70')
+    expect(card.style.getPropertyValue('--card-bg')).toBe('#274d70')
+    // The frame is derived from the body swatch, so it must not equal the value
+    // the caller passed in.
+    expect(card.style.getPropertyValue('--card-border')).toMatch(/^#[0-9a-f]{6}$/)
+    expect(card.style.getPropertyValue('--card-border')).not.toBe('#274d70')
     expect(card.style.getPropertyValue('--card-border-highlight')).toBe(
       card.style.getPropertyValue('--card-top-highlight')
     )
@@ -137,9 +142,19 @@ describe('Card theme variables', () => {
         Content
       </Card>
     )
+    const { container: defaultContainer } = render(
+      <Card title="Custom" showTitle>
+        Content
+      </Card>
+    )
 
-    const card = container.firstElementChild as HTMLElement
+    const invalid = container.firstElementChild as HTMLElement
+    const fallback = defaultContainer.firstElementChild as HTMLElement
 
-    expect(card.style.getPropertyValue('--card-border-dark')).toBe('#fa9305')
+    // A bad value must land on exactly the default card, not on a broken palette.
+    expect(invalid.style.getPropertyValue('--card-border-dark')).toBe(
+      fallback.style.getPropertyValue('--card-border-dark')
+    )
+    expect(invalid.style.getPropertyValue('--card-bg')).toBe(fallback.style.getPropertyValue('--card-bg'))
   })
 })
