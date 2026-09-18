@@ -65,6 +65,15 @@ describe('Card', () => {
   })
 
   describe('配色主题', () => {
+    it('treats a custom color as the visible card surface and derives its lighting layers', () => {
+      const { container } = render(<Card color="#7699B5">内容</Card>)
+      const card = container.firstChild as HTMLElement
+
+      expect(card.style.getPropertyValue('--card-bg')).toBe('#7699b5')
+      expect(card.style.getPropertyValue('--card-border-dark')).not.toBe('#7699b5')
+      expect(card.style.getPropertyValue('--card-body-right-shadow')).toMatch(/^rgba\(/)
+    })
+
     it('应该应用night-village配色', () => {
       const { container } = render(<Card color="night-village">内容</Card>)
       expect(container.firstChild).toHaveClass(styles['stardew-card--color-night-village'])

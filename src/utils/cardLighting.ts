@@ -27,6 +27,14 @@ export interface CardPalette extends CardLighting {
   bodyStripes: [string, string, string, string, string, string, string, string]
 }
 
+/**
+ * A complete pixel-card lighting model derived from the visible body surface.
+ * `background` is the supplied subject colour; every other property maps to a
+ * specific rendered layer in `Card.module.scss` (frame, stripe, inset light,
+ * right-edge occlusion, footer, and typography).
+ */
+export type CardSurfaceLighting = CardPalette
+
 interface Rgb {
   r: number
   g: number
@@ -186,6 +194,36 @@ function shiftColor(hex: string, hueShift: number, saturationScale: number, ligh
   )
 }
 
+const SURFACE_FROM_EDGE_SHIFT = {
+  hue: 0.18,
+  saturation: 1.039,
+  lightness: 0.23,
+} as const
+
+/**
+ * Reconstructs the darker framing seed that sits beneath a body surface.
+ * The inverse is intentional: it preserves the existing Card hierarchy while
+ * making the public API start from the colour users actually see most.
+ */
+function deriveFrameSeedFromSurface(surfaceColor: string) {
+  const surface = rgbToHsl(hexToRgb(surfaceColor))
+  // Bright card surfaces can use the original fixed 0.23 lightness gap.
+  // Applying that gap to a naturally dark custom swatch would clamp its frame
+  // to pure black and erase its hue, so preserve at least 55% of its lightness.
+  const frameLightness = Math.max(
+    surface.l - SURFACE_FROM_EDGE_SHIFT.lightness,
+    surface.l * 0.55
+  )
+
+  return rgbToHex(
+    hslToRgb({
+      h: surface.h - SURFACE_FROM_EDGE_SHIFT.hue,
+      s: clamp(surface.s / SURFACE_FROM_EDGE_SHIFT.saturation),
+      l: clamp(frameLightness),
+    })
+  )
+}
+
 function getRelativeLuminance(hex: string) {
   const { r, g, b } = hexToRgb(hex)
   const toLinear = (channel: number) => {
@@ -265,10 +303,15 @@ export function getCardLighting(edgeColor: string): CardLighting {
   }
 }
 
-export function createCardPalette(edgeColor: string): CardPalette {
+function deriveCardPaletteFromFrameSeed(edgeColor: string): CardPalette {
   const borderDark = rgbToHex(hexToRgb(edgeColor))
   const lighting = getCardLighting(borderDark)
-  const background = shiftColor(borderDark, 0.18, 1.039, 0.23)
+  const background = shiftColor(
+    borderDark,
+    SURFACE_FROM_EDGE_SHIFT.hue,
+    SURFACE_FROM_EDGE_SHIFT.saturation,
+    SURFACE_FROM_EDGE_SHIFT.lightness
+  )
   const backgroundLight = shiftColor(borderDark, -0.1, 1.035, 0.255)
   const backgroundDark = shiftColor(borderDark, -4.3, 0.93, 0.19)
   const headerStripes = generateComputedHeaderStripes(borderDark)
@@ -288,7 +331,11 @@ export function createCardPalette(edgeColor: string): CardPalette {
     isLightSurface ? 2.6 : 2.2,
     isLightSurface ? 'darken' : 'lighten'
   )
-  const innerBorder = mixColors(borderDark, '#8b4513', 0.35)
+  // The inner frame is the occluding edge of the card, rather than another
+  // highlight. Keep it on the source hue and move it decisively toward shade:
+  // light/pastel themes otherwise end up with two pale frames and lose the
+  // top-left-light / bottom-right-shadow reading.
+  const innerBorder = mixColors(borderDark, '#000000', 0.3)
   const textSecondary = mixColors(text, background, isLightSurface ? 0.18 : 0.22)
   const footerTop = toRgba(hexToRgb(isLightSurface ? '#ffffff' : '#fff8ef'), isLightSurface ? 0.1 : 0.08)
   const footerBottom = toRgba(hexToRgb(borderLight), isLightSurface ? 0.08 : 0.14)
@@ -322,4 +369,32 @@ export function createCardPalette(edgeColor: string): CardPalette {
     bodyRightShadow,
     bodyLeftGlow,
   }
+}
+
+/**
+ * Derive all Card lighting from its main visible surface colour.
+ *
+ * This is the public, reusable API for any UI that needs the same Stardew-like
+ * light direction: top and left receive warm light, the right and bottom are
+ * occluded, and text/frame values retain readable contrast. The result can be
+ * consumed as CSS custom properties or by a Canvas renderer.
+ */
+export function deriveCardLightingFromSurface(surfaceColor: string): CardSurfaceLighting {
+  const background = rgbToHex(hexToRgb(surfaceColor))
+  const palette = deriveCardPaletteFromFrameSeed(deriveFrameSeedFromSurface(background))
+
+  // Preserve the caller's exact body swatch. It is the semantic anchor for
+  // all derived layers, so rounding through HSL must never visibly drift it.
+  return {
+    ...palette,
+    background,
+  }
+}
+
+/**
+ * Legacy edge-colour entry point. Prefer `deriveCardLightingFromSurface` when
+ * callers have the card's main body colour rather than an underlying frame.
+ */
+export function createCardPalette(edgeColor: string): CardPalette {
+  return deriveCardPaletteFromFrameSeed(edgeColor)
 }

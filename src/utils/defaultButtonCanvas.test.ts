@@ -18,7 +18,7 @@ describe('defaultButtonCanvas', () => {
     expect(metrics.innerBorderGap).toBe(0.5)
     expect(metrics.cornerSteps).toBe(DEFAULT_BUTTON_CORNER_STEPS)
     expect(metrics.cornerSteps).toBe(1)
-    expect(metrics.cornerSpan).toBe(metrics.cornerStep * DEFAULT_BUTTON_CORNER_STEPS)
+    expect(metrics.cornerSpan).toBe(metrics.cornerStep * (DEFAULT_BUTTON_CORNER_STEPS + 1))
   })
 
   it('scales frame metrics with device pixel ratio', () => {
@@ -45,7 +45,7 @@ describe('defaultButtonCanvas', () => {
     }
   })
 
-  it('caps the corner riser so large buttons keep a fine staircase', () => {
-    expect(getDefaultButtonFrameMetrics(1600, 400, 1).cornerStep).toBeLessThanOrEqual(6)
+  it('caps the corner riser so buttons retain a square silhouette', () => {
+    expect(getDefaultButtonFrameMetrics(1600, 400, 1).cornerStep).toBeLessThanOrEqual(4)
   })
 })

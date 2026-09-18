@@ -12,7 +12,7 @@ export type DefaultButtonFrameMetrics = {
   cornerSteps: number
   /** Size of one staircase segment, in device pixels. */
   cornerStep: number
-  /** Total corner span: `cornerSteps * cornerStep`. */
+  /** Total corner span including the main corner block. */
   cornerSpan: number
   outerBorderWidth: number
   innerBorderWidth: number
@@ -22,7 +22,9 @@ export type DefaultButtonFrameMetrics = {
 
 /** One clean square step per corner keeps the button silhouette compact. */
 export const DEFAULT_BUTTON_CORNER_STEPS = 1
-const MAX_CORNER_STEP = 6
+// Keep the one-step detail compact. Larger blocks make small buttons read as
+// rounded capsules instead of square pixel panels.
+const MAX_CORNER_STEP = 4
 
 const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   if (!points.length) {
@@ -40,15 +42,15 @@ const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
 }
 
 /**
- * Staircase that climbs from the vertical edge up to the horizontal edge.
- * The first point sits on the vertical edge, the last one on the horizontal
- * edge, so four of these concatenate into one clockwise polygon.
+ * One square riser reaches the main corner block. For a single configured
+ * step, the outline is `(0, 2s) → (s, 2s) → (s, s) → (2s, s) → (2s, 0)`:
+ * the substantial blue target silhouette, rather than a diagonal cutout.
  */
 const buildCornerStair = (steps: number, step: number): Point[] => {
-  const span = steps * step
+  const span = (steps + 1) * step
   const points: Point[] = []
 
-  for (let index = 0; index < steps; index += 1) {
+  for (let index = 0; index <= steps; index += 1) {
     points.push({ x: index * step, y: span - index * step })
     points.push({ x: (index + 1) * step, y: span - index * step })
   }
@@ -80,22 +82,22 @@ export const getDefaultButtonFrameMetrics = (width: number, height: number, dpr:
   const scaledDpr = Math.max(1, dpr)
   const steps = DEFAULT_BUTTON_CORNER_STEPS
 
-  // Keep the single step legible on compact buttons and ensure it remains on a
+  // Keep the square step legible on compact buttons and ensure it remains on a
   // whole device pixel so the corner rasterises crisp rather than soft.
   const maxSpan = Math.floor(minSide / 3)
   const cornerStep = Math.max(
     1,
     Math.min(
-      Math.round(minSide / (steps * 2.6)),
+      Math.round(minSide / ((steps + 1) * 4.2)),
       Math.round(MAX_CORNER_STEP * scaledDpr),
-      Math.floor(maxSpan / steps)
+      Math.floor(maxSpan / (steps + 1))
     )
   )
 
   return {
     cornerSteps: steps,
     cornerStep,
-    cornerSpan: cornerStep * steps,
+    cornerSpan: cornerStep * (steps + 1),
     outerBorderWidth: 2 * scaledDpr,
     innerBorderWidth: 2 * scaledDpr,
     innerBorderGap: 0.5 * scaledDpr,

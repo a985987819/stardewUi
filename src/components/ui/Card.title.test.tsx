@@ -20,7 +20,7 @@ describe('Card title area', () => {
     expect(screen.getByRole('heading', { name: '榛樿鍗＄墖' })).toBeInTheDocument()
   })
 
-  it('applies derived card lighting variables from the edge color', () => {
+  it('applies derived card lighting variables from the visible surface color', () => {
     const { container } = render(
       <Card title="Big Chest" showTitle>
         Content
@@ -40,7 +40,7 @@ describe('Card title area', () => {
     )
 
     expect((container.firstElementChild as HTMLElement).style.getPropertyValue('--card-title-text-shadow')).toBe(
-      'rgba(154, 81, 9, 0.28)'
+      'rgba(154, 82, 9, 0.28)'
     )
   })
 })

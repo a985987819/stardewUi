@@ -64,7 +64,7 @@ describe('Card theme variables', () => {
     })
   })
 
-  it('derives the full palette from a raw hex color input', () => {
+  it('derives the full palette from a raw visible-surface color input', () => {
     const renderCard = () =>
       render(
         <Card color="#355123" title="Custom" showTitle>
@@ -77,7 +77,8 @@ describe('Card theme variables', () => {
     const { container } = renderCard()
     const card = container.firstElementChild as HTMLElement
 
-    expect(card.style.getPropertyValue('--card-border-dark')).toBe('#355123')
+    expect(card.style.getPropertyValue('--card-bg')).toBe('#355123')
+    expect(card.style.getPropertyValue('--card-border-dark')).not.toBe('#000000')
     expect(card.style.getPropertyValue('--card-header-stripe-1')).not.toBe('')
     expect(card.style.getPropertyValue('--card-body-stripe-8')).not.toBe('')
   })
