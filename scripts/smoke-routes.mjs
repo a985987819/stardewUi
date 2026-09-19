@@ -72,7 +72,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 async function waitForDevtools() {
   for (let i = 0; i < 60; i += 1) {
     try {
-      const res = await fetch(`http://127.0.0.1:${PORT}/json/version`)
+      const res = await fetch(`http://127.0.0.1:${PORT}/json/version`, { headers: { connection: 'close' } })
+      // Drain the body: Bun's fetch reuses the keep-alive socket and hands an
+      // empty body to the *next* request when a response is left unread.
+      await res.text()
       if (res.ok) return
     } catch {
       /* not ready yet */
@@ -80,6 +83,42 @@ async function waitForDevtools() {
     await sleep(250)
   }
   throw new Error('DevTools endpoint did not become ready')
+}
+
+/**
+ * Opens a fresh page target and returns its CDP descriptor.
+ *
+ * Deliberately avoids `/json/list` and `/json/new`: Chrome's DevTools HTTP
+ * server answers both with `404` and an empty body when the request comes from
+ * Bun's `fetch` (Node and curl get the documented JSON back), and an empty body
+ * made `res.json()` resolve to `null` — `bun run test:smoke` died with "null is
+ * not an object (evaluating 'target.webSocketDebuggerUrl')" while the very same
+ * script was green under `node`.
+ *
+ * `/json/version` is readable from every runtime, so the page target is created
+ * over the browser-level socket instead, and the page socket URL is derived from
+ * the returned target id — that is exactly the URL `/json/list` would have
+ * reported. Keeps `bun run test:smoke` and `node scripts/smoke-routes.mjs`
+ * interchangeable.
+ */
+async function openPageTarget() {
+  const versionRes = await fetch(`http://127.0.0.1:${PORT}/json/version`, { headers: { connection: 'close' } })
+  // `res.json()` — not `JSON.parse(await res.text())` — resolves to `null` for
+  // this response under Bun 1.3, even though the body is intact.
+  const version = JSON.parse(await versionRes.text())
+  if (!version?.webSocketDebuggerUrl) throw new Error('DevTools /json/version did not return webSocketDebuggerUrl')
+
+  const browserWsUrl = version.webSocketDebuggerUrl
+  const browser = createCdp(browserWsUrl)
+  await browser.ready
+
+  try {
+    const { targetId } = await browser.send('Target.createTarget', { url: 'about:blank' })
+    const pageWsUrl = `${browserWsUrl.replace(/\/devtools\/browser\/[^/]*$/, '')}/devtools/page/${targetId}`
+    return { webSocketDebuggerUrl: pageWsUrl }
+  } finally {
+    browser.close()
+  }
 }
 
 function createCdp(wsUrl) {
@@ -129,8 +168,7 @@ let hardFailures = 0
 try {
   await waitForDevtools()
 
-  const targetRes = await fetch(`http://127.0.0.1:${PORT}/json/new?about:blank`, { method: 'PUT' })
-  const target = await targetRes.json()
+  const target = await openPageTarget()
   const cdp = createCdp(target.webSocketDebuggerUrl)
   await cdp.ready
 
