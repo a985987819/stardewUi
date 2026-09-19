@@ -7,7 +7,7 @@ import { useI18n, type Lang } from '../i18n'
 const copy = {
   zh: {
     title: '展示框 DisplayFrame',
-    desc: '单层像素边框的展示框：6px 深色最外层、3px 主色带、3px 深线与 3px 亮线托住一块米黄底的内容面，四角各缺 2px 像素。宽度随内容自适应，本身就是纯容器。',
+    desc: '单层像素边框的展示框：2px 深色最外层、4px 主色带、2px 深线与 2px 亮线托住一块米黄底的内容面，四角各缺 2px 像素。宽度随内容自适应，本身就是纯容器。',
     toc: ['基础用法', '并排布局', '自由排版', 'API'],
     demos: [
       [
@@ -30,7 +30,7 @@ const copy = {
   },
   en: {
     title: 'DisplayFrame',
-    desc: 'A single-layer pixel frame: a 6px dark outline, a 3px colour band, a 3px dark line and a 3px light line around a cream surface, with 2px cut from every corner. It sizes to its content and is a plain container.',
+    desc: 'A single-layer pixel frame: 2px of dark outline, a 4px colour band, a 2px dark line and a 2px light line around a cream surface, with 2px cut from every corner. It sizes to its content and is a plain container.',
     toc: ['Basic Usage', 'Grid Layout', 'Free Layout', 'API'],
     demos: [
       [
@@ -68,7 +68,7 @@ const apiData = {
     },
     {
       property: '（固定外观）',
-      description: '四层厚度与颜色写死为 6px #562c2b / 3px #dd7a0b / 3px #af4f0e / 3px #fdecb1，四角各缺 2px，不提供改色 props',
+      description: '四层厚度与颜色写死为 2px #562c2b / 4px #dd7a0b / 2px #af4f0e / 2px #fdecb1，四角各缺 2px，不提供改色 props',
       type: '-',
       default: '-',
     },
@@ -84,7 +84,7 @@ const apiData = {
     },
     {
       property: '(fixed look)',
-      description: 'The four bands are baked in: 6px #562c2b / 3px #dd7a0b / 3px #af4f0e / 3px #fdecb1, 2px cut from each corner. No colour props.',
+      description: 'The four bands are baked in: 2px #562c2b / 4px #dd7a0b / 2px #af4f0e / 2px #fdecb1, 2px cut from each corner. No colour props.',
       type: '-',
       default: '-',
     },

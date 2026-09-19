@@ -1,4 +1,4 @@
-// 展示框：四层同心填充 + 一块内容面。厚度从外到内 6 / 3 / 3 / 3 = 15px，正好等于
+// 展示框：四层同心填充 + 一块内容面。厚度从外到内 2 / 4 / 2 / 2 = 10px，正好等于
 // `$frame-inset`（根节点 padding）—— 内容面从最内层亮线的内侧开始。
 // 四层顺序必须与 `DisplayFrame.tsx` 里的渲染顺序一致（先画的在下面）。
 //
@@ -6,15 +6,13 @@
 // `createInsetSteppedRectClipPath(1, 2)`，常量是 `DisplayFrame.tsx` 的
 // `DISPLAY_FRAME_CORNER_STEPS` / `_STEP`），通过 `--display-frame-clip` 注入。
 // 每层都裁同一条阶梯，而每层自身已经内缩，所以四角的阶梯逐层内移 2px：斜着走进
-// 角里遇到的色带宽度，与从边上走进来的完全一致（2px 缺口 / 6px 深色 / 3px 主色带
-// / 3px 深线 / 3px 亮线）。这个等式成立的前提是**阶梯步长不超过最窄色带的宽度**，
-// 所以 2px 的角缺口配 3px 及以上的色带是安全的；只裁最外层的话，内层直角会戳出
-// 阶梯，角部就散了。
-$frame-edge: 6px; // #562c2b 最外层
-$frame-band: 3px; // #dd7a0b 主色带
-$frame-accent: 3px; // #af4f0e 内层深线
-$frame-line: 3px; // #fdecb1 内层亮线
-$frame-inset: $frame-edge + $frame-band + $frame-accent + $frame-line; // 15px
+// 角里遇到的色带宽度，与从边上走进来的完全一致（2px 缺口 / 2px 深色 / 4px 主色带
+// / 2px 深线 / 2px 亮线）。只裁最外层的话，内层直角会戳出阶梯，角部就散了。
+$frame-edge: 2px; // #562c2b 最外层
+$frame-band: 4px; // #dd7a0b 主色带
+$frame-accent: 2px; // #af4f0e 内层深线
+$frame-line: 2px; // #fdecb1 内层亮线
+$frame-inset: $frame-edge + $frame-band + $frame-accent + $frame-line; // 10px
 
 $frame-color-edge: #562c2b;
 $frame-color-band: #dd7a0b;
