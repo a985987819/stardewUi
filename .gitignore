@@ -23,6 +23,12 @@ pnpm-lock.yaml
 .tmp_*
 .commitmsg.txt
 
+# Visual-verification scratch: the shots.mjs manifests under .shots-input/ and
+# every screenshot they write (.shots-after/ before/ merge/). All of it is
+# regenerable from the manifests, so it stays out of the repo — and out of
+# `git status` — instead of being deleted by hand after each round.
+.shots-*/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
