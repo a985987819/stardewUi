@@ -759,6 +759,37 @@ import { PixelButton } from 'stardew-valley-ui'
 
 ---
 
+### StarDisplayFrame - 展示框
+
+单层像素边框的展示框，用来托住要展示的数据。四层边框由外到内是 `2px #562c2b` → `4px #dd7a0b`
+→ `2px #af4f0e` → `2px #fdecb1`，里面是 `#fed384` 内容面与黑色文字，**四角各缺 2px 像素**。
+宽度随内容自适应，本质是纯容器，数据怎么排版由你决定。
+
+```tsx
+import { StarDisplayFrame } from 'stardew-valley-ui'
+
+<StarDisplayFrame>
+  <strong>1,240G</strong>
+  <span>春季总收入</span>
+</StarDisplayFrame>
+
+// 布局类直接挂在框上
+<StarDisplayFrame className="grid-cell" style={{ width: 240 }}>
+  4,820G
+</StarDisplayFrame>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| children | `ReactNode` | - | 框内内容 |
+| className | `string` | - | 追加到根节点的类名，布局类挂这里 |
+| ...rest | `HTMLAttributes<HTMLDivElement>` | - | 其余原生 div 属性（style / onClick / aria-* 等） |
+
+四层厚度与颜色写死，不提供改色 props；角部是「每层裁同一条 2px 阶梯」的阶梯像素角，
+几何与其它像素组件共用 `src/utils/pixelCorners.ts`。
+
+---
+
 ## Hooks
 
 ### useToggle
@@ -909,6 +940,7 @@ import type {
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
+  StarDisplayFrameProps,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,

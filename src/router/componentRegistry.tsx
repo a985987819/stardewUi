@@ -3,6 +3,7 @@ import {
   Bell,
   CalendarDays,
   CalendarRange,
+  Frame,
   Gauge,
   Heart,
   Inbox,
@@ -24,6 +25,7 @@ import {
   StarCardDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
+  StarDisplayFrameDemoPage,
   StarEmptyStateDemoPage,
   StarGapBorderDemoPage,
   StarInputDemoPage,
@@ -257,5 +259,16 @@ export const COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <TextCursorInput size={20} />,
     element: StarInputDemoPage,
+  },
+  {
+    routePath: 'display-frame',
+    component: 'DisplayFrame',
+    title: { zh: '展示框', en: 'DisplayFrame' },
+    desc: {
+      zh: '像田间立牌一样醒目的像素边框，用来托住要展示的数字和指标。',
+      en: 'A pixel-bordered plate for the numbers and metrics you need on display.',
+    },
+    icon: <Frame size={20} />,
+    element: StarDisplayFrameDemoPage,
   },
 ]
