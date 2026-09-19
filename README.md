@@ -371,28 +371,6 @@ import { StarDatePicker } from 'stardew-valley-ui'
 
 ---
 
-### StarTitle - 标题
-
-像素风格标题组件，使用 Canvas 绘制背景。
-
-```tsx
-import { StarTitle } from 'stardew-valley-ui'
-
-<StarTitle size="large">星露谷物语</StarTitle>
-<StarTitle size="medium" align="left">副标题</StarTitle>
-<StarTitle size="small" as="h1">小标题</StarTitle>
-```
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| children | `string` | - | 标题文字 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 标题尺寸 |
-| align | `'left' \| 'center'` | `'center'` | 对齐方式 |
-| as | `'div' \| 'h1' \| 'h2' \| 'h3' \| 'p'` | `'h2'` | 渲染标签 |
-| backgroundSrc | `string` | `'/titleBg.png'` | 背景图片 |
-
----
-
 ### StarLoading - 加载
 
 像素风加载动画组件，包子被吃掉的动画效果。
@@ -931,8 +909,6 @@ import type {
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
-  StarTitleProps,
-  TitleSize,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,

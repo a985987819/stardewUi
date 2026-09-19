@@ -4,7 +4,6 @@ import {
   CalendarDays,
   CalendarRange,
   Gauge,
-  Heading1,
   Heart,
   Inbox,
   Joystick,
@@ -37,7 +36,6 @@ import {
   StarRatingDemoPage,
   StarSwitchDemoPage,
   StarTabDemoPage,
-  StarTitleDemoPage,
   StarTypewriterDemoPage,
 } from './lazyPages'
 
@@ -105,17 +103,6 @@ export const COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <CalendarRange size={20} />,
     element: StarDatePickerDemoPage,
-  },
-  {
-    routePath: 'title',
-    component: 'Title',
-    title: { zh: '标题', en: 'Title' },
-    desc: {
-      zh: '像镇口木牌一样醒目的标题横幅，用来标记章节、任务和活动入口。',
-      en: 'Town-sign style title banners for chapters, quests, and event entrances.',
-    },
-    icon: <Heading1 size={20} />,
-    element: StarTitleDemoPage,
   },
   {
     routePath: 'card',
