@@ -974,7 +974,7 @@ bun run lint
 
 ---
 
-## 新增组件
+## 新增与移除组件
 
 组件目录 `src/router/componentRegistry.tsx` 是组件库的唯一数据源：**路由表、左侧导航、组件总览页、冒烟测试**都从它派生。
 所以新增组件的唯一手动步骤就是补一条目录条目，其余入口自动同步 —— 用脚手架一次做完：
@@ -998,7 +998,18 @@ bun run gen:component Switch --dry-run
 bun run check:components   # 秒级；校验目录 ↔ 懒加载 ↔ 演示页 ↔ 组件文件 ↔ 导出，并断言左侧导航渲染出每条路由
 ```
 
-完整约定（命名、五方一致性契约、视觉与主题、文案、完成定义）见 [docs/component-conventions.md](docs/component-conventions.md)。
+### 移除组件
+
+反向操作同样只有一条命令 —— 它按目录条目派生全部改动（删文件、摘条目、摘导出、清 README 与 i18n），末尾自动跑守卫：
+
+```bash
+bun run rm:component Title              # 移除 StarTitle：组件文件 / 演示页 / 条目 / 导出 / 文档文案
+bun run rm:component Title --dry-run    # 只看计划，不删不改
+```
+
+`README.md` 与 `i18n/dictionaries.ts` 是手写文件，找不到对应内容时只告警不报错；其余入口漏一处守卫就会红。
+
+完整约定（命名、五方一致性契约、视觉与主题、文案、完成定义、移除流程）见 [docs/component-conventions.md](docs/component-conventions.md)。
 
 ---
 

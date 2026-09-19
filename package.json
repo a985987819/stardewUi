@@ -37,6 +37,7 @@
     "build:app": "bunx tsc -b && bun run check:components && bunx vite build",
     "build:lib": "bunx vite build --mode lib && bunx tsc -p tsconfig.lib.json",
     "gen:component": "bun scripts/new-component.mjs",
+    "rm:component": "bun scripts/rm-component.mjs",
     "check:components": "bunx vitest run src/router/componentRegistry.sync.test.tsx",
     "lint": "bunx eslint .",
     "preview": "bunx vite preview",

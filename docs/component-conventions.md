@@ -12,6 +12,7 @@ bun run gen:component Switch \
 ```
 
 上面这一条命令会写 4 个新文件、改 3 个文件，然后自动跑一遍同步守卫。
+移除组件是它的反向操作，同样只有一条命令：`bun run rm:component <Component>`（见 §7）。
 
 ---
 
@@ -102,18 +103,50 @@ bun run test:run             # 全量测试（含守卫）
 - [ ] `bun run dev` 后手点左侧导航里的新条目，或跑 `bun run test:smoke http://127.0.0.1:5199/stardewUi`；
 - [ ] README 的组件列表里补上该组件的用法与 API 表。
 
-## 7. 命令速查
+## 7. 移除组件
+
+删除一个组件就是把上面那条链反向走一遍，仍然只有一条命令：
+
+```bash
+bun run rm:component Title              # 删文件 + 摘条目 + 摘导出 + 清 README/i18n，末尾自动跑守卫
+bun run rm:component Title --dry-run    # 只看计划，不删不改
+```
+
+所有动作都从目录条目派生，因此「先摘条目、再删文件」这两步不会漏：
+
+| 动作 | 位置 |
+| --- | --- |
+| 删除文件 | `components/ui/<Component>.{tsx,module.scss,test.tsx}`、`pages/<Component>Demo.{tsx,module.scss}`，以及同前缀的附加单测（如 `Card.theme.test.tsx`） |
+| 删除条目 | `componentRegistry.tsx` 里对应的 `  { … },` 块 |
+| 删除导入 | 同一个文件里的 `Star<Component>DemoPage`，以及**不再被其他条目使用**的 lucide 图标 |
+| 删除导出 | `lazyPages.ts` 的 `Star<Component>DemoPage`，`ui/index.ts` 里所有 `from './<Component>'` 行 |
+| 清废弃文案 | `i18n/dictionaries.ts` 中值等于该条目 `title.zh` / `title.en` 的 `sidebar.*` 键（键名与组件名早已漂移，如 `sidebar.datePicker`，只能按文案匹配） |
+| 清文档 | `README.md` 的 `### Star<Component> - …` 整节（含 API 表与收尾分隔线）+ 类型清单里该模块导出的类型名 |
+
+其中 README / i18n 两项是**尽力而为**：缺失只告警不报错（那两处是手写文件，本来就可能没有对应内容）。
+其余动作漏一处，守卫就会红 —— 脚本末尾直接跑守卫，所以「删了但漏掉某个入口」不可能静默通过。
+
+> 历史坑：`rm-component.mjs` 自己就是靠「`gen:component` 生成 → `rm:component` 删除 → `git diff` 必须为空」
+> 的往返测试才发现的 —— 删**最后一条**目录条目时多退一个换行，收尾的 `]` 会被挤到 `},` 同一行；
+> 删**中间条目**时多退一个换行，两条条目会粘成 `},  {`。两种写法都是合法 TypeScript，守卫和 `tsc`
+> 都抓不到，只有往返测试能暴露。**改动这个脚本后请务必重跑一次往返测试**（见 §8 的暂未自动化说明）。
+
+## 8. 命令速查
 
 ```bash
 bun run gen:component <Name> [--zh --en --icon --desc-zh --desc-en --route]  # 脚手架
 bun run gen:component <Name> --dry-run                                       # 只看计划不落盘
+bun run rm:component <Name> [--no-verify] [--dry-run]                        # 移除组件（含清 README/i18n）
 bun run check:components                                                     # 目录同步守卫
 bunx vitest run src/components/ui/<Component>.test.tsx                       # 单组件测试
 bun run test:smoke http://127.0.0.1:5199/stardewUi                           # 无头路由冒烟
 ```
 
-## 8. 已知欠账
+## 9. 已知欠账
 
 - `PixelButton`、`Tab`、`GapBorderCorners` 尚无同名单测（守卫暂未强制单测文件，因为现在是欠账状态，
   补齐后可以考虑把「每个公共组件必须有同名单测」也写进守卫）。
 - 演示页文案（`copy`）与 API 表仍写在页面里，未来若要自动生成文档站，需要把 `meta` 单独抽成模块。
+- `rm:component` 对 README / i18n 的清理依赖「章节骨架 + 文案匹配」这两条软约定，没有自动化测试兜底。
+  改动该脚本后请手工跑一次往返：`bun run gen:component SmokeTest …` → 手工补一个 `### StarSmokeTest` 章节 →
+  `bun run rm:component SmokeTest`，`git diff` 必须为空。未来可以把它固化成一条 `test:roundtrip` 脚本。
