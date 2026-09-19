@@ -761,8 +761,8 @@ import { PixelButton } from 'stardew-valley-ui'
 
 ### StarDisplayFrame - 展示框
 
-单层像素边框的展示框，用来托住要展示的数据。四层边框由外到内是 `2px #562c2b` → `4px #dd7a0b`
-→ `2px #af4f0e` → `2px #fdecb1`，里面是 `#fed384` 内容面与黑色文字，**四角各缺 2px 像素**。
+单层像素边框的展示框，用来托住要展示的数据。四层边框由外到内是 `6px #562c2b` → `3px #dd7a0b`
+→ `3px #af4f0e` → `3px #fdecb1`，里面是 `#fed384` 内容面与黑色文字，**四角各缺 2px 像素**。
 宽度随内容自适应，本质是纯容器，数据怎么排版由你决定。
 
 ```tsx

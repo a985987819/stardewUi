@@ -11,7 +11,9 @@ import styles from './DisplayFrame.module.scss'
  * thickness of the rings outside it. That is what keeps the corner honest: the
  * step migrates 2px inward per ring, so the colours met while walking diagonally
  * into a corner have the very same widths as the ones met walking in from an
- * edge (2px gap / 2px dark / 4px band / 2px accent / 2px light).
+ * edge (2px gap / 6px dark / 3px band / 3px accent / 3px light). The equation
+ * holds while the step stays no wider than the narrowest band, which is why the
+ * 2px corner is safe next to 3px bands.
  *
  * Steps and step size live here rather than in SCSS because `clip-path`
  * geometry must come from `src/utils/pixelCorners.ts` — the same source the
@@ -29,7 +31,7 @@ export interface StarDisplayFrameProps extends HTMLAttributes<HTMLDivElement> {
  * DisplayFrame — a single-layer pixel plate for showing data.
  *
  * Four fixed bands frame the surface, outermost first:
- * `2px #562c2b` → `4px #dd7a0b` → `2px #af4f0e` → `2px #fdecb1`, with a
+ * `6px #562c2b` → `3px #dd7a0b` → `3px #af4f0e` → `3px #fdecb1`, with a
  * `#fed384` surface and black text inside. The colours are baked in on purpose
  * (there is no `color` prop), and the box grows with its content — it is a plain
  * container, so `className` / `...rest` land on the root and consumers can hang
