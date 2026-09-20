@@ -1,33 +1,121 @@
 .star-progress {
-  --star-progress-color: #71964a;
+  --star-progress-fill: #ce053c;
+  --star-progress-border: #7f2110;
+  --star-progress-shadow: #ba7f53;
+  --star-progress-highlight: #f9606c;
+  --star-progress-empty: #e8a7ac;
+  --star-progress-segment-count: 10;
+  --star-progress-cell-width: 15px;
+  --star-progress-cell-gap: 4px;
+  --star-progress-notch: 3px;
+  --star-progress-frame-width: 3px;
+  --star-progress-highlight-width: 2px;
+  --star-progress-highlight-offset: 2px;
+  --star-progress-shadow-offset-x: -2px;
+  --star-progress-shadow-offset-y: 3px;
 
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  min-width: 180px;
+  max-width: 100%;
 
-  &__track {
-    position: relative;
-    width: 100%;
-    height: 20px;
-    padding: 3px;
-    overflow: hidden;
-    background: #d9c5a1;
-    border: 3px solid #67412f;
-    box-shadow:
-      inset 2px 2px 0 #8a7257,
-      2px 2px 0 rgba(74, 44, 26, 0.28);
-    clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 2px, 100% 2px, 100% calc(100% - 2px), calc(100% - 4px) calc(100% - 2px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 2px), 0 calc(100% - 2px), 0 2px, 4px 2px);
+  &__segments {
+    display: grid;
+    grid-template-columns: repeat(var(--star-progress-segment-count), var(--star-progress-cell-width));
+    gap: var(--star-progress-cell-gap);
+    width: max-content;
+    max-width: 100%;
   }
 
-  &__fill {
-    height: 100%;
-    min-width: 0;
-    background: var(--star-progress-color);
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.3),
-      inset -2px -2px 0 rgba(55, 46, 29, 0.22);
-    transition: width 0.18s steps(6, jump-end);
+  &__cell {
+    position: relative;
+    display: block;
+    width: var(--star-progress-cell-width);
+    height: 25px;
+    overflow: visible;
+    transform-origin: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: var(--star-progress-shadow);
+      clip-path: polygon(var(--star-progress-notch) 0, calc(100% - var(--star-progress-notch)) 0, 100% var(--star-progress-notch), 100% calc(100% - var(--star-progress-notch)), calc(100% - var(--star-progress-notch)) 100%, var(--star-progress-notch) 100%, 0 calc(100% - var(--star-progress-notch)), 0 var(--star-progress-notch));
+      transform: translate(var(--star-progress-shadow-offset-x), var(--star-progress-shadow-offset-y));
+    }
+  }
+
+  &__cell-surface,
+  &__cell-fill,
+  &__cell-bevel {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__cell-surface {
+    z-index: 1;
+    background: var(--star-progress-empty);
+    clip-path: polygon(var(--star-progress-notch) 0, calc(100% - var(--star-progress-notch)) 0, 100% var(--star-progress-notch), 100% calc(100% - var(--star-progress-notch)), calc(100% - var(--star-progress-notch)) 100%, var(--star-progress-notch) 100%, 0 calc(100% - var(--star-progress-notch)), 0 var(--star-progress-notch));
+  }
+
+  &__cell-fill {
+    z-index: 2;
+    background: var(--star-progress-fill);
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: center;
+    clip-path: polygon(var(--star-progress-notch) 0, calc(100% - var(--star-progress-notch)) 0, 100% var(--star-progress-notch), 100% calc(100% - var(--star-progress-notch)), calc(100% - var(--star-progress-notch)) 100%, var(--star-progress-notch) 100%, 0 calc(100% - var(--star-progress-notch)), 0 var(--star-progress-notch));
+  }
+
+  &__cell-bevel {
+    z-index: 3;
+    box-sizing: border-box;
+    border: var(--star-progress-frame-width) solid var(--star-progress-border);
+    clip-path: polygon(var(--star-progress-notch) 0, calc(100% - var(--star-progress-notch)) 0, 100% var(--star-progress-notch), 100% calc(100% - var(--star-progress-notch)), calc(100% - var(--star-progress-notch)) 100%, var(--star-progress-notch) 100%, 0 calc(100% - var(--star-progress-notch)), 0 var(--star-progress-notch));
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      display: block;
+      background: var(--star-progress-highlight);
+      transform: translateX(var(--star-progress-highlight-offset));
+    }
+
+    &::before {
+      top: var(--star-progress-frame-width);
+      left: var(--star-progress-frame-width);
+      right: var(--star-progress-frame-width);
+      height: var(--star-progress-highlight-width);
+    }
+
+    &::after {
+      top: var(--star-progress-frame-width);
+      right: var(--star-progress-frame-width);
+      bottom: var(--star-progress-frame-width);
+      width: var(--star-progress-highlight-width);
+    }
+  }
+
+  &__cell[data-filled] &__cell-fill {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  &__cell[data-motion='in'] {
+    z-index: 1;
+    animation: star-progress-cell-in 360ms cubic-bezier(0.22, 1.34, 0.36, 1) both;
+  }
+
+  &__cell[data-motion='out'] {
+    z-index: 1;
+    animation: star-progress-cell-frame-out 300ms cubic-bezier(0.64, 0, 0.78, -0.16) both;
+  }
+
+  &__cell[data-motion='out'] &__cell-fill {
+    animation: star-progress-cell-out 300ms cubic-bezier(0.64, 0, 0.78, -0.16) both;
   }
 
   &__label {
@@ -37,15 +125,41 @@
     white-space: nowrap;
   }
 
-  &--small &__track {
-    height: 15px;
-    padding: 2px;
-    border-width: 2px;
+  // The dense HUD bar is intentionally a separate geometry. At only 6px wide,
+  // the standard 3px ring would consume the whole cell, so this scales its
+  // edge, corner cut, highlights, and gap down together instead of squeezing
+  // the regular frame into an unreadable strip.
+  &--compact {
+    --star-progress-cell-width: 6px;
+    --star-progress-cell-gap: 2px;
+    --star-progress-notch: 1px;
+    --star-progress-frame-width: 1px;
+    --star-progress-highlight-width: 1px;
+    --star-progress-highlight-offset: 1px;
+    --star-progress-shadow-offset-x: -1px;
+    --star-progress-shadow-offset-y: 2px;
   }
 
-  &--large &__track {
-    height: 28px;
-    padding: 4px;
-    border-width: 3px;
-  }
+}
+
+@keyframes star-progress-cell-in {
+  0% { opacity: 0; transform: scale(0); }
+  68% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes star-progress-cell-out {
+  0% { opacity: 1; transform: scale(1); }
+  36% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(0); }
+}
+
+@keyframes star-progress-cell-frame-out {
+  0% { transform: scale(1); }
+  36% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-progress__cell-fill { animation: none !important; }
 }

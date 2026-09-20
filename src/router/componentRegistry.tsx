@@ -1,6 +1,7 @@
 import type { LazyExoticComponent, ReactNode } from 'react'
 import {
   Bell,
+  CircleUserRound,
   CalendarDays,
   CalendarRange,
   Frame,
@@ -22,6 +23,7 @@ import {
 import type { Lang } from '../i18n'
 import {
   StarCalendarDemoPage,
+  StarAvatarDemoPage,
   StarCardDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
@@ -73,6 +75,17 @@ export interface ComponentRoute {
 }
 
 export const COMPONENT_ROUTES: ComponentRoute[] = [
+  {
+    routePath: 'avatar',
+    component: 'Avatar',
+    title: { zh: '头像', en: 'Avatar' },
+    desc: {
+      zh: '带多层木纹与受光边框的像素头像，支持方框和圆框。',
+      en: 'A pixel avatar with layered wood grain and lighting, in square or round frames.',
+    },
+    icon: <CircleUserRound size={20} />,
+    element: StarAvatarDemoPage,
+  },
   {
     routePath: 'button',
     component: 'NineSliceButton',

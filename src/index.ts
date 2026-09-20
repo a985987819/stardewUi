@@ -45,3 +45,11 @@ export {
   type CardPalette,
   type CardSurfaceLighting,
 } from './utils/cardLighting'
+export {
+  deriveProgressPalette,
+  DEFAULT_PROGRESS_COLOR,
+  DEFAULT_PROGRESS_BORDER,
+  DEFAULT_PROGRESS_SHADOW,
+  DEFAULT_PROGRESS_HIGHLIGHT,
+  type ProgressPalette,
+} from './utils/progressPalette'

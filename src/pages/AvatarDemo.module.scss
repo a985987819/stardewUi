@@ -1,0 +1,18 @@
+.avatar-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.avatar-demo-item {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-width: 94px;
+  color: #4a2c1a;
+  font-size: 13px;
+}
