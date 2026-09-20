@@ -48,3 +48,15 @@
   @apply flex items-center justify-center;
   min-height: 40vh;
 }
+
+// 页脚分割线：挂在 .doc-content **外面**（main 的直接子元素），横向铺满整列，
+// 不跟着正文的 1200px 容器收窄 —— 栅栏自己会排到右边缘、多出来的那格被截断，
+// 所以左右两端都不会留空档。
+.doc-footer {
+  @apply pt-10 pb-6;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    @apply pt-8;
+  }
+}
