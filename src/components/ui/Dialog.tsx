@@ -24,6 +24,13 @@ export interface StarDialogProps {
   maskClosable?: boolean
   typewriter?: boolean
   typewriterSpeed?: number
+  /**
+   * Whether to show the prev/next pager. Leave it out and the pager follows the
+   * content: a dialog with a single page hides it, because a lone "1 / 1" flanked
+   * by two dead buttons is pure chrome. Pass `false` to hide it for a paged
+   * dialog too, or an explicit `true` to keep it even on a single page.
+   */
+  showPagination?: boolean
   onClose?: () => void
 }
 
@@ -45,6 +52,7 @@ function StarDialog({
   maskClosable = true,
   typewriter = true,
   typewriterSpeed = 100,
+  showPagination,
   onClose,
 }: StarDialogProps) {
   const [currentPage, setCurrentPage] = useState(0)
@@ -186,6 +194,10 @@ function StarDialog({
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
   const showActions = isLastPage && finalActions.length > 0
+  // 单页时默认不出分页：一个没人能点的「1 / 1」只是多余的一行
+  const showPager = showPagination ?? totalPages > 1
+  // 分页和动作都没有时，整条页脚（含它的上分隔线）一起收掉，免得留一条空线
+  const showFooter = showActions || showPager
   const hasSidebar = Boolean(image || name)
 
   if (!open) return null
@@ -255,52 +267,56 @@ function StarDialog({
                 )}
               </div>
 
-              <div className={styles['stardew-dialog__footer']}>
-                {showActions ? (
-                  <div className={styles['stardew-dialog__actions']}>
-                    {finalActions.map((action, index) => (
+              {showFooter ? (
+                <div className={styles['stardew-dialog__footer']}>
+                  {showActions ? (
+                    <div className={styles['stardew-dialog__actions']}>
+                      {finalActions.map((action, index) => (
+                        <StarNineSliceButton
+                          key={index}
+                          type="button"
+                          size="small"
+                          variant={action.variant ?? 'default'}
+                          disabled={action.disabled}
+                          onClick={action.onClick}
+                        >
+                          {action.label}
+                        </StarNineSliceButton>
+                      ))}
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  {showPager ? (
+                    <div className={styles['stardew-dialog__pagination']}>
                       <StarNineSliceButton
-                        key={index}
                         type="button"
                         size="small"
-                        variant={action.variant ?? 'default'}
-                        disabled={action.disabled}
-                        onClick={action.onClick}
+                        className={styles['stardew-dialog__nav-btn']}
+                        onClick={handlePrev}
+                        disabled={isFirstPage}
+                        title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
                       >
-                        {action.label}
+                        <ChevronUp size={18} />
                       </StarNineSliceButton>
-                    ))}
-                  </div>
-                ) : (
-                  <div />
-                )}
-
-                <div className={styles['stardew-dialog__pagination']}>
-                  <StarNineSliceButton
-                    type="button"
-                    size="small"
-                    className={styles['stardew-dialog__nav-btn']}
-                    onClick={handlePrev}
-                    disabled={isFirstPage}
-                    title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-                  >
-                    <ChevronUp size={18} />
-                  </StarNineSliceButton>
-                  <span className={styles['stardew-dialog__page-indicator']}>
-                    {currentPage + 1} / {totalPages}
-                  </span>
-                  <StarNineSliceButton
-                    type="button"
-                    size="small"
-                    className={styles['stardew-dialog__nav-btn']}
-                    onClick={handleNext}
-                    disabled={isLastPage}
-                    title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-                  >
-                    <ChevronDown size={18} />
-                  </StarNineSliceButton>
+                      <span className={styles['stardew-dialog__page-indicator']}>
+                        {currentPage + 1} / {totalPages}
+                      </span>
+                      <StarNineSliceButton
+                        type="button"
+                        size="small"
+                        className={styles['stardew-dialog__nav-btn']}
+                        onClick={handleNext}
+                        disabled={isLastPage}
+                        title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
+                      >
+                        <ChevronDown size={18} />
+                      </StarNineSliceButton>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
+              ) : null}
             </div>
 
             {hasSidebar ? (
