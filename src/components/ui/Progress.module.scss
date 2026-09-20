@@ -138,6 +138,10 @@
     --star-progress-highlight-offset: 1px;
     --star-progress-shadow-offset-x: -1px;
     --star-progress-shadow-offset-y: 2px;
+
+    .star-progress__cell {
+      height: 16px;
+    }
   }
 
 }

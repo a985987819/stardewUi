@@ -1,0 +1,94 @@
+.star-divider {
+  display: flex;
+  position: relative;
+  flex: none;
+  isolation: isolate;
+
+  &__rail {
+    position: relative;
+    z-index: 1;
+    display: block;
+    box-sizing: border-box;
+    background:
+      linear-gradient(90deg, transparent 78%, var(--divider-right-shadow) 100%),
+      linear-gradient(
+        180deg,
+        var(--divider-stripe-1) 0 25%,
+        var(--divider-stripe-2) 25% 50%,
+        var(--divider-stripe-3) 50% 75%,
+        var(--divider-stripe-4) 75% 100%
+      );
+    border: 3px solid var(--divider-border-dark);
+    box-shadow:
+      inset 0 2px 0 var(--divider-top-highlight),
+      inset -3px 0 0 var(--divider-right-shadow),
+      inset 0 -3px 0 var(--divider-divider-shadow),
+      0 3px 0 var(--divider-inner-border);
+  }
+
+  &__post {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    box-sizing: border-box;
+    background: var(--divider-border-dark);
+    box-shadow:
+      inset 2px 0 0 var(--divider-border-light),
+      inset -2px 0 0 var(--divider-right-shadow),
+      0 2px 0 var(--divider-inner-border);
+  }
+
+  &--horizontal {
+    width: 100%;
+    height: 20px;
+    padding: 4px 6px;
+
+    .star-divider__rail {
+      width: 100%;
+      height: 12px;
+    }
+
+    .star-divider__post {
+      top: 0;
+      width: 6px;
+      height: 20px;
+
+      &:nth-last-child(2) { left: 0; }
+      &:last-child { right: 0; }
+    }
+  }
+
+  &--vertical {
+    width: 20px;
+    min-height: 100%;
+    padding: 6px 4px;
+
+    .star-divider__rail {
+      width: 12px;
+      height: 100%;
+      background:
+        linear-gradient(180deg, transparent 78%, var(--divider-right-shadow) 100%),
+        linear-gradient(
+          90deg,
+          var(--divider-stripe-1) 0 25%,
+          var(--divider-stripe-2) 25% 50%,
+          var(--divider-stripe-3) 50% 75%,
+          var(--divider-stripe-4) 75% 100%
+        );
+      box-shadow:
+        inset 2px 0 0 var(--divider-top-highlight),
+        inset 0 -3px 0 var(--divider-right-shadow),
+        inset -3px 0 0 var(--divider-divider-shadow),
+        3px 0 0 var(--divider-inner-border);
+    }
+
+    .star-divider__post {
+      left: 0;
+      width: 20px;
+      height: 6px;
+
+      &:nth-last-child(2) { top: 0; }
+      &:last-child { bottom: 0; }
+    }
+  }
+}

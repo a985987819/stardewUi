@@ -2,6 +2,7 @@ import type { LazyExoticComponent, ReactNode } from 'react'
 import {
   Bell,
   CircleUserRound,
+  Columns2,
   CalendarDays,
   CalendarRange,
   Frame,
@@ -24,6 +25,7 @@ import type { Lang } from '../i18n'
 import {
   StarCalendarDemoPage,
   StarAvatarDemoPage,
+  StarDividerDemoPage,
   StarCardDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
@@ -85,6 +87,17 @@ export const COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <CircleUserRound size={20} />,
     element: StarAvatarDemoPage,
+  },
+  {
+    routePath: 'divider',
+    component: 'Divider',
+    title: { zh: '分割线', en: 'Divider' },
+    desc: {
+      zh: '把卡片木纹与光影压缩成开放的像素栅栏，可横向或纵向分隔内容。',
+      en: 'An open pixel fence that condenses Card wood grain and lighting into horizontal or vertical separators.',
+    },
+    icon: <Columns2 size={20} />,
+    element: StarDividerDemoPage,
   },
   {
     routePath: 'button',
