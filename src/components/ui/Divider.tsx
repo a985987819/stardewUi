@@ -19,8 +19,35 @@ export const FENCE_POST_WIDTH = FENCE_POST_BODY_WIDTH + FENCE_POST_FRAME_WIDTH *
 /** Whole post. Only the top edge is framed, hence a single `+ frame`. */
 export const FENCE_POST_HEIGHT = FENCE_POST_BODY_HEIGHT + FENCE_POST_FRAME_WIDTH
 
+/**
+ * Thickness of a connecting rail, in px. Two of them run out of every post, one
+ * to the left and one to the right, a quarter of the way down and two thirds
+ * down.
+ */
+export const FENCE_POST_RAIL_HEIGHT = 5.5
+/** Thickness of the rail's own frame, in px — top and bottom edges only. */
+export const FENCE_POST_RAIL_FRAME_WIDTH = 1.5
+/** Distance from the top edge of a post down to its upper rail, in px. */
+export const FENCE_POST_RAIL_OFFSET = 6
+/** Vertical space between a post's two rails, in px. */
+export const FENCE_POST_RAIL_GAP = 5
+/**
+ * How far a rail reaches out of the post on each side: exactly half a gap, so
+ * the two halves contributed by neighbouring posts butt in the middle and read
+ * as one continuous rail. `offset * 2 + height * 2 + gap === height` keeps the
+ * two rails inside the post; with a 5.5px rail the three gaps are 6/5/6.
+ */
+export const FENCE_POST_RAIL_LENGTH = FENCE_POST_GAP / 2
+
+/**
+ * Thickness of the highlight band running along the inside of a post's frame,
+ * in px. Half the length of the edge it sits on, and the only `#ffd9a3` accent
+ * on an otherwise `#fa9405` post.
+ */
+export const FENCE_POST_HIGHLIGHT_THICKNESS = 3
+
 /** Distance from the left edge of one post to the left edge of the next. */
-const POST_PITCH = FENCE_POST_WIDTH + FENCE_POST_GAP
+export const FENCE_POST_PITCH = FENCE_POST_WIDTH + FENCE_POST_GAP
 /** How far the lower-left drop shadow sticks out of the post, in px. */
 export const FENCE_POST_SHADOW_WIDTH = 3
 
@@ -35,16 +62,19 @@ export interface StarDividerProps extends HTMLAttributes<HTMLDivElement> {
 
 /** `n` posts take `n * 20 + (n - 1) * 30` px, so solve that for the largest `n`. */
 function fitPostCount(availableWidth: number) {
-  return Math.max(1, Math.floor((availableWidth + FENCE_POST_GAP) / POST_PITCH))
+  return Math.max(1, Math.floor((availableWidth + FENCE_POST_GAP) / FENCE_POST_PITCH))
 }
 
 /**
  * A wooden fence divider. Each post is a lifted 20×28 block: a `#fa9405` body
  * behind a solid 4px `#9b440d` frame that wraps the top, left, and right edges
- * only — the bottom is open — with 5px rounded top corners. The inner top and
- * right edges carry a 3px `#ffd9a3` highlight, each half the length of its own
- * edge, and a `#999` block is dropped 3px down-left behind the post. Posts are
- * 30px apart; the connecting rails are not implemented yet.
+ * only — the bottom is open — with 5px rounded top corners. A 3px `#ffd9a3`
+ * highlight runs along the inside of that frame, half way along the top and
+ * half way down the right, meeting in a rounded corner; a `#492b18` block is
+ * dropped 3px down-left behind the post. Two 5.5px connecting rails — a 1.5px
+ * `#9b440d` frame over a 2.5px `#fa9405` core, with no vertical edge — run out of
+ * every post to the left and right, reaching half a gap each, so neighbouring
+ * posts butt in the middle of the gap and read as one fence. Posts are 30px apart.
  */
 function StarDivider({ count, className, ...rest }: StarDividerProps) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -80,6 +110,8 @@ function StarDivider({ count, className, ...rest }: StarDividerProps) {
     >
       {Array.from({ length: posts }, (_, index) => (
         <span key={index} className={styles['star-divider__post']} aria-hidden>
+          <span className={styles['star-divider__rail']} />
+          <span className={classNames(styles['star-divider__rail'], styles['star-divider__rail--lower'])} />
           <span className={styles['star-divider__frame']} />
         </span>
       ))}
