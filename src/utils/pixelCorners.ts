@@ -1,8 +1,10 @@
 /**
  * Shared pixel-corner geometry for the whole kit.
  *
- * The house style is `StarGapBorder`'s **`cornerLevel = 1`**: the border is
- * *broken* at each corner. Concretely, with a border thickness `t`:
+ * The house style is the **`cornerLevel = 1`** gap border — the staircase-corner
+ * frame that `createGapBorderCorners` generates (see `utils/gapBorderCorners`;
+ * the `StarGapBorder` component that used to render it has been removed): the
+ * border is *broken* at each corner. Concretely, with a border thickness `t`:
  *
  * ```text
  *        ┌────────────┊      the four edges stop 2t short of each corner
@@ -37,7 +39,7 @@ export interface PixelRect {
   height: number
 }
 
-/** `StarGapBorder`'s corner level for the house style: exactly one step. */
+/** Corner level of the house-style gap border: exactly one step. */
 export const GAP_CORNER_LEVEL = 1
 
 /**

@@ -24,7 +24,7 @@ export type DefaultButtonFrameMetrics = {
 
 /**
  * Gap-border thickness for the drawn button, in CSS pixels — the same house
- * style as `StarGapBorder` with `cornerLevel = 1` (see `pixelCorners`).
+ * style as the `cornerLevel = 1` gap border (see `pixelCorners`).
  *
  * It is also the corner gap and the size of the block that bridges it, so the
  * drawn frame matches the card's 6px frame proportionally while staying slim

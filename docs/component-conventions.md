@@ -46,7 +46,7 @@ componentRegistry.tsx ──► lazyPages.ts ──► pages/<Component>Demo.tsx
 3. 每条条目的 `element` 对应 `lazyPages.ts` 中 `Star<Component>DemoPage = lazy(() => import('../pages/<Component>Demo'))`；
 4. `pages/` 下**每个 `*Demo.tsx` 都被某条目录引用**，且每条目录都有对应的 `pages/<Component>Demo.tsx`；
 5. `components/ui/<Component>.tsx` 存在，并从 `components/ui/index.ts` 导出；
-6. `ui/index.ts` 里导出的模块要么有目录条目，要么登记在 `SHARED_ROUTE_MODULES`（共用一个路由的模块，如 `GapBorderCorners` 挂在 `gap-border` 下）；
+6. `ui/index.ts` 里导出的模块要么有目录条目，要么登记在 `SHARED_ROUTE_MODULES`（共用一个路由的模块，目前这个表是空的）；
 7. 渲染 `Sidebar`，断言每条目录都出现为 `/components/<routePath>` 链接 —— 这是「新增组件自动进左侧路由」的直接证明；
 8. `router` / `gallery` / `Sidebar` 三个文件都必须是 `COMPONENT_ROUTES` 的派生（防止有人再抄一份手写列表）。
 
@@ -144,7 +144,7 @@ bun run test:smoke http://127.0.0.1:5199/stardewUi                           # �
 
 ## 9. 已知欠账
 
-- `PixelButton`、`Tab`、`GapBorderCorners` 尚无同名单测（守卫暂未强制单测文件，因为现在是欠账状态，
+- `Tab` 尚无同名单测（守卫暂未强制单测文件，因为现在是欠账状态，
   补齐后可以考虑把「每个公共组件必须有同名单测」也写进守卫）。
 - 演示页文案（`copy`）与 API 表仍写在页面里，未来若要自动生成文档站，需要把 `meta` 单独抽成模块。
 - `rm:component` 对 README / i18n 的清理依赖「章节骨架 + 文案匹配」这两条软约定，没有自动化测试兜底。

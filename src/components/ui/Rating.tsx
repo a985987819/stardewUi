@@ -74,6 +74,89 @@ function PixelGlyph({ icon, fill }: { icon: RatingIcon; fill: number }) {
   )
 }
 
+interface RatingIconButtonProps {
+  icon: RatingIcon
+  fill: number
+  position: number
+  count: number
+  disabled: boolean
+  onPointerUp: (event: PointerEvent<HTMLButtonElement>) => void
+  onDoubleClick: () => void
+}
+
+/** Length of the shake-then-shrink motion; keep in sync with `$rating-out-duration`. */
+const OUT_MOTION_MS = 540
+
+/**
+ * One score icon. It remembers how it looked last render so it can play the
+ * matching motion: earned icons pop in exactly like a Progress cell, and lost
+ * icons wobble before their fill shrinks away.
+ */
+function RatingIconButton({ icon, fill, position, count, disabled, onPointerUp, onDoubleClick }: RatingIconButtonProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const previousFilledRef = useRef(fill > 0)
+  const previousFillRef = useRef(fill)
+  const filled = fill > 0
+  /**
+   * The amount of colour actually painted. An icon that just lost its fill keeps
+   * painting the amount it had until the shrink finishes — otherwise there would
+   * be nothing left on screen to animate.
+   */
+  const [paintedFill, setPaintedFill] = useState(fill)
+
+  useEffect(() => {
+    const button = buttonRef.current
+    const wasFilled = previousFilledRef.current
+    const hadFill = previousFillRef.current
+    previousFilledRef.current = filled
+    previousFillRef.current = fill
+
+    if (!button) return undefined
+
+    // Same presence, different amount (a half step): just repaint, nothing moves.
+    if (wasFilled === filled) {
+      setPaintedFill(fill)
+      return undefined
+    }
+
+    button.dataset.motion = filled ? 'in' : 'out'
+    setPaintedFill(filled ? fill : hadFill)
+
+    let finished = false
+    const finish = () => {
+      if (finished) return
+      finished = true
+      delete button.dataset.motion
+      if (!filled) setPaintedFill(0)
+    }
+
+    // `animationend` normally wins; the timer is the safety net for reduced
+    // motion, where the CSS turns the animation off entirely.
+    button.addEventListener('animationend', finish, { once: true })
+    const timer = window.setTimeout(finish, OUT_MOTION_MS + 60)
+
+    return () => {
+      button.removeEventListener('animationend', finish)
+      window.clearTimeout(timer)
+    }
+  }, [fill, filled])
+
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      tabIndex={-1}
+      disabled={disabled}
+      className={styles['star-rating__button']}
+      aria-label={`${position} / ${count}`}
+      onPointerUp={onPointerUp}
+      onDoubleClick={onDoubleClick}
+    >
+      <PixelGlyph icon={icon} fill={paintedFill} />
+    </button>
+  )
+}
+
 function StarRating({
   value,
   defaultValue = 0,
@@ -180,21 +263,18 @@ function StarRating({
     >
       {Array.from({ length: count }, (_, index) => {
         const position = index + 1
-        const fill = clamp(currentValue - index, 1)
 
         return (
-          <button
+          <RatingIconButton
             key={position}
-            type="button"
-            tabIndex={-1}
+            icon={icon}
+            fill={clamp(currentValue - index, 1)}
+            position={position}
+            count={count}
             disabled={disabled}
-            className={styles['star-rating__button']}
-            aria-label={`${position} / ${count}`}
             onPointerUp={(event) => handlePointerUp(event, index)}
             onDoubleClick={() => handleDoubleClick(index)}
-          >
-            <PixelGlyph icon={icon} fill={fill} />
-          </button>
+          />
         )
       })}
     </div>

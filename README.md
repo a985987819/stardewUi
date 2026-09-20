@@ -598,84 +598,9 @@ const [name, setName] = useState('')
 
 ---
 
-### StarGapBorder - 缺角边框
-
-像素风缺角边框容器。
-
-```tsx
-import { StarGapBorder } from 'stardew-valley-ui'
-
-<StarGapBorder>
-  <p>内容</p>
-</StarGapBorder>
-
-<StarGapBorder
-  borderColor="#8B4513"
-  backgroundColor="#FFF8DC"
-  cornerLevel={2}
-  borderThickness={6}
->
-  <p>自定义边框</p>
-</StarGapBorder>
-```
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| borderColor | `string` | `'#5f4322'` | 边框颜色 |
-| backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
-| borderThickness | `number` | `8` | 边框粗细 |
-| cornerGap | `number` | `8` | 角落间距 |
-| cornerLevel | `1 \| 2 \| 3` | - | 角落阶梯级别 |
-| contentPadding | `number` | `24` | 内容内边距 |
-| contentClassName | `string` | - | 内容区域类名 |
-
----
-
-### StarGapBorderCorners - 缺角边框装饰
-
-独立的缺角边框装饰组件，可在任意 `position: relative` 容器中渲染边角效果。适合用于自定义容器边框、叠加层装饰等场景。
-
-```tsx
-import { StarGapBorderCorners } from 'stardew-valley-ui'
-
-// 在自定义容器中使用
-<div style={{ position: 'relative', width: 200, height: 100 }}>
-  <StarGapBorderCorners level={1} />
-  <div style={{ position: 'relative', zIndex: 2, padding: 16 }}>
-    内容区域
-  </div>
-</div>
-
-// 自定义颜色
-<div style={{ position: 'relative' }}>
-  <StarGapBorderCorners
-    level={2}
-    borderColor="#8B4513"
-    backgroundColor="#FFF8DC"
-    borderThickness={6}
-  />
-  <div style={{ position: 'relative', zIndex: 2 }}>内容</div>
-</div>
-
-// 不同阶梯级别
-<StarGapBorderCorners level={1} />  // 每角 1 个阶梯
-<StarGapBorderCorners level={2} />  // 每角 3 个阶梯
-<StarGapBorderCorners level={3} />  // 每角 5 个阶梯
-```
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| level | `1 \| 2 \| 3` | `1` | 角落阶梯级别 |
-| borderColor | `string` | `'#5f4322'` | 边框颜色 |
-| backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
-| borderThickness | `number` | `8` | 边框粗细 |
-| cornerGap | `number` | `8` | 角落间距 |
-
-**注意**：父容器需要设置 `position: relative`，内容区域需要设置 `position: relative; z-index: 2` 以显示在边角装饰之上。
-
----
-
 ### createGapBorderCorners - 缺角边框计算函数
+
+> `StarGapBorder` 和 `StarGapBorderCorners` 两个渲染组件已移除，但这个「缺口边框」的生成函数保留了下来 —— 它是阶梯缺角的参考实现，`pixelCorners` 和各 canvas 绘制器描述 house style 时仍以它为准。
 
 纯函数，用于计算缺角边框的几何数据。适合需要自定义渲染逻辑的高级场景。
 
@@ -737,25 +662,6 @@ function CustomBorder({ children }) {
 | backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
 | borderThickness | `number` | `8` | 边框粗细 |
 | cornerGap | `number` | `8` | 角落间距 |
-
----
-
-### PixelButton - 像素按钮
-
-简单像素风格按钮，支持自定义颜色。
-
-```tsx
-import { PixelButton } from 'stardew-valley-ui'
-
-<PixelButton
-  bgColor="#ffffff"
-  textColor="#333333"
-  borderColor="#ff0000"
-  shadowColor="#999999"
->
-  像素按钮
-</PixelButton>
-```
 
 ---
 
@@ -949,11 +855,8 @@ import type {
   StarTabProps,
   StarTabItem,
   SwitchProps,
-  StarGapBorderProps,
-  StarGapBorderCornersProps,
   GapBorderCornerData,
   CreateGapBorderCornersOptions,
-  PixelButtonProps,
   StarInputProps,
   InputSize,
   InputStatus,

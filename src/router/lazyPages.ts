@@ -25,8 +25,6 @@ export const StarTypewriterDemoPage = lazy(() => import('../pages/TypewriterDemo
 export const StarMessageDemoPage = lazy(() => import('../pages/MessageDemo'))
 export const StarLoadingDemoPage = lazy(() => import('../pages/LoadingDemo'))
 export const StarTabDemoPage = lazy(() => import('../pages/TabDemo'))
-export const StarGapBorderDemoPage = lazy(() => import('../pages/GapBorderDemo'))
-export const StarPixelButtonDemoPage = lazy(() => import('../pages/PixelButtonDemo'))
 export const StarRatingDemoPage = lazy(() => import('../pages/RatingDemo'))
 export const StarProgressDemoPage = lazy(() => import('../pages/ProgressDemo'))
 export const StarSwitchDemoPage = lazy(() => import('../pages/SwitchDemo'))

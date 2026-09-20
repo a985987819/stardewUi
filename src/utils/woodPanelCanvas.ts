@@ -163,7 +163,7 @@ interface WoodPanelGeometry {
 /**
  * Resolves the gap-border geometry of the panel.
  *
- * House style (`StarGapBorder`, `cornerLevel = 1`): with a frame thickness `t`,
+ * House style (`cornerLevel = 1` gap border): with a frame thickness `t`,
  * every edge stops `2t` short of each corner, a `t x t` block bridges the break
  * at `(t, t)`, and the `2t x 2t` corner square is left open. The surface loses a
  * matching `t` step per corner. Here `t` is the whole frame

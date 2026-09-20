@@ -47,14 +47,10 @@ const barrelModules = [...new Set([...uiBarrel.matchAll(/from '\.\/([\w-]+)'/g)]
 
 /**
  * Modules that deliberately share a route with another module instead of owning
- * one: `GapBorderCorners` and `createGapBorderCorners` both belong to the
- * `gap-border` entry. Keep this list short — a module that needs an entry of its
- * own should get one.
+ * one. Currently empty: every module the ui barrel exports owns its own entry.
+ * Keep this list short — a module that needs an entry of its own should get one.
  */
-const SHARED_ROUTE_MODULES: Record<string, string> = {
-  GapBorderCorners: 'gap-border',
-  gapBorderCornersUtils: 'gap-border',
-}
+const SHARED_ROUTE_MODULES: Record<string, string> = {}
 
 const cataloguedComponents = COMPONENT_ROUTES.map((entry) => entry.component)
 const cataloguedRoutePaths = COMPONENT_ROUTES.map((entry) => entry.routePath)
