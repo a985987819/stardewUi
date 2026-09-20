@@ -4,16 +4,7 @@ import {
   CARD_DEFAULT_SURFACE_COLOR,
   deriveCardLightingFromSurface,
 } from '../../utils/cardLighting'
-import { createGapFrameClipPath } from '../../utils/pixelCorners'
 import styles from './Card.module.scss'
-
-/**
- * Thickness of the card's outer gap frame. Must stay in sync with the
- * `$card-frame-width` token in `Card.module.scss` — the CSS draws the edges and
- * corner blocks, this number generates the clip that cuts the matching corner
- * gap out of the fill layer.
- */
-const CARD_FRAME_WIDTH = 6
 
 /**
  * Preset **body** colours. `color` is the swatch the user sees most, and
@@ -72,10 +63,6 @@ function StarCard({
   // framing, stripe bands and directional light from that one swatch.
   const surfaceColor = isPresetCardColor(color) ? CARD_SURFACE_COLORS[color] : color ?? CARD_DEFAULT_SURFACE_COLOR
   const palette = deriveCardLightingFromSurface(surfaceColor)
-  // Continuous gap-border corner (`cornerLevel = 1`): the fill is clipped to
-  // the ring's inner edge, and the frame's 2× thickness corner blocks close the
-  // ring on top — no corner is ever left open to the page.
-  const gapClipPath = createGapFrameClipPath(CARD_FRAME_WIDTH)
   const cardStyle = {
     ...style,
     '--card-bg': palette.background,
@@ -92,7 +79,6 @@ function StarCard({
     '--card-outer-shadow-hover': palette.outerShadowHover,
     '--card-outer-shadow-active': palette.outerShadowActive,
     '--card-inner-glow': palette.innerGlow,
-    '--card-gap-clip': gapClipPath,
     '--card-text': palette.text,
     '--card-text-secondary': palette.textSecondary,
     '--card-section-bg': palette.sectionBackground,
@@ -137,14 +123,6 @@ function StarCard({
 
   return (
     <div {...rest} className={cardClass} style={cardStyle} onClick={onClick}>
-      {/* Decorative layers, all absolutely positioned so they never take part in
-          the card's layout (`consumer` classes like `display: flex` on the card
-          root must keep reaching the real children).
-          - `__plate` = the fill, clipped so each corner loses the gap square
-          - `__frame` = the inner light line, deliberately square
-          - `__border` = the gap frame (edges + corner blocks), stacked above the
-            content so anything running into the frame is covered, not drawn over */}
-      <span className={styles['stardew-card__plate']} aria-hidden />
       <span className={styles['stardew-card__frame']} aria-hidden />
       {hasTitle ? (
         <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
@@ -166,7 +144,6 @@ function StarCard({
         <div className={styles['stardew-card__body-content']}>{children}</div>
       </div>
       {footer ? <div className={styles['stardew-card__footer']}>{footer}</div> : null}
-      <span className={styles['stardew-card__border']} aria-hidden />
     </div>
   )
 }

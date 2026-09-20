@@ -112,28 +112,17 @@ describe('Card theme variables', () => {
     expect(card.style.getPropertyValue('--card-inner-glow')).toMatch(/^rgba\(/)
   })
 
-  it('clips the fill to the continuous ring and keeps the frame layers', () => {
+  it('keeps the rounded inner frame without gap-border decoration layers', () => {
     const { container } = render(<Card>Content</Card>)
     const card = container.firstElementChild as HTMLElement
     const plate = card.querySelector('[class*="stardew-card__plate"]')
     const frame = card.querySelector('[class*="stardew-card__frame"]')
     const border = card.querySelector('[class*="stardew-card__border"]')
-    const clip = card.style.getPropertyValue('--card-gap-clip')
 
-    // Frame thickness 6px -> the fill is clipped to a rectangle inset by 6px on
-    // every side; the frame's 12px corner blocks close the ring on top of it.
-    expect(clip).toBe(
-      'polygon(6px 6px, calc(100% - 6px) 6px, calc(100% - 6px) calc(100% - 6px), 6px calc(100% - 6px))'
-    )
-
-    expect(plate).toBeInTheDocument()
-    expect(plate).toHaveAttribute('aria-hidden')
     expect(frame).toBeInTheDocument()
-
-    // The outer frame is its own layer above the content: the inner light line
-    // must stay outside it, so anything reaching the frame gets covered.
-    expect(border).toBeInTheDocument()
-    expect(border).toHaveAttribute('aria-hidden')
+    expect(plate).not.toBeInTheDocument()
+    expect(border).not.toBeInTheDocument()
+    expect(card.style.getPropertyValue('--card-gap-clip')).toBe('')
   })
 
   it('falls back to the default theme instead of blanking out on an invalid color', () => {
