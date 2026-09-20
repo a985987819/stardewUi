@@ -52,7 +52,7 @@ $rating-out-duration: 540ms;
     animation: star-rating-pop-in $rating-pop-duration cubic-bezier(0.22, 1.34, 0.36, 1) both;
   }
 
-  // 减少：先左右摇晃，摇完再让点亮的那层缩小消失。
+  // 减少：先左右摇晃，摇完再让点亮的那层一边缩小一边淡出，直到完全透明。
   // 两段动画等长（都走 $rating-out-duration），结束时间一致，所以 React 里
   // 只靠一次 animationend 就能把 data-motion 摘干净。
   &__button[data-motion='out'] {
@@ -60,7 +60,9 @@ $rating-out-duration: 540ms;
   }
 
   &__button[data-motion='out'] &__glyph-fill {
-    animation: star-rating-fill-out $rating-out-duration cubic-bezier(0.64, 0, 0.78, -0.16) both;
+    // 缓动必须单调递增（不能像摇晃那样带负超调），否则透明度会先掉到 0 又被弹回 1，
+    // 看起来就只剩「缩小」而没有「变淡」。
+    animation: star-rating-fill-out $rating-out-duration cubic-bezier(0.4, 0, 0.7, 0.2) both;
   }
 
   &__glyph,
@@ -134,7 +136,9 @@ $rating-out-duration: 540ms;
   }
 }
 
-// 点亮层：同样等摇晃结束后（58%）才开始放大再缩没
+// 点亮层：同样等摇晃结束后（58%）才开始放大再缩没，缩小和变淡同步走。
+// 中间补一个 84% 的关键帧，把「缩小到一半、透明度也掉到一半以下」钉死，
+// 免得缓动曲线把淡出挤到最后几毫秒才发生。
 @keyframes star-rating-fill-out {
   0%,
   58% {
@@ -143,8 +147,13 @@ $rating-out-duration: 540ms;
   }
 
   68% {
-    opacity: 1;
+    opacity: 0.92;
     transform: scale(1.1);
+  }
+
+  84% {
+    opacity: 0.4;
+    transform: scale(0.6);
   }
 
   100% {
