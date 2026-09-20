@@ -54,15 +54,26 @@ export const FENCE_POST_SHADOW_WIDTH = 3
 export interface StarDividerProps extends HTMLAttributes<HTMLDivElement> {
   /**
    * Pin the number of fence posts. Leave it out and the divider fills its
-   * container instead: it measures itself and lays out as many posts as fit,
-   * keeping every gap at exactly 30px.
+   * container instead: it measures itself and lays out enough posts to reach the
+   * far edge, keeping every gap at exactly 30px. The last post is clipped by the
+   * root's `overflow` when the width is not a whole number of pitches — a
+   * truncated post beats a gap at the end of the fence.
    */
   count?: number
 }
 
-/** `n` posts take `n * 20 + (n - 1) * 30` px, so solve that for the largest `n`. */
+/**
+ * How many posts are needed to span `availableWidth` (the content box, i.e. the
+ * root's width minus the two half-gap paddings). A post reaches half a gap out
+ * of both sides, so the fence covers `n * pitch` and the smallest covering `n`
+ * is `ceil(width / pitch)`. That deliberately rounds **up**: the extra post is
+ * clipped by the root's `overflow`, which is what makes the fence fill the full
+ * width instead of stopping short with a gap on the right. Kept module-private
+ * on purpose — exporting a function from a component file would break Fast
+ * Refresh, so the rule is asserted through the rendered DOM instead.
+ */
 function fitPostCount(availableWidth: number) {
-  return Math.max(1, Math.floor((availableWidth + FENCE_POST_GAP) / FENCE_POST_PITCH))
+  return Math.max(1, Math.ceil((availableWidth + FENCE_POST_RAIL_LENGTH * 2) / FENCE_POST_PITCH))
 }
 
 /**
@@ -75,6 +86,8 @@ function fitPostCount(availableWidth: number) {
  * `#9b440d` frame over a 2.5px `#fa9405` core, with no vertical edge — run out of
  * every post to the left and right, reaching half a gap each, so neighbouring
  * posts butt in the middle of the gap and read as one fence. Posts are 30px apart.
+ * Left to itself the divider always spans its container edge to edge; the last
+ * post is clipped whenever the width is not a whole number of pitches.
  */
 function StarDivider({ count, className, ...rest }: StarDividerProps) {
   const rootRef = useRef<HTMLDivElement>(null)

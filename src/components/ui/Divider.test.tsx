@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import Divider, { FENCE_POST_BODY_HEIGHT, FENCE_POST_BODY_WIDTH, FENCE_POST_FRAME_WIDTH, FENCE_POST_GAP, FENCE_POST_HEIGHT, FENCE_POST_HIGHLIGHT_THICKNESS, FENCE_POST_PITCH, FENCE_POST_RAIL_FRAME_WIDTH, FENCE_POST_RAIL_GAP, FENCE_POST_RAIL_HEIGHT, FENCE_POST_RAIL_LENGTH, FENCE_POST_RAIL_OFFSET, FENCE_POST_WIDTH } from './Divider'
 import styles from './Divider.module.scss'
 
@@ -40,6 +40,30 @@ describe('Divider', () => {
   it('falls back to a single post while the container width is unmeasured', () => {
     const { container } = render(<Divider />)
     expect(posts(container)).toHaveLength(1)
+  })
+
+  // 自动铺满是「宁可截断也不留空档」：一根横杆左右各伸半个间距，所以 n 格覆盖 n * 50px，
+  // 格数要向上取整 —— 多出来的那格会被根节点的 overflow 截掉。
+  // jsdom 里 clientWidth 恒为 0、计算样式也拿不到 padding，所以这两样都 mock 出来。
+  it('rounds the fitted count up so the fence reaches the far edge', () => {
+    const styleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ paddingLeft: '15px', paddingRight: '15px' } as CSSStyleDeclaration)
+
+    try {
+      // 520px 容器：11 格（第 11 格被截），只排 10 格会在右端空掉 50px
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: 520 })
+      expect(posts(render(<Divider />).container)).toHaveLength(11)
+
+      // 正好是整数个步距时不多排一格（500 = 10 × 50）
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: 500 })
+      expect(posts(render(<Divider />).container)).toHaveLength(10)
+
+      // 比一格还窄也保底一格，超出的部分裁掉
+      Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: 50 })
+      expect(posts(render(<Divider />).container)).toHaveLength(1)
+    } finally {
+      delete (HTMLElement.prototype as { clientWidth?: number }).clientWidth
+      styleSpy.mockRestore()
+    }
   })
 
   it('forwards extra props and classes to the root', () => {
