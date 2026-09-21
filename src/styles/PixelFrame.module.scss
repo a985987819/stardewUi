@@ -1,0 +1,67 @@
+// 连续缺口边框（`cornerLevel = 1`，即 `createGapBorderCorners` 那套阶梯角，边框闭合版）的共享绘制配方。
+//
+// 几何上，一个连续缺口边框 = 4 条边 + 4 个角块，边框环**首尾闭合**，任何角都
+// 不会透出页面背景：
+//
+//   - 每条边两端各缩进 `1 × 厚度`
+//   - 每个角补一个 `2 × 厚度` 的方块，把环封死（角块即「像素凸角」）
+//   - 填色层铺满环的内侧，被角块压住的角形成一级台阶
+//
+// 这些矩形用同一个元素的 8 个 `linear-gradient` 背景图层画出来，不需要额外 DOM。
+// 填色由 `gap-frame-fill` 提供，配合 `createGapFrameClipPath(厚度)`（内缩矩形的
+// clip）使用 —— 层与 clip 全部对齐在同一只盒子上。
+
+/// 应用外壳（页头 / 侧栏 / 内容底板 / 目录）的缺口边框厚度。
+/// 必须与 `App.tsx` 里的 `DOC_FRAME_WIDTH` 一致 —— 那边用它生成 `--doc-gap-clip`。
+$doc-frame-width: 4px;
+
+/// 4 条边 + 4 个角块，作为背景图层画在元素自身的盒子上。
+///
+/// 注意：`$thickness` 必须带单位（如 `6px`）。下面的插值直接输出该值，
+/// 不要再拼 `px` —— 否则会编译出 `6pxpx` 让整条 `background-*` 声明失效。
+@mixin gap-frame-layers($color, $thickness) {
+  $block: $thickness * 2;
+
+  background-image:
+    // 四条边：上、下、左、右
+    linear-gradient($color, $color),
+    linear-gradient($color, $color),
+    linear-gradient($color, $color),
+    linear-gradient($color, $color),
+    // 四个角块：左上、右上、左下、右下
+    linear-gradient($color, $color),
+    linear-gradient($color, $color),
+    linear-gradient($color, $color),
+    linear-gradient($color, $color);
+  background-repeat: no-repeat;
+  background-size:
+    calc(100% - #{$thickness * 2}) #{$thickness},
+    calc(100% - #{$thickness * 2}) #{$thickness},
+    #{$thickness} calc(100% - #{$thickness * 2}),
+    #{$thickness} calc(100% - #{$thickness * 2}),
+    #{$block} #{$block},
+    #{$block} #{$block},
+    #{$block} #{$block},
+    #{$block} #{$block};
+  background-position:
+    left #{$thickness} top 0,
+    left #{$thickness} bottom 0,
+    left 0 top #{$thickness},
+    right 0 top #{$thickness},
+    left 0 top 0,
+    right 0 top 0,
+    left 0 bottom 0,
+    right 0 bottom 0;
+}
+
+/// 单元素写法：填色 + 边框图层，配合 `createGapFrameClipPath(厚度)` 使用。
+/// 填色被 clip 裁到环的内侧，边框图层把环画在上层，合成一条连续的粗角框。
+@mixin gap-frame-fill($fill, $border, $thickness) {
+  background-color: $fill;
+  @include gap-frame-layers($border, $thickness);
+}
+
+/// 只有边框（没有填色）的写法，例如卡片外面那圈装饰光环。
+@mixin gap-frame-only($color, $thickness) {
+  @include gap-frame-layers($color, $thickness);
+}

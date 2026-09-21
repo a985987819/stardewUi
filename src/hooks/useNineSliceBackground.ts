@@ -76,10 +76,11 @@ export const useNineSliceBackground = ({
 }: NineSliceBackgroundOptions) => {
   const hostRef = useRef<HTMLElement | null>(null)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const imageRef = useRef<LoadedImage | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const resolvedSrc = useMemo(() => resolveAssetPath(src), [src])
-  const [loadedSrc, setLoadedSrc] = useState<string | null>(null)
+
+  // The decoded image lives in state rather than a ref so that readiness is
+  // derived, not synchronised. Keeping it in a ref forced `setIsReady(false)`
+  // calls inside effects just to invalidate the cached image on prop changes.
+  const [loadedImage, setLoadedImage] = useState<LoadedImage | null>(null)
 
   const setHostRef = useCallback((node: HTMLElement | null) => {
     hostRef.current = node
@@ -88,7 +89,7 @@ export const useNineSliceBackground = ({
   const draw = useCallback(() => {
     const host = hostRef.current
     const canvas = canvasRef.current
-    const image = imageRef.current
+    const image = loadedImage
 
     if (!host || !canvas || !image) {
       return
@@ -152,48 +153,33 @@ export const useNineSliceBackground = ({
       insets: scaledInsets,
       clearBeforeDraw: false,
     })
-  }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top])
-
-  const scheduleDraw = useCallback(() => {
-    if (rafRef.current !== null) {
-      return
-    }
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null
-      draw()
-    })
-  }, [draw])
+  }, [backgroundColor, imageSmoothingEnabled, insets.bottom, insets.left, insets.right, insets.top, loadedImage])
 
   useEffect(() => {
     if (!enabled) {
-      imageRef.current = null
       return
     }
 
     let cancelled = false
 
-    imageRef.current = null
-
     loadImage(src)
       .then((loaded) => {
-        if (cancelled) {
-          return
+        if (!cancelled) {
+          setLoadedImage(loaded)
         }
-        imageRef.current = loaded
-        setLoadedSrc(resolvedSrc)
       })
       .catch(() => {
         if (!cancelled) {
-          setLoadedSrc((current) => (current === resolvedSrc ? null : current))
+          setLoadedImage(null)
         }
       })
 
     return () => {
       cancelled = true
     }
-  }, [enabled, resolvedSrc, src])
+  }, [enabled, src])
 
-  const isReady = enabled && loadedSrc === resolvedSrc
+  const isReady = enabled && loadedImage !== null
 
   useEffect(() => {
     if (!isReady) {
@@ -203,7 +189,7 @@ export const useNineSliceBackground = ({
   }, [draw, isReady])
 
   useEffect(() => {
-    if (!autoRedraw) {
+    if (!autoRedraw || !isReady) {
       return
     }
 
@@ -212,17 +198,23 @@ export const useNineSliceBackground = ({
       return
     }
 
-    const resizeObserver = new ResizeObserver(scheduleDraw)
+    const resizeObserver = new ResizeObserver(() => {
+      draw()
+    })
+
     resizeObserver.observe(host)
+
+    const handleWindowResize = () => {
+      draw()
+    }
+
+    window.addEventListener('resize', handleWindowResize)
 
     return () => {
       resizeObserver.disconnect()
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current)
-        rafRef.current = null
-      }
+      window.removeEventListener('resize', handleWindowResize)
     }
-  }, [autoRedraw, scheduleDraw])
+  }, [autoRedraw, draw, isReady])
 
   const canvasProps = useMemo(
     () => ({

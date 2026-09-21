@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { Book, Box, ChevronDown, Search } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { useI18n } from '../../i18n'
+import { COMPONENT_ROUTES } from '../../router/componentRegistry'
 import styles from './Sidebar.module.scss'
 
 interface MenuItem {
@@ -26,19 +27,11 @@ const menuItems: MenuItem[] = [
     labelEn: 'Components',
     icon: <Box size={18} />,
     children: [
-      { path: '/components/button', labelZh: '按钮', labelEn: 'Button' },
-      { path: '/components/calendar', labelZh: '日历', labelEn: 'Calendar' },
-      { path: '/components/date-picker', labelZh: '日期选择', labelEn: 'DatePicker' },
-      { path: '/components/title', labelZh: '标题', labelEn: 'Title' },
-      { path: '/components/card', labelZh: '卡片', labelEn: 'Card' },
-      { path: '/components/dialog', labelZh: '对话框', labelEn: 'Dialog' },
-      { path: '/components/popup', labelZh: '弹窗', labelEn: 'Popup' },
-      { path: '/components/typewriter', labelZh: '打字机', labelEn: 'Typewriter' },
-      { path: '/components/loading', labelZh: '加载', labelEn: 'Loading' },
-      { path: '/components/message', labelZh: '消息', labelEn: 'Message' },
-      { path: '/components/empty-state', labelZh: '空状态', labelEn: 'EmptyState' },
-      { path: '/components/tab', labelZh: '选项卡', labelEn: 'Tab' },
-      { path: '/components/step-btn', labelZh: '阶梯按钮', labelEn: 'StepBtn' },
+      ...COMPONENT_ROUTES.map((component) => ({
+        path: `/components/${component.routePath}`,
+        labelZh: component.title.zh,
+        labelEn: component.title.en,
+      })),
     ],
   },
 ]

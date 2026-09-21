@@ -1,22 +1,38 @@
+import {
+  GAP_CORNER_LEVEL,
+  buildGapFrameInnerRects,
+  buildGapFrameRects,
+  buildSteppedRectPoints,
+  type PixelPoint,
+  type PixelRect,
+} from './pixelCorners'
 import type { createDefaultButtonPalette } from './defaultButtonTheme'
-
-type Point = {
-  x: number
-  y: number
-}
 
 type DefaultButtonPalette = ReturnType<typeof createDefaultButtonPalette>
 
 export type DefaultButtonFrameMetrics = {
-  cornerRadius: number
-  stepSize: number
+  /** Corner level of the gap border. Always `1`: one break + one block per corner. */
+  cornerLevel: number
+  /** Border thickness, in device pixels. Doubles as the corner gap and block size. */
+  frameWidth: number
+  /** How far each edge stops short of a corner: `frameWidth` (one `t` per end). */
+  edgeInset: number
   outerBorderWidth: number
   innerBorderWidth: number
-  innerBorderGap: number
   innerShadowOffsetY: number
 }
 
-const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
+/**
+ * Gap-border thickness for the drawn button, in CSS pixels — the same house
+ * style as the `cornerLevel = 1` gap border (see `pixelCorners`).
+ *
+ * It is also the corner gap and the size of the block that bridges it, so the
+ * drawn frame matches the card's 6px frame proportionally while staying slim
+ * enough for a 34px tall button.
+ */
+export const DEFAULT_BUTTON_FRAME_WIDTH = 4
+
+const tracePolygon = (ctx: CanvasRenderingContext2D, points: PixelPoint[]) => {
   if (!points.length) {
     return
   }
@@ -31,49 +47,52 @@ const tracePolygon = (ctx: CanvasRenderingContext2D, points: Point[]) => {
   ctx.closePath()
 }
 
-const clampInset = (value: number, width: number, height: number) =>
-  Math.min(value, Math.max(1, Math.floor(Math.min(width, height) / 2) - 1))
+const fillRect = (ctx: CanvasRenderingContext2D, rect: PixelRect, color: string) => {
+  if (rect.width <= 0 || rect.height <= 0) {
+    return
+  }
 
-const buildButtonPolygon = (width: number, height: number, cornerRadius: number, stepSize: number): Point[] => {
-  const outerInset = clampInset(cornerRadius, width, height)
-  const innerInset = clampInset(Math.max(stepSize, Math.round(outerInset * 0.42)), width, height)
-
-  return [
-    { x: outerInset, y: 0 },
-    { x: width - outerInset, y: 0 },
-    { x: width - innerInset, y: innerInset },
-    { x: width, y: outerInset },
-    { x: width, y: height - outerInset },
-    { x: width - innerInset, y: height - innerInset },
-    { x: width - outerInset, y: height },
-    { x: outerInset, y: height },
-    { x: innerInset, y: height - innerInset },
-    { x: 0, y: height - outerInset },
-    { x: 0, y: outerInset },
-    { x: innerInset, y: innerInset },
-  ]
+  ctx.fillStyle = color
+  ctx.fillRect(rect.x, rect.y, rect.width, rect.height)
 }
-
-const insetPolygon = (points: Point[], inset: number, width: number, height: number): Point[] =>
-  points.map(({ x, y }) => ({
-    x: Math.min(width, Math.max(0, x < width / 2 ? x + inset : x - inset)),
-    y: Math.min(height, Math.max(0, y < height / 2 ? y + inset : y - inset)),
-  }))
 
 export const getDefaultButtonFrameMetrics = (width: number, height: number, dpr: number): DefaultButtonFrameMetrics => {
   const minSide = Math.max(1, Math.min(width, height))
   const scaledDpr = Math.max(1, dpr)
 
+  // Whole device pixels keep the blocks crisp. The clamp keeps the four edges
+  // from overlapping each other on very small buttons: every edge loses
+  // `2 * frameWidth` at both ends, and opposite edges must not meet.
+  const frameWidth = Math.max(
+    1,
+    Math.min(Math.round(DEFAULT_BUTTON_FRAME_WIDTH * scaledDpr), Math.floor(minSide / 6))
+  )
+
   return {
-    cornerRadius: clampInset(Math.round(10 * scaledDpr), width, height),
-    stepSize: Math.max(1, Math.round(Math.min(minSide / 8, 4 * scaledDpr))),
-    outerBorderWidth: 2 * scaledDpr,
-    innerBorderWidth: 2 * scaledDpr,
-    innerBorderGap: 0.5 * scaledDpr,
+    cornerLevel: GAP_CORNER_LEVEL,
+    frameWidth,
+    edgeInset: frameWidth,
+    // The frame is a single thickness of `frameWidth`, split into an outer band
+    // of `frameWidth / 2` … which is exactly the outer/inner pair below.
+    outerBorderWidth: frameWidth / 2,
+    innerBorderWidth: frameWidth / 2,
     innerShadowOffsetY: Math.max(1, Math.round(1.5 * scaledDpr)),
   }
 }
 
+/**
+ * Draws the button in the house gap-border style.
+ *
+ * Shape, with `t = frameWidth`:
+ *  - four edges of thickness `t`, each stopping `t` short of every corner
+ *  - one `2t x 2t` block per corner that closes the ring — the border is
+ *    continuous, so no corner ever shows the page through
+ *  - the fill runs edge to edge underneath; its visible boundary keeps a
+ *    single `t` step where it meets each block
+ *
+ * The fill is painted first and the frame covers its outer band, so no clip is
+ * needed — nothing inside the ring is ever left transparent.
+ */
 export const drawDefaultButtonBackground = (
   ctx: CanvasRenderingContext2D,
   {
@@ -89,47 +108,50 @@ export const drawDefaultButtonBackground = (
   }
 ) => {
   const metrics = getDefaultButtonFrameMetrics(width, height, dpr)
+  const t = metrics.frameWidth
+  const hairline = Math.max(1, Math.round(dpr))
 
   ctx.clearRect(0, 0, width, height)
   ctx.imageSmoothingEnabled = false
 
-  const outerPolygon = buildButtonPolygon(width, height, metrics.cornerRadius, metrics.stepSize)
-  const fillPolygon = insetPolygon(outerPolygon, metrics.outerBorderWidth, width, height)
-  const innerBorderPolygon = insetPolygon(
-    outerPolygon,
-    metrics.outerBorderWidth + metrics.innerBorderGap + metrics.innerBorderWidth / 2,
-    width,
-    height
-  )
+  ctx.save()
+  // Clip to the frame-fill shape (two steps of `t`): keeps the edges and the
+  // corner blocks, leaves the `2t x 2t` corner break empty.
+  tracePolygon(ctx, buildSteppedRectPoints(width, height, 2, t))
+  ctx.clip()
 
-  tracePolygon(ctx, outerPolygon)
-  ctx.fillStyle = palette.outerBorder
-  ctx.fill()
+  // Fill spans the whole box; the frame painted below covers all but its centre.
+  fillRect(ctx, { x: 0, y: 0, width, height }, palette.fill)
 
-  tracePolygon(ctx, fillPolygon)
-  ctx.fillStyle = palette.fill
-  ctx.fill()
+  // Frame, dark. Blocks and edges are the only things that reach the corners.
+  for (const rect of buildGapFrameRects(width, height, t)) {
+    fillRect(ctx, rect, palette.outerBorder)
+  }
+
+  // Bevel: the inner half of every edge and the quarter of every block that
+  // faces the content, so the frame reads as lit from the upper left.
+  for (const rect of buildGapFrameInnerRects(width, height, t)) {
+    fillRect(ctx, rect, palette.innerBorder)
+  }
+
+  // The fill's visible boundary is one step of `t` inset by `t` — the same
+  // stencil the DOM gap border puts an inset box-shadow on.
+  const visibleFill = buildSteppedRectPoints(width - t * 2, height - t * 2, 1, t).map(({ x, y }) => ({
+    x: x + t,
+    y: y + t,
+  }))
 
   ctx.save()
   ctx.translate(0, metrics.innerShadowOffsetY)
-  tracePolygon(ctx, innerBorderPolygon)
+  tracePolygon(ctx, visibleFill)
   ctx.strokeStyle = 'rgba(66, 39, 17, 0.28)'
-  ctx.lineWidth = metrics.innerBorderWidth
-  ctx.lineJoin = 'miter'
+  ctx.lineWidth = hairline
   ctx.stroke()
   ctx.restore()
 
-  tracePolygon(ctx, innerBorderPolygon)
-  ctx.strokeStyle = palette.innerBorder
-  ctx.lineWidth = metrics.innerBorderWidth
-  ctx.lineJoin = 'miter'
-  ctx.stroke()
-
+  // Top highlight hairline, clear of the corner breaks.
   ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
-  ctx.fillRect(
-    metrics.outerBorderWidth * 2,
-    metrics.outerBorderWidth * 2,
-    Math.max(0, width - metrics.outerBorderWidth * 4),
-    Math.max(1, Math.round(2 * dpr))
-  )
+  ctx.fillRect(t * 2, t + hairline, Math.max(0, width - t * 4), hairline)
+
+  ctx.restore()
 }

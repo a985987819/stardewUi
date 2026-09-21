@@ -14,28 +14,22 @@
   }
 
   &__bubble {
-    min-width: 232px;
-    max-width: 312px;
-    color: #4d2608;
-    filter: drop-shadow(4px 4px 0 rgba(77, 38, 8, 0.18));
+    min-width: 244px;
+    max-width: 324px;
+    color: var(--wood-panel-text, #3f2510);
+    filter: drop-shadow(4px 4px 0 rgba(63, 37, 16, 0.24));
   }
 
+  /**
+   * Content box of the canvas panel. It lines up with the drawn surface, so the
+   * sections below run edge to edge exactly like the card header/body/footer.
+   * The clip keeps their square corners tucked inside the gap frame the canvas
+   * drew (`createInsetSteppedRectClipPath` in `Popup.tsx`).
+   */
   &__surface {
-    position: relative;
-    min-width: 196px;
-    color: #4d2608;
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 1px;
-      border: 2px solid #9d4100;
-      border-radius: 4px;
-      box-shadow:
-        inset -2px 4px 0 rgba(216, 154, 106, 0.92),
-        inset -3px 4px 0 rgba(216, 154, 106, 0.92);
-      pointer-events: none;
-    }
+    min-width: 204px;
+    color: var(--wood-panel-text, #3f2510);
+    clip-path: var(--wood-panel-surface-clip-path);
   }
 
   &__header,
@@ -46,37 +40,45 @@
   }
 
   &__header {
-    padding: 4px 6px 10px;
-    border-bottom: 2px solid rgba(157, 65, 0, 0.2);
-  }
-
-  &__title-tag {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    min-height: 44px;
-    padding: 6px 12px;
-    background: rgba(255, 239, 190, 0.82);
-    border: 3px solid rgba(215, 119, 15, 0.9);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    padding: 10px 14px 12px;
+    border-bottom: 3px solid var(--wood-panel-divider, rgba(107, 68, 35, 0.22));
+    background:
+      linear-gradient(90deg, transparent calc(100% - 20px), var(--wood-panel-title-shadow, rgba(107, 68, 35, 0.28))),
+      linear-gradient(
+        180deg,
+        var(--wood-panel-header-grain-1) 0%,
+        var(--wood-panel-header-grain-1) 25%,
+        var(--wood-panel-header-grain-2) 25%,
+        var(--wood-panel-header-grain-2) 50%,
+        var(--wood-panel-header-grain-3) 50%,
+        var(--wood-panel-header-grain-3) 75%,
+        var(--wood-panel-header-grain-4) 75%,
+        var(--wood-panel-header-grain-4) 100%
+      );
+    box-shadow: inset 0 2px 0 var(--wood-panel-top-highlight, rgba(255, 250, 232, 0.42));
   }
 
   &__title {
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: #4d2608;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.22);
+    line-height: 1.3;
+    color: var(--wood-panel-text, #3f2510);
+    text-shadow: 1px 1px 0 var(--wood-panel-title-shadow, rgba(107, 68, 35, 0.28));
   }
 
   &__body {
-    padding: 14px 8px 8px;
-    color: #6a350b;
+    padding: 12px 14px 13px;
+    color: var(--wood-panel-text-secondary, #5a3a1c);
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
+    text-shadow: 1px 1px 0 var(--wood-panel-title-shadow, rgba(107, 68, 35, 0.28));
   }
 
   &__body--without-title {
-    padding-top: 8px;
+    padding-top: 14px;
   }
 
   &__footer {
@@ -84,8 +86,12 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10px;
-    padding: 10px 8px 4px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(157, 65, 0, 0.06));
-    border-top: 2px solid rgba(157, 65, 0, 0.2);
+    padding: 10px 14px 12px;
+    background: linear-gradient(
+      180deg,
+      var(--wood-panel-footer-top, rgba(255, 250, 232, 0.16)),
+      var(--wood-panel-footer-bottom, rgba(107, 68, 35, 0.08))
+    );
+    border-top: 2px solid var(--wood-panel-footer-border, rgba(107, 68, 35, 0.2));
   }
 }

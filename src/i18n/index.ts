@@ -1,3 +1,5 @@
 export { I18nProvider } from './I18nProvider'
-export { useI18n } from './useI18n'
-export type { Lang } from './context'
+export { I18nContext, useI18n } from './context'
+export type { I18nContextValue } from './context'
+export { dictionaries, enDict, zhDict } from './dictionaries'
+export type { Lang } from './dictionaries'

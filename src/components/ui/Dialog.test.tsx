@@ -129,6 +129,38 @@ describe('Dialog', () => {
       })
     })
 
+    it('单页时默认不渲染分页', async () => {
+      render(<Dialog open={true} content="只有一页" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('只有一页')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('1 / 1')).not.toBeInTheDocument()
+    })
+
+    it('单页可以传 showPagination 强制显示分页', async () => {
+      render(<Dialog open={true} content="只有一页" typewriter={false} showPagination />)
+
+      await waitFor(() => {
+        expect(screen.getByText('1 / 1')).toBeInTheDocument()
+      })
+    })
+
+    it('多页可以传 showPagination={false} 关掉分页，键盘仍能翻页', async () => {
+      render(<Dialog open={true} content={['第一页', '第二页']} typewriter={false} showPagination={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('第一页')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('1 / 2')).not.toBeInTheDocument()
+
+      fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+      await waitFor(() => {
+        expect(screen.getByText('第二页')).toBeInTheDocument()
+      })
+    })
+
     it('点击下一页应该切换到下一页内容', async () => {
       const content = ['第一页', '第二页']
       render(<Dialog open={true} content={content} typewriter={false} />)

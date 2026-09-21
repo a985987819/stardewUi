@@ -109,12 +109,17 @@ function Calendar({
 
   const cells = useMemo(() => buildCalendarCells(monthTimestamp), [monthTimestamp])
   const itemsByDay = useMemo(() => groupCalendarItemsByDay(items), [items])
-  const visibleDayTimestamps = useMemo(() => new Set(cells.map((cell) => cell.dateTimestamp)), [cells])
-  const resolvedActiveDayTimestamp =
-    activeDayTimestamp !== null && visibleDayTimestamps.has(activeDayTimestamp)
-      ? activeDayTimestamp
-      : null
-  const activeItems = resolvedActiveDayTimestamp !== null ? itemsByDay[resolvedActiveDayTimestamp] ?? [] : []
+  const activeItems = activeDayTimestamp !== null ? itemsByDay[activeDayTimestamp] ?? [] : []
+
+  // Drop the hovered day when the visible month changes. Adjusting state during
+  // render is React's recommended replacement for a "reset on prop change" effect
+  // and avoids committing an extra frame with a stale highlighted day.
+  const [syncedMonthTimestamp, setSyncedMonthTimestamp] = useState(monthTimestamp)
+
+  if (syncedMonthTimestamp !== monthTimestamp) {
+    setSyncedMonthTimestamp(monthTimestamp)
+    setActiveDayTimestamp(null)
+  }
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setTooltipPosition({ x: e.clientX + 12, y: e.clientY + 12 })
@@ -184,7 +189,6 @@ function Calendar({
       </div>
 
       <CalendarGrid
-        monthLabel={formatMonthLabel(monthTimestamp)}
         cells={cells}
         showOutsideDays={showOutsideDays}
         onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}
@@ -212,7 +216,7 @@ function Calendar({
             top: tooltipPosition.y,
           }}
         >
-          <div className={styles['calendar__details-title']}>{formatDayLabel(resolvedActiveDayTimestamp as number)}</div>
+          <div className={styles['calendar__details-title']}>{formatDayLabel(activeDayTimestamp as number)}</div>
           <ul className={styles['calendar__details-list']}>
             {activeItems.map((item, index) => (
               <li key={`${item.title}-${index}`} className={styles['calendar__details-item']}>

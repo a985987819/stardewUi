@@ -1,132 +1,22 @@
 ﻿import { useEffect, useMemo, useRef, useState, type CSSProperties, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
-import { getBunJoltOffset } from './loadingMath'
+import {
+  applyBiteMasks,
+  BITE_SETTLE_DURATION,
+  BITE_STRIKE_DURATION,
+  drawLoadingFallback,
+  getBiteImpulse,
+  getBunRadius,
+  loadLoadingImage,
+  LOADING_DEFAULT_TEXT,
+  LOADING_EMPTY_HOLD_DURATION,
+  LOADING_FRAME_COUNT,
+  LOADING_FRAME_DURATION,
+  LOADING_VANISH_DURATION,
+  RESTING_IMPULSE,
+  VANISHING_IMPULSE,
+} from './loadingCanvas'
 import styles from './Loading.module.scss'
-
-const FRAME_COUNT = 12
-const FRAME_DURATION = 240
-const DEFAULT_TEXT = '正在加载...'
-const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
-const FULL_CIRCLE = Math.PI * 2
-const START_ANGLE = -Math.PI / 2
-const BUN_EDGE_RATIO = 0
-const BITE_CENTER_DISTANCE_RATIO = 0.97
-const BITE_DEPTH_RATIO = 0.39
-const BITE_JOLT_LEVELS = [1, 0.55, 0] as const
-const BITE_JOLT_DECAY_DURATION = 60
-
-let loadingImagePromise: Promise<HTMLImageElement> | null = null
-
-function loadLoadingImage() {
-  if (!loadingImagePromise) {
-    loadingImagePromise = new Promise((resolve, reject) => {
-      const image = new Image()
-      image.decoding = 'async'
-      image.onload = () => resolve(image)
-      image.onerror = () => reject(new Error(`Failed to load loading image: ${LOADING_IMAGE_SRC}`))
-      image.src = LOADING_IMAGE_SRC
-    })
-  }
-
-  return loadingImagePromise
-}
-
-function getBunRadius(canvasSize: number) {
-  return canvasSize / 2 - canvasSize * BUN_EDGE_RATIO
-}
-
-function drawFallback(ctx: CanvasRenderingContext2D, size: number) {
-  const center = size / 2
-  const radius = getBunRadius(size)
-
-  ctx.fillStyle = '#f5d7a1'
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
-  ctx.fill()
-
-  ctx.strokeStyle = '#8b4c22'
-  ctx.lineWidth = Math.max(2, size * 0.08)
-  ctx.beginPath()
-  ctx.arc(center, center, radius, 0, FULL_CIRCLE)
-  ctx.stroke()
-
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.28)'
-  ctx.beginPath()
-  ctx.arc(center - size * 0.12, center - size * 0.14, size * 0.17, 0, FULL_CIRCLE)
-  ctx.fill()
-}
-
-type BiteMask = {
-  x: number
-  y: number
-  radiusX: number
-  radiusY: number
-  rotation: number
-  arcStart: number
-  arcEnd: number
-}
-
-function createBiteMasks(canvasSize: number, biteCount: number): BiteMask[] {
-  const centerPoint = canvasSize / 2
-  const bunRadius = getBunRadius(canvasSize)
-  const stepAngle = FULL_CIRCLE / FRAME_COUNT
-  const halfStep = stepAngle / 2
-  const centerDistance = bunRadius * BITE_CENTER_DISTANCE_RATIO
-  const radiusY = bunRadius * BITE_DEPTH_RATIO
-  const radiusX = Math.tan(halfStep) * Math.sqrt(Math.max(centerDistance * centerDistance - radiusY * radiusY, 0))
-  const arcStart = Math.atan2(radiusY * Math.sin(halfStep), radiusX * Math.cos(halfStep))
-  const arcEnd = Math.PI - arcStart
-
-  return Array.from({ length: biteCount }, (_, index) => {
-    const angle = START_ANGLE + index * stepAngle
-
-    return {
-      x: centerPoint + Math.cos(angle) * centerDistance,
-      y: centerPoint + Math.sin(angle) * centerDistance,
-      radiusX,
-      radiusY,
-      rotation: angle + Math.PI / 2,
-      arcStart,
-      arcEnd,
-    }
-  })
-}
-
-function applyBiteMasks(ctx: CanvasRenderingContext2D, canvasSize: number, biteCount: number) {
-  if (biteCount <= 0) {
-    return
-  }
-
-  const centerPoint = canvasSize / 2
-  const bunRadius = getBunRadius(canvasSize)
-  const strokeWidth = Math.max(1.1, canvasSize * 0.03)
-  const bites = createBiteMasks(canvasSize, biteCount)
-
-  ctx.save()
-  ctx.globalCompositeOperation = 'destination-out'
-  bites.forEach(({ x, y, radiusX, radiusY, rotation }) => {
-    ctx.beginPath()
-    ctx.ellipse(x, y, radiusX, radiusY, rotation, 0, FULL_CIRCLE)
-    ctx.fill()
-  })
-  ctx.restore()
-
-  ctx.save()
-  ctx.beginPath()
-  ctx.arc(centerPoint, centerPoint, bunRadius, 0, FULL_CIRCLE)
-  ctx.clip()
-
-  ctx.strokeStyle = 'rgb(105, 69, 51,0.3)'
-  ctx.lineWidth = strokeWidth
-  ctx.lineJoin = 'round'
-  ctx.lineCap = 'round'
-  bites.forEach(({ x, y, radiusX, radiusY, rotation, arcStart, arcEnd }) => {
-    ctx.beginPath()
-    ctx.ellipse(x, y, radiusX, radiusY, rotation, arcStart, arcEnd)
-    ctx.stroke()
-  })
-  ctx.restore()
-}
 
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   active?: boolean
@@ -137,6 +27,15 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   block?: boolean
   fill?: boolean
 }
+
+/** `strike` = a bite just landed (or the bun just reappeared), `rest` = settled. */
+type BiteStage = 'strike' | 'rest'
+/** `eating` -> bites around the circle, `vanishing` -> the crumb shrinks away, `gone` -> a beat of nothing. */
+type CycleStage = 'eating' | 'vanishing' | 'gone'
+
+const STRIKE_EASING = 'cubic-bezier(0.2, 0.9, 0.25, 1)'
+const SETTLE_EASING = 'cubic-bezier(0.34, 1.46, 0.64, 1)'
+const VANISH_EASING = 'cubic-bezier(0.55, 0, 0.75, 0.2)'
 
 function StarLoading({
   active = true,
@@ -151,52 +50,11 @@ function StarLoading({
   role,
   ...rest
 }: StarLoadingProps) {
-  const resolvedText = text === undefined ? DEFAULT_TEXT : text
-  const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
-
-  return (
-    <LoadingSession
-      key={`${active ? 'active' : 'inactive'}-${size}-${resolvedText}`}
-      {...rest}
-      active={active}
-      text={resolvedText}
-      size={size}
-      gap={gap}
-      center={center}
-      block={block}
-      fill={fill}
-      className={className}
-      style={style}
-      role={isAriaHidden ? undefined : role ?? 'status'}
-      ariaLabel={isAriaHidden ? undefined : resolvedText || DEFAULT_TEXT}
-    />
-  )
-}
-
-function LoadingSession({
-  active,
-  text,
-  size = 28,
-  gap = 8,
-  center,
-  block,
-  fill,
-  className,
-  style,
-  role,
-  ariaLabel,
-  ...rest
-}: Omit<StarLoadingProps, 'text' | 'role'> & {
-  text: string
-  role?: string
-  ariaLabel?: string
-}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const timerRef = useRef<number | null>(null)
-  const joltTimerRef = useRef<number | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [hiddenSlices, setHiddenSlices] = useState(0)
-  const [joltIndex, setJoltIndex] = useState(2)
+  const [biteStage, setBiteStage] = useState<BiteStage>('rest')
+  const [cycleStage, setCycleStage] = useState<CycleStage>('eating')
 
   useEffect(() => {
     let cancelled = false
@@ -218,51 +76,72 @@ function LoadingSession({
     }
   }, [])
 
+  // Resetting animation state when `active` flips used to happen inside an
+  // effect, which schedules an extra render pass and can visibly flicker. The
+  // React-recommended approach is to adjust state during render instead; React
+  // re-runs the component immediately without committing the intermediate tree.
+  const [previousActive, setPreviousActive] = useState(active)
+
+  if (previousActive !== active) {
+    setPreviousActive(active)
+
+    if (active) {
+      setHiddenSlices(0)
+      setBiteStage('strike')
+      setCycleStage('eating')
+    }
+  }
+
+  const [previousHiddenSlices, setPreviousHiddenSlices] = useState(hiddenSlices)
+
+  if (previousHiddenSlices !== hiddenSlices) {
+    setPreviousHiddenSlices(hiddenSlices)
+    // Each new bite is its own little impulse, so the chew is a sequence of
+    // easing-out reactions rather than one long shake.
+    setBiteStage('strike')
+  }
+
+  if (cycleStage === 'eating' && hiddenSlices >= LOADING_FRAME_COUNT) {
+    setCycleStage('vanishing')
+  }
+
+  // Bite cadence. Kept independent of the strike/settle stage so a settling
+  // transition can never stretch the time between two bites.
   useEffect(() => {
     if (!active) {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
       return
     }
 
-    timerRef.current = window.setTimeout(() => {
-      setHiddenSlices((current) => {
-        const nextHiddenSlices = current >= FRAME_COUNT ? 0 : current + 1
-        setJoltIndex(nextHiddenSlices <= 0 || nextHiddenSlices >= FRAME_COUNT ? 2 : 0)
-        return nextHiddenSlices
-      })
-    }, FRAME_DURATION)
-
-    return () => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current)
-        timerRef.current = null
-      }
+    if (cycleStage === 'vanishing') {
+      const timer = window.setTimeout(() => setCycleStage('gone'), LOADING_VANISH_DURATION)
+      return () => window.clearTimeout(timer)
     }
-  }, [active, hiddenSlices])
 
+    if (cycleStage === 'gone') {
+      const timer = window.setTimeout(() => {
+        setHiddenSlices(0)
+        setCycleStage('eating')
+      }, LOADING_EMPTY_HOLD_DURATION)
+      return () => window.clearTimeout(timer)
+    }
+
+    const timer = window.setTimeout(() => {
+      setHiddenSlices((current) => Math.min(current + 1, LOADING_FRAME_COUNT))
+    }, LOADING_FRAME_DURATION)
+
+    return () => window.clearTimeout(timer)
+  }, [active, cycleStage, hiddenSlices])
+
+  // One impulse at a time: settle shortly after it lands.
   useEffect(() => {
-    if (joltIndex >= BITE_JOLT_LEVELS.length - 1) {
+    if (biteStage !== 'strike' || cycleStage !== 'eating') {
       return
     }
 
-    joltTimerRef.current = window.setTimeout(() => {
-      setJoltIndex((current) => Math.min(current + 1, BITE_JOLT_LEVELS.length - 1))
-    }, BITE_JOLT_DECAY_DURATION)
+    const timer = window.setTimeout(() => setBiteStage('rest'), BITE_STRIKE_DURATION)
 
-    return () => {
-      if (joltTimerRef.current !== null) {
-        window.clearTimeout(joltTimerRef.current)
-        joltTimerRef.current = null
-      }
-    }
-  }, [joltIndex])
+    return () => window.clearTimeout(timer)
+  }, [biteStage, cycleStage])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -285,37 +164,61 @@ function LoadingSession({
     }
 
     ctx.clearRect(0, 0, targetSize, targetSize)
-    if (hiddenSlices >= FRAME_COUNT) {
+    // A beat of empty space between one bun vanishing and the next appearing,
+    // so the eating reads as "finished" instead of resetting mid-chew.
+    if (cycleStage === 'gone') {
       return
     }
 
     ctx.save()
     ctx.beginPath()
-    ctx.arc(targetSize / 2, targetSize / 2, getBunRadius(targetSize), 0, FULL_CIRCLE)
+    ctx.arc(targetSize / 2, targetSize / 2, getBunRadius(targetSize), 0, Math.PI * 2)
     ctx.clip()
 
     if (image) {
       ctx.drawImage(image, 0, 0, targetSize, targetSize)
     } else {
-      drawFallback(ctx, targetSize)
+      drawLoadingFallback(ctx, targetSize)
     }
 
     ctx.restore()
 
     applyBiteMasks(ctx, targetSize, hiddenSlices)
-  }, [hiddenSlices, image, size])
+  }, [cycleStage, hiddenSlices, image, size])
 
-  const joltOffset = getBunJoltOffset(size, hiddenSlices, BITE_JOLT_LEVELS[joltIndex])
+  const resolvedText = text === undefined ? LOADING_DEFAULT_TEXT : text
+  const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
+  const impulse = useMemo(() => {
+    if (cycleStage !== 'eating') {
+      return VANISHING_IMPULSE
+    }
+
+    return biteStage === 'strike' ? getBiteImpulse(size, hiddenSlices) : RESTING_IMPULSE
+  }, [biteStage, cycleStage, hiddenSlices, size])
+
+  const joltDuration =
+    cycleStage !== 'eating'
+      ? LOADING_VANISH_DURATION
+      : biteStage === 'strike'
+        ? BITE_STRIKE_DURATION
+        : BITE_SETTLE_DURATION
+  const joltEasing =
+    cycleStage !== 'eating' ? VANISH_EASING : biteStage === 'strike' ? STRIKE_EASING : SETTLE_EASING
+
   const rootStyle = useMemo(
     () =>
       ({
         ...style,
         '--star-loading-size': `${size}px`,
         '--star-loading-gap': `${gap}px`,
-        '--star-loading-jolt-x': `${joltOffset.x}px`,
-        '--star-loading-jolt-y': `${joltOffset.y}px`,
+        '--star-loading-jolt-x': `${impulse.x}px`,
+        '--star-loading-jolt-y': `${impulse.y}px`,
+        '--star-loading-jolt-rotate': `${impulse.rotate}deg`,
+        '--star-loading-jolt-scale': `${impulse.scale}`,
+        '--star-loading-jolt-duration': `${joltDuration}ms`,
+        '--star-loading-jolt-easing': joltEasing,
       }) as CSSProperties,
-    [gap, joltOffset.x, joltOffset.y, size, style]
+    [gap, impulse, joltDuration, joltEasing, size, style]
   )
 
   return (
@@ -329,15 +232,13 @@ function LoadingSession({
         className
       )}
       style={rootStyle}
-      role={role}
-      aria-label={ariaLabel}
+      role={isAriaHidden ? undefined : role ?? 'status'}
+      aria-label={isAriaHidden ? undefined : resolvedText || LOADING_DEFAULT_TEXT}
     >
       <canvas ref={canvasRef} className={styles['loading__canvas']} aria-hidden />
-      {text ? <span className={styles['loading__text']}>{text}</span> : null}
+      {resolvedText ? <span className={styles['loading__text']}>{resolvedText}</span> : null}
     </div>
   )
 }
 
 export default StarLoading
-
-

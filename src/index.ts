@@ -38,6 +38,26 @@ export {
   resolveAssetPath,
 } from './utils/githubPages'
 export {
-  createStepButtonPalette,
-  type StepButtonPalette,
-} from './utils/stepButtonTheme'
+  deriveCardLightingFromSurface,
+  createCardPalette,
+  getCardLighting,
+  type CardLighting,
+  type CardPalette,
+  type CardSurfaceLighting,
+} from './utils/cardLighting'
+export {
+  deriveProgressPalette,
+  DEFAULT_PROGRESS_COLOR,
+  DEFAULT_PROGRESS_BORDER,
+  DEFAULT_PROGRESS_SHADOW,
+  DEFAULT_PROGRESS_HIGHLIGHT,
+  type ProgressPalette,
+} from './utils/progressPalette'
+// The `StarGapBorder` component is gone, but its corner generator is kept: it is
+// the reference implementation of the stepped "gap border" corner, and
+// `pixelCorners` / the canvas painters still describe the house style in its terms.
+export {
+  createGapBorderCorners,
+  type GapBorderCornerData,
+  type CreateGapBorderCornersOptions,
+} from './utils/gapBorderCorners'

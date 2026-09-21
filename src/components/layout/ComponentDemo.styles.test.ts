@@ -11,13 +11,18 @@ describe('component demo frame styles', () => {
     expect(scss).not.toContain('overflow-hidden')
   })
 
-  it('implements the card outer frame with pseudo-elements instead of an outline node', () => {
+  it('implements the card outer ring with an after pseudo-element', () => {
     const cardTsx = readFileSync(resolve(process.cwd(), 'src/components/ui/Card.tsx'), 'utf8')
     const cardScss = readFileSync(resolve(process.cwd(), 'src/components/ui/Card.module.scss'), 'utf8')
 
-    expect(cardTsx).not.toContain('stardew-card__outline')
-    expect(cardScss).toContain('&::before')
-    expect(cardScss).toContain('&::after')
-    expect(cardScss).toContain('inset: calc(var(--card-frame-ring-width) * -1)')
+    expect(cardTsx).not.toContain("stardew-card__outline")
+
+    const afterBlock = cardScss.match(/&::after\s*\{[^}]*\}/)
+    expect(afterBlock).not.toBeNull()
+
+    // The ring is an expanded pseudo-element, so it has to offset outwards from
+    // the card box. The value moved to `calc(-1 * $card-halo-gap)` when the ring
+    // became a gap frame; only the direction is a contract, not the pixels.
+    expect(afterBlock?.[0]).toMatch(/inset:\s*(calc\(\s*-1|-\d+px)/)
   })
 })

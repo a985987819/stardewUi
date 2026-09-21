@@ -1,0 +1,117 @@
+.star-avatar {
+  display: inline-grid;
+  position: relative;
+  isolation: isolate;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  flex: 0 0 var(--avatar-size);
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--avatar-bg);
+  border: var(--avatar-frame-width) solid var(--avatar-border-dark);
+  color: var(--avatar-border-dark);
+  box-shadow:
+    0 0 0 3px var(--avatar-border-light),
+    0 6px 8px var(--avatar-shadow);
+
+  &--square {
+    border-radius: 8px;
+  }
+
+  &--circle {
+    border-radius: 50%;
+  }
+
+  &__grain,
+  &__frame,
+  &__gloss,
+  &__image,
+  &__fallback {
+    position: absolute;
+  }
+
+  // Four stepped wood bands follow Card's header stripe sequence. The image
+  // sits above them, leaving a visible, directional wooden ring around it.
+  &__grain {
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(90deg, transparent 72%, var(--avatar-right-shadow) 100%),
+      repeating-linear-gradient(
+        180deg,
+        var(--avatar-stripe-1) 0 16%,
+        var(--avatar-stripe-2) 16% 32%,
+        var(--avatar-stripe-3) 32% 58%,
+        var(--avatar-stripe-4) 58% 74%,
+        var(--avatar-stripe-2) 74% 100%
+      );
+  }
+
+  &__image,
+  &__fallback {
+    inset: var(--avatar-content-inset);
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: auto;
+    height: auto;
+    overflow: hidden;
+    background: var(--avatar-bg);
+    border: var(--avatar-inner-width) solid var(--avatar-inner-border);
+  }
+
+  &__image {
+    width: calc(100% - var(--avatar-content-inset) - var(--avatar-content-inset));
+    height: calc(100% - var(--avatar-content-inset) - var(--avatar-content-inset));
+    object-fit: cover;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  &__fallback {
+    padding: 2px;
+    font-size: calc(var(--avatar-size) * 0.27);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 1px 1px 0 rgba(255, 248, 235, 0.5);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 54%),
+      var(--avatar-bg);
+  }
+
+  &__frame {
+    inset: var(--avatar-frame-width);
+    z-index: 2;
+    pointer-events: none;
+    border: var(--avatar-inner-width) solid var(--avatar-inner-border);
+    box-shadow:
+      inset 0 2px 0 var(--avatar-top-highlight),
+      inset -3px 0 0 var(--avatar-right-shadow),
+      inset 0 -2px 0 var(--avatar-divider-shadow);
+  }
+
+  &__gloss {
+    inset: var(--avatar-frame-width);
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0.46;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), transparent 36%);
+  }
+
+  &--square &__image,
+  &--square &__fallback,
+  &--square &__frame,
+  &--square &__gloss {
+    border-radius: 2px;
+  }
+
+  &--circle &__grain,
+  &--circle &__image,
+  &--circle &__fallback,
+  &--circle &__frame,
+  &--circle &__gloss {
+    border-radius: 50%;
+  }
+}

@@ -1,0 +1,143 @@
+// 木栅栏分割线。
+//
+// 一个栅栏 = 20×28 的方块：12×24 的 #fa9405 主体 + 上、左、右三边各 4px 的 #9b440d 实心框。
+// **底边不画框**，木色直接落到最下沿（所以主体高是 28 - 4 = 24，而不是 20）；顶部两角 5px 圆角。
+// 立体感照 Progress 的像素格：整尺寸的 #492b18 投影块垫在后面、向左下各平移 3px 露出左下边。
+// 高光 #ffd9a3 贴在**外框内侧**（边框内部、贴着主体的上/右边沿）：3px 厚，长度各取所在边的一半
+// （内沿宽 12 → 6px，内沿高 24 → 12px），在右上角接成一个 Γ；外侧端是自由端、做圆角，
+// 拐角那头是方角、交给 __frame 的 overflow + 圆角裁掉。
+// 每格左右还各伸出一根横杆把栅栏连起来：5.5px 厚（上下各 1.5px #9b440d 描边 + 2.5px #fa9405 主体），
+// 往外伸半个间距；横杆**不画竖向描边**，相邻两格的横杆在间隙正中首尾相接就看不出一道竖线，
+// 只有整条分割线最外侧的两端才补竖边收口。
+// 数值都是产品要求，要调只改下面这组变量。
+
+$post-width: 20px;
+$post-height: 28px;
+$post-frame-width: 4px; // 上、左、右三边；底边为 0
+$post-radius: 5px; // 只圆顶部两个角
+
+$post-highlight-width: 3px; // 高光厚度
+$post-highlight-ratio: 50%; // 高光长度 = 所在边（内沿）的一半
+// 自由端圆角（3px 厚的高光会被浏览器压到半厚 = 1.5px）；拐角那头是方的，交给 __frame 的圆角裁
+$post-highlight-radius: 3px;
+
+$post-shadow-width: 3px; // 左下投影向外露出的宽度
+
+$post-gap: 30px;
+
+// 连接横杆：一根 5.5px 厚 = 上下各 1.5px 描边 + 2.5px 主体；
+// 左右各伸半个间距，两格之间正好在中点对接
+$post-rail-height: 5.5px;
+$post-rail-frame: 1.5px;
+$post-rail-length: $post-gap * 0.5;
+// 两根横杆的垂直位置：6 + 5.5 + 5 + 5.5 + 6 = 28 = 栅栏高（5.5 除不尽，三个缝隙只能取 6/5/6）
+$post-rail-offset: 6px;
+$post-rail-gap: 5px;
+
+$post-body: #fa9405;
+$post-frame: #9b440d;
+$post-highlight: #ffd9a3;
+$post-shadow: #492b18;
+
+.star-divider {
+  display: flex;
+  gap: $post-gap;
+  width: 100%;
+  // 首尾两根横杆、第一块栅栏的左侧投影、以及所有栅栏的下方投影都要有地方露出来，
+  // 否则会被 overflow 裁掉（左右各留一个「半间距」给横杆）
+  padding: 0 $post-rail-length $post-shadow-width $post-rail-length;
+  overflow: hidden;
+
+  &__post {
+    position: relative;
+    display: block;
+    flex: none;
+    width: $post-width;
+    height: $post-height;
+
+    // 左下投影：整块垫在主体下面，向左下平移，于是左边和下边各露出 3px
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: $post-shadow;
+      border-radius: $post-radius $post-radius 0 0;
+      transform: translate(-$post-shadow-width, $post-shadow-width);
+    }
+  }
+
+  // 连接横杆：一条从 -15px 贯到 +35px 的横条，中间那 20px 被 __frame 盖住，只剩左右两截露在外面。
+  // 相邻两格的横杆各出一半、在间隙正中首尾相接，于是整排栅栏看起来是被横杆串起来的。
+  &__rail {
+    position: absolute;
+    left: -$post-rail-length;
+    right: -$post-rail-length;
+    top: $post-rail-offset;
+    z-index: 1; // 压在投影块上，但仍在 __frame 之下
+    box-sizing: border-box;
+    height: $post-rail-height;
+    background: $post-body;
+    // **只画上下两条边**：相邻两格的横杆在间隙正中首尾相接，中间不留竖线，看起来是一根整杆
+    border-width: $post-rail-frame 0;
+    border-style: solid;
+    border-color: $post-frame;
+
+    // 下面那根：上面一根的下沿再空 $post-rail-gap
+    &--lower {
+      top: $post-rail-offset + $post-rail-height + $post-rail-gap;
+    }
+  }
+
+  // 整条分割线最外侧的两端没有邻居可接，补一条 3px 竖边收口
+  &__post:first-child &__rail {
+    border-left-width: $post-rail-frame;
+  }
+
+  &__post:last-child &__rail {
+    border-right-width: $post-rail-frame;
+  }
+
+  &__frame {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    box-sizing: border-box;
+    background: $post-body;
+    // 上、左、右三边实心框，底边不画
+    border-width: $post-frame-width $post-frame-width 0 $post-frame-width;
+    border-style: solid;
+    border-color: $post-frame;
+    border-radius: $post-radius $post-radius 0 0;
+    // 让两条高光跟着圆角一起被裁掉（高光贴在边框内侧的 padding box 上）
+    overflow: hidden;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      display: block;
+      background: $post-highlight;
+    }
+
+    // 上高光：贴边框内侧、占上边靠右的一半，与右边那条接成右上角的 Γ
+    &::before {
+      top: 0;
+      right: 0;
+      width: $post-highlight-ratio;
+      height: $post-highlight-width;
+      // 左端是自由端 → 圆角；右端接右高光 → 方角（Γ 拐角由 __frame 的圆角裁出来）
+      border-radius: $post-highlight-radius 0 0 $post-highlight-radius;
+    }
+
+    // 右高光：贴边框内侧、占右边靠上的一半
+    &::after {
+      top: 0;
+      right: 0;
+      width: $post-highlight-width;
+      height: $post-highlight-ratio;
+      // 下端是自由端 → 圆角；上端接上高光 → 方角
+      border-radius: 0 0 $post-highlight-radius $post-highlight-radius;
+    }
+  }
+}

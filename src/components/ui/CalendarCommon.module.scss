@@ -1,21 +1,52 @@
-// 日历组件和日期选择组件的共享样式变量
+// 日历组件（Calendar）与日期选择组件（DatePicker）共享的尺寸与排版令牌。
+//
+// 两边都通过这里的 mixin 取尺寸，所以「两边一样大」是被结构保证的，而不是
+// 靠两套 SCSS 各自对齐：任何格子高度、日期字号、状态图标大小的调整都只改这一处。
 
-// 容器尺寸
-$calendar-max-width: 640px;
+// ---------------------------------------------------------------- 容器
+/** 两个组件统一的最大宽度，保证并排看起来是同一个控件。 */
+$calendar-width: 560px;
 $calendar-gap: 16px;
 $calendar-padding: 18px;
 
-// 工具栏
+// ---------------------------------------------------------------- 工具栏
 $toolbar-gap: 12px;
 $month-font-size: 18px;
 $month-font-weight: 700;
 $month-color: #4e342e;
 
-// 混合器：日历容器基础样式
+// ---------------------------------------------------------------- 日期格子
+/**
+ * 行高。必须同时放得下「一行日期数字」和「一行状态图标」，这是日历能显示
+ * 事件状态的前提：之前格子只有 ~38px，数字用 1.4rem 直接占满，图标只能压在
+ * 数字上。
+ */
+$cell-height: 60px;
+$cell-padding: 4px;
+$day-font-size: 15px;
+$day-color: #6d4c41;
+$outside-day-opacity: 0.55;
+$weekday-font-size: 14px;
+$weekday-height: 32px;
+$grid-line: 2px solid #2c2c2c;
+
+// ---------------------------------------------------------------- 状态图标
+$marker-size: 14px;
+$marker-gap: 3px;
+$marker-font-size: 10px;
+$marker-dot-size: 6px;
+$marker-bg: #f4c46a;
+$marker-color: #4e342e;
+
+// 混合器：组件容器
 @mixin calendar-container {
   display: grid;
   gap: $calendar-gap;
-  max-width: $calendar-max-width;
+  box-sizing: border-box;
+  // `width: 100%` + `max-width` 而不是只写 max-width：作为 flex/grid 子项时
+  // 只写 max-width 会按内容收缩，两个组件会各自算出不同宽度。
+  width: 100%;
+  max-width: $calendar-width;
   margin: 0 auto;
   background-image: url("/calenderBg.png");
   background-size: 100% 100%;
@@ -23,7 +54,7 @@ $month-color: #4e342e;
   padding: $calendar-padding;
 }
 
-// 混合器：工具栏样式
+// 混合器：工具栏
 @mixin calendar-toolbar {
   display: flex;
   align-items: center;
@@ -31,11 +62,68 @@ $month-color: #4e342e;
   gap: $toolbar-gap;
 }
 
-// 混合器：月份标签样式
+// 混合器：月份标签
 @mixin calendar-month-label {
   flex: 1;
   text-align: center;
   font-size: $month-font-size;
   font-weight: $month-font-weight;
   color: $month-color;
+}
+
+// 混合器：日期数字
+@mixin calendar-day-number {
+  font-size: $day-font-size;
+  font-weight: 600;
+  line-height: 1;
+  color: $day-color;
+}
+
+// 混合器：状态图标所在的一行
+@mixin calendar-marker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: $marker-gap;
+  width: 100%;
+}
+
+// 混合器：单个状态图标
+@mixin calendar-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: $marker-size;
+  min-height: $marker-size;
+  border-radius: 2px;
+  background: $marker-bg;
+  color: $marker-color;
+  font-size: $marker-font-size;
+  overflow: hidden;
+}
+
+// 混合器：图标图片
+@mixin calendar-marker-image {
+  display: block;
+  width: $marker-size;
+  height: $marker-size;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+// 混合器：默认圆点
+@mixin calendar-marker-dot {
+  display: inline-block;
+  width: $marker-dot-size;
+  height: $marker-dot-size;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+// 混合器：+N 汇总
+@mixin calendar-marker-summary {
+  font-size: $marker-font-size;
+  font-weight: 700;
+  color: #6d4c41;
 }

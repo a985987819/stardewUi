@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
-import hljs from 'highlight.js'
+import { highlightCode } from './codeHighlight'
 import styles from './CodeBlock.module.scss'
 
 interface CodeBlockProps {
@@ -18,20 +18,38 @@ function StarCodeBlock({
   className = '',
 }: CodeBlockProps) {
   const [copied, setCopied] = useState(false)
-  const codeRef = useRef<HTMLElement>(null)
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    if (codeRef.current) {
-      codeRef.current.removeAttribute('data-highlighted')
-      hljs.highlightElement(codeRef.current)
-    }
-  }, [code, language])
+  // Highlighting is derived during render rather than mutated onto the DOM in an
+  // effect. The previous implementation called `hljs.highlightElement` on an
+  // element React already owned, so every re-render (and React 19 StrictMode's
+  // double-invoked effects) re-highlighted the spans hljs had just produced and
+  // triggered "unescaped HTML" warnings.
+  const highlighted = useMemo(() => highlightCode(code, language), [code, language])
+
+  useEffect(
+    () => () => {
+      if (copyTimerRef.current !== null) {
+        clearTimeout(copyTimerRef.current)
+        copyTimerRef.current = null
+      }
+    },
+    []
+  )
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(code)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+
+      if (copyTimerRef.current !== null) {
+        clearTimeout(copyTimerRef.current)
+      }
+
+      copyTimerRef.current = setTimeout(() => {
+        copyTimerRef.current = null
+        setCopied(false)
+      }, 2000)
     } catch (err) {
       console.error('复制失败:', err)
     }
@@ -68,9 +86,14 @@ function StarCodeBlock({
           </div>
         ) : null}
         <pre className={styles['code-block-pre']}>
-          <code ref={codeRef} className={`language-${language}`}>
-            {code}
-          </code>
+          {highlighted !== null ? (
+            <code
+              className={`language-${language} hljs`}
+              dangerouslySetInnerHTML={{ __html: highlighted }}
+            />
+          ) : (
+            <code className={`language-${language}`}>{code}</code>
+          )}
         </pre>
       </div>
     </div>

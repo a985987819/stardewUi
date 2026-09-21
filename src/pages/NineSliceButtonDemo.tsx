@@ -4,7 +4,7 @@ import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
 import { StarNineSliceButton, type NineSliceButtonTheme } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
-import styles from './ButtonDemo.module.scss'
+import styles from './NineSliceButtonDemo.module.scss'
 
 const seasonalThemes: Array<{ key: NineSliceButtonTheme; zh: string; en: string }> = [
   { key: 'spring', zh: '春天', en: 'Spring' },
@@ -12,6 +12,8 @@ const seasonalThemes: Array<{ key: NineSliceButtonTheme; zh: string; en: string 
   { key: 'autumn', zh: '秋天', en: 'Autumn' },
   { key: 'winter', zh: '冬天', en: 'Winter' },
 ]
+
+const actionVariants = ['primary', 'secondary', 'success', 'danger'] as const
 
 const copy = {
   zh: {
@@ -27,7 +29,8 @@ const copy = {
       disabled: ['禁用状态', '当体力不足或任务未解锁时，禁用态会保留形状但降低权重。'],
       multi: ['多实例场景', '同一页面里可以放置多个按钮，用作背包、商店或任务列表操作。'],
     },
-    labels: ['默认按钮', '确认交易', '丢弃物品', '小按钮', '大按钮', '木质边框', '森林边框', '湖蓝边框', '工具', '收藏', '禁用按钮', '加载按钮', '块级按钮'],
+    labels: ['默认按钮', '小按钮', '大按钮', '木质边框', '森林边框', '湖蓝边框', '工具', '收藏', '禁用按钮', '加载按钮', '块级按钮'],
+    actionLabels: ['主要操作', '次要操作', '成功确认', '删除操作'],
   },
   en: {
     title: 'Button',
@@ -42,9 +45,10 @@ const copy = {
       disabled: ['Disabled State', 'When stamina is low or a quest is locked, disabled buttons keep shape while lowering priority.'],
       multi: ['Multiple Instances', 'Render many independent buttons for backpacks, shops, and quest lists.'],
     },
-    labels: ['Default', 'Confirm Trade', 'Trash Item', 'Small', 'Large', 'Wood Border', 'Forest Border', 'Lake Border', 'Tool', 'Favorite', 'Disabled', 'Loading', 'Block Button'],
+    labels: ['Default', 'Small', 'Large', 'Wood Border', 'Forest Border', 'Lake Border', 'Tool', 'Favorite', 'Disabled', 'Loading', 'Block Button'],
+    actionLabels: ['Primary', 'Secondary', 'Success', 'Danger'],
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demo: Record<string, [string, string]>; labels: string[] }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demo: Record<string, [string, string]>; labels: string[]; actionLabels: string[] }>
 
 const apiData = {
   zh: [
@@ -67,7 +71,7 @@ const apiData = {
 
 const code = `<StarNineSliceButton theme="spring">Plant Seeds</StarNineSliceButton>`
 
-function StarButtonDemoPage() {
+function StarNineSliceButtonDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
   const toc = t.toc.map((title, index) => ({ id: ['basic', 'theme', 'size', 'color', 'icon', 'disabled', 'multi', 'api'][index], title, level: 1 }))
@@ -77,8 +81,9 @@ function StarButtonDemoPage() {
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="basic" title={t.demo.basic[0]} description={t.demo.basic[1]} code={code}>
         <StarNineSliceButton>{label(0)}</StarNineSliceButton>
-        <StarNineSliceButton variant="primary">{label(1)}</StarNineSliceButton>
-        <StarNineSliceButton variant="danger">{label(2)}</StarNineSliceButton>
+        {actionVariants.map((variant, index) => (
+          <StarNineSliceButton key={variant} variant={variant}>{t.actionLabels[index]}</StarNineSliceButton>
+        ))}
       </StarComponentDemo>
       <StarComponentDemo id="theme" title={t.demo.theme[0]} description={t.demo.theme[1]} code={code}>
         <div className={styles['button-theme-grid']}>
@@ -89,9 +94,9 @@ function StarButtonDemoPage() {
                 <p className={styles['button-theme-title']}>{season}</p>
                 <div className={styles['button-theme-actions']}>
                   <StarNineSliceButton theme={item.key}>{season}</StarNineSliceButton>
-                  <StarNineSliceButton theme={item.key} size="small">{label(3)}</StarNineSliceButton>
-                  <StarNineSliceButton theme={item.key} loading>{label(11)}</StarNineSliceButton>
-                  <StarNineSliceButton theme={item.key} disabled>{label(10)}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} size="small">{label(1)}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} loading>{label(9)}</StarNineSliceButton>
+                  <StarNineSliceButton theme={item.key} disabled>{label(8)}</StarNineSliceButton>
                 </div>
               </div>
             )
@@ -99,22 +104,22 @@ function StarButtonDemoPage() {
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="size" title={t.demo.size[0]} description={t.demo.size[1]} code={code}>
-        <StarNineSliceButton size="small">{label(3)}</StarNineSliceButton>
+        <StarNineSliceButton size="small">{label(1)}</StarNineSliceButton>
         <StarNineSliceButton>{label(0)}</StarNineSliceButton>
-        <StarNineSliceButton size="large">{label(4)}</StarNineSliceButton>
+        <StarNineSliceButton size="large">{label(2)}</StarNineSliceButton>
       </StarComponentDemo>
       <StarComponentDemo id="color" title={t.demo.color[0]} description={t.demo.color[1]} code={code}>
-        <StarNineSliceButton color="#8B4513">{label(5)}</StarNineSliceButton>
-        <StarNineSliceButton color="#2E6F40">{label(6)}</StarNineSliceButton>
-        <StarNineSliceButton color="#355C9A">{label(7)}</StarNineSliceButton>
+        <StarNineSliceButton color="#8B4513">{label(3)}</StarNineSliceButton>
+        <StarNineSliceButton color="#2E6F40">{label(4)}</StarNineSliceButton>
+        <StarNineSliceButton color="#355C9A">{label(5)}</StarNineSliceButton>
       </StarComponentDemo>
       <StarComponentDemo id="icon" title={t.demo.icon[0]} description={t.demo.icon[1]} code={code}>
-        <StarNineSliceButton icon={<Pickaxe size={18} />}>{label(8)}</StarNineSliceButton>
-        <StarNineSliceButton icon="☆">{label(9)}</StarNineSliceButton>
+        <StarNineSliceButton icon={<Pickaxe size={18} />}>{label(6)}</StarNineSliceButton>
+        <StarNineSliceButton icon="☆">{label(7)}</StarNineSliceButton>
       </StarComponentDemo>
       <StarComponentDemo id="disabled" title={t.demo.disabled[0]} description={t.demo.disabled[1]} code={code}>
-        <StarNineSliceButton disabled>{label(10)}</StarNineSliceButton>
-        <StarNineSliceButton theme="winter" disabled>{label(10)}</StarNineSliceButton>
+        <StarNineSliceButton disabled>{label(8)}</StarNineSliceButton>
+        <StarNineSliceButton theme="winter" disabled>{label(8)}</StarNineSliceButton>
       </StarComponentDemo>
       <StarComponentDemo id="multi" title={t.demo.multi[0]} description={t.demo.multi[1]} code={code}>
         <div className={styles['demo-multi-buttons']}>{Array.from({ length: 8 }).map((_, index) => <StarNineSliceButton key={index}>{`${label(0)} ${index + 1}`}</StarNineSliceButton>)}</div>
@@ -124,4 +129,4 @@ function StarButtonDemoPage() {
   )
 }
 
-export default StarButtonDemoPage
+export default StarNineSliceButtonDemoPage

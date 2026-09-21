@@ -24,6 +24,13 @@ export interface StarDialogProps {
   maskClosable?: boolean
   typewriter?: boolean
   typewriterSpeed?: number
+  /**
+   * Whether to show the prev/next pager. Leave it out and the pager follows the
+   * content: a dialog with a single page hides it, because a lone "1 / 1" flanked
+   * by two dead buttons is pure chrome. Pass `false` to hide it for a paged
+   * dialog too, or an explicit `true` to keep it even on a single page.
+   */
+  showPagination?: boolean
   onClose?: () => void
 }
 
@@ -45,8 +52,56 @@ function StarDialog({
   maskClosable = true,
   typewriter = true,
   typewriterSpeed = 100,
+  showPagination,
   onClose,
 }: StarDialogProps) {
+  const [currentPage, setCurrentPage] = useState(0)
+  const [titleKey, setTitleKey] = useState(0)
+  const [contentKey, setContentKey] = useState(0)
+  const [titleComplete, setTitleComplete] = useState(false)
+  const [contentComplete, setContentComplete] = useState(false)
+  const [titleCompleteTrigger, setTitleCompleteTrigger] = useState(0)
+  const [contentCompleteTrigger, setContentCompleteTrigger] = useState(0)
+
+  const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
+  const totalPages = pages.length
+  const isFirstPage = currentPage === 0
+  const isLastPage = currentPage >= totalPages - 1
+
+  // Restart the typewriter sequence when the dialog opens or its copy changes.
+  // These resets run during render rather than in effects: an effect would commit
+  // a frame showing the previous page's finished text before resetting, which
+  // cascades an extra render and produces a visible flash.
+  const [openSignature, setOpenSignature] = useState({ open, title, typewriter })
+
+  if (
+    openSignature.open !== open ||
+    openSignature.title !== title ||
+    openSignature.typewriter !== typewriter
+  ) {
+    setOpenSignature({ open, title, typewriter })
+
+    if (open) {
+      setCurrentPage(0)
+      setTitleComplete(!title || !typewriter)
+      setContentComplete(!typewriter)
+      setTitleKey((key) => key + 1)
+      setContentKey((key) => key + 1)
+    }
+  }
+
+  const [pageSignature, setPageSignature] = useState({ currentPage, typewriter })
+
+  if (pageSignature.currentPage !== currentPage || pageSignature.typewriter !== typewriter) {
+    setPageSignature({ currentPage, typewriter })
+    setContentKey((key) => key + 1)
+    setContentComplete(!typewriter)
+
+    if (!isFirstPage) {
+      setTitleComplete(true)
+    }
+  }
+
   useEffect(() => {
     if (!open) return
 
@@ -58,73 +113,11 @@ function StarDialog({
     }
   }, [open])
 
-  if (!open) return null
-
-  const portalTarget = document.querySelector('[data-star-app="true"]') ?? document.body
-  const dialogLabel = typeof title === 'string' ? title : undefined
-
-  return createPortal(
-    <DialogSession
-      title={title}
-      content={content}
-      image={image}
-      name={name}
-      actions={actions}
-      maskClosable={maskClosable}
-      typewriter={typewriter}
-      typewriterSpeed={typewriterSpeed}
-      onClose={onClose}
-      dialogLabel={dialogLabel}
-    />,
-    portalTarget
-  )
-}
-
-function DialogSession({
-  title,
-  content,
-  image,
-  name,
-  actions,
-  maskClosable,
-  typewriter,
-  typewriterSpeed,
-  onClose,
-  dialogLabel,
-}: Omit<StarDialogProps, 'open'> & { dialogLabel?: string }) {
-  const [currentPage, setCurrentPage] = useState(0)
-  const [contentKey, setContentKey] = useState(0)
-  const [titleComplete, setTitleComplete] = useState(!title || !typewriter)
-  const [contentComplete, setContentComplete] = useState(!typewriter)
-  const [titleCompleteTrigger, setTitleCompleteTrigger] = useState(0)
-  const [contentCompleteTrigger, setContentCompleteTrigger] = useState(0)
-
-  const pages = useMemo(() => (Array.isArray(content) ? content : [content]), [content])
-  const totalPages = pages.length
-  const isFirstPage = currentPage === 0
-  const isLastPage = currentPage >= totalPages - 1
-  const hasSidebar = Boolean(image || name)
-
-  const resetTypingState = useCallback(
-    (page: number) => {
-      setContentKey((k) => k + 1)
-      setContentComplete(!typewriter)
-      if (page > 0) {
-        setTitleComplete(true)
-      }
-    },
-    [typewriter]
-  )
-
   const handlePrev = useCallback(() => {
     if (!isFirstPage) {
-      setCurrentPage((page) => {
-        const nextPage = Math.max(page - 1, 0)
-        resetTypingState(nextPage)
-        return nextPage
-      })
+      setCurrentPage((page) => Math.max(page - 1, 0))
     }
-  }, [isFirstPage, resetTypingState])
+  }, [isFirstPage])
 
   const handleNext = useCallback(() => {
     if (typewriter && (!titleComplete || !contentComplete)) {
@@ -138,13 +131,9 @@ function DialogSession({
     }
 
     if (!isLastPage) {
-      setCurrentPage((page) => {
-        const nextPage = Math.min(page + 1, totalPages - 1)
-        resetTypingState(nextPage)
-        return nextPage
-      })
+      setCurrentPage((page) => Math.min(page + 1, totalPages - 1))
     }
-  }, [contentComplete, isLastPage, resetTypingState, titleComplete, totalPages, typewriter])
+  }, [contentComplete, isLastPage, titleComplete, totalPages, typewriter])
 
   const handleOverlayClick = useCallback(() => {
     if (maskClosable) {
@@ -176,6 +165,8 @@ function DialogSession({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!open) return
+
       if (e.key === 'Escape' && maskClosable) {
         onClose?.()
       }
@@ -191,17 +182,34 @@ function DialogSession({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNext, handlePrev, maskClosable, onClose])
+  }, [handleNext, handlePrev, maskClosable, onClose, open])
 
+  // Confirm and cancel deliberately share the same default button. The darker
+  // `primary` treatment made the confirm action harder to read against the
+  // dialog surface, and the pair reads as one group again.
   const defaultActions: DialogAction[] = [
-    { label: LABEL_CONFIRM, variant: 'primary', onClick: onClose },
-    { label: LABEL_CANCEL, variant: 'default', onClick: onClose },
+    { label: LABEL_CONFIRM, onClick: onClose },
+    { label: LABEL_CANCEL, onClick: onClose },
   ]
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
   const showActions = isLastPage && finalActions.length > 0
+  // 单页时默认不出分页：一个没人能点的「1 / 1」只是多余的一行
+  const showPager = showPagination ?? totalPages > 1
+  // 分页和动作都没有时，整条页脚（含它的上分隔线）一起收掉，免得留一条空线
+  const showFooter = showActions || showPager
+  const hasSidebar = Boolean(image || name)
 
-  return (
+  if (!open) return null
+
+  const portalTarget = typeof document !== 'undefined'
+    ? (document.querySelector('[data-star-app="true"]') ?? document.body)
+    : null
+
+  if (!portalTarget) return null
+  const dialogLabel = typeof title === 'string' ? title : undefined
+
+  return createPortal(
     <div
       className={classNames(styles['stardew-dialog-overlay'], maskClosable && styles['stardew-dialog-overlay--clickable'])}
       onClick={handleOverlayClick}
@@ -223,6 +231,7 @@ function DialogSession({
               <StarTypewriter
                 text={title}
                 speed={typewriterSpeed}
+                key={`title-${titleKey}`}
                 onComplete={handleTitleComplete}
                 completeTrigger={titleCompleteTrigger}
               />
@@ -258,52 +267,56 @@ function DialogSession({
                 )}
               </div>
 
-              <div className={styles['stardew-dialog__footer']}>
-                {showActions ? (
-                  <div className={styles['stardew-dialog__actions']}>
-                    {finalActions.map((action, index) => (
+              {showFooter ? (
+                <div className={styles['stardew-dialog__footer']}>
+                  {showActions ? (
+                    <div className={styles['stardew-dialog__actions']}>
+                      {finalActions.map((action, index) => (
+                        <StarNineSliceButton
+                          key={index}
+                          type="button"
+                          size="small"
+                          variant={action.variant ?? 'default'}
+                          disabled={action.disabled}
+                          onClick={action.onClick}
+                        >
+                          {action.label}
+                        </StarNineSliceButton>
+                      ))}
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  {showPager ? (
+                    <div className={styles['stardew-dialog__pagination']}>
                       <StarNineSliceButton
-                        key={index}
                         type="button"
                         size="small"
-                        variant={action.variant ?? 'default'}
-                        disabled={action.disabled}
-                        onClick={action.onClick}
+                        className={styles['stardew-dialog__nav-btn']}
+                        onClick={handlePrev}
+                        disabled={isFirstPage}
+                        title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
                       >
-                        {action.label}
+                        <ChevronUp size={18} />
                       </StarNineSliceButton>
-                    ))}
-                  </div>
-                ) : (
-                  <div />
-                )}
-
-                <div className={styles['stardew-dialog__pagination']}>
-                  <StarNineSliceButton
-                    type="button"
-                    size="small"
-                    className={styles['stardew-dialog__nav-btn']}
-                    onClick={handlePrev}
-                    disabled={isFirstPage}
-                    title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-                  >
-                    <ChevronUp size={18} />
-                  </StarNineSliceButton>
-                  <span className={styles['stardew-dialog__page-indicator']}>
-                    {currentPage + 1} / {totalPages}
-                  </span>
-                  <StarNineSliceButton
-                    type="button"
-                    size="small"
-                    className={styles['stardew-dialog__nav-btn']}
-                    onClick={handleNext}
-                    disabled={isLastPage}
-                    title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-                  >
-                    <ChevronDown size={18} />
-                  </StarNineSliceButton>
+                      <span className={styles['stardew-dialog__page-indicator']}>
+                        {currentPage + 1} / {totalPages}
+                      </span>
+                      <StarNineSliceButton
+                        type="button"
+                        size="small"
+                        className={styles['stardew-dialog__nav-btn']}
+                        onClick={handleNext}
+                        disabled={isLastPage}
+                        title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
+                      >
+                        <ChevronDown size={18} />
+                      </StarNineSliceButton>
+                    </div>
+                  ) : null}
                 </div>
-              </div>
+              ) : null}
             </div>
 
             {hasSidebar ? (
@@ -322,10 +335,11 @@ function DialogSession({
                 ) : null}
               </div>
             ) : null}
-          </div>
+            </div>
         </StarCard>
       </div>
-    </div>
+    </div>,
+    portalTarget
   )
 }
 

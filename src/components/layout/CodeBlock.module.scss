@@ -17,13 +17,28 @@
 
   &-copy {
     @apply flex items-center gap-1 text-xs cursor-pointer px-3 py-1;
-    background: var(--color-bg-code-lines);
-    color: var(--color-text-secondary);
-    border: 2px solid #4a4030;
+    // This control sits on a dark code surface in both app themes. Keep the
+    // icon on currentColor and use an explicit light swatch so it never gets
+    // inherited from the warm, low-contrast page text variables.
+    background: #514531;
+    color: #fff7dc;
+    border: 2px solid #d7b676;
+    text-shadow: 1px 1px 0 #21180e;
+
+    :global(svg) {
+      color: currentColor;
+      stroke-width: 2.5;
+    }
 
     &:hover {
-      background: var(--color-bg-hover);
-      color: var(--color-text);
+      background: #746042;
+      color: #ffffff;
+      border-color: #ffe0a0;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff7dc;
+      outline-offset: 2px;
     }
   }
 

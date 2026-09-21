@@ -1,10 +1,10 @@
 import { useCallback, type ReactNode } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { I18nContext, type Lang } from './context'
 import { dictionaries } from './dictionaries'
+import { I18nContext } from './context'
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useLocalStorage<Lang>('star-ui-lang', 'zh')
+  const [lang, setLang] = useLocalStorage<'zh' | 'en'>('star-ui-lang', 'zh')
 
   const t = useCallback(
     (key: string) => {
@@ -14,9 +14,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [lang]
   )
 
-  return (
-    <I18nContext.Provider value={{ lang, setLang, t }}>
-      {children}
-    </I18nContext.Provider>
-  )
+  return <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>
 }
+
+export default I18nProvider

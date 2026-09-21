@@ -1,27 +1,33 @@
-import { useMemo, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
+import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import { createCardPalette } from '../../utils/cardLighting'
+import {
+  CARD_DEFAULT_SURFACE_COLOR,
+  deriveCardLightingFromSurface,
+} from '../../utils/cardLighting'
 import styles from './Card.module.scss'
 
-const DEFAULT_CARD_EDGE_COLOR = '#dc7b05'
-
-const CARD_EDGE_COLORS = {
-  'night-village': '#2f1e27',
-  'forest-farm': '#48652c',
-  'wooden-cabin': '#6f3a18',
-  'lake-night': '#274d70',
-  'flower-festival': '#82445f',
-  'mine-starry': '#34458a',
-  farmland: '#7a4824',
-  'orchard-grass': '#355123',
-  'workshop-ore': '#39434c',
-  'night-celebration': '#202f76',
+/**
+ * Preset **body** colours. `color` is the swatch the user sees most, and
+ * `deriveCardLightingFromSurface` derives the frame, stripes and directional
+ * light from it — so these are surfaces, not frame seeds.
+ */
+const CARD_SURFACE_COLORS = {
+  'night-village': '#774b62',
+  'forest-farm': '#82b651',
+  'wooden-cabin': '#d36c2a',
+  'lake-night': '#4988c3',
+  'flower-festival': '#bd7e99',
+  'mine-starry': '#6a7dc9',
+  farmland: '#cc7f47',
+  'orchard-grass': '#6aa545',
+  'workshop-ore': '#6b7e90',
+  'night-celebration': '#3d56ce',
 } as const
 
-export type CardColor = keyof typeof CARD_EDGE_COLORS
+export type CardColor = keyof typeof CARD_SURFACE_COLORS
 export type CardThemeColor = CardColor | string
 
-export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'color'> {
+export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   title?: ReactNode
   children: ReactNode
   variant?: 'default' | 'outlined' | 'elevated'
@@ -33,41 +39,8 @@ export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'tit
   showTitle?: boolean
 }
 
-type CardCssVariables = CSSProperties & {
-  '--card-frame-border-base': string
-  '--card-frame-border-inner': string
-  '--card-frame-border-outer': string
-  '--card-frame-highlight-top': string
-  '--card-frame-shadow-right': string
-  '--card-header-border-base': string
-  '--card-header-border-inner': string
-  '--card-header-border-outer': string
-  '--card-header-highlight-top': string
-  '--card-header-shadow-right': string
-  '--card-header-stripe-1': string
-  '--card-header-stripe-2': string
-  '--card-header-stripe-3': string
-  '--card-header-stripe-4': string
-  '--card-body-border-base': string
-  '--card-body-border-inner': string
-  '--card-body-border-outer': string
-  '--card-body-highlight-top': string
-  '--card-body-shadow-right': string
-  '--card-body-stripe-1': string
-  '--card-body-stripe-2': string
-  '--card-body-stripe-3': string
-  '--card-body-stripe-4': string
-  '--card-body-stripe-5': string
-  '--card-body-stripe-6': string
-  '--card-body-stripe-7': string
-  '--card-body-stripe-8': string
-  '--card-text-primary': string
-  '--card-text-secondary': string
-  '--card-text-shadow': string
-}
-
 function isPresetCardColor(color?: CardThemeColor): color is CardColor {
-  return Boolean(color && color in CARD_EDGE_COLORS)
+  return Boolean(color && color in CARD_SURFACE_COLORS)
 }
 
 function StarCard({
@@ -86,77 +59,80 @@ function StarCard({
   ...rest
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
-  const baseColor = isPresetCardColor(color) ? CARD_EDGE_COLORS[color] : color ?? DEFAULT_CARD_EDGE_COLOR
-  const palette = useMemo(() => createCardPalette(baseColor), [baseColor])
-
-  const cardCssVars = useMemo((): CardCssVariables => ({
-    '--card-frame-border-base': palette.frame.borderBase,
-    '--card-frame-border-inner': palette.frame.borderInner,
-    '--card-frame-border-outer': palette.frame.borderOuter,
-    '--card-frame-highlight-top': palette.frame.highlightTop,
-    '--card-frame-shadow-right': palette.frame.shadowRight,
-    '--card-header-border-base': palette.header.borderBase,
-    '--card-header-border-inner': palette.header.borderInner,
-    '--card-header-border-outer': palette.header.borderOuter,
-    '--card-header-highlight-top': palette.header.highlightTop,
-    '--card-header-shadow-right': palette.header.shadowRight,
-    '--card-header-stripe-1': palette.header.stripes[0],
-    '--card-header-stripe-2': palette.header.stripes[1],
-    '--card-header-stripe-3': palette.header.stripes[2],
-    '--card-header-stripe-4': palette.header.stripes[3],
-    '--card-body-border-base': palette.body.borderBase,
-    '--card-body-border-inner': palette.body.borderInner,
-    '--card-body-border-outer': palette.body.borderOuter,
-    '--card-body-highlight-top': palette.body.highlightTop,
-    '--card-body-shadow-right': palette.body.shadowRight,
-    '--card-body-stripe-1': palette.body.stripes[0],
-    '--card-body-stripe-2': palette.body.stripes[1],
-    '--card-body-stripe-3': palette.body.stripes[2],
-    '--card-body-stripe-4': palette.body.stripes[3],
-    '--card-body-stripe-5': palette.body.stripes[4],
-    '--card-body-stripe-6': palette.body.stripes[5],
-    '--card-body-stripe-7': palette.body.stripes[6],
-    '--card-body-stripe-8': palette.body.stripes[7],
-    '--card-text-primary': palette.text.primary,
-    '--card-text-secondary': palette.text.secondary,
-    '--card-text-shadow': palette.text.shadow,
-  }), [palette])
+  // `color` is the visible card body; the reusable lighting function derives the
+  // framing, stripe bands and directional light from that one swatch.
+  const surfaceColor = isPresetCardColor(color) ? CARD_SURFACE_COLORS[color] : color ?? CARD_DEFAULT_SURFACE_COLOR
+  const palette = deriveCardLightingFromSurface(surfaceColor)
+  const cardStyle = {
+    ...style,
+    '--card-bg': palette.background,
+    '--card-bg-light': palette.backgroundLight,
+    '--card-bg-dark': palette.backgroundDark,
+    '--card-border': palette.border,
+    '--card-border-dark': palette.borderDark,
+    '--card-border-light': palette.borderLight,
+    '--card-inner-border': palette.innerBorder,
+    '--card-border-highlight': palette.borderHighlight,
+    '--card-border-inner-shadow': palette.borderInnerShadow,
+    '--card-border-outer-glow': palette.borderOuterGlow,
+    '--card-outer-shadow': palette.outerShadow,
+    '--card-outer-shadow-hover': palette.outerShadowHover,
+    '--card-outer-shadow-active': palette.outerShadowActive,
+    '--card-inner-glow': palette.innerGlow,
+    '--card-text': palette.text,
+    '--card-text-secondary': palette.textSecondary,
+    '--card-section-bg': palette.sectionBackground,
+    // Legacy aliases, kept so inline styles written against the old variable
+    // names keep working.
+    '--card-top-highlight': palette.topHighlight,
+    '--card-right-edge-shadow': palette.rightEdgeShadow,
+    '--card-divider-shadow': palette.dividerShadow,
+    '--card-title-text-shadow': palette.titleTextShadow,
+    '--card-header-stripe-1': palette.headerStripes[0],
+    '--card-header-stripe-2': palette.headerStripes[1],
+    '--card-header-stripe-3': palette.headerStripes[2],
+    '--card-header-stripe-4': palette.headerStripes[3],
+    '--card-body-stripe-1': palette.bodyStripes[0],
+    '--card-body-stripe-2': palette.bodyStripes[1],
+    '--card-body-stripe-3': palette.bodyStripes[2],
+    '--card-body-stripe-4': palette.bodyStripes[3],
+    '--card-body-stripe-5': palette.bodyStripes[4],
+    '--card-body-stripe-6': palette.bodyStripes[5],
+    '--card-body-stripe-7': palette.bodyStripes[6],
+    '--card-body-stripe-8': palette.bodyStripes[7],
+    '--card-footer-top': palette.footerTop,
+    '--card-footer-bottom': palette.footerBottom,
+    '--card-footer-border': palette.footerBorder,
+    '--card-image-divider': palette.imageDivider,
+    '--card-body-top-glow': palette.bodyTopGlow,
+    '--card-body-bottom-shadow': palette.bodyBottomShadow,
+    '--card-body-right-shadow': palette.bodyRightShadow,
+    '--card-body-left-glow': palette.bodyLeftGlow,
+  } as CSSProperties
 
   const cardClass = classNames(
     styles['stardew-card'],
     styles[`stardew-card--${variant}`],
     styles[`stardew-card--${size}`],
+    isPresetCardColor(color) && styles[`stardew-card--color-${color}`],
     hasTitle && styles['stardew-card--with-title'],
     hoverable && styles['stardew-card--hoverable'],
     onClick && styles['stardew-card--clickable'],
     className
   )
 
-  const cardStyle: CSSProperties = {
-    ...cardCssVars,
-    ...style,
-  }
-
   return (
-    <div {...rest} className={cardClass} onClick={onClick} style={cardStyle}>
+    <div {...rest} className={cardClass} style={cardStyle} onClick={onClick}>
+      <span className={styles['stardew-card__frame']} aria-hidden />
       {hasTitle ? (
-        <div
-          data-slot="card-header"
-          className={styles['stardew-card__header']}
-        >
-          <span
-            data-slot="card-header-overlay"
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              boxShadow: `inset -4px 0 0 var(--card-right-edge-shadow), inset 0 2px 0 var(--card-top-highlight), inset 0 -3px 0 var(--card-divider-shadow)`,
-            }}
-          />
+        <div data-slot="card-header" className={styles['stardew-card__header']} style={{ justifyContent: 'flex-start' }}>
+          {/* <CardSurfaceCanvas stripes={palette.headerStripes} slot="card-header-surface" /> */}
           <h3 className={styles['stardew-card__title']}>{title}</h3>
           {headerExtra ? <div className={styles['stardew-card__extra']}>{headerExtra}</div> : null}
         </div>
       ) : null}
       <div className={styles['stardew-card__body']}>
+        {/* <CardSurfaceCanvas stripes={palette.bodyStripes} slot="card-body-surface" /> */}
         <span
           data-slot="card-body-overlay"
           aria-hidden
@@ -167,7 +143,7 @@ function StarCard({
         />
         <div className={styles['stardew-card__body-content']}>{children}</div>
       </div>
-      {footer ? <footer className={styles['stardew-card__footer']}>{footer}</footer> : null}
+      {footer ? <div className={styles['stardew-card__footer']}>{footer}</div> : null}
     </div>
   )
 }

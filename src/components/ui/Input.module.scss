@@ -1,0 +1,248 @@
+/**
+ * Pixel text field.
+ *
+ * Two layers share one `clip-path` value (injected as `--star-input-clip` by
+ * `Input.tsx`): `__plate` paints the ring across the whole box, `__field` is
+ * inset by `$input-frame-width` and paints the parchment fill. Because both are
+ * cut with the same staircase, the ring comes out an even 4px wide around the
+ * stepped corners — the same trick `Card` uses.
+ *
+ * Colour tokens live on `.star-input-wrapper` so `is-disabled` / `is-readonly` /
+ * the `status` tints can override them; `.star-input` and its layers only
+ * consume them. Only `--star-input-clip` is set inline, because it depends on
+ * the geometry constants in `Input.tsx`.
+ */
+$input-frame-width: 4px;
+$input-ring-color: #a8895f;
+$input-text: #4a2c1a;
+$input-placeholder: #9c8660;
+$input-surface: #f7efc5;
+$input-bevel-dark: #ddc79b;
+$input-bevel-light: #f4ead6;
+$input-accent: #71964a;
+$input-hint: #5c4526;
+
+.star-input-wrapper {
+  --star-input-surface: #{$input-surface};
+  --star-input-ring: #{$input-ring-color};
+  --star-input-text: #{$input-text};
+  --star-input-accent: #{$input-accent};
+  --star-input-bevel-dark: #{$input-bevel-dark};
+  --star-input-bevel-light: #{$input-bevel-light};
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: inherit;
+
+  &.is-block {
+    display: flex;
+    width: 100%;
+  }
+}
+
+.star-input__label {
+  color: $input-hint;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.star-input__message {
+  margin: 0;
+  color: $input-hint;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+// --------------------------------------------------------------- status tints
+
+.star-input-wrapper--warning {
+  --star-input-accent: #d7992e;
+  --star-input-ring: #bb8a33;
+
+  .star-input__message {
+    color: #a9752a;
+  }
+}
+
+.star-input-wrapper--error {
+  --star-input-accent: #c0574f;
+  --star-input-ring: #a35149;
+
+  .star-input__message {
+    color: #a35149;
+  }
+}
+
+.star-input-wrapper--success {
+  --star-input-accent: #71964a;
+  --star-input-ring: #6d8a4c;
+
+  .star-input__message {
+    color: #5d7a3d;
+  }
+}
+
+// Declared last so a locked field stays muted regardless of its status.
+.star-input-wrapper.is-disabled {
+  --star-input-surface: #ece3cf;
+  --star-input-ring: #bfae90;
+  --star-input-text: #9b8b70;
+  --star-input-accent: #b8a890;
+
+  cursor: not-allowed;
+}
+
+// Read-only keeps the normal weight — it is still selectable content, not a
+// broken control — but flattens the surface a touch to read as "view only".
+.star-input-wrapper.is-readonly {
+  --star-input-surface: #f3ecd7;
+  --star-input-bevel-light: #f3ecd7;
+
+  cursor: default;
+}
+
+// ---------------------------------------------------------------------- field
+
+.star-input {
+  position: relative;
+  display: inline-flex;
+  width: 220px;
+  color: var(--star-input-text);
+  font-family: inherit;
+
+  .is-block & {
+    width: 100%;
+  }
+}
+
+.star-input--small {
+  --star-input-height: 32px;
+  --star-input-padding: 10px;
+  --star-input-font-size: 13px;
+}
+
+.star-input--medium {
+  --star-input-height: 40px;
+  --star-input-padding: 12px;
+  --star-input-font-size: 14px;
+}
+
+.star-input--large {
+  --star-input-height: 48px;
+  --star-input-padding: 16px;
+  --star-input-font-size: 16px;
+}
+
+/** Focus halo: the same staircase on a box grown 3px per side. */
+.star-input__glow {
+  position: absolute;
+  inset: -3px;
+  background: var(--star-input-accent);
+  clip-path: var(--star-input-clip);
+
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms steps(2, end);
+}
+
+.star-input__plate {
+  position: absolute;
+  inset: 0;
+  background: var(--star-input-ring);
+  clip-path: var(--star-input-clip);
+
+  pointer-events: none;
+}
+
+.star-input__field {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 0;
+  height: var(--star-input-height);
+  margin: $input-frame-width;
+  padding: 0 var(--star-input-padding);
+
+  background: var(--star-input-surface);
+  clip-path: var(--star-input-clip);
+
+  // Recessed read: a dark band under the top edge, a light band above the bottom.
+  box-shadow:
+    inset 0 4px 0 0 var(--star-input-bevel-dark),
+    inset 0 -4px 0 0 var(--star-input-bevel-light);
+
+  font-size: var(--star-input-font-size);
+}
+
+.star-input:focus-within {
+  // Focus reads as one cue: the ring picks up the accent, and the halo behind it
+  // repeats the same staircase 3px further out.
+  --star-input-ring: var(--star-input-accent);
+
+  .star-input__glow {
+    opacity: 1;
+  }
+}
+
+.star-input__control {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  padding: 0;
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: inherit;
+  caret-color: var(--star-input-accent);
+  font: inherit;
+  font-size: inherit;
+  line-height: 1;
+
+  &::placeholder {
+    color: $input-placeholder;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.star-input__affix {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: $input-placeholder;
+}
+
+.star-input__count {
+  flex: 0 0 auto;
+  color: $input-placeholder;
+  font-size: 11px;
+}
+
+.star-input__clear {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+
+  background: var(--star-input-bevel-dark);
+  color: $input-text;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--star-input-accent);
+    color: var(--star-input-bevel-light);
+  }
+}

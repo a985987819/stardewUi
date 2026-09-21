@@ -14,12 +14,13 @@ import {
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
 import { drawDefaultButtonBackground } from '../../utils/defaultButtonCanvas'
 import {
-  drawSeasonalButtonBackground,
-  getSeasonalButtonTextColor,
-  loadSeasonalButtonImage,
-  type SeasonalButtonVisualState,
+  SEASONAL_BUTTON_PALETTES,
 } from '../../utils/seasonalButtonCanvas'
-import { createDefaultButtonPalette } from '../../utils/defaultButtonTheme'
+import {
+  createDefaultButtonPalette,
+  DEFAULT_BUTTON_FILL,
+  DEFAULT_BUTTON_HOVER_FILL,
+} from '../../utils/defaultButtonTheme'
 import { resolveAssetPath } from '../../utils/githubPages'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
@@ -27,6 +28,8 @@ import styles from './NineSliceButton.module.scss'
 type NineSliceButtonVariant =
   | 'default'
   | 'primary'
+  | 'secondary'
+  | 'success'
   | 'warning'
   | 'danger'
   | 'disabled'
@@ -44,6 +47,7 @@ type ButtonTone = {
 
 type ImageButtonVariant = Exclude<NineSliceButtonVariant, 'dashed' | 'text' | 'link'>
 type ButtonColorMap = Record<ImageButtonVariant, ButtonTone>
+type SteppedButtonTone = ButtonTone & { border: string }
 
 export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: NineSliceButtonVariant
@@ -70,11 +74,20 @@ const DEFAULT_BUTTON_IMAGE_SRC = resolveAssetPath('/defaultBtn.png')
 
 const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
-  primary: { bg: '#7A4E2D', text: '#FFE8B6' },
+  primary: { bg: '#8B5A32', text: '#FFF4D6' },
+  secondary: { bg: '#D6B477', text: '#4A2C1A' },
+  success: { bg: '#71964A', text: '#FFF7DC' },
   warning: { bg: '#C28A45', text: '#FFF2D5' },
-  danger: { bg: '#C62828', text: '#FFF2D5' },
+  danger: { bg: '#B85C4A', text: '#FFF0DD' },
   disabled: { bg: '#B0A999', text: '#E0D9C6' },
   concise: { bg: '#F5E6CC', text: '#3A2E39' },
+}
+
+const STEPPED_BUTTON_TONES: Partial<Record<NineSliceButtonVariant, SteppedButtonTone>> = {
+  primary: { bg: '#8B5A32', border: '#4A2C1A', text: '#FFF4D6' },
+  secondary: { bg: '#D6B477', border: '#76502D', text: '#4A2C1A' },
+  success: { bg: '#71964A', border: '#40582C', text: '#FFF7DC' },
+  danger: { bg: '#B85C4A', border: '#71372D', text: '#FFF0DD' },
 }
 
 const drawDashedBorder = (
@@ -132,9 +145,14 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const hasIcon = icon !== undefined && icon !== null
     const isConcise = variant === 'concise'
 
-    const usesSeasonalBackground = Boolean(theme) && variant === 'default'
-    const usesRegularBackground = !isConcise && !usesSeasonalBackground && appearance !== 'classical' && !backgroundSrc
-    const usesPlainDefaultBackground = usesRegularBackground && variant === 'default'
+    // Default and seasonal buttons deliberately share one canvas renderer. The
+    // colour changes with the season, while the visible square-step frame stays
+    // identical to the default button instead of switching to asset art.
+    const steppedTone = STEPPED_BUTTON_TONES[variant]
+    const usesPlainDefaultBackground =
+      (variant === 'default' || Boolean(steppedTone)) && appearance !== 'classical' && !backgroundSrc
+    const usesSeasonalBackground = Boolean(theme) && variant === 'default' && usesPlainDefaultBackground
+    const usesRegularBackground = !isConcise && !usesPlainDefaultBackground && appearance !== 'classical' && !backgroundSrc
     const usesRegularImageBackground = usesRegularBackground && !usesPlainDefaultBackground && !hasIcon
     const usesRegularNineSliceBackground = usesRegularBackground && !usesPlainDefaultBackground && hasIcon
     const resolvedBackgroundSrc = backgroundSrc ? resolveAssetPath(backgroundSrc) : resolveAssetPath('/btnImg.png')
@@ -142,15 +160,9 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const activeBackgroundInsets = usesRegularNineSliceBackground ? ICON_BUTTON_INSETS : backgroundInsets
     const [isHovered, setIsHovered] = useState(false)
     const [isPressed, setIsPressed] = useState(false)
-    const [seasonalImageVersion, setSeasonalImageVersion] = useState(0)
     const defaultCanvasRef = useRef<HTMLCanvasElement | null>(null)
-    const seasonalCanvasRef = useRef<HTMLCanvasElement | null>(null)
-    const seasonalImageRef = useRef<Awaited<ReturnType<typeof loadSeasonalButtonImage>> | null>(null)
-    const defaultRafRef = useRef<number | null>(null)
-    const seasonalRafRef = useRef<number | null>(null)
-    const dashedRafRef = useRef<number | null>(null)
 
-    const seasonalState: SeasonalButtonVisualState = isDisabled
+    const seasonalState = isDisabled
       ? 'disabled'
       : isPressed
         ? 'active'
@@ -163,6 +175,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       !usesRegularBackground &&
       (effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
+        effectiveVariant === 'secondary' ||
+        effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||
         effectiveVariant === 'disabled')
@@ -173,6 +187,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       if (
         effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
+        effectiveVariant === 'secondary' ||
+        effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||
         effectiveVariant === 'disabled'
@@ -182,14 +198,45 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       return null
     }, [effectiveVariant])
 
-    const plainDefaultPalette = useMemo(
-      () => (usesPlainDefaultBackground ? createDefaultButtonPalette(color) : null),
-      [color, usesPlainDefaultBackground]
-    )
+    const seasonalPalette = usesSeasonalBackground && theme ? SEASONAL_BUTTON_PALETTES[theme] : null
+    const plainDefaultPalette = useMemo(() => {
+      if (!usesPlainDefaultBackground) {
+        return null
+      }
+
+      if (seasonalPalette) {
+        const fill =
+          seasonalState === 'active'
+            ? seasonalPalette.pressedFill
+            : seasonalState === 'disabled'
+              ? seasonalPalette.disabledFill
+              : seasonalPalette.normalFill
+        return createDefaultButtonPalette(
+          seasonalPalette.border,
+          fill,
+          seasonalPalette.text[seasonalState]
+        )
+      }
+
+      if (steppedTone) {
+        return createDefaultButtonPalette(steppedTone.border, steppedTone.bg, steppedTone.text)
+      }
+
+      // Custom colours keep their caller-provided fill. The built-in default
+      // alone changes from normal to the supplied warm hover swatch.
+      return createDefaultButtonPalette(
+        color,
+        !color && isHovered && !isDisabled ? DEFAULT_BUTTON_HOVER_FILL : DEFAULT_BUTTON_FILL
+      )
+    }, [color, isDisabled, isHovered, seasonalPalette, seasonalState, steppedTone, usesPlainDefaultBackground])
 
     const plainDefaultColor = useMemo(() => {
       if (!plainDefaultPalette) {
         return null
+      }
+
+      if (seasonalPalette) {
+        return seasonalPalette.text[seasonalState]
       }
 
       if (isDisabled) {
@@ -205,18 +252,9 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       }
 
       return plainDefaultPalette.text.normal
-    }, [isDisabled, isHovered, isPressed, plainDefaultPalette])
+    }, [isDisabled, isHovered, isPressed, plainDefaultPalette, seasonalPalette, seasonalState])
 
     const buttonStyle = useMemo(() => {
-      if (usesSeasonalBackground && theme) {
-        return {
-          ...style,
-          '--nine-slice-button-default-color': getSeasonalButtonTextColor(theme, seasonalState),
-          '--nine-slice-button-disabled-color': getSeasonalButtonTextColor(theme, seasonalState),
-          fontWeight: seasonalState === 'active' ? 700 : style?.fontWeight,
-        } as CSSProperties
-      }
-
       if (usesPlainDefaultBackground && plainDefaultColor && plainDefaultPalette) {
         return {
           ...style,
@@ -224,7 +262,8 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
           '--nine-slice-button-default-outer-border': plainDefaultPalette.outerBorder,
           '--nine-slice-button-default-inner-border': plainDefaultPalette.innerBorder,
           '--nine-slice-button-default-color': plainDefaultColor,
-          '--nine-slice-button-default-disabled-overlay': isDisabled ? plainDefaultPalette.disabledOverlay : 'transparent',
+          '--nine-slice-button-default-disabled-overlay':
+            isDisabled && !seasonalPalette ? plainDefaultPalette.disabledOverlay : 'transparent',
           fontWeight: isPressed ? 700 : style?.fontWeight,
         } as CSSProperties
       }
@@ -235,11 +274,9 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       isPressed,
       plainDefaultColor,
       plainDefaultPalette,
-      seasonalState,
       style,
-      theme,
       usesPlainDefaultBackground,
-      usesSeasonalBackground,
+      seasonalPalette,
     ])
 
     const { hostRef, canvasProps } = useNineSliceBackground({
@@ -293,123 +330,16 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         })
       }
 
-      const scheduleRedraw = () => {
-        if (defaultRafRef.current !== null) return
-        defaultRafRef.current = requestAnimationFrame(() => {
-          defaultRafRef.current = null
-          redraw()
-        })
-      }
-
       redraw()
-      const observer = new ResizeObserver(scheduleRedraw)
+      const observer = new ResizeObserver(redraw)
       observer.observe(canvas)
+      window.addEventListener('resize', redraw)
 
       return () => {
         observer.disconnect()
-        if (defaultRafRef.current !== null) {
-          cancelAnimationFrame(defaultRafRef.current)
-          defaultRafRef.current = null
-        }
+        window.removeEventListener('resize', redraw)
       }
     }, [plainDefaultPalette, usesPlainDefaultBackground])
-
-    useEffect(() => {
-      if (!usesSeasonalBackground || !theme) {
-        seasonalImageRef.current = null
-        setSeasonalImageVersion(0)
-        return
-      }
-
-      let cancelled = false
-
-      loadSeasonalButtonImage(theme)
-        .then((loaded) => {
-          if (cancelled) {
-            return
-          }
-
-          seasonalImageRef.current = loaded
-          setSeasonalImageVersion((value) => value + 1)
-        })
-        .catch(() => {
-          if (!cancelled) {
-            seasonalImageRef.current = null
-            setSeasonalImageVersion(0)
-          }
-        })
-
-      return () => {
-        cancelled = true
-      }
-    }, [theme, usesSeasonalBackground])
-
-    useEffect(() => {
-      if (!usesSeasonalBackground || !theme) {
-        return
-      }
-
-      const canvas = seasonalCanvasRef.current
-      if (!canvas) {
-        return
-      }
-
-      const redraw = () => {
-        const image = seasonalImageRef.current
-        if (!image) {
-          return
-        }
-
-        const width = Math.round(canvas.clientWidth)
-        const height = Math.round(canvas.clientHeight)
-        if (width <= 0 || height <= 0) {
-          return
-        }
-
-        const dpr = window.devicePixelRatio || 1
-        const targetWidth = Math.max(1, Math.round(width * dpr))
-        const targetHeight = Math.max(1, Math.round(height * dpr))
-
-        if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
-          canvas.width = targetWidth
-          canvas.height = targetHeight
-          canvas.style.width = `${width}px`
-          canvas.style.height = `${height}px`
-        }
-
-        const ctx = canvas.getContext('2d')
-        if (!ctx) {
-          return
-        }
-
-        drawSeasonalButtonBackground({
-          ctx,
-          image,
-          theme,
-          state: seasonalState,
-          targetWidth,
-          targetHeight,
-        })
-      }
-
-      redraw()
-      const observer = new ResizeObserver(() => {
-        if (seasonalRafRef.current !== null) return
-        seasonalRafRef.current = requestAnimationFrame(() => {
-          seasonalRafRef.current = null
-          redraw()
-        })
-      })
-      observer.observe(canvas)
-
-      return () => {
-        observer.disconnect()
-        if (seasonalRafRef.current !== null) {
-          cancelAnimationFrame(seasonalRafRef.current)
-          seasonalRafRef.current = null
-        }
-      }
-    }, [seasonalImageVersion, seasonalState, theme, usesSeasonalBackground])
 
     const dashedCanvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -449,21 +379,13 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       }
 
       redraw()
-      const observer = new ResizeObserver(() => {
-        if (dashedRafRef.current !== null) return
-        dashedRafRef.current = requestAnimationFrame(() => {
-          dashedRafRef.current = null
-          redraw()
-        })
-      })
+      const observer = new ResizeObserver(redraw)
       observer.observe(canvas)
+      window.addEventListener('resize', redraw)
 
       return () => {
         observer.disconnect()
-        if (dashedRafRef.current !== null) {
-          cancelAnimationFrame(dashedRafRef.current)
-          dashedRafRef.current = null
-        }
+        window.removeEventListener('resize', redraw)
       }
     }, [dashedVariant])
 
@@ -539,18 +461,6 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
           className
         )}
       >
-        {usesSeasonalBackground ? (
-          <span className={styles['nine-slice-button__bg']}>
-            <canvas
-              ref={seasonalCanvasRef}
-              className={cls(
-                styles['nine-slice-button__canvas'],
-                styles['nine-slice-button__canvas--seasonal']
-              )}
-              aria-hidden
-            />
-          </span>
-        ) : null}
         {usesPlainDefaultBackground ? (
           <span className={styles['nine-slice-button__bg']}>
             <canvas

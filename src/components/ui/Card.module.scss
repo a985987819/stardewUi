@@ -1,54 +1,28 @@
-.stardew-card {
-  --card-corner-step: 1px;
-  --card-corner-size: 3px;
-  --card-frame-border-width: 6px;
-  --card-frame-ring-width: 4px;
-  --card-inline-shadow-width: 4px;
-  --card-header-padding-x: 14px;
-  --card-header-padding-y: 10px;
-  --card-body-padding-x: 12px;
-  --card-body-padding-y: 10px;
+$shadow-color: rgba(0, 0, 0, 0.3);
+$inner-glow: rgba(255, 255, 255, 0.18);
 
+.stardew-card {
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
   overflow: visible;
-  color: var(--card-text-primary);
-  background: var(--card-body-stripe-4);
-  border: var(--card-frame-border-width) solid var(--card-frame-border-base);
-  clip-path: polygon(
-    3px 0,
-    calc(100% - 3px) 0,
-    calc(100% - 1px) 1px,
-    100% 3px,
-    100% calc(100% - 3px),
-    calc(100% - 1px) calc(100% - 1px),
-    calc(100% - 3px) 100%,
-    3px 100%,
-    1px calc(100% - 1px),
-    0 calc(100% - 3px),
-    0 3px,
-    1px 1px
-  );
-  box-shadow:
-    inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-    inset calc(var(--card-inline-shadow-width) * -1) 0 0
-      var(--card-frame-shadow-right);
+  background: var(--card-bg);
+  border: 6px solid var(--card-border-dark);
+  border-radius: 8px;
   transition:
     transform 0.1s steps(2),
     box-shadow 0.1s steps(2);
 
-  &::before,
-  &::after {
-    content: "";
+  &__frame,
+  &__outline {
     position: absolute;
     pointer-events: none;
-    clip-path: inherit;
+    z-index: 0;
   }
 
   &__frame {
     inset: 0px;
-    border: 4px solid var(--card-border-light);
+    border: 4px solid var(--card-inner-border);
     border-radius: 2px;
     box-shadow:
       inset -4px 0 0 var(--card-right-edge-shadow),
@@ -68,26 +42,19 @@
   &--default,
   &--elevated {
     box-shadow:
-      0 6px 8px rgba(0, 0, 0, 0.28),
-      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0
-        var(--card-frame-shadow-right);
+      0 6px 8px $shadow-color,
+      inset 0 1px 0 $inner-glow;
   }
 
   &--outlined {
-    box-shadow:
-      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0
-        var(--card-frame-shadow-right);
+    box-shadow: inset 0 1px 0 $inner-glow;
   }
 
   &--elevated {
     box-shadow:
       0 10px 14px rgba(0, 0, 0, 0.28),
       0 4px 0 rgba(0, 0, 0, 0.12),
-      inset 0 var(--card-inline-shadow-width) 0 var(--card-frame-highlight-top),
-      inset calc(var(--card-inline-shadow-width) * -1) 0 0
-        var(--card-frame-shadow-right);
+      inset 0 1px 0 $inner-glow;
   }
 
   &--small {
@@ -104,6 +71,9 @@
 
   &--hoverable:hover {
     transform: translate(-2px, -2px);
+    box-shadow:
+      0 12px 18px rgba(0, 0, 0, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   &--clickable {
@@ -111,14 +81,15 @@
 
     &:active {
       transform: translate(2px, 2px);
+      box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
   }
 
   &__header,
   &__body,
-  &__footer,
-  &__image,
-  &__meta {
+  &__footer {
     position: relative;
     z-index: 1;
   }
@@ -126,7 +97,6 @@
   &__header {
     display: flex;
     align-items: center;
-    gap: 12px;
     justify-content: flex-start;
     gap: 12px;
     border-bottom: 6px solid var(--card-border-dark);
@@ -161,7 +131,12 @@
     margin: 10px 0;
     font-size: calc(1.05em + 4px);
     font-weight: 700;
+    position: relative;
+    z-index: 3;
+    color: var(--card-text);
     line-height: 1.6rem;
+    letter-spacing: 0.01em;
+    text-shadow: 1px 1px 0 var(--card-title-text-shadow);
   }
 
   &__extra {
@@ -169,38 +144,15 @@
     align-items: center;
     gap: 8px;
     margin-left: auto;
+    position: relative;
+    z-index: 3;
   }
 
   &__body {
-    padding: var(--card-body-padding-y) var(--card-body-padding-x);
+    padding: 8px;
     color: var(--card-text-secondary);
     line-height: 1.6;
     text-shadow: 1px 1px 0 var(--card-title-text-shadow);
-    background:
-      linear-gradient(
-        90deg,
-        transparent calc(100% - 24px),
-        var(--card-frame-shadow-right) 4
-      ),
-      linear-gradient(
-        180deg,
-        var(--card-body-stripe-1) 0%,
-        var(--card-body-stripe-1) 12.5%,
-        var(--card-body-stripe-2) 12.5%,
-        var(--card-body-stripe-2) 25%,
-        var(--card-body-stripe-3) 25%,
-        var(--card-body-stripe-3) 37.5%,
-        var(--card-body-stripe-4) 37.5%,
-        var(--card-body-stripe-4) 50%,
-        var(--card-body-stripe-5) 50%,
-        var(--card-body-stripe-5) 62.5%,
-        var(--card-body-stripe-6) 62.5%,
-        var(--card-body-stripe-6) 75%,
-        var(--card-body-stripe-7) 75%,
-        var(--card-body-stripe-7) 87.5%,
-        var(--card-body-stripe-8) 87.5%,
-        var(--card-body-stripe-8) 100%
-      );
 
     &::before {
       content: "";
@@ -216,13 +168,28 @@
   }
 
   &--with-title &__body {
-    padding-top: var(--card-body-padding-y);
+    padding-top: 8px;
   }
 
   &__body-content {
     position: relative;
-    z-index: 1;
-    text-shadow: 1px 1px 0 var(--card-text-shadow);
+    z-index: 3;
+  }
+
+  &__surface {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  &__surface-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
   }
 
   &__footer {
@@ -231,20 +198,20 @@
     justify-content: flex-end;
     gap: 8px;
     padding: 12px 18px 16px;
-    color: var(--card-text-primary);
-    border-top: var(--card-frame-ring-width) solid var(--card-body-border-outer);
     background: linear-gradient(
       180deg,
-      var(--card-body-stripe-3),
-      var(--card-body-stripe-8)
+      var(--card-footer-top),
+      var(--card-footer-bottom)
     );
+    border-top: 2px solid var(--card-footer-border);
   }
 
   &__image {
+    position: relative;
+    z-index: 1;
     width: 100%;
     overflow: hidden;
-    border-bottom: var(--card-frame-ring-width) solid
-      var(--card-body-border-outer);
+    border-bottom: 3px solid var(--card-image-divider);
 
     img {
       display: block;
@@ -259,9 +226,49 @@
     padding: 10px 0;
   }
 
+  &__meta-title {
+    margin: 0 0 4px;
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--card-text);
+    text-shadow: 1px 1px 0 var(--card-title-text-shadow);
+  }
+
   &__meta-desc {
     margin: 0;
+    font-size: 0.9em;
+    line-height: 1.5;
     color: var(--card-text-secondary);
-    text-shadow: 1px 1px 0 var(--card-text-shadow);
+    text-shadow: 1px 1px 0 var(--card-title-text-shadow);
+  }
+
+  &--color-night-village {
+  }
+
+  &--color-forest-farm {
+  }
+
+  &--color-wooden-cabin {
+  }
+
+  &--color-lake-night {
+  }
+
+  &--color-flower-festival {
+  }
+
+  &--color-mine-starry {
+  }
+
+  &--color-farmland {
+  }
+
+  &--color-orchard-grass {
+  }
+
+  &--color-workshop-ore {
+  }
+
+  &--color-night-celebration {
   }
 }

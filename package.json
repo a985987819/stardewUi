@@ -17,9 +17,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/stardew-valley-ui.mjs",
-      "require": "./dist/stardew-valley-ui.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/stardew-valley-ui.cjs"
     },
     "./style.css": "./dist/style.css"
   },
@@ -33,14 +33,18 @@
   ],
   "scripts": {
     "dev": "bunx vite",
-    "build": "bunx tsc -b && bunx vite build && node scripts/prepare-github-pages.mjs",
-    "build:app": "bunx tsc -b && bunx vite build",
+    "build": "bunx tsc -b && bun run check:components && bunx vite build && node scripts/prepare-github-pages.mjs",
+    "build:app": "bunx tsc -b && bun run check:components && bunx vite build",
     "build:lib": "bunx vite build --mode lib && bunx tsc -p tsconfig.lib.json",
+    "gen:component": "bun scripts/new-component.mjs",
+    "rm:component": "bun scripts/rm-component.mjs",
+    "check:components": "bunx vitest run src/router/componentRegistry.sync.test.tsx",
     "lint": "bunx eslint .",
     "preview": "bunx vite preview",
     "test": "bunx vitest",
     "test:run": "bunx vitest run",
-    "test:coverage": "bunx vitest run --coverage"
+    "test:coverage": "bunx vitest run --coverage",
+    "test:smoke": "bun scripts/smoke-routes.mjs"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

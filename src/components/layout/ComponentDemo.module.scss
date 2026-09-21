@@ -1,13 +1,6 @@
 .component-demo {
   @apply mb-8;
 
-  &-title {
-    @apply mb-3 text-lg font-semibold;
-    color: var(--color-text);
-    padding-bottom: 8px;
-    border-bottom: 2px solid rgba(157, 65, 0, 0.2);
-  }
-
   &-desc {
     @apply mb-4 text-sm;
     color: var(--color-text-secondary);
@@ -46,11 +39,12 @@
   }
 
   &-code {
-    @apply mt-5 flex justify-center;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 3px solid rgba(157, 65, 0, 0.22);
   }
 
   &-code-block {
-    width: min(100%, 960px);
     border: none;
     box-shadow: none;
   }

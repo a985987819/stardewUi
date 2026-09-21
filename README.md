@@ -371,28 +371,6 @@ import { StarDatePicker } from 'stardew-valley-ui'
 
 ---
 
-### StarTitle - 标题
-
-像素风格标题组件，使用 Canvas 绘制背景。
-
-```tsx
-import { StarTitle } from 'stardew-valley-ui'
-
-<StarTitle size="large">星露谷物语</StarTitle>
-<StarTitle size="medium" align="left">副标题</StarTitle>
-<StarTitle size="small" as="h1">小标题</StarTitle>
-```
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| children | `string` | - | 标题文字 |
-| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 标题尺寸 |
-| align | `'left' \| 'center'` | `'center'` | 对齐方式 |
-| as | `'div' \| 'h1' \| 'h2' \| 'h3' \| 'p'` | `'h2'` | 渲染标签 |
-| backgroundSrc | `string` | `'/titleBg.png'` | 背景图片 |
-
----
-
 ### StarLoading - 加载
 
 像素风加载动画组件，包子被吃掉的动画效果。
@@ -570,54 +548,151 @@ import { StarSwitch } from 'stardew-valley-ui'
 
 ---
 
-### StarGapBorder - 缺角边框
+### StarInput - 输入框
 
-像素风缺角边框容器。
+木框凹陷的像素输入框：4px 阶梯边框 + 顶部内阴影，支持受控/非受控、前后缀、一键清空与校验状态。
 
 ```tsx
-import { StarGapBorder } from 'stardew-valley-ui'
+import { StarInput } from 'stardew-valley-ui'
+import { Search } from 'lucide-react'
 
-<StarGapBorder>
-  <p>内容</p>
-</StarGapBorder>
+// 非受控
+<StarInput label="农场名" placeholder="例如：鹈鹕农场" />
 
-<StarGapBorder
-  borderColor="#8B4513"
-  backgroundColor="#FFF8DC"
-  cornerLevel={2}
-  borderThickness={6}
->
-  <p>自定义边框</p>
-</StarGapBorder>
+// 受控
+const [name, setName] = useState('')
+<StarInput label="农场名" value={name} onChange={setName} />
+
+// 前缀 / 后缀 / 一键清空
+<StarInput label="搜索作物" prefix={<Search size={16} />} suffix="金币" allowClear />
+
+// 校验状态与字数限制
+<StarInput
+  label="农场名"
+  status="error"
+  message="名字最多 12 个字"
+  maxLength={12}
+  showCount
+/>
+
+// 尺寸与块级
+<StarInput size="large" block />
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
+| value / defaultValue | `string` | `''` | 受控值或初始值 |
+| onChange | `(value: string) => void` | - | 文本变化回调（只回传文本，DOM 事件用 `onInput` / `onKeyDown`） |
+| label | `ReactNode` | - | 可见标题，用 for/id 绑定输入框 |
+| message | `ReactNode` | - | 字段下方的提示或校验文案 |
+| status | `'default' \| 'warning' \| 'error' \| 'success'` | `'default'` | 语义状态，决定边框与提示颜色 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 输入框尺寸（32 / 40 / 48px） |
+| color | `string` | `'#71964a'` | 强调色（聚焦、光标、清空按钮），覆盖 status |
+| prefix / suffix | `ReactNode` | - | 框内的前置 / 后置内容 |
+| allowClear | `boolean` | `false` | 显示一键清空按钮 |
+| showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
+| block | `boolean` | `false` | 撑满容器宽度 |
+| clearLabel | `string` | `'Clear'` | 清空按钮的无障碍名称 |
+
+其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`name`、`onFocus`…）会透传到内部的 `<input>`。
+
+---
+
+### createGapBorderCorners - 缺角边框计算函数
+
+> `StarGapBorder` 和 `StarGapBorderCorners` 两个渲染组件已移除，但这个「缺口边框」的生成函数保留了下来 —— 它是阶梯缺角的参考实现，`pixelCorners` 和各 canvas 绘制器描述 house style 时仍以它为准。
+
+纯函数，用于计算缺角边框的几何数据。适合需要自定义渲染逻辑的高级场景。
+
+```tsx
+import { createGapBorderCorners } from 'stardew-valley-ui'
+import type { GapBorderCornerData, CreateGapBorderCornersOptions } from 'stardew-valley-ui'
+
+// 计算边角数据
+const { cornerSteps, surfaceClipPath, cssVariables } = createGapBorderCorners({
+  level: 1,
+  borderColor: '#5f4322',
+  backgroundColor: '#f7efc5',
+  borderThickness: 8,
+  cornerGap: 8,
+})
+
+// cornerSteps: 阶梯方块的位置数组
+// surfaceClipPath: CSS clip-path polygon 字符串
+// cssVariables: CSS 自定义属性对象
+
+// 自定义渲染示例
+function CustomBorder({ children }) {
+  const { cornerSteps, cssVariables } = createGapBorderCorners({ level: 2 })
+
+  return (
+    <div style={{ position: 'relative', ...cssVariables }}>
+      {cornerSteps.map(({ key, style }) => (
+        <span
+          key={key}
+          style={{
+            position: 'absolute',
+            width: 8,
+            height: 8,
+            background: cssVariables['--gap-border-color'],
+            ...style,
+          }}
+        />
+      ))}
+      <div style={{ position: 'relative', zIndex: 2 }}>{children}</div>
+    </div>
+  )
+}
+```
+
+**返回值 `GapBorderCornerData`**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| cornerSteps | `{ key: string; style: CSSProperties }[]` | 阶梯方块位置数组 |
+| surfaceClipPath | `string` | CSS clip-path polygon 字符串 |
+| cssVariables | `CSSProperties` | CSS 自定义属性对象 |
+
+**参数 `CreateGapBorderCornersOptions`**：
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| level | `number` | `1` | 角落阶梯级别 |
 | borderColor | `string` | `'#5f4322'` | 边框颜色 |
 | backgroundColor | `string` | `'#f7efc5'` | 背景颜色 |
 | borderThickness | `number` | `8` | 边框粗细 |
 | cornerGap | `number` | `8` | 角落间距 |
-| cornerLevel | `1 \| 2 \| 3` | - | 角落阶梯级别 |
-| contentPadding | `number` | `24` | 内容内边距 |
 
 ---
 
-### PixelButton - 像素按钮
+### StarDisplayFrame - 展示框
 
-简单像素风格按钮，支持自定义颜色。
+单层像素边框的展示框，用来托住要展示的数据。四层边框由外到内是 `2px #562c2b` → `4px #dd7a0b`
+→ `2px #af4f0e` → `2px #fdecb1`，里面是 `#fed384` 内容面与黑色文字，**四角各缺 2px 像素**。
+宽度随内容自适应，本质是纯容器，数据怎么排版由你决定。
 
 ```tsx
-import { PixelButton } from 'stardew-valley-ui'
+import { StarDisplayFrame } from 'stardew-valley-ui'
 
-<PixelButton
-  bgColor="#ffffff"
-  textColor="#333333"
-  borderColor="#ff0000"
-  shadowColor="#999999"
->
-  像素按钮
-</PixelButton>
+<StarDisplayFrame>
+  <strong>1,240G</strong>
+  <span>春季总收入</span>
+</StarDisplayFrame>
+
+// 布局类直接挂在框上
+<StarDisplayFrame className="grid-cell" style={{ width: 240 }}>
+  4,820G
+</StarDisplayFrame>
 ```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| children | `ReactNode` | - | 框内内容 |
+| className | `string` | - | 追加到根节点的类名，布局类挂这里 |
+| ...rest | `HTMLAttributes<HTMLDivElement>` | - | 其余原生 div 属性（style / onClick / aria-* 等） |
+
+四层厚度与颜色写死，不提供改色 props；角部是「每层裁同一条 2px 阶梯」的阶梯像素角，
+几何与其它像素组件共用 `src/utils/pixelCorners.ts`。
 
 ---
 
@@ -771,8 +846,7 @@ import type {
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
-  StarTitleProps,
-  TitleSize,
+  StarDisplayFrameProps,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,
@@ -781,8 +855,11 @@ import type {
   StarTabProps,
   StarTabItem,
   SwitchProps,
-  StarGapBorderProps,
-  PixelButtonProps,
+  GapBorderCornerData,
+  CreateGapBorderCornersOptions,
+  StarInputProps,
+  InputSize,
+  InputStatus,
 } from 'stardew-valley-ui'
 ```
 
@@ -829,6 +906,45 @@ bun run test:coverage
 ```bash
 bun run lint
 ```
+
+---
+
+## 新增与移除组件
+
+组件目录 `src/router/componentRegistry.tsx` 是组件库的唯一数据源：**路由表、左侧导航、组件总览页、冒烟测试**都从它派生。
+所以新增组件的唯一手动步骤就是补一条目录条目，其余入口自动同步 —— 用脚手架一次做完：
+
+```bash
+# 生成组件 / 样式 / 单测 / 演示页，并把条目接入目录，最后自动跑一遍一致性校验
+bun run gen:component Switch \
+  --zh 开关 --en Switch --icon ToggleRight \
+  --desc-zh "像素药丸形状的开关，用来点亮灯或切换难度。" \
+  --desc-en "A pixel pill switch for lamps and difficulty toggles."
+
+# 只打印将要写入的内容，不落盘
+bun run gen:component Switch --dry-run
+```
+
+生成后需要做的是：实现组件、把演示页里的 `TODO` 换成真实文案与示例、补齐 API 表。
+
+如果手改目录，请务必跑一次守卫 —— 它会指出第几处漏了：
+
+```bash
+bun run check:components   # 秒级；校验目录 ↔ 懒加载 ↔ 演示页 ↔ 组件文件 ↔ 导出，并断言左侧导航渲染出每条路由
+```
+
+### 移除组件
+
+反向操作同样只有一条命令 —— 它按目录条目派生全部改动（删文件、摘条目、摘导出、清 README 与 i18n），末尾自动跑守卫：
+
+```bash
+bun run rm:component Title              # 移除 StarTitle：组件文件 / 演示页 / 条目 / 导出 / 文档文案
+bun run rm:component Title --dry-run    # 只看计划，不删不改
+```
+
+`README.md` 与 `i18n/dictionaries.ts` 是手写文件，找不到对应内容时只告警不报错；其余入口漏一处守卫就会红。
+
+完整约定（命名、五方一致性契约、视觉与主题、文案、完成定义、移除流程）见 [docs/component-conventions.md](docs/component-conventions.md)。
 
 ---
 

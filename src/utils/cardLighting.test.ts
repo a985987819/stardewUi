@@ -1,129 +1,129 @@
 import { describe, expect, it } from 'vitest'
-import { createCardPalette } from './cardLighting'
+import * as cardLighting from './cardLighting'
 
-describe('cardLighting', () => {
-  it('creates the grouped palette contract for the default orange', () => {
-    const palette = createCardPalette('#dc7b05')
+const { getCardLighting, createCardPalette, resolveCardThemeColor, CARD_DEFAULT_THEME_COLOR } = cardLighting
 
-    expect(palette).toEqual({
-      frame: {
-        borderBase: '#dc7b05',
-        borderInner: '#b14e05',
-        borderOuter: '#853605',
-        highlightTop: '#d79f6f',
-        shadowRight: expect.any(String),
-      },
-      header: {
-        borderBase: expect.any(String),
-        borderInner: expect.any(String),
-        borderOuter: expect.any(String),
-        highlightTop: expect.any(String),
-        shadowRight: expect.any(String),
-        stripes: ['#ffc576', '#fdbc6e', '#f5b56f', '#f4ab65'],
-      },
-      body: {
-        borderBase: expect.any(String),
-        borderInner: expect.any(String),
-        borderOuter: expect.any(String),
-        highlightTop: expect.any(String),
-        shadowRight: expect.any(String),
-        stripes: expect.any(Array),
-      },
-      text: {
-        primary: expect.any(String),
-        secondary: expect.any(String),
-        shadow: expect.stringContaining('rgba('),
-      },
-    })
-
-    expect(palette.body.stripes).toHaveLength(8)
-    expect(palette.frame.borderBase).toBe('#dc7b05')
-    expect(palette.frame.borderInner).toBe('#b14e05')
-    expect(palette.frame.borderOuter).toBe('#853605')
-    expect(palette.frame.highlightTop).toBe('#d79f6f')
-    expect(palette.header.stripes).toEqual(['#ffc576', '#fdbc6e', '#f5b56f', '#f4ab65'])
+describe('getCardLighting', () => {
+  it('derives the right edge shadow from the card edge color', () => {
+    expect(getCardLighting('#fa9305').rightEdgeShadow).toBe('#d49667')
   })
 
-  it('returns a fresh palette copy for the default orange path', () => {
-    const firstPalette = createCardPalette('#dc7b05')
-    const secondPalette = createCardPalette('#dc7b05')
-
-    firstPalette.frame.borderBase = '#000000'
-    firstPalette.header.stripes[0] = '#000000'
-    firstPalette.body.stripes[0] = '#000000'
-    firstPalette.text.primary = '#000000'
-
-    expect(secondPalette.frame.borderBase).toBe('#dc7b05')
-    expect(secondPalette.header.stripes[0]).toBe('#ffc576')
-    expect(secondPalette.body.stripes[0]).toBe('#f0b66b')
-    expect(secondPalette.text.primary).toBe('#40210a')
+  it('derives a subtle text shadow from the same edge color', () => {
+    expect(getCardLighting('#fa9305').titleTextShadow).toBeDefined()
   })
 
-  it('supports raw hex input without a leading hash', () => {
-    const fromHash = createCardPalette('#dc7b05')
-    const fromRawHex = createCardPalette('dc7b05')
+  it('maps the theme color onto the full border lighting set', () => {
+    const lighting = getCardLighting('#355123')
 
-    expect(fromRawHex).toEqual(fromHash)
+    expect(lighting.border).toBe('#355123')
+    // Highlight is a dimmer, less saturated version of the same hue; the inner
+    // shadow is the same hue pushed darker again.
+    expect(lighting.borderHighlight).toMatch(/^#[0-9a-f]{6}$/)
+    expect(lighting.borderInnerShadow).toMatch(/^#[0-9a-f]{6}$/)
+    expect(lighting.borderOuterGlow).toBe(lighting.rightEdgeShadow)
+    expect(lighting.borderHighlight).toBe(lighting.topHighlight)
+    expect(lighting.borderInnerShadow).toBe(lighting.dividerShadow)
   })
 
-  it('normalizes 3-digit hex input', () => {
-    const shortHex = createCardPalette('#abc')
-    const expandedHex = createCardPalette('#aabbcc')
+  it('tints the outer shadow and the inner glow with the theme hue', () => {
+    const lighting = getCardLighting('#274d70')
+    const channels = (value: string) => value.match(/\d+/g)?.map(Number) ?? []
 
-    expect(shortHex).toEqual(expandedHex)
+    expect(lighting.outerShadow).toMatch(/^rgba\(\d+, \d+, \d+, 0\.3\)$/)
+    expect(lighting.innerGlow).toMatch(/^rgba\(\d+, \d+, \d+, 0\.22\)$/)
+
+    // A blue theme must not produce a neutral grey shadow: blue stays the
+    // dominant channel on both ends of the light range.
+    const [shadowR, shadowG, shadowB] = channels(lighting.outerShadow)
+    expect(shadowB).toBeGreaterThan(shadowR)
+    expect(shadowB).toBeGreaterThan(shadowG)
+
+    const [glowR, glowG, glowB] = channels(lighting.innerGlow)
+    expect(glowB).toBeGreaterThan(glowR)
+    expect(glowB).toBeGreaterThan(glowG)
+
+    // ...and the warm default keeps its warm cast.
+    const warm = getCardLighting(CARD_DEFAULT_THEME_COLOR)
+    const [warmR, , warmB] = channels(warm.outerShadow)
+    expect(warmR).toBeGreaterThan(warmB)
   })
 
-  it('normalizes whitespace and letter case for hex input', () => {
-    const normalized = createCardPalette('#dc7b05')
-    const padded = createCardPalette('  #Dc7B05  ')
+  it('keeps the hover and active shadows lighter than the resting one', () => {
+    const alpha = (value: string) => Number(value.match(/, ([\d.]+)\)$/)?.[1] ?? '0')
+    const lighting = getCardLighting('#fa9305')
 
-    expect(padded).toEqual(normalized)
+    expect(alpha(lighting.outerShadow)).toBeGreaterThan(alpha(lighting.outerShadowHover))
+    expect(alpha(lighting.outerShadowHover)).toBeGreaterThan(alpha(lighting.outerShadowActive))
+  })
+})
+
+describe('resolveCardThemeColor', () => {
+  it('accepts hex with or without the leading hash, and #rgb shorthand', () => {
+    expect(resolveCardThemeColor('#7A4E2D')).toBe('#7a4e2d')
+    expect(resolveCardThemeColor('7a4e2d')).toBe('#7a4e2d')
+    expect(resolveCardThemeColor('#f93')).toBe('#ff9933')
   })
 
-  it('falls back to the default orange palette for invalid colors', () => {
-    const invalid = createCardPalette('not-a-color')
-    const fallback = createCardPalette('#dc7b05')
+  it('falls back to the default theme color instead of throwing on bad input', () => {
+    expect(resolveCardThemeColor()).toBe(CARD_DEFAULT_THEME_COLOR)
+    expect(resolveCardThemeColor('rebeccapurple')).toBe(CARD_DEFAULT_THEME_COLOR)
+    expect(() => createCardPalette('not-a-color')).not.toThrow()
+    expect(createCardPalette('not-a-color').borderDark).toBe(CARD_DEFAULT_THEME_COLOR)
+  })
+})
 
-    expect(invalid).toEqual(fallback)
+describe('createCardPalette', () => {
+  it('derives a full card palette, including 4 header stripes and 8 body stripes, from the base color', () => {
+    expect(typeof cardLighting.createCardPalette).toBe('function')
+
+    const palette = cardLighting.createCardPalette('#fa9305')
+
+    expect(palette.headerStripes).toEqual(['#ffc576', '#fdbc6e', '#f5b565', '#f5ab65'])
+    expect(palette.bodyStripes).toHaveLength(8)
+    expect(palette.borderDark).toBe('#fa9305')
+    expect(palette.rightEdgeShadow).toBe('#d49667')
   })
 
-  it('creates the grouped palette structure for custom colors', () => {
-    const palette = createCardPalette('#4a90e2')
+  it('exposes the lighting roles alongside the surface colors', () => {
+    const palette = cardLighting.createCardPalette('#274d70')
 
-    expect(palette).toEqual({
-      frame: {
-        borderBase: expect.any(String),
-        borderInner: expect.any(String),
-        borderOuter: expect.any(String),
-        highlightTop: expect.any(String),
-        shadowRight: expect.any(String),
-      },
-      header: {
-        borderBase: expect.any(String),
-        borderInner: expect.any(String),
-        borderOuter: expect.any(String),
-        highlightTop: expect.any(String),
-        shadowRight: expect.any(String),
-        stripes: expect.any(Array),
-      },
-      body: {
-        borderBase: expect.any(String),
-        borderInner: expect.any(String),
-        borderOuter: expect.any(String),
-        highlightTop: expect.any(String),
-        shadowRight: expect.any(String),
-        stripes: expect.any(Array),
-      },
-      text: {
-        primary: expect.any(String),
-        secondary: expect.any(String),
-        shadow: expect.stringContaining('rgba('),
-      },
-    })
+    expect(palette.border).toBe('#274d70')
+    expect(palette.borderDark).toBe('#274d70')
+    expect(palette.borderHighlight).toBe(palette.topHighlight)
+    expect(palette.borderInnerShadow).toBe(palette.dividerShadow)
+    expect(palette.borderOuterGlow).toBe(palette.rightEdgeShadow)
+    expect(palette.outerShadow).toMatch(/^rgba\(/)
+    expect(palette.innerGlow).toMatch(/^rgba\(/)
+  })
+})
 
-    expect(palette.body.stripes).toHaveLength(8)
-    expect(palette.frame.borderBase).toBe('#4a90e2')
-    expect(palette.header.stripes).toHaveLength(4)
-    expect(palette.text.shadow).toContain('rgba(')
+// Merged from the surface-colour entry point that landed while this branch was
+// reworking the card frame. Both entry points share one derivation path, so
+// these assertions also lock the funnel described in `deriveCardPaletteFromFrameSeed`.
+describe('deriveCardLightingFromSurface', () => {
+  it('derives every directional Card layer from the exact visible surface colour', () => {
+    const surface = '#7699b5'
+    const palette = cardLighting.deriveCardLightingFromSurface(surface)
+
+    expect(palette.background).toBe(surface)
+    expect(palette.headerStripes).toHaveLength(4)
+    expect(palette.bodyStripes).toHaveLength(8)
+    expect(palette.borderDark).not.toBe(surface)
+    expect(palette.topHighlight).not.toBe(surface)
+    expect(palette.rightEdgeShadow).not.toBe(surface)
+    expect(palette.footerTop).toMatch(/^rgba\(/)
+    expect(palette.bodyBottomShadow).toMatch(/^rgba\(/)
+  })
+
+  it('normalizes shorthand subject colours before using them as the surface anchor', () => {
+    expect(cardLighting.deriveCardLightingFromSurface('#d98').background).toBe('#dd9988')
+  })
+
+  it('keeps the inset frame as a deeper, hue-preserving shadow layer', () => {
+    const palette = cardLighting.deriveCardLightingFromSurface('#4988c3')
+
+    expect(palette.innerBorder).toBe('#1b364e')
+    expect(palette.innerBorder).not.toBe(palette.borderLight)
+    expect(palette.innerBorder).not.toBe(palette.borderDark)
   })
 })
