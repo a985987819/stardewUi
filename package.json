@@ -4,6 +4,14 @@
   "packageManager": "bun@1.3.11",
   "type": "module",
   "description": "A Stardew Valley-inspired pixel-art React component library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a985987819/stardewUi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/a985987819/stardewUi/issues"
+  },
+  "homepage": "https://github.com/a985987819/stardewUi#readme",
   "keywords": [
     "react",
     "stardew-valley",
@@ -21,11 +29,10 @@
       "import": "./dist/stardew-valley-ui.mjs",
       "require": "./dist/stardew-valley-ui.cjs"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/stardew-valley-ui.css"
   },
   "files": [
-    "dist",
-    "public"
+    "dist"
   ],
   "sideEffects": [
     "**/*.css",
@@ -36,6 +43,7 @@
     "build": "bunx tsc -b && bun run check:components && bunx vite build && node scripts/prepare-github-pages.mjs",
     "build:app": "bunx tsc -b && bun run check:components && bunx vite build",
     "build:lib": "bunx vite build --mode lib && bunx tsc -p tsconfig.lib.json",
+    "verify:package": "node scripts/verify-package.mjs",
     "gen:component": "bun scripts/new-component.mjs",
     "rm:component": "bun scripts/rm-component.mjs",
     "check:components": "bunx vitest run src/router/componentRegistry.sync.test.tsx",

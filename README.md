@@ -1,7 +1,8 @@
 # Stardew Valley UI
 
-一个 **星露谷风格、像素化的前端组件库**，基于 React + TypeScript + Vite 构建，使用 Bun 作为默认包管理器和运行时。
-目标是打造一个复古像素风格的 UI 组件库，适合网页和应用开发。
+一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
+
+面向业务项目发布：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。
 
 ---
 
@@ -38,6 +39,7 @@ import 'stardew-valley-ui/style.css'
 ### 2. 使用组件
 
 ```tsx
+import { useState } from 'react'
 import { StarCard, StarNineSliceButton, StarDialog, message } from 'stardew-valley-ui'
 
 function App() {
@@ -69,6 +71,43 @@ function App() {
   )
 }
 ```
+
+---
+
+## 在其他前端项目中使用
+
+只需在应用的全局入口（例如 Vite 的 `main.tsx`、Next.js 的根布局或应用样式入口）**引入一次**样式。组件库的内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式。
+
+```tsx
+// main.tsx / app/layout.tsx
+import 'stardew-valley-ui/style.css'
+```
+
+内置的默认按钮、季节按钮、日历背景、空状态和加载动画素材均随构建产物发布，安装 npm 包即可使用。传入 `backgroundSrc`、`imageSrc`、`src` 等自定义图片地址时，资源的部署与缓存策略由宿主项目负责；Vite 项目中推荐传入静态导入得到的 URL：
+
+```tsx
+import customButtonBackground from './assets/custom-button.png'
+import { StarNineSliceButton } from 'stardew-valley-ui'
+
+export function SaveButton() {
+  return <StarNineSliceButton backgroundSrc={customButtonBackground}>保存</StarNineSliceButton>
+}
+```
+
+`StarDialog`、`message`、画布背景和浏览器存储 Hooks 会在客户端访问 DOM、Canvas 或 Storage。使用 Next.js、RSC 等 SSR 框架时，请将调用它们的交互组件标记为客户端组件（`'use client'`）；不要在服务端渲染阶段调用命令式的 `message(...)`。
+
+### 公开组件一览
+
+| 分类 | 导出 |
+|------|------|
+| 容器与展示 | `StarCard`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
+| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
+| 反馈与浮层 | `StarDialog`、`StarPopup`、`message`、`StarTypewriter` |
+| 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
+
+完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
+
+更完整的素材、SSR / RSC 边界和维护者发布检查请见 [接入指南](docs/consumer-integration.md)。
 
 ---
 
@@ -847,6 +886,10 @@ import type {
   CalendarItem,
   StarDatePickerProps,
   StarDisplayFrameProps,
+  StarAvatarProps,
+  AvatarShape,
+  AvatarSize,
+  StarDividerProps,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,
@@ -855,6 +898,10 @@ import type {
   StarTabProps,
   StarTabItem,
   SwitchProps,
+  StarRatingProps,
+  RatingIcon,
+  StarProgressProps,
+  ProgressVariant,
   GapBorderCornerData,
   CreateGapBorderCornersOptions,
   StarInputProps,
@@ -876,8 +923,18 @@ bun run build:lib
 输出到 `dist/` 目录：
 - `stardew-valley-ui.mjs` — ESM 格式
 - `stardew-valley-ui.cjs` — CommonJS 格式
-- `style.css` — 样式文件
+- `stardew-valley-ui.css` — 样式文件（通过 `stardew-valley-ui/style.css` 导入）
 - `index.d.ts` — 类型声明
+- 内置像素素材 — 自动由组件引用（在 Vite 库构建中会随 JS 嵌入或作为构建资产输出）
+
+发布前执行：
+
+```bash
+bun run build:lib
+bun run verify:package
+```
+
+`verify:package` 会校验 ESM、CommonJS、类型和样式子路径导出是否真实存在，并确保内置素材已经打入库产物、未遗留演示站专用路径。
 
 ### 构建演示站
 

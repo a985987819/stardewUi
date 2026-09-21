@@ -6,6 +6,8 @@
  * exports, React Refresh falls back to a full page reload on every edit.
  */
 
+import loadingImageSrc from '../../assets/loadingBaozi.png'
+
 export const LOADING_FRAME_COUNT = 12
 export const LOADING_FRAME_DURATION = 240
 export const LOADING_DEFAULT_TEXT = '正在加载...'
@@ -23,7 +25,7 @@ export const BITE_SETTLE_DURATION = 300
 export const LOADING_VANISH_DURATION = 220
 export const LOADING_EMPTY_HOLD_DURATION = 420
 
-const LOADING_IMAGE_SRC = `${import.meta.env.BASE_URL}loadingBaozi.png`
+const LOADING_IMAGE_SRC = loadingImageSrc
 const FULL_CIRCLE = Math.PI * 2
 const START_ANGLE = -Math.PI / 2
 const BUN_EDGE_RATIO = 0

@@ -1,4 +1,7 @@
-import { resolveAssetPath } from './githubPages'
+import autumnButtonImageSrc from '../assets/autumnBtn.png'
+import springButtonImageSrc from '../assets/springBtn.png'
+import summerButtonImageSrc from '../assets/summerBtn.png'
+import winterButtonImageSrc from '../assets/winterBtn.png'
 
 type HTMLImageWithSize = HTMLImageElement & {
   naturalWidth: number
@@ -44,8 +47,7 @@ type DrawSeasonalButtonOptions = {
 const imageCache = new Map<string, Promise<LoadedImage>>()
 
 const loadImage = (src: string) => {
-  const resolvedSrc = resolveAssetPath(src)
-  const cached = imageCache.get(resolvedSrc)
+  const cached = imageCache.get(src)
   if (cached) {
     return cached
   }
@@ -61,13 +63,13 @@ const loadImage = (src: string) => {
       })
     }
     img.onerror = () => {
-      imageCache.delete(resolvedSrc)
-      reject(new Error(`Failed to load seasonal button image: ${resolvedSrc}`))
+      imageCache.delete(src)
+      reject(new Error(`Failed to load seasonal button image: ${src}`))
     }
-    img.src = resolvedSrc
+    img.src = src
   })
 
-  imageCache.set(resolvedSrc, loading)
+  imageCache.set(src, loading)
   return loading
 }
 
@@ -124,7 +126,7 @@ export const SEASONAL_BUTTON_PALETTES: Record<SeasonalButtonTheme, SeasonalButto
 
 const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceConfig> = {
   spring: {
-    src: '/springBtn.png',
+    src: springButtonImageSrc,
     leftCap: 36,
     rightCap: 36,
     topHeight: 70,
@@ -133,7 +135,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 220,
   },
   summer: {
-    src: '/summerBtn.png',
+    src: summerButtonImageSrc,
     leftCap: 34,
     rightCap: 34,
     topHeight: 62,
@@ -142,7 +144,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 232,
   },
   autumn: {
-    src: '/autumnBtn.png',
+    src: autumnButtonImageSrc,
     leftCap: 42,
     rightCap: 42,
     topHeight: 76,
@@ -151,7 +153,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 196,
   },
   winter: {
-    src: '/winterBtn.png',
+    src: winterButtonImageSrc,
     leftCap: 38,
     rightCap: 38,
     topHeight: 64,

@@ -22,5 +22,16 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": [
+    "src/index.ts",
+    "src/components/ui/**/*.ts",
+    "src/components/ui/**/*.tsx",
+    "src/hooks/**/*.ts",
+    "src/hooks/**/*.tsx",
+    "src/types/**/*.ts",
+    "src/utils/**/*.ts",
+    "src/vite-env.d.ts",
+    "src/types/style-modules.d.ts"
+  ],
+  "exclude": ["src/**/*.test.*", "src/test/**"]
 }

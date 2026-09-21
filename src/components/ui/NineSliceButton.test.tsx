@@ -162,7 +162,7 @@ describe('NineSliceButton', () => {
     const image = button.querySelector('img')
 
     expect(image).toBeNull()
-    expect(canvas).toHaveAttribute('data-src', '/btnImg.png')
+    expect(canvas).toHaveAttribute('data-src', expect.stringContaining('btnImg'))
     expect(canvas).toHaveAttribute('data-insets', '8,8,8,8')
   })
 
@@ -287,7 +287,7 @@ describe('NineSliceButton', () => {
 
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4E7')
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
-    expect(canvas).not.toHaveAttribute('data-src', '/defaultBtn.png')
-    expect(canvas).not.toHaveAttribute('data-src', '/btnImg.png')
+    expect(canvas).not.toHaveAttribute('data-src', expect.stringContaining('defaultBtn'))
+    expect(canvas).not.toHaveAttribute('data-src', expect.stringContaining('btnImg'))
   })
 })

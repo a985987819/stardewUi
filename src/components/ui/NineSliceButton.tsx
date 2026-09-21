@@ -11,6 +11,8 @@ import {
   type PointerEvent,
   type ReactNode,
 } from 'react'
+import defaultButtonImageSrc from '../../assets/defaultBtn.png'
+import regularButtonImageSrc from '../../assets/btnImg.png'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
 import { drawDefaultButtonBackground } from '../../utils/defaultButtonCanvas'
 import {
@@ -21,7 +23,6 @@ import {
   DEFAULT_BUTTON_FILL,
   DEFAULT_BUTTON_HOVER_FILL,
 } from '../../utils/defaultButtonTheme'
-import { resolveAssetPath } from '../../utils/githubPages'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
 
@@ -70,7 +71,7 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
 const cls = (...classNames: Array<string | false | undefined>) => classNames.filter(Boolean).join(' ')
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 const ICON_BUTTON_INSETS = { top: 80, right: 200, bottom: 80, left: 200 }
-const DEFAULT_BUTTON_IMAGE_SRC = resolveAssetPath('/defaultBtn.png')
+const DEFAULT_BUTTON_IMAGE_SRC = defaultButtonImageSrc
 
 const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
@@ -155,7 +156,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const usesRegularBackground = !isConcise && !usesPlainDefaultBackground && appearance !== 'classical' && !backgroundSrc
     const usesRegularImageBackground = usesRegularBackground && !usesPlainDefaultBackground && !hasIcon
     const usesRegularNineSliceBackground = usesRegularBackground && !usesPlainDefaultBackground && hasIcon
-    const resolvedBackgroundSrc = backgroundSrc ? resolveAssetPath(backgroundSrc) : resolveAssetPath('/btnImg.png')
+    const resolvedBackgroundSrc = backgroundSrc ?? regularButtonImageSrc
     const activeBackgroundSrc = usesRegularNineSliceBackground ? DEFAULT_BUTTON_IMAGE_SRC : resolvedBackgroundSrc
     const activeBackgroundInsets = usesRegularNineSliceBackground ? ICON_BUTTON_INSETS : backgroundInsets
     const [isHovered, setIsHovered] = useState(false)
