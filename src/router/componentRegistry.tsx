@@ -72,7 +72,7 @@ export interface ComponentRoute {
   element: LazyExoticComponent<() => ReactNode>
 }
 
-export const COMPONENT_ROUTES: ComponentRoute[] = [
+const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'avatar',
     component: 'Avatar',
@@ -272,3 +272,14 @@ export const COMPONENT_ROUTES: ComponentRoute[] = [
     element: StarDisplayFrameDemoPage,
   },
 ]
+
+/**
+ * Components that remain implemented and exported, but are temporarily kept
+ * out of the public gallery, sidebar, and generated routes while their visual
+ * direction is being revisited. Remove an entry here to publish it again.
+ */
+export const HIDDEN_COMPONENTS = ['Avatar', 'Switch'] as const
+
+export const COMPONENT_ROUTES: ComponentRoute[] = ALL_COMPONENT_ROUTES.filter(
+  ({ component }) => !(HIDDEN_COMPONENTS as readonly string[]).includes(component)
+)
