@@ -29,11 +29,35 @@ describe('Switch', () => {
     expect(screen.getByRole('switch', { name: 'Locked' })).toBeDisabled()
   })
 
-  it('sizes the track from the shared size table and tints the on state', () => {
+  it('sizes the framed track, moves the checked marker, and derives its palette', () => {
     render(<Switch size="large" color="#D7992E" checked aria-label="Mine lighting" />)
 
     const style = screen.getByRole('switch', { name: 'Mine lighting' }).style
-    expect(style.getPropertyValue('--switch-track-width')).toBe('52px')
+    expect(style.getPropertyValue('--switch-track-width')).toBe('70px')
     expect(style.getPropertyValue('--switch-on-color')).toBe('#D7992E')
+    expect(style.getPropertyValue('--switch-fill')).toBe('#D7992E')
+    expect(style.getPropertyValue('--switch-border')).not.toBe('')
+    expect(style.getPropertyValue('--switch-thumb-translate')).toBe('30px')
+  })
+
+  it('parks an unchecked marker at the left endpoint', () => {
+    render(<Switch size="large" aria-label="Closed gate" />)
+
+    expect(screen.getByRole('switch', { name: 'Closed gate' }).style.getPropertyValue('--switch-thumb-translate')).toBe('0px')
+  })
+
+  it('keeps the divider rail and progress-cell marker layers decorative', () => {
+    const { container } = render(<Switch checked aria-label="Gate latch" />)
+
+    expect(container.querySelectorAll('[class*="stardew-switch__rail"]')).toHaveLength(2)
+    expect(container.querySelector('[class*="stardew-switch__thumb"]')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('honours a consumer click handler that prevents the state change', () => {
+    const onChange = vi.fn()
+    render(<Switch onChange={onChange} onClick={(event) => event.preventDefault()} aria-label="Paused setting" />)
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Paused setting' }))
+    expect(onChange).not.toHaveBeenCalled()
   })
 })
