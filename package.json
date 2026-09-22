@@ -29,20 +29,27 @@
       "import": "./dist/stardew-valley-ui.mjs",
       "require": "./dist/stardew-valley-ui.cjs"
     },
-    "./style.css": "./dist/stardew-valley-ui.css"
+    "./style.css": "./dist/stardew-valley-ui.css",
+    "./auto": {
+      "types": "./dist/auto.d.ts",
+      "import": "./dist/stardew-valley-ui.auto.mjs",
+      "require": "./dist/stardew-valley-ui.auto.cjs"
+    }
   },
   "files": [
     "dist"
   ],
   "sideEffects": [
     "**/*.css",
-    "**/*.scss"
+    "**/*.scss",
+    "./dist/stardew-valley-ui.auto.mjs",
+    "./dist/stardew-valley-ui.auto.cjs"
   ],
   "scripts": {
     "dev": "bunx vite",
     "build": "bunx tsc -b && bun run check:components && bunx vite build && bun run check:motion && node scripts/prepare-github-pages.mjs",
     "build:app": "bunx tsc -b && bun run check:components && bunx vite build && bun run check:motion",
-    "build:lib": "bunx vite build --mode lib && bun run check:motion && bunx tsc -p tsconfig.lib.json",
+    "build:lib": "bunx vite build --mode lib && bun run check:motion && bunx tsc -p tsconfig.lib.json && node scripts/build-style-entry.mjs",
     "verify:package": "node scripts/verify-package.mjs",
     "gen:component": "bun scripts/new-component.mjs",
     "rm:component": "bun scripts/rm-component.mjs",

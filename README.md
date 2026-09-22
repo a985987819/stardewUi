@@ -34,11 +34,20 @@ yarn add stardew-valley-ui
 
 ### 1. 引入样式
 
-在入口文件中引入组件库样式：
+在应用的全局入口引入一次样式（**推荐**：样式进入宿主项目的构建产物，SSR 首屏不闪烁）：
 
 ```tsx
 import 'stardew-valley-ui/style.css'
 ```
+
+如果不想多写这一行，改用带**自动注入**的入口即可，组件导入写法完全一致：
+
+```tsx
+import { StarCard, StarNineSliceButton } from 'stardew-valley-ui/auto'
+// 样式会在模块加载时注入到 <style>，无需再 import css
+```
+
+两条路径**只选一条**。若项目同时保留了两者也不会重复加载（注入前会探测样式是否已在页面上）。选择建议见[接入指南](docs/consumer-integration.md#样式引入方式)。
 
 ### 2. 使用组件
 
@@ -80,12 +89,25 @@ function App() {
 
 ## 在其他前端项目中使用
 
-只需在应用的全局入口（例如 Vite 的 `main.tsx`、Next.js 的根布局或应用样式入口）**引入一次**样式。组件库的内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式。
+样式只需在应用里生效一次。组件库内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式。两种方式任选其一：
+
+| 方式 | 写法 | 适用场景 |
+| --- | --- | --- |
+| **显式样式入口**（推荐） | `import 'stardew-valley-ui/style.css'` + 从 `stardew-valley-ui` 导入组件 | 所有场景，尤其是 Next.js / SSR / 需要样式走构建产物或受 CSP 约束的项目 |
+| **自动注入入口** | 直接从 `stardew-valley-ui/auto` 导入组件 | 纯客户端应用（Vite / CRA 等），想省掉那一行 css 引用 |
 
 ```tsx
-// main.tsx / app/layout.tsx
+// 方式一：main.tsx / app/layout.tsx
 import 'stardew-valley-ui/style.css'
+import { StarCard } from 'stardew-valley-ui'
+
+// 方式二：省掉 css 引用
+import { StarCard } from 'stardew-valley-ui/auto'
 ```
+
+> 「自动注入」在模块加载时创建 `<style id="stardew-valley-ui-styles">`。代价是：SSR/SSG 首屏可能出现短暂无样式（样式在客户端才注入）、
+> 需要 `style-src 'unsafe-inline'` 的 CSP 放行。因此 SSR 项目仍建议用显式样式入口 —— 详细取舍见
+> [接入指南](docs/consumer-integration.md#样式引入方式)。
 
 内置的默认按钮、季节按钮、日历背景、空状态和加载动画素材均随构建产物发布，安装 npm 包即可使用。传入 `backgroundSrc`、`imageSrc`、`src` 等自定义图片地址时，资源的部署与缓存策略由宿主项目负责；Vite 项目中推荐传入静态导入得到的 URL：
 
@@ -1072,33 +1094,50 @@ import type {
 
 ## 构建与发布
 
-### 构建库
+### 构建库（发布到 npm）
 
 ```bash
 bun run build:lib
 ```
 
-输出到 `dist/` 目录：
-- `stardew-valley-ui.mjs` — ESM 格式
-- `stardew-valley-ui.cjs` — CommonJS 格式
-- `stardew-valley-ui.css` — 样式文件（通过 `stardew-valley-ui/style.css` 导入）
-- `index.d.ts` — 类型声明
-- 内置像素素材 — 自动由组件引用（在 Vite 库构建中会随 JS 嵌入或作为构建资产输出）
+输出到 `dist/`：
 
-发布前执行：
+| 文件 | 说明 |
+| --- | --- |
+| `stardew-valley-ui.mjs` | ESM 入口 |
+| `stardew-valley-ui.cjs` | CommonJS 入口 |
+| `stardew-valley-ui.css` | 样式文件（`stardew-valley-ui/style.css`） |
+| `stardew-valley-ui.auto.mjs` / `.auto.cjs` | 自动注入样式的入口（`stardew-valley-ui/auto`），由 `scripts/build-style-entry.mjs` 生成 |
+| `index.d.ts` / `auto.d.ts` 等 | 类型声明 |
+| 内置像素素材 | 随 JS 内联或作为 `dist/assets/**` 发出 |
+
+发布前执行校验，它会断言五个出口都存在、样式已内嵌进 `/auto` 入口、且没有把演示站资源路径带进包：
 
 ```bash
 bun run build:lib
 bun run verify:package
 ```
 
-`verify:package` 会校验 ESM、CommonJS、类型和样式子路径导出是否真实存在，并确保内置素材已经打入库产物、未遗留演示站专用路径。
+### 发布到 npm
+
+```bash
+npm publish --registry=https://registry.npmjs.org/ --access public
+```
+
+⚠️ **必须显式带 `--registry=https://registry.npmjs.org/`** —— 本机 `~/.npmrc` 保留了淘宝镜像用于装包，它是只读镜像，发布会被它接走而失败。
+
+首次发布还需要一个**启用了 Bypass 2FA 的 Granular Access Token**（npm 现在强制要求 2FA 或该令牌，否则返回 `E403`）。
+
+完整流程（令牌生成、版本号、发布后核验、常见报错对照、npm 政策时间表）见 **[docs/publishing.md](docs/publishing.md)**。
 
 ### 构建演示站
 
 ```bash
 bun run build:app
 ```
+
+`dist/` 是库产物与演示站产物**共用的目录，两种构建互相覆盖**：发布用 `build:lib`，跑演示站用 `build:app` / `build`。
+线上站点由 `.github/workflows/deploy-pages.yml` 在 CI 里自行构建，本地 `dist/` 的状态不影响它。
 
 ---
 
