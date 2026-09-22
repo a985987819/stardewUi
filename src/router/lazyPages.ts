@@ -34,3 +34,4 @@ export const StarDisplayFrameDemoPage = lazy(() => import('../pages/DisplayFrame
 export const StarAvatarDemoPage = lazy(() => import('../pages/AvatarDemo'))
 export const StarDividerDemoPage = lazy(() => import('../pages/DividerDemo'))
 export const StarDrawerDemoPage = lazy(() => import('../pages/DrawerDemo'))
+export const StarBackToTopDemoPage = lazy(() => import('../pages/BackToTopDemo'))

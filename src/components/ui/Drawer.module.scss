@@ -3,12 +3,19 @@
   transition:
     opacity 0.2s ease-out,
     transform 0.2s cubic-bezier(0.22, 0.8, 0.24, 1);
-  will-change: opacity, transform;
 }
 
+// `will-change` belongs on the state that animates, never on the resting state of
+// the whole app. It was not free here: `will-change: transform` turns
+// `[data-star-app]` into a containing block for `position: fixed` descendants, so
+// anything pinned to the viewport silently re-anchored to the *document*. The
+// StarBackToTop plane showed it — resting at the bottom of the page it read
+// `top: 909` (correct), but at the top of the page it read `top: 4706` on a 1005px
+// viewport, i.e. far outside the screen.
 :global([data-star-app='true'].stardew-drawer-page-focused) {
   opacity: 0.82;
   transform: scale(0.965);
+  will-change: opacity, transform;
 }
 
 .stardew-drawer-layer {

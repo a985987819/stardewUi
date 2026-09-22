@@ -342,6 +342,44 @@ function InventoryDrawer() {
 
 ---
 
+### StarBackToTop - 回到顶部
+
+页面滚动之后才浮现的像素纸飞机，机头朝着页面顶部；点击后它向上飞出去、同时淡到全透明，页面平滑回到顶部。图案画在 21 × 21 的像素网格上：左右两个 `#b2ccfa` 阶梯直角三角形，`#5899f1` 描边，中间一条 `#308be2` 脊线把两半连起来，机头是顶部那一个像素。一个美术像素固定等于 3px，所以那条描边正好是 3px，整张图 63 × 63。
+
+```tsx
+import { StarBackToTop } from 'stardew-valley-ui'
+
+// 默认：页面停在顶部时隐藏，一滚动就从右下角浮现
+<StarBackToTop />
+
+// 滚过 400px 才出现，并停在更高的位置
+<StarBackToTop threshold={400} bottom={140} />
+
+// 显示时机交给调用方，不再监听滚动
+<StarBackToTop visible={pinned} />
+
+// 监听某个滚动容器，而不是 window
+<StarBackToTop container={panelElement} />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| threshold | `number` | `0` | 滚动多少像素后浮现；`0` 即离开顶部就出现 |
+| bottom | `number` | `32` | 距视口底部的固定距离（px） |
+| right | `number` | `32` | 距视口右侧的固定距离（px） |
+| scrollBehavior | `'auto' \| 'instant' \| 'smooth'` | `'smooth'` | 回顶动画，`prefers-reduced-motion` 下强制瞬间跳转 |
+| visible | `boolean` | - | 传入后由调用方接管显示时机 |
+| container | `HTMLElement \| null` | `null` | 要监听的滚动容器，默认 `window` |
+| label | `string` | `'Back to top'` | 按钮的无障碍名称 |
+| children | `ReactNode` | 像素纸飞机 | 替换默认图案 |
+| onVisibleChange | `(visible: boolean) => void` | - | 浮现 / 隐藏时触发，挂载时也会触发一次 |
+
+隐藏期间组件仍留在 DOM 里（入场过渡需要挂载点），但会带上 `aria-hidden` 与 `tabIndex={-1}`，键盘和读屏都够不着。图案尺寸是固定的 63 × 63（21 个美术像素 × 3px），放大缩小会连带改掉描边粗细，所以没有 `size` 一类的属性。
+
+点击后纸飞机沿单调的 `cubic-bezier(0.4, 0, 0.7, 0.2)` 向上飞 48px，位移和透明度共用同一条曲线，所以两者同时到终点；整段 280ms，即 `BACK_TO_TOP_FLIGHT_MS`。飞完它不会闪回来：动画的结束状态一直保持到页面真的回到顶部、隐藏样式接管为止。`prefers-reduced-motion` 下整段动画关掉，纸飞机直接消失。用 `visible` 自己管显示时机的调用方可以拿 `BACK_TO_TOP_FLIGHT_MS` 对齐收尾动作——等动画放完再摘掉 `visible`。
+
+---
+
 ### message - 消息提示
 
 命令式调用的消息提示组件，支持多种类型和位置。

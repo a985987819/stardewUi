@@ -1,11 +1,12 @@
 import type { LazyExoticComponent, ReactNode } from 'react'
 import {
+  ArrowUp,
   Bell,
-  CircleUserRound,
-  Columns2,
   CalendarDays,
   CalendarRange,
   CheckSquare,
+  CircleUserRound,
+  Columns2,
   Frame,
   Gauge,
   Heart,
@@ -23,15 +24,16 @@ import {
 } from 'lucide-react'
 import type { Lang } from '../i18n'
 import {
-  StarCalendarDemoPage,
-  StarCheckboxDemoPage,
   StarAvatarDemoPage,
-  StarDividerDemoPage,
+  StarBackToTopDemoPage,
+  StarCalendarDemoPage,
   StarCardDemoPage,
+  StarCheckboxDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
-  StarDrawerDemoPage,
   StarDisplayFrameDemoPage,
+  StarDividerDemoPage,
+  StarDrawerDemoPage,
   StarEmptyStateDemoPage,
   StarInputDemoPage,
   StarLoadingDemoPage,
@@ -375,6 +377,19 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <Frame size={20} />,
     element: StarDisplayFrameDemoPage,
+  },
+  {
+    routePath: 'back-to-top',
+    component: 'BackToTop',
+    category: 'navigation',
+    usageRank: 2,
+    title: { zh: '回到顶部', en: 'BackToTop' },
+    desc: {
+      zh: '页面滚动后浮现的像素纸飞机，一点就回到页面顶部。',
+      en: 'A pixel paper plane that floats in once the page scrolls and takes you back to the top.',
+    },
+    icon: <ArrowUp size={20} />,
+    element: StarBackToTopDemoPage,
   },
 ]
 

@@ -1,0 +1,119 @@
+// The plane keeps the ink palette of its own artwork (`backToTopArt.ts`) rather
+// than the page theme: the three blues are the drawing, not a skin. Only the
+// focus ring needs a colour from the stylesheet, and it reuses the centre ridge.
+$focus: var(--star-raw-hex-308be2);
+$shadow: var(--star-raw-rgba-0-0-0-0-2);
+
+// The fly-away played on click: the plane climbs out of its corner and fades away.
+// `$flight-duration` must stay equal to `BACK_TO_TOP_FLIGHT_MS` in `BackToTop.tsx`
+// — the component schedules its hand-off with that number, and a test locks the
+// pair together.
+$flight-rise: 48px;
+$flight-duration: 280ms;
+// One monotonic ease-in-out shared by the climb and the fade, so both reach their
+// end at the same moment. It must stay monotonic: an overshooting curve (a
+// negative `y2`) would pull the opacity down to 0 and bounce it back to 1, and
+// the eye would be left with nothing but the climb.
+$flight-ease: cubic-bezier(0.4, 0, 0.7, 0.2);
+
+.star-back-to-top {
+  position: fixed;
+  right: var(--star-back-to-top-right, 32px);
+  bottom: var(--star-back-to-top-bottom, 32px);
+  // Above the page chrome (sidebar, sticky outline, footer) but below the
+  // portal layers that Dialog and Drawer own.
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  // Hidden state: still mounted, so the entrance can animate, but it can neither
+  // be clicked nor seen. The component pairs this with `aria-hidden` and
+  // `tabIndex={-1}`, so a hidden plane is unreachable from the keyboard too.
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  // `steps()` rather than an ease: the plane should teleport in whole pixels,
+  // like every other transition in the kit.
+  transition:
+    opacity 0.2s steps(5),
+    transform 0.2s steps(5);
+
+  &--visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  // Flying away. The component has already dropped `--visible` by the time this
+  // lands, so what sits underneath is the hidden style — `opacity: 0`. The
+  // animation owns both properties for its duration and `forwards` holds the end
+  // state afterwards; the component only removes the attribute once the page has
+  // really arrived back at the top, so the plane cannot blink into view halfway
+  // through the scroll. Under `prefers-reduced-motion` the animation is switched
+  // off below, which leaves the hidden style in charge: the plane is simply gone,
+  // which is the instant result that setting asks for.
+  &[data-motion='flying'] {
+    animation: star-back-to-top-flight $flight-duration $flight-ease forwards;
+    pointer-events: none;
+  }
+
+  &__art {
+    display: flex;
+    // One level deeper than the root on purpose: the root owns the show/hide
+    // transform, this owns the hover/press nudge, so neither can overwrite the
+    // other halfway through an animation.
+    transition: transform 0.12s steps(2);
+  }
+
+  &__plane {
+    display: block;
+    // A hard offset shadow, not a blur — a soft glow would be the only
+    // non-pixel edge in the whole drawing.
+    filter: drop-shadow(3px 3px 0 $shadow);
+  }
+
+  &:hover &__art,
+  &:focus-visible &__art {
+    transform: translateY(-3px);
+  }
+
+  &:active &__art {
+    transform: translateY(3px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $focus;
+    outline-offset: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &[data-motion='flying'] {
+      animation: none;
+    }
+
+    &__art {
+      transition: none;
+    }
+  }
+}
+
+@keyframes star-back-to-top-flight {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    // Negative Y is up: the plane climbs the same distance it is tall, while the
+    // shared timing function takes the opacity down at exactly the same rate.
+    opacity: 0;
+    transform: translateY(-$flight-rise);
+  }
+}
