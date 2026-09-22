@@ -255,8 +255,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     usageRank: 2,
     title: { zh: '加载', en: 'Loading' },
     desc: {
-      zh: '包子被一口口吃掉的加载反馈，让等待也像小游戏。',
-      en: 'A bun-bite loading indicator that turns waiting into a tiny game loop.',
+      zh: '洒水器带动八株胡萝卜一圈圈成熟的加载反馈，让等待也像小游戏。',
+      en: 'A sprinkler-grown carrot garden that turns waiting into a tiny game loop.',
     },
     icon: <LoaderCircle size={20} />,
     element: StarLoadingDemoPage,
