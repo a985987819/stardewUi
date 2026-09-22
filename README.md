@@ -272,6 +272,14 @@ import { StarDialog } from 'stardew-valley-ui'
   typewriter={false}
   onClose={() => setOpen(false)}
 />
+
+// 屏幕下方居中，并占满可用宽度
+<StarDialog
+  open={open}
+  placement="bottom"
+  content="明天再来继续探索吧。"
+  onClose={() => setOpen(false)}
+/>
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -282,6 +290,8 @@ import { StarDialog } from 'stardew-valley-ui'
 | image | `string` | - | 角色头像 |
 | name | `string` | - | 角色名称 |
 | actions | `DialogAction[] \| null` | - | 操作按钮，null 则不显示 |
+| mask | `'dark' \| 'light'` | `'dark'` | 遮罩风格 |
+| placement | `'center' \| 'bottom'` | `'center'` | 屏幕位置；`bottom` 在下方居中并占满可用宽度 |
 | maskClosable | `boolean` | `true` | 点击遮罩是否关闭 |
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |
@@ -923,6 +933,7 @@ import type {
   NineSliceButtonTheme,
   StarCardProps,
   StarDialogProps,
+  DialogPlacement,
   StarDrawerProps,
   DrawerPlacement,
   MessageProps,

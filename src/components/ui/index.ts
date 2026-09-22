@@ -1,6 +1,6 @@
 export { StarCard, StarCardImage, StarCardMeta } from './Card'
 export { default as StarDialog } from './Dialog'
-export type { DialogMask, StarDialogProps, DialogAction } from './Dialog'
+export type { DialogMask, DialogPlacement, StarDialogProps, DialogAction } from './Dialog'
 export { default as StarDrawer } from './Drawer'
 export type { DrawerPlacement, StarDrawerProps } from './Drawer'
 export { default as StarEmptyState } from './EmptyState'

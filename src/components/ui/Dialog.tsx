@@ -15,6 +15,7 @@ export interface DialogAction {
 }
 
 export type DialogMask = 'dark' | 'light'
+export type DialogPlacement = 'center' | 'bottom'
 
 export interface StarDialogProps {
   open: boolean
@@ -25,6 +26,8 @@ export interface StarDialogProps {
   actions?: DialogAction[] | null
   /** Backdrop tone. `dark` preserves focus; `light` keeps the page context visible. */
   mask?: DialogMask
+  /** Viewport position. `bottom` centers the dialog along the lower edge at full available width. */
+  placement?: DialogPlacement
   maskClosable?: boolean
   typewriter?: boolean
   typewriterSpeed?: number
@@ -54,6 +57,7 @@ function StarDialog({
   name,
   actions,
   mask = 'dark',
+  placement = 'center',
   maskClosable = true,
   typewriter = true,
   typewriterSpeed = 100,
@@ -207,9 +211,7 @@ function StarDialog({
 
   if (!open) return null
 
-  const portalTarget = typeof document !== 'undefined'
-    ? (document.querySelector('[data-star-app="true"]') ?? document.body)
-    : null
+  const portalTarget = typeof document !== 'undefined' ? document.body : null
 
   if (!portalTarget) return null
   const dialogLabel = typeof title === 'string' ? title : undefined
@@ -219,12 +221,13 @@ function StarDialog({
       className={classNames(
         styles['stardew-dialog-overlay'],
         styles[`stardew-dialog-overlay--${mask}`],
+        styles[`stardew-dialog-overlay--${placement}`],
         maskClosable && styles['stardew-dialog-overlay--clickable']
       )}
       onClick={handleOverlayClick}
     >
       <div
-        className={styles['stardew-dialog']}
+        className={classNames(styles['stardew-dialog'], styles[`stardew-dialog--${placement}`])}
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel}
