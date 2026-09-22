@@ -14,6 +14,8 @@ export interface DialogAction {
   onClick?: () => void
 }
 
+export type DialogMask = 'dark' | 'light'
+
 export interface StarDialogProps {
   open: boolean
   title?: string
@@ -21,6 +23,8 @@ export interface StarDialogProps {
   image?: string
   name?: string
   actions?: DialogAction[] | null
+  /** Backdrop tone. `dark` preserves focus; `light` keeps the page context visible. */
+  mask?: DialogMask
   maskClosable?: boolean
   typewriter?: boolean
   typewriterSpeed?: number
@@ -49,6 +53,7 @@ function StarDialog({
   image,
   name,
   actions,
+  mask = 'dark',
   maskClosable = true,
   typewriter = true,
   typewriterSpeed = 100,
@@ -211,7 +216,11 @@ function StarDialog({
 
   return createPortal(
     <div
-      className={classNames(styles['stardew-dialog-overlay'], maskClosable && styles['stardew-dialog-overlay--clickable'])}
+      className={classNames(
+        styles['stardew-dialog-overlay'],
+        styles[`stardew-dialog-overlay--${mask}`],
+        maskClosable && styles['stardew-dialog-overlay--clickable']
+      )}
       onClick={handleOverlayClick}
     >
       <div

@@ -1,0 +1,15 @@
+.drawer-demo {
+  &__direction-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(132px, 1fr));
+    gap: 12px;
+    width: min(100%, 360px);
+  }
+
+  &__copy {
+    margin: 0;
+    padding: 12px;
+    background: rgba(255, 249, 223, 0.32);
+    border: 3px solid rgba(122, 76, 36, 0.22);
+  }
+}

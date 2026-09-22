@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Dialog from './Dialog'
+import styles from './Dialog.module.scss'
 
 describe('Dialog', () => {
   beforeEach(() => {
@@ -211,6 +212,26 @@ describe('Dialog', () => {
   })
 
   describe('遮罩层关闭', () => {
+    it('defaults to a dark backdrop mask', async () => {
+      render(<Dialog open={true} content="内容" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('内容')).toBeInTheDocument()
+      })
+
+      expect(document.querySelector(`.${styles['stardew-dialog-overlay--dark']}`)).toBeInTheDocument()
+    })
+
+    it('renders a light backdrop mask when requested', async () => {
+      render(<Dialog open={true} content="内容" mask="light" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('内容')).toBeInTheDocument()
+      })
+
+      expect(document.querySelector(`.${styles['stardew-dialog-overlay--light']}`)).toBeInTheDocument()
+    })
+
     it('点击遮罩层应该触发onClose', async () => {
       const handleClose = vi.fn()
       const { container } = render(

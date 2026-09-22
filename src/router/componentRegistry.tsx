@@ -14,6 +14,7 @@ import {
   MessageSquare,
   MessageSquareMore,
   MousePointer,
+  PanelRightOpen,
   Square,
   TextCursorInput,
   ToggleRight,
@@ -27,6 +28,7 @@ import {
   StarCardDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
+  StarDrawerDemoPage,
   StarDisplayFrameDemoPage,
   StarEmptyStateDemoPage,
   StarInputDemoPage,
@@ -149,6 +151,17 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <MessageSquare size={20} />,
     element: StarDialogDemoPage,
+  },
+  {
+    routePath: 'drawer',
+    component: 'Drawer',
+    title: { zh: '抽屉', en: 'Drawer' },
+    desc: {
+      zh: '从页面四边滑入的像素抽屉，适合编辑、筛选和上下文操作。',
+      en: 'Pixel drawers that slide in from any edge for editing, filters, and contextual actions.',
+    },
+    icon: <PanelRightOpen size={20} />,
+    element: StarDrawerDemoPage,
   },
   {
     routePath: 'popup',

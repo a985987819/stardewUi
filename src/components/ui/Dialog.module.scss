@@ -7,10 +7,18 @@
   justify-content: center;
   padding: 32px 20px;
   isolation: isolate;
-  background: rgba(43, 24, 10, 0.9);
   backdrop-filter: blur(4px);
   overflow-y: auto;
   overscroll-behavior: contain;
+
+  &--dark {
+    background: rgba(43, 24, 10, 0.84);
+  }
+
+  &--light {
+    background: rgba(251, 235, 200, 0.68);
+    backdrop-filter: blur(2px);
+  }
 
   &--clickable {
     cursor: pointer;
@@ -20,7 +28,7 @@
 .stardew-dialog {
   position: relative;
   z-index: 1;
-  width: min(1080px, 100%);
+  width: min(760px, 100%);
   cursor: default;
 
   &__shell {
@@ -31,7 +39,7 @@
     display: flex;
     align-items: stretch;
     gap: 4px;
-    min-height: 350px;
+    min-height: 260px;
   }
 
   &__content-panel {
@@ -41,7 +49,7 @@
     gap: 4px;
     min-width: 0;
     min-height: 0;
-    padding: 18px 20px;
+    padding: 14px 16px;
     background:
       linear-gradient(180deg, rgba(255, 249, 235, 0.22), rgba(215, 119, 15, 0.08)),
       rgba(255, 247, 226, 0.14);
@@ -53,7 +61,7 @@
 
   &__content {
     flex: 1;
-    min-height: 250px;
+    min-height: 170px;
     color: #4f2b17;
     font-size: 1em;
     line-height: 1.6;
@@ -108,7 +116,7 @@
 
   &__sidebar {
     display: flex;
-    width: 232px;
+    width: 188px;
     flex-shrink: 0;
     flex-direction: column;
     gap: 4px;
@@ -128,13 +136,13 @@
 
   &__image-panel {
     flex: 1;
-    min-height: 282px;
+    min-height: 212px;
   }
 
   &__image-wrap {
     width: 100%;
     height: 100%;
-    min-height: 254px;
+    min-height: 184px;
     overflow: hidden;
     background: rgba(255, 245, 220, 0.5);
     border: 2px solid rgba(157, 65, 0, 0.22);
@@ -151,7 +159,7 @@
 
   &__name {
     display: flex;
-    min-height: 68px;
+    min-height: 54px;
     align-items: center;
     justify-content: center;
     text-align: center;

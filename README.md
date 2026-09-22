@@ -102,7 +102,7 @@ export function SaveButton() {
 |------|------|
 | 容器与展示 | `StarCard`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
 | 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
-| 反馈与浮层 | `StarDialog`、`StarPopup`、`message`、`StarTypewriter` |
+| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
 
 完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
@@ -286,6 +286,49 @@ import { StarDialog } from 'stardew-valley-ui'
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |
 | onClose | `() => void` | - | 关闭回调 |
+
+---
+
+### StarDrawer - 抽屉
+
+从页面四边滑入的受控像素抽屉。开启时会默认缩小并柔化原页面，抽屉自身通过 body portal 保持完整尺寸；传入 `focusEffect={false}` 可关闭此视觉聚焦。
+
+```tsx
+import { useState } from 'react'
+import { StarDrawer, StarNineSliceButton } from 'stardew-valley-ui'
+
+function InventoryDrawer() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>打开背包</StarNineSliceButton>
+      <StarDrawer
+        open={open}
+        placement="right"
+        title="农场背包"
+        footer={<span>12 / 24 格</span>}
+        onClose={() => setOpen(false)}
+      >
+        <p>这里可以放置任意 React 内容。</p>
+      </StarDrawer>
+    </>
+  )
+}
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| open | `boolean` | - | 受控可见状态 |
+| placement | `'top' \| 'right' \| 'bottom' \| 'left'` | `'right'` | 抽屉进入方向 |
+| title | `ReactNode` | - | 可选标题 |
+| footer | `ReactNode` | - | 可选固定页脚 |
+| children | `ReactNode` | - | 抽屉主体内容 |
+| className | `string` | - | 添加到抽屉面板的类名 |
+| maskStyle | `CSSProperties` | - | 覆盖遮罩层的内联样式 |
+| focusEffect | `boolean` | `true` | 是否缩小并柔化原页面 |
+| maskClosable | `boolean` | `true` | 点击遮罩是否请求关闭 |
+| onClose | `() => void` | - | 点击关闭按钮、遮罩或 Escape 时触发 |
 
 ---
 
@@ -880,6 +923,8 @@ import type {
   NineSliceButtonTheme,
   StarCardProps,
   StarDialogProps,
+  StarDrawerProps,
+  DrawerPlacement,
   MessageProps,
   MessageType,
   StarCalendarProps,
