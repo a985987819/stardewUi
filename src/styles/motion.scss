@@ -1,0 +1,90 @@
+// Shared component-motion library. Keep reusable state-change timing and
+// keyframes here so Checkbox, Progress, and Rating do not slowly diverge.
+// Components refer to the names through CSS variables because CSS Modules would
+// otherwise scope an animation identifier independently in every module.
+:root {
+  --star-motion-mask-reveal-name: star-motion-mask-reveal;
+  --star-motion-pop-in-name: star-motion-pop-in;
+  --star-motion-loss-shake-name: star-motion-loss-shake;
+  --star-motion-loss-shrink-name: star-motion-loss-shrink;
+
+  --star-motion-mask-reveal-duration: 360ms;
+  --star-motion-pop-in-duration: 360ms;
+  // Rating's former 540ms removal is deliberately halved. Checkbox uses this
+  // same exit sequence, so its red check now leaves at the matching tempo.
+  --star-motion-loss-duration: 270ms;
+}
+
+// Checkbox entrance: a literal left-to-right mask which holds back most of the
+// glyph initially, then travels quickly through the finishing stretch.
+@keyframes star-motion-mask-reveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    transform: scale(0.92);
+  }
+
+  38% {
+    clip-path: inset(0 78% 0 0);
+    transform: scale(0.98);
+  }
+
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: scale(1);
+  }
+}
+
+// Progress cells and newly earned Rating icons share this 0 → 1.1 → 1 beat.
+@keyframes star-motion-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  68% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// First half of the shared loss sequence: a quick three-step wobble.
+@keyframes star-motion-loss-shake {
+  0%,
+  58%,
+  100% {
+    transform: translateX(0);
+  }
+
+  12% { transform: translateX(-2px); }
+  28% { transform: translateX(2px); }
+  44% { transform: translateX(-2px); }
+}
+
+// Second half: a small swell followed by synchronized shrink and fade.
+@keyframes star-motion-loss-shrink {
+  0%,
+  58% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  68% {
+    opacity: 0.92;
+    transform: scale(1.1);
+  }
+
+  84% {
+    opacity: 0.4;
+    transform: scale(0.6);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}

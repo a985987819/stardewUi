@@ -1,10 +1,12 @@
 import type { LazyExoticComponent, ReactNode } from 'react'
 import {
+  ArrowUp,
   Bell,
-  CircleUserRound,
-  Columns2,
   CalendarDays,
   CalendarRange,
+  CheckSquare,
+  CircleUserRound,
+  Columns2,
   Frame,
   Gauge,
   Heart,
@@ -22,14 +24,16 @@ import {
 } from 'lucide-react'
 import type { Lang } from '../i18n'
 import {
-  StarCalendarDemoPage,
   StarAvatarDemoPage,
-  StarDividerDemoPage,
+  StarBackToTopDemoPage,
+  StarCalendarDemoPage,
   StarCardDemoPage,
+  StarCheckboxDemoPage,
   StarDatePickerDemoPage,
   StarDialogDemoPage,
-  StarDrawerDemoPage,
   StarDisplayFrameDemoPage,
+  StarDividerDemoPage,
+  StarDrawerDemoPage,
   StarEmptyStateDemoPage,
   StarInputDemoPage,
   StarLoadingDemoPage,
@@ -70,6 +74,8 @@ export interface ComponentRoute {
   component: string
   /** Keeps the sidebar and gallery in a familiar product-development order. */
   category: ComponentCatalogueCategory
+  /** Smaller ranks are shown first inside each category. */
+  usageRank: number
   title: Record<Lang, string>
   desc: Record<Lang, string>
   icon: ReactNode
@@ -83,15 +89,29 @@ export interface ComponentRoute {
  */
 export const COMPONENT_CATALOGUE_CATEGORIES = [
   'common',
-  'form',
+  'layout',
   'navigation',
+  'data-entry',
   'data-display',
-  'overlay',
   'feedback',
-  'utility',
+  'other',
 ] as const
 
 export type ComponentCatalogueCategory = (typeof COMPONENT_CATALOGUE_CATEGORIES)[number]
+
+/** Labels travel with the catalogue so the sidebar never needs a second map. */
+export const COMPONENT_CATALOGUE_CATEGORY_META: Record<
+  ComponentCatalogueCategory,
+  Record<Lang, string>
+> = {
+  common: { zh: '通用', en: 'General' },
+  layout: { zh: '布局', en: 'Layout' },
+  navigation: { zh: '导航', en: 'Navigation' },
+  'data-entry': { zh: '数据录入', en: 'Data Entry' },
+  'data-display': { zh: '数据展示', en: 'Data Display' },
+  feedback: { zh: '反馈', en: 'Feedback' },
+  other: { zh: '其他', en: 'Other' },
+}
 
 const COMPONENT_CATALOGUE_CATEGORY_ORDER = new Map(
   COMPONENT_CATALOGUE_CATEGORIES.map((category, index) => [category, index])
@@ -102,6 +122,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'avatar',
     component: 'Avatar',
     category: 'data-display',
+    usageRank: 4,
     title: { zh: '头像', en: 'Avatar' },
     desc: {
       zh: '带多层木纹与受光边框的像素头像，支持方框和圆框。',
@@ -113,7 +134,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'divider',
     component: 'Divider',
-    category: 'utility',
+    category: 'layout',
+    usageRank: 2,
     title: { zh: '分割线', en: 'Divider' },
     desc: {
       zh: '由像素木栅栏等距排列组成的分割线，默认按容器宽度自动铺满。',
@@ -126,6 +148,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'button',
     component: 'NineSliceButton',
     category: 'common',
+    usageRank: 1,
     title: { zh: '按钮', en: 'Button' },
     desc: {
       zh: '像工具栏一样可靠的九宫格按钮，适合确认、交易、升级和危险操作。',
@@ -138,6 +161,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'calendar',
     component: 'Calendar',
     category: 'data-display',
+    usageRank: 1,
     title: { zh: '日历', en: 'Calendar' },
     desc: {
       zh: '把节日、收获日和村民生日钉在月历上，别再错过花舞节。',
@@ -149,7 +173,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'date-picker',
     component: 'DatePicker',
-    category: 'form',
+    category: 'data-entry',
+    usageRank: 3,
     title: { zh: '日期选择', en: 'DatePicker' },
     desc: {
       zh: '选择播种日或规划一段采矿假期，并返回稳定的标准化时间戳。',
@@ -161,7 +186,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'card',
     component: 'Card',
-    category: 'common',
+    category: 'layout',
+    usageRank: 1,
     title: { zh: '卡片', en: 'Card' },
     desc: {
       zh: '像公告栏纸条一样承载任务、物品、提示和操作区。',
@@ -173,7 +199,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'dialog',
     component: 'Dialog',
-    category: 'common',
+    category: 'feedback',
+    usageRank: 3,
     title: { zh: '对话框', en: 'Dialog' },
     desc: {
       zh: '用于 NPC 台词、剧情提示和确认流程的像素对话面板。',
@@ -185,7 +212,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'drawer',
     component: 'Drawer',
-    category: 'common',
+    category: 'feedback',
+    usageRank: 4,
     title: { zh: '抽屉', en: 'Drawer' },
     desc: {
       zh: '从页面四边滑入的像素抽屉，适合编辑、筛选和上下文操作。',
@@ -197,7 +225,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'popup',
     component: 'Popup',
-    category: 'overlay',
+    category: 'feedback',
+    usageRank: 5,
     title: { zh: '弹窗', en: 'Popup' },
     desc: {
       zh: '像气泡提示一样贴近目标，适合展示奖励、状态和小提示。',
@@ -209,7 +238,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'typewriter',
     component: 'Typewriter',
-    category: 'utility',
+    category: 'other',
+    usageRank: 1,
     title: { zh: '打字机', en: 'Typewriter' },
     desc: {
       zh: '让文本像 NPC 逐字说话一样出现，适合剧情、引导和成就提示。',
@@ -222,6 +252,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'loading',
     component: 'Loading',
     category: 'feedback',
+    usageRank: 2,
     title: { zh: '加载', en: 'Loading' },
     desc: {
       zh: '包子被一口口吃掉的加载反馈，让等待也像小游戏。',
@@ -234,6 +265,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'message',
     component: 'Message',
     category: 'feedback',
+    usageRank: 1,
     title: { zh: '消息', en: 'Message' },
     desc: {
       zh: '像右下角收获提示一样，轻量展示成功、警告和错误反馈。',
@@ -246,6 +278,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'empty-state',
     component: 'EmptyState',
     category: 'feedback',
+    usageRank: 6,
     title: { zh: '空状态', en: 'EmptyState' },
     desc: {
       zh: '背包空了、搜索没结果、任务板暂无委托时，用它保持页面友好。',
@@ -258,6 +291,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'tab',
     component: 'Tab',
     category: 'navigation',
+    usageRank: 1,
     title: { zh: '选项卡', en: 'Tab' },
     desc: {
       zh: '用季节、区域或任务分类切换内容，像翻看农场手册。',
@@ -269,7 +303,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'rating',
     component: 'Rating',
-    category: 'form',
+    category: 'data-entry',
+    usageRank: 4,
     title: { zh: '评分', en: 'Rating' },
     desc: {
       zh: '用像素爱心或星星记录好感与评价，支持半格评分和禁用状态。',
@@ -282,6 +317,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'progress',
     component: 'Progress',
     category: 'data-display',
+    usageRank: 2,
     title: { zh: '进度条', en: 'Progress' },
     desc: {
       zh: '农场 HUD 风格的像素进度条，可自定义体力、危险或成熟度颜色。',
@@ -293,7 +329,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'switch',
     component: 'Switch',
-    category: 'form',
+    category: 'data-entry',
+    usageRank: 2,
     title: { zh: '开关', en: 'Switch' },
     desc: {
       zh: '像素药丸形状的开关，用来点亮灯、开启自动浇水或切换难度。',
@@ -303,9 +340,23 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     element: StarSwitchDemoPage,
   },
   {
+    routePath: 'checkbox',
+    component: 'Checkbox',
+    category: 'data-entry',
+    usageRank: 2,
+    title: { zh: '多选框', en: 'Checkbox' },
+    desc: {
+      zh: 'Card 风格方框承托红色对勾的多选控件，支持横竖排列、禁用项、尺寸和圆框。',
+      en: 'Card-framed multi-select checks with red reveal motion, layouts, disabled options, sizes, and round frames.',
+    },
+    icon: <CheckSquare size={20} />,
+    element: StarCheckboxDemoPage,
+  },
+  {
     routePath: 'input',
     component: 'Input',
-    category: 'common',
+    category: 'data-entry',
+    usageRank: 1,
     title: { zh: '输入框', en: 'Input' },
     desc: {
       zh: '木框凹陷的像素输入框，用来写农场名、村民昵称或给皮埃尔留言。',
@@ -318,6 +369,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'display-frame',
     component: 'DisplayFrame',
     category: 'data-display',
+    usageRank: 3,
     title: { zh: '展示框', en: 'DisplayFrame' },
     desc: {
       zh: '像田间立牌一样醒目的像素边框，用来托住要展示的数字和指标。',
@@ -325,6 +377,19 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <Frame size={20} />,
     element: StarDisplayFrameDemoPage,
+  },
+  {
+    routePath: 'back-to-top',
+    component: 'BackToTop',
+    category: 'navigation',
+    usageRank: 2,
+    title: { zh: '回到顶部', en: 'BackToTop' },
+    desc: {
+      zh: '页面滚动后浮现的像素纸飞机，一点就回到页面顶部。',
+      en: 'A pixel paper plane that floats in once the page scrolls and takes you back to the top.',
+    },
+    icon: <ArrowUp size={20} />,
+    element: StarBackToTopDemoPage,
   },
 ]
 
@@ -338,7 +403,11 @@ export const HIDDEN_COMPONENTS = ['Avatar', 'Switch'] as const
 export const COMPONENT_ROUTES: ComponentRoute[] = ALL_COMPONENT_ROUTES
   .filter(({ component }) => !(HIDDEN_COMPONENTS as readonly string[]).includes(component))
   .toSorted(
-    (left, right) =>
-      (COMPONENT_CATALOGUE_CATEGORY_ORDER.get(left.category) ?? Infinity) -
-      (COMPONENT_CATALOGUE_CATEGORY_ORDER.get(right.category) ?? Infinity)
+    (left, right) => {
+      const categoryOrder =
+        (COMPONENT_CATALOGUE_CATEGORY_ORDER.get(left.category) ?? Infinity) -
+        (COMPONENT_CATALOGUE_CATEGORY_ORDER.get(right.category) ?? Infinity)
+
+      return categoryOrder || left.usageRank - right.usageRank || left.title.en.localeCompare(right.title.en)
+    }
   )

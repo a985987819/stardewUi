@@ -7,7 +7,12 @@ import { afterEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { I18nProvider } from '../i18n'
 import StarSidebar from '../components/layout/Sidebar'
-import { COMPONENT_CATALOGUE_CATEGORIES, COMPONENT_ROUTES, HIDDEN_COMPONENTS } from './componentRegistry'
+import {
+  COMPONENT_CATALOGUE_CATEGORIES,
+  COMPONENT_CATALOGUE_CATEGORY_META,
+  COMPONENT_ROUTES,
+  HIDDEN_COMPONENTS,
+} from './componentRegistry'
 
 /**
  * The component library publishes one component through five files. This suite
@@ -71,17 +76,16 @@ describe('component catalogue sync', () => {
     }
   })
 
-  it('orders common components before specialised catalogue categories', () => {
+  it('orders standard component categories and each category by usage frequency', () => {
     const categoryIndexes = COMPONENT_ROUTES.map((entry) => COMPONENT_CATALOGUE_CATEGORIES.indexOf(entry.category))
 
     expect(categoryIndexes).toEqual(categoryIndexes.toSorted((left, right) => left - right))
-    expect(COMPONENT_ROUTES.slice(0, 5).map(({ routePath }) => routePath)).toEqual([
-      'button',
-      'card',
-      'dialog',
-      'drawer',
-      'input',
-    ])
+    for (const category of COMPONENT_CATALOGUE_CATEGORIES) {
+      const entries = COMPONENT_ROUTES.filter((entry) => entry.category === category)
+      expect(entries.map(({ usageRank }) => usageRank)).toEqual(entries.map(({ usageRank }) => usageRank).toSorted())
+      expect(COMPONENT_CATALOGUE_CATEGORY_META[category].zh).toBeTruthy()
+      expect(COMPONENT_CATALOGUE_CATEGORY_META[category].en).toBeTruthy()
+    }
   })
 
   it('describes every entry in both languages', () => {
@@ -172,7 +176,7 @@ describe('component catalogue sync', () => {
     // of the component list (which is how `/components/switch` went missing).
     expect(routerIndex, 'router must map COMPONENT_ROUTES').toContain('COMPONENT_ROUTES.map')
     expect(gallery, 'gallery must map COMPONENT_ROUTES').toContain('COMPONENT_ROUTES.map')
-    expect(sidebar, 'sidebar must map COMPONENT_ROUTES').toContain('COMPONENT_ROUTES.map')
+    expect(sidebar, 'sidebar must derive grouped entries from COMPONENT_ROUTES').toContain('COMPONENT_ROUTES\n        .filter')
     expect(sidebar, 'sidebar labels must come from the catalogue, not i18n keys').not.toContain("t('sidebar.")
   })
 })

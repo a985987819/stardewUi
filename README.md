@@ -342,6 +342,50 @@ function InventoryDrawer() {
 
 ---
 
+### StarBackToTop - 回到顶部
+
+页面滚动之后才浮现的像素纸飞机，机头朝着页面顶部；点击后它向上飞出去、同时淡到全透明，页面平滑回到顶部。图案画在 21 × 21 的像素网格上：左右两个 `#b2ccfa` 阶梯直角三角形，`#5899f1` 描边，中间一条 `#308be2` 脊线把两半连起来，机头是顶部那一个像素。一个美术像素固定等于 3px，所以那条描边正好是 3px，整张图 63 × 63。
+
+```tsx
+import { StarBackToTop } from 'stardew-valley-ui'
+
+// 默认：页面停在顶部时隐藏，一滚动就从右下角浮现
+<StarBackToTop />
+
+// 滚过 400px 才出现，并停在更高的位置
+<StarBackToTop threshold={400} bottom={140} />
+
+// 显示时机交给调用方，不再监听滚动
+<StarBackToTop visible={pinned} />
+
+// 监听某个滚动容器，而不是 window
+<StarBackToTop container={panelElement} />
+
+// 换页时替路由飞走一次（回顶由路由自己做，它只补上飞走那一拍）
+<StarBackToTop flightKey={pathname} />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| threshold | `number` | `0` | 滚动多少像素后浮现；`0` 即离开顶部就出现 |
+| bottom | `number` | `32` | 距视口底部的固定距离（px） |
+| right | `number` | `32` | 距视口右侧的固定距离（px） |
+| scrollBehavior | `'auto' \| 'instant' \| 'smooth'` | `'smooth'` | 回顶动画，`prefers-reduced-motion` 下强制瞬间跳转 |
+| visible | `boolean` | - | 传入后由调用方接管显示时机 |
+| flightKey | `string \| number` | - | 值一变就飞一次（隐藏时不动），适合传路由的 `pathname` |
+| container | `HTMLElement \| null` | `null` | 要监听的滚动容器，默认 `window` |
+| label | `string` | `'Back to top'` | 按钮的无障碍名称 |
+| children | `ReactNode` | 像素纸飞机 | 替换默认图案 |
+| onVisibleChange | `(visible: boolean) => void` | - | 浮现 / 隐藏时触发，挂载时也会触发一次 |
+
+隐藏期间组件仍留在 DOM 里（入场过渡需要挂载点），但会带上 `aria-hidden` 与 `tabIndex={-1}`，键盘和读屏都够不着。图案尺寸是固定的 63 × 63（21 个美术像素 × 3px），放大缩小会连带改掉描边粗细，所以没有 `size` 一类的属性。
+
+点击后纸飞机沿单调的 `cubic-bezier(0.4, 0, 0.7, 0.2)` 向上飞 48px，位移和透明度共用同一条曲线，所以两者同时到终点；整段 280ms，即 `BACK_TO_TOP_FLIGHT_MS`。飞完它不会闪回来：动画的结束状态一直保持到页面真的回到顶部、隐藏样式接管为止。`prefers-reduced-motion` 下整段动画关掉，纸飞机直接消失。用 `visible` 自己管显示时机的调用方可以拿 `BACK_TO_TOP_FLIGHT_MS` 对齐收尾动作——等动画放完再摘掉 `visible`。
+
+换页回顶是路由的事，纸飞机不会知道；把 route key 交给 `flightKey`，它就补上飞走那一拍。**当时不在屏幕上就什么都不做**——动画从全不透明开始，硬放会在一个它从没待过的角落凭空闪出来，所以路由可以每次跳转都 bump 它，不必先问一句。本仓库的文档站就是这么用的（`Layout.tsx` 挂一只、`flightKey={pathname}`，并且只在 `pathname` 变化时才回顶，页内锚点只改 hash 就不动滚动位置）。
+
+---
+
 ### message - 消息提示
 
 命令式调用的消息提示组件，支持多种类型和位置。
@@ -380,7 +424,7 @@ setTimeout(() => close(), 1000)
 
 ### StarCalendar - 日历
 
-像素风日历组件，支持事件标记。
+像素风日历组件，支持事件标记。工具栏的月份标题可点击，弹出年月下拉做快速跳转；右上角「回到今日」按东八区（UTC+8）当天回到本月。
 
 ```tsx
 import { StarCalendar } from 'stardew-valley-ui'
@@ -407,6 +451,11 @@ import { StarCalendar } from 'stardew-valley-ui'
 | iconMap | `Record<string, ReactNode \| string>` | - | 图标映射 |
 | showOutsideDays | `boolean` | `true` | 是否显示非当月日期 |
 | onMonthChange | `(timestamp: number) => void` | - | 月份切换回调 |
+| todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
+| showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
+| todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区 |
+
+> 翻月、「回到今日」和下拉选月都会走 `onMonthChange`；目标月份和当前一致时不会重复触发。
 
 `CalendarItem`：
 
@@ -425,7 +474,7 @@ import { StarCalendar } from 'stardew-valley-ui'
 
 ### StarDatePicker - 日期选择器
 
-支持单选和范围选择的日期选择器。
+支持单选和范围选择的日期选择器。工具栏与 `StarCalendar` 共用：点击月份标题弹出年月下拉，右上角「回到今日」按东八区（UTC+8）当天把视图带回本月（只移动视图，不改动已选日期）。
 
 ```tsx
 import { StarDatePicker } from 'stardew-valley-ui'
@@ -460,6 +509,9 @@ import { StarDatePicker } from 'stardew-valley-ui'
 | maxDate | `number` | - | 最大日期 |
 | disabledDates | `number[]` | `[]` | 禁用日期 |
 | showOutsideDays | `boolean` | `true` | 显示非当月日期 |
+| todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
+| showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
+| todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区；仅影响「今日」的判断与按钮落点，不会改动选中值 |
 
 ---
 
@@ -616,6 +668,19 @@ import { StarTab } from 'stardew-valley-ui'
 | defaultActiveKey | `string` | - | 默认激活项 |
 | onChange | `(key: string) => void` | - | 切换回调 |
 | position | `'top' \| 'bottom'` | `'top'` | 选项卡位置 |
+| external | `boolean` | `false` | 外接导航：选项卡条移到内容框外，内容仍留在带边框的框里 |
+
+```tsx
+// 选项卡在内容框上方
+<StarTab external items={items} />
+
+// 选项卡挂在内容框下方
+<StarTab external position="bottom" items={items} />
+```
+
+`external` 与 `position` 正交：默认（`false`）时选项卡和内容同处一个框；开启后内容框保留边框，
+每个选项卡以独立像素边框显示，选中项会向内容框平移 4px 并紧贴其边缘。导出结构上，
+`role="tabpanel"` 始终落在内容框上，`role="tablist"` 的位置随 `external` 变化，可以据此做样式或测试断言。
 
 ---
 
@@ -639,6 +704,37 @@ import { StarSwitch } from 'stardew-valley-ui'
 | disabled | `boolean` | `false` | 是否禁用 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 开关尺寸 |
 | color | `string` | `'#4ade80'` | 开启颜色 |
+
+---
+
+### StarCheckbox - 多选框
+
+Card 风格边框的多选框组，默认水平排列；选中时红色对勾从左向右显示，取消时使用评分图标同款的摇晃、缩小、淡出动画。
+
+```tsx
+import { StarCheckbox } from 'stardew-valley-ui'
+
+const crops = [
+  { value: 'parsnip', label: '防风草' },
+  { value: 'potato', label: '土豆' },
+  { value: 'strawberry', label: '草莓', disabled: true },
+]
+
+<StarCheckbox options={crops} defaultValue={['parsnip']} />
+<StarCheckbox options={crops} direction="vertical" shape="round" size="large" />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| options | `CheckboxOption[]` | - | 选项列表；每项可设置 `value`、`label`、`disabled` |
+| value / defaultValue | `string[]` | `[]` | 受控选中值或非受控初始值 |
+| onChange | `(value: string[]) => void` | - | 返回完整的下一组选中值 |
+| direction | `'horizontal' \| 'vertical'` | `'horizontal'` | 选项排列方向 |
+| disabled | `boolean` | `false` | 禁用整个多选框组 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 控件尺寸 |
+| shape | `'square' \| 'round'` | `'square'` | Card 方框或圆形印章框 |
+| radio | `boolean` | `false` | 单选模式；最多选择一项，并使用 `radiogroup` / `radio` 语义 |
+| aria-label | `string` | `'Checkbox'` | 多选框组的无障碍名称 |
 
 ---
 

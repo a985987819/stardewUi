@@ -1,9 +1,12 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getMonthStartTimestamp } from '../../utils/calendar'
 import Calendar from './Calendar'
+import { formatMonthLabel } from './calendarLabels'
 
 const MAY_2024 = new Date(2024, 4, 1).getTime()
+// 直接复用组件里的格式化实现，避免把 Intl 的“2024年5月”写死在断言里。
+const MAY_2024_LABEL = formatMonthLabel(MAY_2024)
 
 function getDayButton(label: string) {
   return screen.getByRole('button', { name: label })
@@ -216,5 +219,147 @@ describe('Calendar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
 
     expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2024-06-01'))
+  })
+
+  describe('year and month quick switch', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    function openMonthPanel() {
+      fireEvent.click(screen.getByRole('button', { name: MAY_2024_LABEL }))
+
+      return screen.getByRole('dialog', { name: '选择年月' })
+    }
+
+    it('jumps to a month picked from the dropdown and closes the panel', () => {
+      const handleMonthChange = vi.fn()
+
+      render(<Calendar value={MAY_2024} onMonthChange={handleMonthChange} />)
+
+      const panel = openMonthPanel()
+
+      fireEvent.click(within(panel).getByRole('button', { name: '2024年9月' }))
+
+      expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2024-09-01'))
+      expect(screen.queryByRole('dialog')).toBeNull()
+    })
+
+    it('picks a year first and then a month of that year', () => {
+      const handleMonthChange = vi.fn()
+
+      render(<Calendar value={MAY_2024} onMonthChange={handleMonthChange} />)
+
+      const panel = openMonthPanel()
+
+      // 标题在月视图里显示年份，点一下切到年份网格。
+      fireEvent.click(within(panel).getByRole('button', { name: '2024年' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '2026年' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '2026年2月' }))
+
+      expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2026-02-01'))
+    })
+
+    it('pages the year grid by twelve years at a time', () => {
+      render(<Calendar value={MAY_2024} />)
+
+      const panel = openMonthPanel()
+
+      fireEvent.click(within(panel).getByRole('button', { name: '2024年' }))
+
+      // 2024 落在 2016-2027 这一页。
+      expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
+
+      fireEvent.click(within(panel).getByRole('button', { name: 'Next years' }))
+
+      expect(within(panel).queryByRole('button', { name: '2016年' })).toBeNull()
+      expect(within(panel).getByRole('button', { name: '2028年' })).toBeInTheDocument()
+
+      fireEvent.click(within(panel).getByRole('button', { name: 'Previous years' }))
+
+      expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
+    })
+
+    it('steps a single year while the month grid is visible', () => {
+      render(<Calendar value={MAY_2024} />)
+
+      const panel = openMonthPanel()
+
+      fireEvent.click(within(panel).getByRole('button', { name: 'Next year' }))
+
+      expect(within(panel).getByRole('button', { name: '2025年' })).toBeInTheDocument()
+      expect(within(panel).getByRole('button', { name: '2025年5月' })).toBeInTheDocument()
+    })
+
+    it('closes on outside pointer down and on Escape', () => {
+      render(<Calendar value={MAY_2024} />)
+
+      openMonthPanel()
+      fireEvent.pointerDown(document.body)
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      openMonthPanel()
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(screen.getByRole('button', { name: MAY_2024_LABEL })).toHaveFocus()
+    })
+  })
+
+  describe('back to today', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('jumps to the month of today in UTC+8', () => {
+      // 2026-09-22 18:00 东八区（同一瞬间在 UTC 是 09-22 10:00）。
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(Date.UTC(2026, 8, 22, 10, 0)))
+      const handleMonthChange = vi.fn()
+
+      render(<Calendar value={MAY_2024} onMonthChange={handleMonthChange} />)
+
+      fireEvent.click(screen.getByRole('button', { name: '回到今日' }))
+
+      expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2026-09-01'))
+    })
+
+    it('marks the UTC+8 day as today even when the browser date differs', () => {
+      // 东八区已经是 09-22，UTC 还停在 09-21：高亮必须跟着东八区走。
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(Date.UTC(2026, 8, 21, 17, 0)))
+
+      render(<Calendar defaultValue={getMonthStartTimestamp('2026-09-01')} />)
+
+      expect(screen.getByRole('button', { name: '2026-09-22' })).toHaveAttribute(
+        'aria-current',
+        'date',
+      )
+      expect(screen.getByRole('button', { name: '2026-09-21' })).not.toHaveAttribute('aria-current')
+    })
+
+    it('does not fire onMonthChange when the calendar already shows this month', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(Date.UTC(2026, 8, 22, 10, 0)))
+      const handleMonthChange = vi.fn()
+
+      render(
+        <Calendar value={getMonthStartTimestamp('2026-09-01')} onMonthChange={handleMonthChange} />,
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: '回到今日' }))
+
+      expect(handleMonthChange).not.toHaveBeenCalled()
+    })
+
+    it('hides the today button and accepts a custom label', () => {
+      const { rerender } = render(<Calendar value={MAY_2024} todayLabel="Today" />)
+
+      expect(screen.getByRole('button', { name: 'Today' })).toBeInTheDocument()
+
+      rerender(<Calendar value={MAY_2024} showToday={false} />)
+
+      expect(screen.queryByRole('button', { name: 'Today' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '回到今日' })).toBeNull()
+    })
   })
 })

@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   addMonths,
   buildCalendarCells,
+  CHINA_STANDARD_TIME_OFFSET_MINUTES,
   getMonthStartTimestamp,
+  getTodayTimestamp,
   isDayInRange,
   isSameDay,
   normalizeToDayTimestamp,
@@ -94,6 +96,35 @@ describe('calendar utilities', () => {
       dateTimestamp: new Date(2026, 3, 6).getTime(),
       dayOfWeek: 1,
     })
+  })
+
+  it('resolves today in UTC+8 no matter which timezone the browser runs in', () => {
+    // 2026-09-21 17:00 UTC 已经是东八区的 09-22 01:00，而 15:00 UTC 还停在 09-21。
+    // 断言两边都按「本地日历日」建时间戳，所以结果与运行环境的时区无关。
+    const utc8 = CHINA_STANDARD_TIME_OFFSET_MINUTES
+
+    expect(getTodayTimestamp(utc8, Date.UTC(2026, 8, 21, 17, 0))).toBe(
+      new Date(2026, 8, 22).getTime(),
+    )
+    expect(getTodayTimestamp(utc8, Date.UTC(2026, 8, 21, 15, 0))).toBe(
+      new Date(2026, 8, 21).getTime(),
+    )
+  })
+
+  it('allows overriding the today offset for other timezones', () => {
+    const instant = Date.UTC(2026, 8, 21, 17, 0)
+
+    expect(getTodayTimestamp(0, instant)).toBe(new Date(2026, 8, 21).getTime())
+    expect(getTodayTimestamp(-480, instant)).toBe(new Date(2026, 8, 21).getTime())
+    expect(getTodayTimestamp(9 * 60, instant)).toBe(new Date(2026, 8, 22).getTime())
+  })
+
+  it('marks the supplied today instead of the system clock', () => {
+    const cells = buildCalendarCells(new Date(2026, 8, 1).getTime(), '2026-09-22')
+
+    expect(cells.filter((cell) => cell.isToday).map((cell) => cell.dateTimestamp)).toEqual([
+      new Date(2026, 8, 22).getTime(),
+    ])
   })
 
   it('compares same-day values while ignoring time', () => {

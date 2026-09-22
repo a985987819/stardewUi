@@ -46,8 +46,11 @@ const PATHS = {
 
 const ICON_MODULE = 'lucide-react'
 const DEFAULT_ICON = 'Square'
-const DEFAULT_CATEGORY = 'utility'
-const CATALOGUE_CATEGORIES = ['common', 'form', 'navigation', 'data-display', 'overlay', 'feedback', 'utility']
+const DEFAULT_CATEGORY = 'other'
+// Kept in sync with `COMPONENT_CATALOGUE_CATEGORIES` in the registry: a stale
+// list here fails late (the sync guard rejects the entry the script just wrote)
+// instead of failing fast at argument parsing.
+const CATALOGUE_CATEGORIES = ['common', 'layout', 'navigation', 'data-entry', 'data-display', 'feedback', 'other']
 
 const USAGE = `用法: bun run gen:component <Name> [options]
 
@@ -326,10 +329,11 @@ function Star${name}DemoPage() {
 export default Star${name}DemoPage
 `
 
-const registryEntryTemplate = ({ name, routePath, category, zh, en, descZh, descEn, icon }) => `  {
+const registryEntryTemplate = ({ name, routePath, category, usageRank, zh, en, descZh, descEn, icon }) => `  {
     routePath: '${routePath}',
     component: '${name}',
     category: '${category}',
+    usageRank: ${usageRank},
     title: { zh: ${quote(zh)}, en: ${quote(en)} },
     desc: {
       zh: ${quote(descZh)},
@@ -386,6 +390,12 @@ async function main() {
   if (new RegExp(`component: '${name}'`).test(registry)) fail(`componentRegistry.tsx 里已经有 component: '${name}'`)
   if (new RegExp(`routePath: '${routePath}'`).test(registry)) fail(`componentRegistry.tsx 里已经有 routePath: '${routePath}'`)
 
+  // `usageRank` is per category and the sync guard requires each category to run
+  // 1..n without holes or ties, so the newcomer takes the next free slot. Deriving
+  // it from the registry keeps that invariant true without a second source of truth.
+  const usageRank =
+    (registry.match(new RegExp(`category: '${options.category}'`, 'g')) ?? []).length + 1
+
   await assertIconExists(icon)
 
   const files = {
@@ -402,7 +412,7 @@ async function main() {
       `Star${name}DemoPage`,
       PATHS.registry
     ),
-    registryEntryTemplate({ name, routePath, category: options.category, zh, en, descZh, descEn, icon }),
+    registryEntryTemplate({ name, routePath, category: options.category, usageRank, zh, en, descZh, descEn, icon }),
     PATHS.registry
   )
 
@@ -423,7 +433,7 @@ async function main() {
     `写文件   ${targets.demo}`,
     `追加导出 ${PATHS.uiBarrel}  ->  Star${name}`,
     `追加导出 ${PATHS.lazyPages}   ->  Star${name}DemoPage`,
-    `追加条目 ${PATHS.registry}  ->  /components/${routePath}（${options.category}）`,
+    `追加条目 ${PATHS.registry}  ->  /components/${routePath}（${options.category} #${usageRank}）`,
   ]
 
   if (options.dryRun) {

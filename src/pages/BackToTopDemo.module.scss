@@ -1,0 +1,113 @@
+.back-to-top-demo {
+  &__actions {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  &__hint {
+    margin: 0;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+  }
+
+  // 联系人列表：比视口长，页面才有得滚；这也是纸飞机存在的理由。
+  &__contacts {
+    width: 100%;
+  }
+
+  &__contacts-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 3px solid var(--color-border);
+    color: var(--color-text);
+
+    span:last-child {
+      color: var(--color-text-tertiary);
+      font-size: 12px;
+    }
+  }
+
+  &__contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__contact {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px 6px 6px;
+    background: var(--color-bg-secondary);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-pixel-sm);
+  }
+
+  &__contact-avatar {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-card);
+    border: 3px solid var(--color-border-dark);
+    color: var(--color-text);
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  &__contact-identity {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__contact-name {
+    color: var(--color-text);
+    font-size: 15px;
+  }
+
+  &__contact-role {
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+  }
+
+  &__contact-hearts {
+    flex-shrink: 0;
+    color: var(--color-danger);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 520px) {
+    &__contact {
+      grid-template-columns: 32px minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    &__contact-avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 15px;
+    }
+
+    &__contacts-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+}

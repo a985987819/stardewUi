@@ -75,9 +75,11 @@ bun run test:run             # 全量测试（含守卫）
 
 左侧目录和组件总览都会按 `componentRegistry.tsx` 中的 `category` 自动排序，不依赖条目的书写或追加位置。分类优先级为：
 
-`common` → `form` → `navigation` → `data-display` → `overlay` → `feedback` → `utility`
+`common` → `layout` → `navigation` → `data-entry` → `data-display` → `feedback` → `other`
 
-将最常用于页面搭建的组件放入 `common`；新增组件请用脚手架的 `--category` 参数选最贴近的分类。未指定时脚手架会使用 `utility`，避免未经分类的新组件挤到高频入口之前。删除组件不需要额外维护顺序，派生目录会自动收紧。
+将最常用于页面搭建的组件放入 `common`；新增组件请用脚手架的 `--category` 参数选最贴近的分类。未指定时脚手架会使用 `other`，避免未经分类的新组件挤到高频入口之前。删除组件不需要额外维护顺序，派生目录会自动收紧。
+
+> 同一分类内还有 `usageRank`，守卫要求每个分类的 rank 是 `1..n` 连续无重复的整数。`gen:component` 会数一遍该分类已有多少条，把新条目排到末尾，所以**不要手写一个重复的 rank** —— 守卫和 `tsc` 都会红。
 
 > 历史坑：按钮的演示页曾叫 `ButtonDemo.tsx` 而组件叫 `NineSliceButton.tsx`，两者对不上，
 > 生成器也就无法按组件名推算文件路径。现已统一为 `NineSliceButtonDemo.tsx`。

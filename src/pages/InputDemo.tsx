@@ -113,6 +113,42 @@ const apiData = {
 
 const stackStyle = { display: 'grid', gap: 16, width: 'min(100%, 420px)' } as const
 
+const controlledInputCode = `import { useState } from 'react'
+import { StarInput } from 'stardew-valley-ui'
+
+export function FarmNameField() {
+  const [farmName, setFarmName] = useState('Pelican Farm')
+
+  return (
+    <>
+      <StarInput label="Farm name" value={farmName} onChange={setFarmName} block />
+      <output>Farm name: {farmName || '(empty)'}</output>
+    </>
+  )
+}`
+
+const controlledAffixInputCode = `import { useState } from 'react'
+import { Search, User } from 'lucide-react'
+import { StarInput } from 'stardew-valley-ui'
+
+export function ShippingBinField() {
+  const [shippingBinLabel, setShippingBinLabel] = useState('')
+
+  return (
+    <>
+      <StarInput
+        label="Shipping bin label"
+        prefix={<User size={16} />}
+        value={shippingBinLabel}
+        onChange={setShippingBinLabel}
+        allowClear
+      />
+      <StarInput label="Search crops" prefix={<Search size={16} />} allowClear />
+      <output>Shipping bin label: {shippingBinLabel || '(empty)'}</output>
+    </>
+  )
+}`
+
 function StarInputDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
@@ -126,7 +162,8 @@ function StarInputDemoPage() {
         id="basic"
         title={t.demos[0][0]}
         description={t.demos[0][1]}
-        code={'<StarInput label="Farm name" value={farmName} onChange={setFarmName} />'}
+        code={controlledInputCode}
+        data={[{ label: 'farmName', value: farmName || '(empty)' }]}
       >
         <div style={stackStyle}>
           <StarInput
@@ -144,7 +181,8 @@ function StarInputDemoPage() {
         id="affix"
         title={t.demos[1][0]}
         description={t.demos[1][1]}
-        code={'<StarInput prefix={<Search size={16} />} allowClear />'}
+        code={controlledAffixInputCode}
+        data={[{ label: 'shippingBinLabel', value: nickname || '(empty)' }]}
       >
         <div style={stackStyle}>
           <StarInput

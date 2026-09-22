@@ -5,14 +5,6 @@
   position: relative;
 }
 
-.calendar__toolbar {
-  @include common.calendar-toolbar;
-}
-
-.calendar__month {
-  @include common.calendar-month-label;
-}
-
 .calendar__markers {
   @include common.calendar-marker-row;
 }

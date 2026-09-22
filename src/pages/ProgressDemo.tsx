@@ -61,6 +61,39 @@ const LOOP_STEP = 10
 const SLOW_LOOP_MS = 800
 const FAST_LOOP_MS = 400
 
+const loopingProgressCode = `import { useEffect, useState } from 'react'
+import { StarProgress } from 'stardew-valley-ui'
+
+export function LoopingProgress() {
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setValue((current) => (current >= 100 ? 0 : current + 10))
+    }, 800)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  return <StarProgress value={value} showLabel />
+}`
+
+const controlledProgressCode = `import { useState } from 'react'
+import { StarNineSliceButton, StarProgress } from 'stardew-valley-ui'
+
+export function CropProgress() {
+  const [value, setValue] = useState(50)
+  const changeBy = (amount: number) => setValue((current) => Math.min(100, Math.max(0, current + amount)))
+
+  return (
+    <>
+      <StarProgress value={value} showLabel />
+      <StarNineSliceButton onClick={() => changeBy(-10)}>-10</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => changeBy(10)}>+10</StarNineSliceButton>
+      <output>Progress: {value} / 100</output>
+    </>
+  )
+}`
+
 /** Runs a `0 → 100 → 0 …` loop that advances by `LOOP_STEP` every `intervalMs`, forever. */
 function useLoopValue(intervalMs: number) {
   const [value, setValue] = useState(0)
@@ -85,17 +118,17 @@ function StarProgressDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="loop" title={t.demos[0][0]} description={t.demos[0][1]} code={'const [value, setValue] = useState(0)\nuseEffect(() => {\n  const id = setInterval(() => setValue(v => (v >= 100 ? 0 : v + 10)), 800)\n  return () => clearInterval(id)\n}, [])\n\n<StarProgress value={value} showLabel />'}>
+      <StarComponentDemo id="loop" title={t.demos[0][0]} description={t.demos[0][1]} code={loopingProgressCode} data={[{ label: 'value', value: `${slowLoop} / 100` }, { label: 'interval', value: `${SLOW_LOOP_MS}ms` }]}>
         <div style={{ display: 'grid', width: 'min(100%, 440px)' }}>
           <StarProgress value={slowLoop} showLabel />
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="loop-compact" title={t.demos[1][0]} description={t.demos[1][1]} code={'// 同一个循环，换成 compact 格子并把节奏加快一倍\n<StarProgress value={value} variant="compact" showLabel />'}>
+      <StarComponentDemo id="loop-compact" title={t.demos[1][0]} description={t.demos[1][1]} code={loopingProgressCode.replace('showLabel />', 'variant="compact" showLabel />').replace('}, 800)', '}, 400)')} data={[{ label: 'value', value: `${fastLoop} / 100` }, { label: 'interval', value: `${FAST_LOOP_MS}ms` }]}>
         <div style={{ display: 'grid', width: 'min(100%, 440px)' }}>
           <StarProgress value={fastLoop} variant="compact" showLabel />
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="basic" title={t.demos[2][0]} description={t.demos[2][1]} code={'<StarProgress value={value} />\n<StarNineSliceButton onClick={() => setValue(value + 10)}>+10</StarNineSliceButton>'}>
+      <StarComponentDemo id="basic" title={t.demos[2][0]} description={t.demos[2][1]} code={controlledProgressCode} data={[{ label: 'value', value: `${value} / 100` }, { label: 'segmentSize', value: '10' }]}>
         <div style={{ display: 'grid', width: 'min(100%, 440px)', gap: 18 }}>
           <StarProgress value={value} showLabel />
           <div style={{ display: 'flex', gap: 10 }}>

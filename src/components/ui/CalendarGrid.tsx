@@ -50,7 +50,7 @@ function CalendarGrid({ cells, monthLabel, showOutsideDays = true, onSelectDay, 
                 return (
                   <div key={cell.dateTimestamp} role="gridcell" className={classNames(styles['calendar-grid__cell'], !cell.inCurrentMonth && styles['calendar-grid__cell--outside-month'], cell.isToday && styles['calendar-grid__cell--today'], disabled && styles['calendar-grid__cell--disabled'], hiddenOutsideDay && styles['calendar-grid__cell--hidden-outside'], getCellStateClassName?.(cell))}>
                     {hiddenOutsideDay ? <div className={classNames(styles['calendar-grid__button'], styles['calendar-grid__button--placeholder'])} aria-hidden="true"><span className={styles['calendar-grid__day-number']} /></div> : (
-                      <button {...buttonProps} type="button" className={classNames(styles['calendar-grid__button'], buttonProps?.className)} disabled={disabled} onClick={() => { if (!disabled) onSelectDay?.(cell.dateTimestamp) }}>
+                      <button aria-current={cell.isToday ? 'date' : undefined} {...buttonProps} type="button" className={classNames(styles['calendar-grid__button'], buttonProps?.className)} disabled={disabled} onClick={() => { if (!disabled) onSelectDay?.(cell.dateTimestamp) }}>
                         <span className={styles['calendar-grid__day-number']}>{cell.dayNumber}</span>
                         {renderCellContent ? <span className={styles['calendar-grid__content']}>{renderCellContent(cell)}</span> : null}
                       </button>

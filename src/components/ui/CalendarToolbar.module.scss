@@ -1,0 +1,159 @@
+@use "./CalendarCommon.module.scss" as common;
+
+// 工具栏与年月下拉共用日历家族的牛皮纸配色（与 Calendar 的详情浮层、
+// DatePicker 的选中态同源），不要在这里引入全局的绿色语义色。
+$toolbar-panel-bg: var(--star-raw-hex-fbebc2);
+$toolbar-panel-border: var(--star-raw-hex-2c2c2c);
+$toolbar-text: var(--star-raw-hex-4e342e);
+$toolbar-accent: var(--star-raw-hex-9d4100);
+$toolbar-cell-hover-bg: var(--star-raw-rgba-215-119-15-0-08);
+$toolbar-cell-selected-bg: var(--star-raw-hex-f4c46a);
+$toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
+
+.calendar-toolbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: common.$toolbar-gap;
+  // 标题居中、今日按钮贴右：两者都在同一行，但按钮绝对定位脱离文档流，
+  // 这样中间的月份标题仍然是相对整行居中的。
+  min-height: 34px;
+}
+
+.calendar-toolbar__nav {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: common.$toolbar-gap;
+  min-width: 0;
+}
+
+.calendar-toolbar__title {
+  @include common.calendar-month-label;
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  font-family: var(--font-pixel);
+  cursor: pointer;
+  transition: background 0.12s steps(2, jump-start);
+
+  &:hover {
+    border-color: $toolbar-panel-border;
+    background: $toolbar-cell-hover-bg;
+  }
+
+  &[aria-expanded='true'] {
+    border-color: $toolbar-panel-border;
+    background: $toolbar-cell-selected-bg;
+  }
+}
+
+.calendar-toolbar__caret {
+  width: 0;
+  height: 0;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+  border-top: 6px solid currentColor;
+
+  .calendar-toolbar__title[aria-expanded='true'] & {
+    transform: rotate(180deg);
+  }
+}
+
+.calendar-toolbar__today {
+  // 绝对定位的是外层容器而不是按钮本身：StarNineSliceButton 在 hover / active
+  // 时会把自己的 `transform` 归零，直接给按钮加 translateY 会被它覆盖掉。
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.calendar-toolbar__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  width: 252px;
+  padding: 10px;
+  border: 2px solid $toolbar-panel-border;
+  border-radius: 4px;
+  background: $toolbar-panel-bg;
+  color: $toolbar-text;
+  box-shadow: 2px 2px 8px $toolbar-panel-shadow;
+  transform: translateX(-50%);
+}
+
+.calendar-toolbar__panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.calendar-toolbar__panel-title {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: $toolbar-accent;
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.calendar-toolbar__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-toolbar__cell {
+  min-width: 0;
+  padding: 6px 0;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: $toolbar-text;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.12s steps(2, jump-start);
+
+  &:hover {
+    border-color: $toolbar-panel-border;
+    background: $toolbar-cell-hover-bg;
+  }
+
+  // 顺序有意义：选中态写在「今日」之后，两者同时命中时以选中态为准。
+  &--today {
+    color: $toolbar-accent;
+    font-weight: 700;
+  }
+
+  &--selected {
+    border-color: $toolbar-panel-border;
+    background: $toolbar-cell-selected-bg;
+    color: $toolbar-text;
+    font-weight: 700;
+  }
+}

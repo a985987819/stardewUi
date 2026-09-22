@@ -1,0 +1,220 @@
+// A Card-inspired control at field scale: the outer brown frame, orange inner
+// ring, top glint and lower-right shadow deliberately echo Card's wood frame.
+$checkbox-surface: var(--star-raw-hex-ffc675);
+$checkbox-frame: var(--star-raw-hex-9d4100);
+$checkbox-inner-frame: var(--star-raw-hex-d7770f);
+$checkbox-highlight: var(--star-raw-hex-ffe0b2);
+$checkbox-shadow: var(--star-raw-hex-6a350b);
+$checkbox-check: var(--star-raw-hex-e53935);
+
+.star-checkbox {
+  // The red check keeps its established scale; its wooden tile is four fifths
+  // that size so the mark still reads as a floating stamp above the tile.
+  --checkbox-check-size: 23.04px;
+  --checkbox-control-size: calc(var(--checkbox-check-size) * 0.8);
+  --checkbox-loss-duration: 150ms;
+  --checkbox-frame-width: 1px;
+  --checkbox-inner-width: 0.5px;
+  --checkbox-label-size: 15px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--star-raw-hex-4d2608);
+  font-family: var(--font-pixel);
+
+  &--horizontal {
+    flex-flow: row wrap;
+  }
+
+  &--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  &--small {
+    --checkbox-check-size: 17.28px;
+    --checkbox-frame-width: 1px;
+    --checkbox-inner-width: 0.5px;
+    --checkbox-label-size: 13px;
+  }
+
+  &--medium {
+    --checkbox-check-size: 23.04px;
+    --checkbox-frame-width: 1px;
+    --checkbox-inner-width: 0.5px;
+    --checkbox-label-size: 15px;
+  }
+
+  &--large {
+    --checkbox-check-size: 28.8px;
+    --checkbox-frame-width: 1.5px;
+    --checkbox-inner-width: 0.5px;
+    --checkbox-label-size: 17px;
+  }
+
+  &--disabled {
+    opacity: 0.58;
+  }
+
+  &__option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: var(--checkbox-control-size);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 90ms steps(2, jump-start);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $checkbox-check;
+      outline-offset: 4px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    // A locked task should look washed out as a whole: the label, tiny wooden
+    // tile, and any retained check all share the same muted disabled state.
+    &--disabled {
+      opacity: 0.42;
+      filter: saturate(0.32) contrast(0.88);
+    }
+  }
+
+  &__control {
+    position: relative;
+    display: inline-grid;
+    flex: 0 0 var(--checkbox-control-size);
+    width: var(--checkbox-control-size);
+    height: var(--checkbox-control-size);
+    // The check is deliberately allowed past this compact Card-like frame so
+    // it reads as a floating red stamp rather than a glyph trapped in a box.
+    overflow: visible;
+    background: $checkbox-surface;
+    border: var(--checkbox-frame-width) solid $checkbox-frame;
+    box-shadow:
+      2px 3px 0 $checkbox-shadow,
+      inset 0 1px 0 $checkbox-highlight;
+  }
+
+  &--square &__control {
+    border-radius: 4px;
+  }
+
+  &--round &__control {
+    border-radius: 50%;
+  }
+
+  &__surface,
+  &__frame,
+  &__mark {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__surface {
+    z-index: 0;
+    background:
+      linear-gradient(
+        135deg,
+        var(--star-raw-rgba-255-255-255-0-28),
+        transparent 44%
+      ),
+      $checkbox-surface;
+  }
+
+  &__frame {
+    z-index: 1;
+    border: var(--checkbox-inner-width) solid $checkbox-inner-frame;
+    box-shadow:
+      inset 0 2px 0 $checkbox-highlight,
+      inset -2px -2px 0 var(--star-raw-rgba-157-65-0-0-32);
+  }
+
+  &--square &__frame {
+    border-radius: 1px;
+  }
+
+  &--round &__frame {
+    border-radius: 50%;
+  }
+
+  &__mark {
+    // The expanded mark box gives both its mask and its exit shake room to
+    // float. Its paired horizontal insets shift the full check 5px left
+    // without competing with the exit animation's transform.
+    inset: calc(var(--checkbox-check-size) * -0.3)
+      calc(var(--checkbox-check-size) * -0.48 + 3px) 0
+      calc(var(--checkbox-check-size) * -0.14 - 3px);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    color: $checkbox-check;
+    font-family: var(--font-pixel);
+    font-size: var(--checkbox-check-size);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 1px 2px 0 var(--star-raw-rgba-157-65-0-0-38);
+  }
+
+  &__mark-glyph {
+    display: block;
+    transform-origin: center;
+    filter: drop-shadow(0 5px 0 var(--star-raw-rgba-157-65-0-0-32));
+  }
+
+  // The check begins nearly concealed, then speeds up across the last stretch:
+  // a literal left-to-right masking reveal rather than a generic fade-in.
+  &__mark[data-motion="in"] &__mark-glyph {
+    animation: var(--star-motion-mask-reveal-name)
+      var(--star-motion-mask-reveal-duration) cubic-bezier(0.72, 0, 1, 1) both;
+  }
+
+  // Same two-part shape as Rating's loss motion, but with Checkbox's brisker
+  // duration: shake first, then enlarge, shrink and fade the painted mark.
+  // The control frame itself never jumps.
+  &__mark[data-motion="out"] {
+    animation: var(--star-motion-loss-shake-name) var(--checkbox-loss-duration)
+      ease-in-out both;
+  }
+
+  &__mark[data-motion="out"] &__mark-glyph {
+    animation: var(--star-motion-loss-shrink-name) var(--checkbox-loss-duration)
+      cubic-bezier(0.4, 0, 0.7, 0.2) both;
+  }
+
+  &__label {
+    font-size: var(--checkbox-label-size);
+    line-height: 1.45;
+    text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-4);
+  }
+
+  &__option--disabled &__label {
+    color: var(--star-raw-hex-6a350b);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-checkbox__option,
+  .star-checkbox__mark[data-motion],
+  .star-checkbox__mark[data-motion] .star-checkbox__mark-glyph {
+    animation: none !important;
+    transition: none !important;
+  }
+}

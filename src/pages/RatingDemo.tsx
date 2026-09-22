@@ -57,6 +57,48 @@ const apiData = {
 
 const MOTION_MAX = 5
 
+const friendshipCode = `import { useState } from 'react'
+import { StarRating } from 'stardew-valley-ui'
+
+export function FriendshipRating() {
+  const [friendship, setFriendship] = useState(3)
+
+  return (
+    <>
+      <StarRating value={friendship} onChange={setFriendship} aria-label="Friendship rating" />
+      <output>Friendship: {friendship} / 5</output>
+    </>
+  )
+}`
+
+const motionCode = `import { useState } from 'react'
+import { StarNineSliceButton, StarRating } from 'stardew-valley-ui'
+
+const MAX_RATING = 5
+
+export function AnimatedRating() {
+  const [rating, setRating] = useState(3)
+  const decrease = () => setRating((value) => Math.max(0, value - 1))
+  const increase = () => setRating((value) => Math.min(MAX_RATING, value + 1))
+
+  return (
+    <>
+      <StarRating value={rating} count={MAX_RATING} onChange={setRating} />
+      <StarNineSliceButton onClick={decrease}>-1</StarNineSliceButton>
+      <StarNineSliceButton onClick={increase}>+1</StarNineSliceButton>
+      <output>Rating: {rating} / {MAX_RATING}</output>
+    </>
+  )
+}`
+
+const halfRatingCode = `import { useState } from 'react'
+import { StarRating } from 'stardew-valley-ui'
+
+export function HalfStarRating() {
+  const [score, setScore] = useState(3.5)
+  return <StarRating value={score} onChange={setScore} icon="star" allowHalf color="#D7992E" />
+}`
+
 function StarRatingDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
@@ -67,10 +109,10 @@ function StarRatingDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={'<StarRating value={3} onChange={setValue} />'}>
+      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={friendshipCode} data={[{ label: 'friendship', value: `${friendship} / 5` }]}>
         <StarRating value={friendship} onChange={setFriendship} aria-label="Friendship rating" />
       </StarComponentDemo>
-      <StarComponentDemo id="motion" title={t.demos[1][0]} description={t.demos[1][1]} code={'<StarRating value={value} count={5} onChange={setValue} />'}>
+      <StarComponentDemo id="motion" title={t.demos[1][0]} description={t.demos[1][1]} code={motionCode} data={[{ label: 'rating', value: `${motionValue} / ${MOTION_MAX}` }]}>
         <div style={{ display: 'grid', gap: 18 }}>
           <StarRating value={motionValue} count={MOTION_MAX} onChange={setMotionValue} aria-label="Motion rating" />
           <div style={{ display: 'flex', gap: 10 }}>
@@ -79,7 +121,7 @@ function StarRatingDemoPage() {
           </div>
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="half" title={t.demos[2][0]} description={t.demos[2][1]} code={'<StarRating icon="star" allowHalf defaultValue={3.5} />'}>
+      <StarComponentDemo id="half" title={t.demos[2][0]} description={t.demos[2][1]} code={halfRatingCode} data={[{ label: 'score', value: `${stars} / 5` }]}>
         <StarRating value={stars} onChange={setStars} icon="star" allowHalf color="#D7992E" aria-label="Star rating" />
       </StarComponentDemo>
       <StarComponentDemo id="count" title={t.demos[3][0]} description={t.demos[3][1]} code={'<StarRating count={3} defaultValue={2} />\n<StarRating count={10} defaultValue={6} />'}>

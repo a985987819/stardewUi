@@ -4,6 +4,9 @@ $tab-bg-active: var(--star-raw-hex-fff3dc);
 $tab-border: var(--star-raw-hex-d7770f);
 $tab-border-dark: var(--star-raw-hex-9d4100);
 $tab-border-light: var(--star-raw-hex-ffe0b2);
+// 外接模式下单个选项卡的边框：比内容框的 $tab-border-dark 浅一档，
+// 选中项贴入内容框时仍能分清「标签」和「内容」。
+$tab-strip-border: var(--star-raw-hex-ca6f1c);
 $tab-text: var(--star-raw-hex-4d2608);
 $tab-text-secondary: var(--star-raw-hex-6a350b);
 $tab-text-active: var(--star-raw-hex-9d4100);
@@ -69,6 +72,17 @@ $tab-step-span: 6px;
   &--bottom &__nav-wrapper {
     border-bottom: none;
     border-top: 3px solid $tab-border;
+  }
+
+  /**
+   * 内容框。内联模式下它只是一层透明的包裹（边框、底色仍在根节点上，默认渲染
+   * 结果与改造前一致），外接模式才自己承担边框。
+   */
+  &__panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
   }
 
   &__nav {
@@ -171,5 +185,89 @@ $tab-step-span: 6px;
     padding: 16px 20px;
     background: $tab-bg;
     min-height: 80px;
+  }
+
+  /**
+   * 外接导航：根节点让出边框与底色，改由内容框承担，选项卡整体挪到框外
+   * （`position="bottom"` 时挂在方框下方）。每个选项卡自己拥有 6px 边框，
+   * 不再把整条导航包成一个大框。
+   *
+   * 这一块写在 `&--bottom` 之后，确保外接底部选中项可以再覆写为向上贴入内容框。
+   */
+  &--external {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    overflow: visible;
+
+    .star-tab__panel {
+      position: relative;
+      // The content frame intentionally paints over the tab edge that touches
+      // it. This keeps the page-tab illusion crisp instead of drawing two
+      // competing borders at the join.
+      z-index: 2;
+      border: 4px solid $tab-border-dark;
+      border-radius: 8px;
+      background: $tab-bg;
+      overflow: hidden;
+    }
+
+    .star-tab__nav-wrapper {
+      position: relative;
+      z-index: 1;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .star-tab__nav {
+      // Center the label group against the edge of its content frame. There is
+      // deliberately no inset: the tabs meet that frame directly.
+      justify-content: center;
+      gap: 2px;
+      padding: 0;
+      overflow: visible;
+    }
+
+    // Each external tab is its own small framed sign, not a cell inside a
+    // shared strip. The selected sign moves four pixels into the panel frame,
+    // so its lower edge reads as physically joined to the content it owns.
+    .star-tab__item {
+      z-index: 1;
+      border: 6px solid $tab-strip-border;
+      // Only the outer (top) edge is rounded. The lower edge is the page
+      // seam: the content frame supplies that edge, so the tab has no bottom
+      // border of its own.
+      border-bottom-width: 0;
+      border-radius: 12px 12px 0 0;
+      padding: 5px;
+      background: #ffcb78;
+      clip-path: none;
+      box-shadow: inset 0 2px 0 $tab-border-light;
+    }
+
+    .star-tab__item--active {
+      z-index: 3;
+      border-color: $tab-border-dark;
+      // Preserve the requested label colour in the selected state too.
+      background: #ffcb78;
+      transform: translateY(4px);
+    }
+
+    .star-tab__indicator {
+      display: none;
+    }
+  }
+
+  &--external.star-tab--bottom {
+    .star-tab__item {
+      // Bottom navigation mirrors the top-edge page-tab treatment.
+      border-top-width: 0;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .star-tab__item--active {
+      transform: translateY(-4px);
+    }
   }
 }

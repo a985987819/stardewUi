@@ -1,4 +1,5 @@
 import './styles/global.module.scss'
+import './styles/motion.scss'
 
 export { BUTTON_VARIANT_COLORS, STAR_COLORS } from './styles/colorTokens'
 export * from './components/ui'

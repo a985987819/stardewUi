@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  addMonths,
   buildCalendarCells,
   getMonthStartTimestamp,
+  getTodayTimestamp,
   isDayInRange,
   isSameDay,
   normalizeToDayTimestamp,
@@ -11,7 +11,8 @@ import {
 } from '../../utils/calendar'
 import { classNames } from '../../utils/classNames'
 import CalendarGrid from './CalendarGrid'
-import StarNineSliceButton from './NineSliceButton'
+import CalendarToolbar from './CalendarToolbar'
+import { formatMonthLabel } from './calendarLabels'
 import styles from './DatePicker.module.scss'
 
 type DatePickerMode = 'single' | 'range'
@@ -36,15 +37,16 @@ export interface StarDatePickerProps {
   maxDate?: number
   disabledDates?: number[]
   showOutsideDays?: boolean
+  /** 「回到今日」按钮文案 */
+  todayLabel?: string
+  /** 是否显示「回到今日」按钮 */
+  showToday?: boolean
+  /** 计算「今日」所用的时区偏移（分钟），默认 480 即东八区 */
+  todayOffsetMinutes?: number
   className?: string
 }
 
-function formatMonthLabel(monthTimestamp: number) {
-  return new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-  }).format(new Date(monthTimestamp))
-}
+const DEFAULT_TODAY_LABEL = '回到今日'
 
 function formatDayLabel(dayTimestamp: number) {
   const date = new Date(dayTimestamp)
@@ -129,6 +131,9 @@ function DatePicker({
   maxDate,
   disabledDates = [],
   showOutsideDays = true,
+  todayLabel = DEFAULT_TODAY_LABEL,
+  showToday = true,
+  todayOffsetMinutes,
   className,
 }: StarDatePickerProps) {
   const isControlled = value !== undefined
@@ -181,6 +186,8 @@ function DatePicker({
         }
 
   const monthTimestamp = internalMonth
+  // 与 Calendar 同一口径：今日按东八区计算，默认偏移 480 分钟。
+  const todayTimestamp = getTodayTimestamp(todayOffsetMinutes)
 
   useEffect(() => {
     if (!isControlled) {
@@ -249,7 +256,10 @@ function DatePicker({
     setInternalSingleValue(null)
   }, [defaultValue, isControlled, mode, value])
 
-  const cells = useMemo(() => buildCalendarCells(monthTimestamp), [monthTimestamp])
+  const cells = useMemo(
+    () => buildCalendarCells(monthTimestamp, todayTimestamp),
+    [monthTimestamp, todayTimestamp],
+  )
   const normalizedMinDate = minDate === undefined ? undefined : normalizeToDayTimestamp(minDate)
   const normalizedMaxDate = maxDate === undefined ? undefined : normalizeToDayTimestamp(maxDate)
   const disabledDateSet = useMemo(
@@ -319,8 +329,8 @@ function DatePicker({
     onChange?.(nextValue)
   }
 
-  const changeMonth = (offset: number) => {
-    setInternalMonth((currentMonth) => addMonths(currentMonth, offset))
+  const changeMonth = (nextMonth: number) => {
+    setInternalMonth(nextMonth)
   }
 
   const getCellStateClassName = (cell: CalendarCell) => {
@@ -372,27 +382,13 @@ function DatePicker({
 
   return (
     <section className={classNames(styles['date-picker'], className)}>
-      <div className={styles['date-picker__toolbar']}>
-        <StarNineSliceButton
-          type="button"
-          variant="concise"
-          size="small"
-          aria-label="Previous month"
-          onClick={() => changeMonth(-1)}
-        >
-          &lt;
-        </StarNineSliceButton>
-        <div className={styles['date-picker__month']}>{formatMonthLabel(monthTimestamp)}</div>
-        <StarNineSliceButton
-          type="button"
-          variant="concise"
-          size="small"
-          aria-label="Next month"
-          onClick={() => changeMonth(1)}
-        >
-          &gt;
-        </StarNineSliceButton>
-      </div>
+      <CalendarToolbar
+        monthTimestamp={monthTimestamp}
+        todayTimestamp={todayTimestamp}
+        todayLabel={todayLabel}
+        showToday={showToday}
+        onSelectMonth={changeMonth}
+      />
 
       <CalendarGrid
         monthLabel={formatMonthLabel(monthTimestamp)}

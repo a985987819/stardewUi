@@ -10,11 +10,11 @@ const text = {
   zh: {
     title: 'Tab 选项卡',
     desc: '像翻农场手册一样切换季节、区域和任务状态。适合把复杂内容拆成清晰的小田块。',
-    toc: ['季节手册', '带图标区域', '底部导航', '自定义选中样式', '全局主题', '禁用选项', '受控模式', 'ReactNode 内容', 'API'],
+    toc: ['带图标区域', '外接选项卡', '底部导航', '自定义选中样式', '全局主题', '禁用选项', '受控模式', 'ReactNode 内容', 'API'],
     sections: {
-      basic: ['季节手册', '每个选项卡都可以承载一段与功能相关的场景文案，切换时像翻到下一页农场日志。'],
       icon: ['带图标区域', '为选项卡添加图标，让农场、钓鱼和矿洞的入口一眼可辨。'],
       bottom: ['底部导航', '把导航放到底部，适合移动端或卡片底部工具栏。'],
+      external: ['外接选项卡', '开启 external 后，每个选项卡都有独立边框；选中项会贴入内容框边缘，搭配 position="bottom" 可以挂在框的下方。'],
       custom: ['自定义选中样式', '不同季节可以拥有不同色彩，选中态会像季节旗帜一样突出。'],
       global: ['全局主题', '选中不同区域时，整个选项卡容器也能跟着变成农场、矿洞或湖边氛围。'],
       disabled: ['禁用选项', '未解锁区域可以先显示出来，但暂时禁止点击。'],
@@ -26,11 +26,11 @@ const text = {
   en: {
     title: 'Tab',
     desc: 'Switch seasons, locations, and quest states like flipping through a farm manual. Tabs keep dense content in tidy plots.',
-    toc: ['Season Manual', 'Icon Locations', 'Bottom Navigation', 'Custom Active Style', 'Global Theme', 'Disabled Item', 'Controlled Mode', 'ReactNode Content', 'API'],
+    toc: ['Icon Locations', 'External Tabs', 'Bottom Navigation', 'Custom Active Style', 'Global Theme', 'Disabled Item', 'Controlled Mode', 'ReactNode Content', 'API'],
     sections: {
-      basic: ['Season Manual', 'Each tab can carry component-aware story copy, so switching feels like turning a page in the farm log.'],
       icon: ['Icon Locations', 'Add icons so farm, fishing, and mine entrances are recognizable at a glance.'],
       bottom: ['Bottom Navigation', 'Move navigation to the bottom for mobile layouts or card footers.'],
+      external: ['External Tabs', 'With external enabled, each tab has its own frame and the active tab tucks into the content edge; pair it with position="bottom" to hang the tabs below the frame.'],
       custom: ['Custom Active Style', 'Give each season its own color and make the active tab read like a seasonal banner.'],
       global: ['Global Theme', 'Let the whole tab container shift mood when farm, mine, or lake content is active.'],
       disabled: ['Disabled Item', 'Show locked areas while preventing interaction until the player is ready.'],
@@ -63,6 +63,7 @@ const apiData = {
     { property: 'defaultActiveKey', description: '默认激活的 key', type: 'string', default: '第一项 key' },
     { property: 'onChange', description: '切换选项卡时触发', type: '(key: string) => void', default: '-' },
     { property: 'position', description: '导航栏位置', type: "'top' | 'bottom'", default: "'top'" },
+    { property: 'external', description: '外接导航：选项卡移到内容框外，内容仍留在框内', type: 'boolean', default: 'false' },
   ],
   en: [
     { property: 'items', description: 'Tab item list.', type: 'StarTabItem[]', default: '-', required: true },
@@ -70,6 +71,7 @@ const apiData = {
     { property: 'defaultActiveKey', description: 'Initial active key.', type: 'string', default: 'first item key' },
     { property: 'onChange', description: 'Called when the active tab changes.', type: '(key: string) => void', default: '-' },
     { property: 'position', description: 'Navigation position.', type: "'top' | 'bottom'", default: "'top'" },
+    { property: 'external', description: 'Renders the tab strip outside the content frame.', type: 'boolean', default: 'false' },
   ],
 }
 
@@ -80,11 +82,34 @@ const code = `<StarTab
   ]}
 />`
 
+const externalCode = `<StarTab external items={items} />            // 选项卡在内容框上方
+<StarTab external position="bottom" items={items} /> // 选项卡在内容框下方`
+
+const controlledTabCode = `import { useState } from 'react'
+import { StarTab } from 'stardew-valley-ui'
+
+const seasons = [
+  { key: 'spring', label: 'Spring', content: 'Plant potatoes and strawberries.' },
+  { key: 'summer', label: 'Summer', content: 'Blueberries love the heat.' },
+  { key: 'fall', label: 'Fall', content: 'Pumpkins fill the shed.' },
+]
+
+export function SeasonTabs() {
+  const [activeKey, setActiveKey] = useState('spring')
+
+  return (
+    <>
+      <StarTab activeKey={activeKey} onChange={setActiveKey} items={seasons} />
+      <output>Active tab: {activeKey}</output>
+    </>
+  )
+}`
+
 function StarTabDemoPage() {
   const { lang } = useI18n()
   const copy = text[lang]
   const [controlledKey, setControlledKey] = useState('spring')
-  const toc = copy.toc.map((title, index) => ({ id: ['basic', 'icon', 'position', 'custom', 'global', 'disabled', 'controlled', 'nodeContent', 'api'][index], title, level: 1 }))
+  const toc = copy.toc.map((title, index) => ({ id: ['icon', 'external', 'position', 'custom', 'global', 'disabled', 'controlled', 'nodeContent', 'api'][index], title, level: 1 }))
   const items = seasonItems[lang]
 
   const iconItems = useMemo(
@@ -98,11 +123,15 @@ function StarTabDemoPage() {
 
   return (
     <StarComponentPage title={copy.title} description={copy.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={copy.sections.basic[0]} description={copy.sections.basic[1]} code={code}>
-        <div style={{ width: '100%' }}><StarTab items={items} /></div>
-      </StarComponentDemo>
-      <StarComponentDemo id="icon" title={copy.sections.icon[0]} description={copy.sections.icon[1]} code={code}>
+      <StarComponentDemo id="icon" title={copy.sections.icon[0]} description={copy.sections.icon[1]} code={code} data={[{ label: 'items', value: `${iconItems.length} locations` }]}>
         <div style={{ width: '100%' }}><StarTab items={iconItems} /></div>
+      </StarComponentDemo>
+      <StarComponentDemo id="external" title={copy.sections.external[0]} description={copy.sections.external[1]} code={externalCode}>
+        <div style={{ width: '100%' }}>
+          <StarTab external items={items} />
+          <div style={{ height: 20 }} />
+          <StarTab external position="bottom" items={iconItems} />
+        </div>
       </StarComponentDemo>
       <StarComponentDemo id="position" title={copy.sections.bottom[0]} description={copy.sections.bottom[1]} code={code}>
         <div style={{ width: '100%' }}><StarTab items={iconItems} position="bottom" /></div>
@@ -116,10 +145,9 @@ function StarTabDemoPage() {
       <StarComponentDemo id="disabled" title={copy.sections.disabled[0]} description={copy.sections.disabled[1]} code={code}>
         <div style={{ width: '100%' }}><StarTab items={[items[0], { ...items[1], label: lang === 'zh' ? '未解锁海滩' : 'Locked Beach', disabled: true }, items[2]]} /></div>
       </StarComponentDemo>
-      <StarComponentDemo id="controlled" title={copy.sections.controlled[0]} description={copy.sections.controlled[1]} code={code}>
+      <StarComponentDemo id="controlled" title={copy.sections.controlled[0]} description={copy.sections.controlled[1]} code={controlledTabCode} data={[{ label: 'activeKey', value: controlledKey }, { label: 'available keys', value: items.map((item) => item.key).join(', ') }]}>
         <div style={{ width: '100%' }}>
           <StarTab activeKey={controlledKey} onChange={setControlledKey} items={items} />
-          <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-text-tertiary)' }}>{copy.sections.current}: <strong>{controlledKey}</strong></p>
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="nodeContent" title={copy.sections.node[0]} description={copy.sections.node[1]} code={code}>
