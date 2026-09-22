@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Checkbox from './Checkbox'
 import styles from './Checkbox.module.scss'
@@ -58,5 +58,32 @@ describe('Checkbox', () => {
     expect(potato).toBeDisabled()
     fireEvent.click(potato)
     expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it('keeps the mark mounted across a state change so enter and exit motions can play', async () => {
+    const { container } = render(<Checkbox options={options} />)
+
+    expect(container.querySelector(`.${styles['star-checkbox__mark']}`)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('checkbox', { name: '防风草' }))
+
+    await waitFor(() => expect(container.querySelector('[data-motion="in"]')).toBeInTheDocument())
+
+    fireEvent.click(screen.getByRole('checkbox', { name: '防风草' }))
+    await waitFor(() => expect(container.querySelector('[data-motion="out"]')).toBeInTheDocument())
+  })
+
+  it('limits selection to one option in radio mode and exposes radio semantics', () => {
+    const onChange = vi.fn()
+    render(<Checkbox options={options} radio defaultValue={['parsnip', 'potato']} onChange={onChange} aria-label="耕作方式" />)
+
+    expect(screen.getByRole('radiogroup', { name: '耕作方式' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '防风草' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('radio', { name: '土豆' })).toHaveAttribute('aria-checked', 'false')
+
+    fireEvent.click(screen.getByRole('radio', { name: '土豆' }))
+    expect(onChange).toHaveBeenCalledWith(['potato'])
+
+    fireEvent.click(screen.getByRole('radio', { name: '防风草' }))
+    expect(onChange).toHaveBeenLastCalledWith(['parsnip'])
   })
 })

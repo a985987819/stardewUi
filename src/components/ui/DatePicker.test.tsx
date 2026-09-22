@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { normalizeToDayTimestamp } from '../../utils/calendar'
+import { getMonthStartTimestamp, normalizeToDayTimestamp } from '../../utils/calendar'
 import DatePicker from './DatePicker'
+import { formatMonthLabel } from './calendarLabels'
 
 function getDayButton(label: string) {
   return screen.getByRole('button', { name: label })
@@ -243,5 +244,60 @@ describe('DatePicker', () => {
     expect(getDayButton('2024-05-20')).toHaveAttribute('data-selected', 'true')
     expect(getDayButton('2024-05-22')).toHaveAttribute('data-selected', 'true')
     expect(getDayButton('2024-05-21')).toHaveAttribute('data-in-range', 'true')
+  })
+
+  describe('month navigation toolbar', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('jumps to a month picked from the year/month dropdown', () => {
+      render(<DatePicker defaultValue={normalizeToDayTimestamp('2024-05-13')} />)
+
+      fireEvent.click(
+        screen.getByRole('button', { name: formatMonthLabel(getMonthStartTimestamp('2024-05-01')) }),
+      )
+
+      const panel = screen.getByRole('dialog', { name: '选择年月' })
+
+      fireEvent.click(within(panel).getByRole('button', { name: '2024年11月' }))
+
+      expect(getGrid()).toHaveAttribute(
+        'aria-label',
+        formatMonthLabel(getMonthStartTimestamp('2024-11-01')),
+      )
+    })
+
+    it('returns to the UTC+8 today month without touching the selected value', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(Date.UTC(2026, 8, 22, 10, 0)))
+      const handleChange = vi.fn()
+
+      render(
+        <DatePicker
+          defaultValue={normalizeToDayTimestamp('2024-05-13')}
+          onChange={handleChange}
+        />,
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: '回到今日' }))
+
+      expect(getGrid()).toHaveAttribute(
+        'aria-label',
+        formatMonthLabel(getMonthStartTimestamp('2026-09-01')),
+      )
+      expect(handleChange).not.toHaveBeenCalled()
+    })
+
+    it('keeps the today button label configurable and removable', () => {
+      const { rerender } = render(<DatePicker todayLabel="Today" />)
+
+      expect(screen.getByRole('button', { name: 'Today' })).toBeInTheDocument()
+
+      rerender(<DatePicker showToday={false} />)
+
+      expect(screen.queryByRole('button', { name: 'Today' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '回到今日' })).toBeNull()
+    })
   })
 })

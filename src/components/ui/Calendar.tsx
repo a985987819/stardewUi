@@ -1,15 +1,15 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
-  addMonths,
   buildCalendarCells,
   getMonthStartTimestamp,
+  getTodayTimestamp,
   groupCalendarItemsByDay,
   type CalendarCell,
   type CalendarInput,
 } from '../../utils/calendar'
 import { classNames } from '../../utils/classNames'
 import CalendarGrid from './CalendarGrid'
-import StarNineSliceButton from './NineSliceButton'
+import CalendarToolbar from './CalendarToolbar'
 import styles from './Calendar.module.scss'
 
 export interface CalendarItem {
@@ -31,10 +31,17 @@ export interface StarCalendarProps {
   maxVisibleMarkers?: number
   iconMap?: Record<string, ReactNode | string>
   showOutsideDays?: boolean
+  /** 「回到今日」按钮文案 */
+  todayLabel?: string
+  /** 是否显示「回到今日」按钮 */
+  showToday?: boolean
+  /** 计算「今日」所用的时区偏移（分钟），默认 480 即东八区 */
+  todayOffsetMinutes?: number
   className?: string
 }
 
 const DEFAULT_MAX_VISIBLE_MARKERS = 3
+const DEFAULT_TODAY_LABEL = '回到今日'
 
 function getInitialMonth(value?: number, defaultValue?: number) {
   if (value !== undefined) {
@@ -46,13 +53,6 @@ function getInitialMonth(value?: number, defaultValue?: number) {
   }
 
   return getMonthStartTimestamp(Date.now())
-}
-
-function formatMonthLabel(monthTimestamp: number) {
-  return new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-  }).format(new Date(monthTimestamp))
 }
 
 function formatDayLabel(dayTimestamp: number) {
@@ -99,6 +99,9 @@ function Calendar({
   maxVisibleMarkers = DEFAULT_MAX_VISIBLE_MARKERS,
   iconMap,
   showOutsideDays = true,
+  todayLabel = DEFAULT_TODAY_LABEL,
+  showToday = true,
+  todayOffsetMinutes,
   className,
 }: StarCalendarProps) {
   const [internalMonth, setInternalMonth] = useState(() => getInitialMonth(value, defaultValue))
@@ -106,8 +109,14 @@ function Calendar({
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const isControlled = value !== undefined
   const monthTimestamp = isControlled ? getMonthStartTimestamp(value) : internalMonth
+  // 「今日」按东八区算，与「回到今日」落点保持同一个口径：格子高亮和按钮跳转
+  // 都读这一个值，所以跨时区访问时不会出现「按钮跳过去但没高亮」。
+  const todayTimestamp = getTodayTimestamp(todayOffsetMinutes)
 
-  const cells = useMemo(() => buildCalendarCells(monthTimestamp), [monthTimestamp])
+  const cells = useMemo(
+    () => buildCalendarCells(monthTimestamp, todayTimestamp),
+    [monthTimestamp, todayTimestamp],
+  )
   const itemsByDay = useMemo(() => groupCalendarItemsByDay(items), [items])
   const activeItems = activeDayTimestamp !== null ? itemsByDay[activeDayTimestamp] ?? [] : []
 
@@ -125,8 +134,12 @@ function Calendar({
     setTooltipPosition({ x: e.clientX + 12, y: e.clientY + 12 })
   }
 
-  const changeMonth = (offset: number) => {
-    const nextMonth = addMonths(monthTimestamp, offset)
+  const changeMonth = (nextMonth: number) => {
+    // 翻月、下拉选月、「回到今日」都走这一条路径：目标月份和当前一致时不再重
+    // 复通知，避免「回到今日」在本月内触发一次无意义的 onMonthChange。
+    if (nextMonth === monthTimestamp) {
+      return
+    }
 
     if (!isControlled) {
       setInternalMonth(nextMonth)
@@ -166,27 +179,13 @@ function Calendar({
 
   return (
     <section className={classNames(styles.calendar, className)}>
-      <div className={styles['calendar__toolbar']}>
-        <StarNineSliceButton
-          type="button"
-          variant="concise"
-          size="small"
-          aria-label="Previous month"
-          onClick={() => changeMonth(-1)}
-        >
-          &lt;
-        </StarNineSliceButton>
-        <div className={styles['calendar__month']}>{formatMonthLabel(monthTimestamp)}</div>
-        <StarNineSliceButton
-          type="button"
-          variant="concise"
-          size="small"
-          aria-label="Next month"
-          onClick={() => changeMonth(1)}
-        >
-          &gt;
-        </StarNineSliceButton>
-      </div>
+      <CalendarToolbar
+        monthTimestamp={monthTimestamp}
+        todayTimestamp={todayTimestamp}
+        todayLabel={todayLabel}
+        showToday={showToday}
+        onSelectMonth={changeMonth}
+      />
 
       <CalendarGrid
         cells={cells}

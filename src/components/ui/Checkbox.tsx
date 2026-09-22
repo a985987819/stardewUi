@@ -39,13 +39,18 @@ export interface StarCheckboxProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   size?: CheckboxSize
   /** Square Card frame by default; round turns the frame into a seal. */
   shape?: CheckboxShape
+  /** Limits selection to one option and exposes radio-group semantics. */
+  radio?: boolean
   /** Accessible name of the group. */
   'aria-label'?: string
 }
 
 const CHECK_IN_DURATION_MS = 360
-/** Shared Rating-loss motion, now deliberately half of its former 540ms pace. */
-const CHECK_OUT_DURATION_MS = 270
+/**
+ * Checkbox exits should clear quickly so a fast re-check does not feel held
+ * back by the old state. Rating keeps its own, longer shared loss rhythm.
+ */
+const CHECK_OUT_DURATION_MS = 150
 
 /**
  * Keeps a red check in the DOM while it leaves. That lets removal reuse the
@@ -77,11 +82,9 @@ function CheckboxMark({ checked }: { checked: boolean }) {
     return () => window.clearTimeout(timer)
   }, [checked])
 
-  if (!visible) return null
-
   return (
     <span className={styles['star-checkbox__mark']} data-motion={motion ?? undefined} aria-hidden>
-      <span className={styles['star-checkbox__mark-glyph']}>✔</span>
+      {visible ? <span className={styles['star-checkbox__mark-glyph']}>✔</span> : null}
     </span>
   )
 }
@@ -100,20 +103,31 @@ function StarCheckbox({
   disabled = false,
   size = 'medium',
   shape = 'square',
+  radio = false,
   className,
   style,
   'aria-label': ariaLabel = 'Checkbox',
   ...rest
 }: StarCheckboxProps) {
   const [internalValue, setInternalValue] = useState<string[]>(() => [...new Set(defaultValue)])
-  const selectedValues = value ?? internalValue
+  const rawSelectedValues = value ?? internalValue
+  // Radio mode remains API-compatible with checkbox mode (it still reports a
+  // string array), but deliberately exposes at most one selected value.
+  const selectedValues = radio ? rawSelectedValues.slice(0, 1) : rawSelectedValues
 
   const toggle = (option: CheckboxOption) => {
     if (disabled || option.disabled) return
 
-    const nextValue = selectedValues.includes(option.value)
-      ? selectedValues.filter((item) => item !== option.value)
-      : [...selectedValues, option.value]
+    const alreadySelected = selectedValues.includes(option.value)
+    // A radio selection is sticky: clicking the selected option doesn't leave
+    // the group empty, matching native radio-button behaviour.
+    if (radio && alreadySelected) return
+
+    const nextValue = radio
+      ? [option.value]
+      : alreadySelected
+        ? selectedValues.filter((item) => item !== option.value)
+        : [...selectedValues, option.value]
 
     if (value === undefined) setInternalValue(nextValue)
     onChange?.(nextValue)
@@ -122,7 +136,7 @@ function StarCheckbox({
   return (
     <div
       {...rest}
-      role="group"
+      role={radio ? 'radiogroup' : 'group'}
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
       className={classNames(
@@ -130,6 +144,7 @@ function StarCheckbox({
         styles[`star-checkbox--${direction}`],
         styles[`star-checkbox--${size}`],
         styles[`star-checkbox--${shape}`],
+        radio && styles['star-checkbox--radio'],
         disabled && styles['star-checkbox--disabled'],
         className,
       )}
@@ -143,7 +158,7 @@ function StarCheckbox({
           <button
             key={option.value}
             type="button"
-            role="checkbox"
+            role={radio ? 'radio' : 'checkbox'}
             aria-checked={checked}
             disabled={optionDisabled}
             className={classNames(

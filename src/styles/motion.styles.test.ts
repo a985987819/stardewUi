@@ -9,6 +9,8 @@ const motion = read('src/styles/motion.scss')
 const checkbox = read('src/components/ui/Checkbox.module.scss')
 const progress = read('src/components/ui/Progress.module.scss')
 const rating = read('src/components/ui/Rating.module.scss')
+const appEntry = read('src/main.tsx')
+const libraryEntry = read('src/index.ts')
 
 describe('shared component motion', () => {
   it('defines the four reusable state-change motions and the faster shared exit duration once', () => {
@@ -33,5 +35,10 @@ describe('shared component motion', () => {
     expect(rating).not.toContain('@keyframes star-rating-pop-in')
     expect(rating).not.toContain('@keyframes star-rating-shake')
     expect(rating).not.toContain('@keyframes star-rating-fill-out')
+  })
+
+  it('loads the shared motion stylesheet from both application and library entries', () => {
+    expect(appEntry).toContain("import './styles/motion.scss'")
+    expect(libraryEntry).toContain("import './styles/motion.scss'")
   })
 })

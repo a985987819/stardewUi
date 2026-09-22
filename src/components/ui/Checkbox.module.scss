@@ -8,9 +8,13 @@ $checkbox-shadow: var(--star-raw-hex-6a350b);
 $checkbox-check: var(--star-raw-hex-e53935);
 
 .star-checkbox {
-  --checkbox-control-size: 32px;
-  --checkbox-frame-width: 4px;
-  --checkbox-inner-width: 2px;
+  // The red check keeps its established scale; its wooden tile is four fifths
+  // that size so the mark still reads as a floating stamp above the tile.
+  --checkbox-check-size: 23.04px;
+  --checkbox-control-size: calc(var(--checkbox-check-size) * 0.8);
+  --checkbox-loss-duration: 150ms;
+  --checkbox-frame-width: 1px;
+  --checkbox-inner-width: 0.5px;
   --checkbox-label-size: 15px;
 
   display: inline-flex;
@@ -29,23 +33,23 @@ $checkbox-check: var(--star-raw-hex-e53935);
   }
 
   &--small {
-    --checkbox-control-size: 24px;
-    --checkbox-frame-width: 1.5px;
+    --checkbox-check-size: 17.28px;
+    --checkbox-frame-width: 1px;
     --checkbox-inner-width: 0.5px;
     --checkbox-label-size: 13px;
   }
 
   &--medium {
-    --checkbox-control-size: 32px;
-    --checkbox-frame-width: 2px;
-    --checkbox-inner-width: 1px;
+    --checkbox-check-size: 23.04px;
+    --checkbox-frame-width: 1px;
+    --checkbox-inner-width: 0.5px;
     --checkbox-label-size: 15px;
   }
 
   &--large {
-    --checkbox-control-size: 40px;
-    --checkbox-frame-width: 2.5px;
-    --checkbox-inner-width: 1px;
+    --checkbox-check-size: 28.8px;
+    --checkbox-frame-width: 1.5px;
+    --checkbox-inner-width: 0.5px;
     --checkbox-label-size: 17px;
   }
 
@@ -83,6 +87,13 @@ $checkbox-check: var(--star-raw-hex-e53935);
     &:disabled {
       cursor: not-allowed;
     }
+
+    // A locked task should look washed out as a whole: the label, tiny wooden
+    // tile, and any retained check all share the same muted disabled state.
+    &--disabled {
+      opacity: 0.42;
+      filter: saturate(0.32) contrast(0.88);
+    }
   }
 
   &__control {
@@ -119,7 +130,11 @@ $checkbox-check: var(--star-raw-hex-e53935);
   &__surface {
     z-index: 0;
     background:
-      linear-gradient(135deg, var(--star-raw-rgba-255-255-255-0-28), transparent 44%),
+      linear-gradient(
+        135deg,
+        var(--star-raw-rgba-255-255-255-0-28),
+        transparent 44%
+      ),
       $checkbox-surface;
   }
 
@@ -140,16 +155,19 @@ $checkbox-check: var(--star-raw-hex-e53935);
   }
 
   &__mark {
-    // Shift the original-size check slightly above/right of the control. The
-    // expanded mark box gives both its mask and its exit shake room to float.
-    inset: -12px -10px 2px 0;
+    // The expanded mark box gives both its mask and its exit shake room to
+    // float. Its paired horizontal insets shift the full check 5px left
+    // without competing with the exit animation's transform.
+    inset: calc(var(--checkbox-check-size) * -0.3)
+      calc(var(--checkbox-check-size) * -0.48 + 3px) 0
+      calc(var(--checkbox-check-size) * -0.14 - 3px);
     z-index: 2;
     display: grid;
     place-items: center;
     pointer-events: none;
     color: $checkbox-check;
     font-family: var(--font-pixel);
-    font-size: calc(var(--checkbox-control-size) * 0.72);
+    font-size: var(--checkbox-check-size);
     font-weight: 700;
     line-height: 1;
     text-shadow: 1px 2px 0 var(--star-raw-rgba-157-65-0-0-38);
@@ -158,22 +176,27 @@ $checkbox-check: var(--star-raw-hex-e53935);
   &__mark-glyph {
     display: block;
     transform-origin: center;
+    filter: drop-shadow(0 5px 0 var(--star-raw-rgba-157-65-0-0-32));
   }
 
   // The check begins nearly concealed, then speeds up across the last stretch:
   // a literal left-to-right masking reveal rather than a generic fade-in.
-  &__mark[data-motion='in'] &__mark-glyph {
-    animation: var(--star-motion-mask-reveal-name) var(--star-motion-mask-reveal-duration) cubic-bezier(0.72, 0, 1, 1) both;
+  &__mark[data-motion="in"] &__mark-glyph {
+    animation: var(--star-motion-mask-reveal-name)
+      var(--star-motion-mask-reveal-duration) cubic-bezier(0.72, 0, 1, 1) both;
   }
 
-  // Same two-part timing as Rating's loss motion: shake first, then enlarge,
-  // shrink and fade the painted mark. The control frame itself never jumps.
-  &__mark[data-motion='out'] {
-    animation: var(--star-motion-loss-shake-name) var(--star-motion-loss-duration) ease-in-out both;
+  // Same two-part shape as Rating's loss motion, but with Checkbox's brisker
+  // duration: shake first, then enlarge, shrink and fade the painted mark.
+  // The control frame itself never jumps.
+  &__mark[data-motion="out"] {
+    animation: var(--star-motion-loss-shake-name) var(--checkbox-loss-duration)
+      ease-in-out both;
   }
 
-  &__mark[data-motion='out'] &__mark-glyph {
-    animation: var(--star-motion-loss-shrink-name) var(--star-motion-loss-duration) cubic-bezier(0.4, 0, 0.7, 0.2) both;
+  &__mark[data-motion="out"] &__mark-glyph {
+    animation: var(--star-motion-loss-shrink-name) var(--checkbox-loss-duration)
+      cubic-bezier(0.4, 0, 0.7, 0.2) both;
   }
 
   &__label {

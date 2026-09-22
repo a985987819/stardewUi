@@ -689,6 +689,7 @@ const crops = [
 | disabled | `boolean` | `false` | 禁用整个多选框组 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 控件尺寸 |
 | shape | `'square' \| 'round'` | `'square'` | Card 方框或圆形印章框 |
+| radio | `boolean` | `false` | 单选模式；最多选择一项，并使用 `radiogroup` / `radio` 语义 |
 | aria-label | `string` | `'Checkbox'` | 多选框组的无障碍名称 |
 
 ---

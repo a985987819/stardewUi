@@ -2,14 +2,7 @@
 
 .date-picker {
   @include common.calendar-container;
-}
-
-.date-picker__toolbar {
-  @include common.calendar-toolbar;
-}
-
-.date-picker__month {
-  @include common.calendar-month-label;
+  position: relative;
 }
 
 .date-picker__cell--selected button,

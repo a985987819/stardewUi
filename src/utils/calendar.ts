@@ -12,6 +12,12 @@ export interface CalendarCell {
 
 const DAYS_IN_WEEK = 7
 const CALENDAR_CELLS = 42
+
+/**
+ * 「今日」默认按东八区（Asia/Shanghai）计算。中国大陆不使用夏令时，偏移全年
+ * 固定为 +08:00，所以这里可以直接用常量分钟数而不是完整时区数据库。
+ */
+export const CHINA_STANDARD_TIME_OFFSET_MINUTES = 8 * 60
 const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/
 const ISO_LOCAL_DATETIME_PATTERN =
   /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?$/
@@ -130,6 +136,24 @@ export function getMonthStartTimestamp(input: CalendarInput): number {
   return new Date(date.getFullYear(), date.getMonth(), 1).getTime()
 }
 
+/**
+ * 指定时区下「今天」的那一天，返回值仍然是与 `buildCalendarCells` 同源的
+ * **本地零点时间戳**：先把瞬间平移到目标时区读出年月日，再按本地日历日建时间戳。
+ * 这样跨时区算出来的「今日」能和日历格子直接比较，不会因为浏览器时区而错位。
+ *
+ * `now` 放在第二位是为了让组件里可以只传偏移量：`Date.now()` 默认值留在本模块内，
+ * 组件渲染路径上就不会出现 `Date.now()` 这类杂质调用（react-hooks/purity）。
+ */
+export function getTodayTimestamp(
+  offsetMinutes: number = CHINA_STANDARD_TIME_OFFSET_MINUTES,
+  now: CalendarInput = Date.now(),
+): number {
+  const instant = toValidDate(now).getTime()
+  const shifted = new Date(instant + offsetMinutes * 60_000)
+
+  return new Date(shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate()).getTime()
+}
+
 export function addMonths(monthTimestamp: CalendarInput, offset: number): number {
   const monthStart = getMonthStartTimestamp(monthTimestamp)
   const date = new Date(monthStart)
@@ -177,7 +201,10 @@ export function groupCalendarItemsByDay<Item extends { date: CalendarInput }>(
   }, {})
 }
 
-export function buildCalendarCells(monthTimestamp: CalendarInput): CalendarCell[] {
+export function buildCalendarCells(
+  monthTimestamp: CalendarInput,
+  todayTimestamp: CalendarInput = getTodayTimestamp(),
+): CalendarCell[] {
   const currentMonthStart = getMonthStartTimestamp(monthTimestamp)
   const currentMonthDate = new Date(currentMonthStart)
   const firstDayOffset = getDayOfWeek(currentMonthDate) - 1
@@ -186,7 +213,7 @@ export function buildCalendarCells(monthTimestamp: CalendarInput): CalendarCell[
     currentMonthDate.getMonth(),
     1 - firstDayOffset,
   )
-  const todayTimestamp = normalizeToDayTimestamp(new Date())
+  const normalizedTodayTimestamp = normalizeToDayTimestamp(todayTimestamp)
 
   return Array.from({ length: CALENDAR_CELLS }, (_, index) => {
     const cellDate = new Date(
@@ -201,7 +228,7 @@ export function buildCalendarCells(monthTimestamp: CalendarInput): CalendarCell[
       dayNumber: cellDate.getDate(),
       dayOfWeek: (((index % DAYS_IN_WEEK) + 1) as CalendarDayOfWeek),
       inCurrentMonth: cellDate.getMonth() === currentMonthDate.getMonth(),
-      isToday: dateTimestamp === todayTimestamp,
+      isToday: dateTimestamp === normalizedTodayTimestamp,
     }
   })
 }
