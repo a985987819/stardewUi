@@ -39,3 +39,6 @@ pnpm-lock.yaml
 *.njsproj
 *.sln
 *.sw?
+
+# OpenMemory - IDE/Assistant specific rules
+CLAUDE.md

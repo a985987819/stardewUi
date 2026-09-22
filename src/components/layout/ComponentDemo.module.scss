@@ -44,6 +44,32 @@
     border-top: 3px solid var(--star-raw-rgba-157-65-0-0-22);
   }
 
+  &-code-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+    color: var(--color-text);
+    font-size: 13px;
+
+    span:first-child {
+      color: var(--star-raw-hex-7a3514);
+      font-weight: 700;
+    }
+
+    span:last-child {
+      color: var(--color-text-tertiary);
+      font-size: 11px;
+    }
+
+    @media (max-width: 520px) {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
   &-code-block {
     border: none;
     box-shadow: none;

@@ -14,16 +14,47 @@ interface ComponentDemoProps {
   id?: string
 }
 
+const libraryComponentPattern = /\b(Star[A-Z][A-Za-z0-9]*)\b/g
+const lucideComponentPattern = /<([A-Z][A-Za-z0-9]*)\b/g
+const lucideComponents = new Set(['Search'])
+
+const unique = (values: string[]) => [...new Set(values)]
+
+/**
+ * Turns the concise JSX passed by a demo page into a copy-ready snippet. Demo
+ * pages only describe the meaningful usage; the shared frame owns the package
+ * imports so the visible code never silently omits its component references.
+ */
+export function createCopyableDemoCode(code: string): string {
+  if (code.includes("from 'stardew-valley-ui'") || code.includes('from "stardew-valley-ui"')) {
+    return code
+  }
+
+  const libraryImports = unique([...code.matchAll(libraryComponentPattern)].map(([, component]) => component))
+  const iconImports = unique(
+    [...code.matchAll(lucideComponentPattern)]
+      .map(([, component]) => component)
+      .filter((component) => lucideComponents.has(component)),
+  )
+  const imports = [
+    libraryImports.length > 0 ? `import { ${libraryImports.join(', ')} } from 'stardew-valley-ui'` : null,
+    iconImports.length > 0 ? `import { ${iconImports.join(', ')} } from 'lucide-react'` : null,
+  ].filter((statement): statement is string => statement !== null)
+
+  return imports.length > 0 ? `${imports.join('\n')}\n\n${code}` : code
+}
+
 function StarComponentDemo({
   title,
   description,
   children,
   code,
-  defaultShowCode = false,
+  defaultShowCode = true,
   id,
 }: ComponentDemoProps) {
   const [showCode, setShowCode] = useState(defaultShowCode)
   const { t } = useI18n()
+  const copyableCode = code ? createCopyableDemoCode(code) : undefined
 
   return (
     <StarCard
@@ -42,9 +73,13 @@ function StarComponentDemo({
           </button>
         </div>
       ) : null}
-      {showCode && code ? (
+      {showCode && copyableCode ? (
         <div className={styles['component-demo-code']}>
-          <StarCodeBlock code={code} language="tsx" className={styles['component-demo-code-block']} />
+          <div className={styles['component-demo-code-heading']}>
+            <span>{t('demo.copyReady')}</span>
+            <span>{t('demo.copyReadyHint')}</span>
+          </div>
+          <StarCodeBlock code={copyableCode} language="tsx" className={styles['component-demo-code-block']} />
         </div>
       ) : null}
     </StarCard>
