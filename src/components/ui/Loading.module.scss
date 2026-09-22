@@ -1,12 +1,13 @@
 .loading {
-  --star-loading-size: 28px;
+  --star-loading-size: 144px;
   --star-loading-gap: 8px;
-  --star-loading-jolt-x: 0px;
-  --star-loading-jolt-y: 0px;
-  --star-loading-jolt-rotate: 0deg;
-  --star-loading-jolt-scale: 1;
-  --star-loading-jolt-duration: 300ms;
-  --star-loading-jolt-easing: cubic-bezier(0.34, 1.46, 0.64, 1);
+  // The 3:4 carrot sprites need a little more radial breathing room than the
+  // square sprinkler. This keeps a fully grown plant visibly on the ring,
+  // instead of crossing into the central tool.
+  --star-loading-carrot-size: calc(var(--star-loading-size) * 0.2);
+  --star-loading-orbit-x: calc(var(--star-loading-size) * 0.56);
+  --star-loading-orbit-y: calc(var(--star-loading-orbit-x) * 0.42);
+  --star-loading-garden-height: calc(var(--star-loading-size) * 0.68);
 
   display: inline-flex;
   flex-direction: column;
@@ -16,43 +17,57 @@
   vertical-align: middle;
   color: var(--star-raw-hex-7a4c24);
 
-  &--center {
-    justify-content: center;
-    text-align: center;
-  }
+  &--center { justify-content: center; text-align: center; }
+  &--block { display: flex; width: 100%; }
+  &--fill { display: flex; width: 100%; height: 100%; min-height: 100%; align-items: center; }
 
-  &--block {
-    display: flex;
-    width: 100%;
-  }
-
-  &--fill {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    min-height: 100%;
-    align-items: center;
-  }
-
-  /**
-   * The chew is a real eased transition, not `steps(2)`: the component hands
-   * over a fresh impulse on every bite (recoil + squash + twist), then settles
-   * back to rest with a slight overshoot so it reads as a soft bounce.
-   */
-  &__canvas {
-    display: block;
+  &__garden {
+    position: relative;
     width: var(--star-loading-size);
-    height: var(--star-loading-size);
-    flex: 0 0 var(--star-loading-size);
-    transform-origin: 50% 50%;
-    transform: translate(var(--star-loading-jolt-x), var(--star-loading-jolt-y))
-      rotate(var(--star-loading-jolt-rotate)) scale(var(--star-loading-jolt-scale));
-    transition: transform var(--star-loading-jolt-duration) var(--star-loading-jolt-easing);
-    will-change: transform;
+    height: var(--star-loading-garden-height);
+    flex: 0 0 var(--star-loading-garden-height);
   }
 
-  &__text {
-    line-height: 1.2;
-    white-space: nowrap;
+  &__sprinkler {
+    position: absolute;
+    top: 50%; left: 50%; z-index: 1;
+    width: calc(var(--star-loading-size) * 0.3);
+    height: auto;
+    transform: translate(-50%, -50%);
   }
+
+  &__carrot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: var(--star-loading-carrot-size);
+    aspect-ratio: 3 / 4;
+    transform: translate(-50%, -50%)
+      translate(
+        calc(var(--star-loading-carrot-x) * var(--star-loading-orbit-x)),
+        calc(var(--star-loading-carrot-y) * var(--star-loading-orbit-y))
+      );
+    transform-origin: center;
+
+    img { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+    &[data-grown] {
+      z-index: 2;
+    }
+
+    &[data-grown] img {
+      animation: star-loading-carrot-grow 300ms cubic-bezier(0.18, 1.45, 0.4, 1) both;
+    }
+  }
+
+  &__text { line-height: 1.35; white-space: nowrap; text-align: center; }
+}
+
+@keyframes star-loading-carrot-grow {
+  0% { opacity: 0; transform: scale(0.4); }
+  65% { opacity: 1; transform: scale(1.13); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading__carrot[data-grown] img { animation: none; }
 }

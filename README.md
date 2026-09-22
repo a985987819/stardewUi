@@ -465,14 +465,15 @@ import { StarDatePicker } from 'stardew-valley-ui'
 
 ### StarLoading - 加载
 
-像素风加载动画组件，包子被吃掉的动画效果。
+像素风加载动画组件：中央洒水器带动八株胡萝卜沿扁圆轨迹顺时针成熟，提示文案的尾部点号会随每秒的生长节奏循环。
 
 ```tsx
 import { StarLoading } from 'stardew-valley-ui'
 
 <StarLoading />
 <StarLoading active={false} text="加载完成" />
-<StarLoading size={48} text="请稍候..." />
+<StarLoading size={144} text="请稍候..." />
+<StarLoading speed={500} text="快速生长" />
 <StarLoading center />
 <StarLoading fill />
 ```
@@ -481,7 +482,8 @@ import { StarLoading } from 'stardew-valley-ui'
 |------|------|--------|------|
 | active | `boolean` | `true` | 是否激活动画 |
 | text | `string` | `'正在加载...'` | 加载文字 |
-| size | `number` | `28` | 图标尺寸 |
+| size | `number` | `144` | 完整花圃的直径 |
+| speed | `number` | `1000` | 每株胡萝卜生长的间隔（毫秒）；数值越小动画越快 |
 | gap | `number` | `8` | 图标与文字间距 |
 | center | `boolean` | `false` | 居中显示 |
 | block | `boolean` | `false` | 块级显示 |
