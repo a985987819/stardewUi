@@ -8,17 +8,17 @@
 // 每层都裁同一条阶梯，而每层自身已经内缩，所以四角的阶梯逐层内移 2px：斜着走进
 // 角里遇到的色带宽度，与从边上走进来的完全一致（2px 缺口 / 2px 深色 / 4px 主色带
 // / 2px 深线 / 2px 亮线）。只裁最外层的话，内层直角会戳出阶梯，角部就散了。
-$frame-edge: 2px; // #562c2b 最外层
-$frame-band: 4px; // #dd7a0b 主色带
-$frame-accent: 2px; // #af4f0e 内层深线
-$frame-line: 2px; // #fdecb1 内层亮线
+$frame-edge: 2px; // var(--star-raw-hex-562c2b) 最外层
+$frame-band: 4px; // var(--star-raw-hex-dd7a0b) 主色带
+$frame-accent: 2px; // var(--star-raw-hex-af4f0e) 内层深线
+$frame-line: 2px; // var(--star-raw-hex-fdecb1) 内层亮线
 $frame-inset: $frame-edge + $frame-band + $frame-accent + $frame-line; // 10px
 
-$frame-color-edge: #562c2b;
-$frame-color-band: #dd7a0b;
-$frame-color-accent: #af4f0e;
-$frame-color-line: #fdecb1;
-$frame-color-surface: #fed384;
+$frame-color-edge: var(--star-raw-hex-562c2b);
+$frame-color-band: var(--star-raw-hex-dd7a0b);
+$frame-color-accent: var(--star-raw-hex-af4f0e);
+$frame-color-line: var(--star-raw-hex-fdecb1);
+$frame-color-surface: var(--star-raw-hex-fed384);
 
 .star-display-frame {
   position: relative;
@@ -26,7 +26,7 @@ $frame-color-surface: #fed384;
   box-sizing: border-box;
   // 只为几何：padding 让内容面落在最内层亮线内侧，四层填充用绝对定位铺上去。
   padding: $frame-inset;
-  color: #000;
+  color: var(--star-raw-hex-000);
 
   &__edge,
   &__band,
@@ -67,7 +67,7 @@ $frame-color-surface: #fed384;
     box-sizing: border-box;
     clip-path: var(--display-frame-clip);
     background: $frame-color-surface;
-    color: #000;
+    color: var(--star-raw-hex-000);
     padding: 10px 12px;
   }
 }

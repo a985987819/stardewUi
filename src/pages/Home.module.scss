@@ -20,9 +20,9 @@
 
   &-title-badge {
     @apply px-3 py-1 text-sm font-medium;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--star-raw-rgba-255-255-255-0-2);
     color: var(--color-text);
-    border: 2px solid rgba(157, 65, 0, 0.28);
+    border: 2px solid var(--star-raw-rgba-157-65-0-0-28);
   }
 
   &-desc {
@@ -36,29 +36,29 @@
 
   &-btn {
     @apply inline-flex items-center gap-2 px-6 py-3 text-base font-medium no-underline;
-    border: 3px solid rgba(157, 65, 0, 0.34);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-34);
     box-shadow: var(--shadow-pixel-sm);
 
     &-primary {
-      background: #f4a54f;
-      color: #4d2608;
+      background: var(--star-raw-hex-f4a54f);
+      color: var(--star-raw-hex-4d2608);
     }
 
     &-secondary {
-      background: rgba(255, 255, 255, 0.22);
+      background: var(--star-raw-rgba-255-255-255-0-22);
       color: var(--color-text);
     }
 
     &-primary:hover,
     &-secondary:hover {
       transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.18);
+      box-shadow: 6px 6px 0 var(--star-raw-rgba-0-0-0-0-18);
     }
 
     &-primary:active,
     &-secondary:active {
       transform: translate(2px, 2px);
-      box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 2px 0 var(--star-raw-rgba-0-0-0-0-1);
     }
   }
 
@@ -81,9 +81,9 @@
 
   &-feature-icon {
     @apply mb-4 inline-flex h-14 w-14 items-center justify-center;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--star-raw-rgba-255-255-255-0-2);
     color: var(--color-text);
-    border: 3px solid rgba(157, 65, 0, 0.32);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-32);
   }
 
   @media (max-width: 768px) {

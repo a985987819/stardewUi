@@ -113,8 +113,8 @@
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(135deg, rgba(255, 236, 184, 0.06) 25%, transparent 25%) 0 0 / 8px 8px,
-      rgba(38, 25, 17, 0.58);
+      linear-gradient(135deg, var(--star-raw-rgba-255-236-184-0-06) 25%, transparent 25%) 0 0 / 8px 8px,
+      var(--star-raw-rgba-38-25-17-0-58);
     opacity: 0;
     transition: opacity 0.18s ease-out;
     will-change: opacity;
@@ -135,7 +135,7 @@
     height: 100%;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 8px 8px 0 rgba(48, 28, 14, 0.34);
+    box-shadow: 8px 8px 0 var(--star-raw-rgba-48-28-14-0-34);
 
     > :global([class*='stardew-card__body']) {
       display: flex;
@@ -155,7 +155,7 @@
     min-height: 0;
     overflow: auto;
     padding: 4px 6px;
-    color: #4f2b17;
+    color: var(--star-raw-hex-4f2b17);
     line-height: 1.6;
   }
 
@@ -166,17 +166,17 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 3px solid #7a3514;
-    background: #f7d37f;
-    color: #5e2615;
+    border: 3px solid var(--star-raw-hex-7a3514);
+    background: var(--star-raw-hex-f7d37f);
+    color: var(--star-raw-hex-5e2615);
     cursor: pointer;
     font-family: inherit;
     font-size: 20px;
     line-height: 1;
-    box-shadow: 2px 2px 0 rgba(77, 38, 8, 0.24);
+    box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-24);
 
     &:hover {
-      background: #ffe6a5;
+      background: var(--star-raw-hex-ffe6a5);
       transform: translate(-1px, -1px);
     }
 

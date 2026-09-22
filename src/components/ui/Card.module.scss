@@ -1,5 +1,5 @@
-$shadow-color: rgba(0, 0, 0, 0.3);
-$inner-glow: rgba(255, 255, 255, 0.18);
+$shadow-color: var(--star-raw-rgba-0-0-0-0-3);
+$inner-glow: var(--star-raw-rgba-255-255-255-0-18);
 
 .stardew-card {
   position: relative;
@@ -52,8 +52,8 @@ $inner-glow: rgba(255, 255, 255, 0.18);
 
   &--elevated {
     box-shadow:
-      0 10px 14px rgba(0, 0, 0, 0.28),
-      0 4px 0 rgba(0, 0, 0, 0.12),
+      0 10px 14px var(--star-raw-rgba-0-0-0-0-28),
+      0 4px 0 var(--star-raw-rgba-0-0-0-0-12),
       inset 0 1px 0 $inner-glow;
   }
 
@@ -72,8 +72,8 @@ $inner-glow: rgba(255, 255, 255, 0.18);
   &--hoverable:hover {
     transform: translate(-2px, -2px);
     box-shadow:
-      0 12px 18px rgba(0, 0, 0, 0.26),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      0 12px 18px var(--star-raw-rgba-0-0-0-0-26),
+      inset 0 1px 0 var(--star-raw-rgba-255-255-255-0-2);
   }
 
   &--clickable {
@@ -82,8 +82,8 @@ $inner-glow: rgba(255, 255, 255, 0.18);
     &:active {
       transform: translate(2px, 2px);
       box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 4px 6px var(--star-raw-rgba-0-0-0-0-2),
+        inset 0 1px 0 var(--star-raw-rgba-255-255-255-0-12);
     }
   }
 

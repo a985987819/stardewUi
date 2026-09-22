@@ -14,7 +14,7 @@
   justify-content: flex-start;
   gap: var(--star-loading-gap);
   vertical-align: middle;
-  color: #7a4c24;
+  color: var(--star-raw-hex-7a4c24);
 
   &--center {
     justify-content: center;

@@ -13,7 +13,7 @@ $calendar-padding: 18px;
 $toolbar-gap: 12px;
 $month-font-size: 18px;
 $month-font-weight: 700;
-$month-color: #4e342e;
+$month-color: var(--star-raw-hex-4e342e);
 
 // ---------------------------------------------------------------- 日期格子
 /**
@@ -24,19 +24,19 @@ $month-color: #4e342e;
 $cell-height: 60px;
 $cell-padding: 4px;
 $day-font-size: 15px;
-$day-color: #6d4c41;
+$day-color: var(--star-raw-hex-6d4c41);
 $outside-day-opacity: 0.55;
 $weekday-font-size: 14px;
 $weekday-height: 32px;
-$grid-line: 2px solid #2c2c2c;
+$grid-line: 2px solid var(--star-raw-hex-2c2c2c);
 
 // ---------------------------------------------------------------- 状态图标
 $marker-size: 14px;
 $marker-gap: 3px;
 $marker-font-size: 10px;
 $marker-dot-size: 6px;
-$marker-bg: #f4c46a;
-$marker-color: #4e342e;
+$marker-bg: var(--star-raw-hex-f4c46a);
+$marker-color: var(--star-raw-hex-4e342e);
 
 // 混合器：组件容器
 @mixin calendar-container {
@@ -125,5 +125,5 @@ $marker-color: #4e342e;
 @mixin calendar-marker-summary {
   font-size: $marker-font-size;
   font-weight: 700;
-  color: #6d4c41;
+  color: var(--star-raw-hex-6d4c41);
 }

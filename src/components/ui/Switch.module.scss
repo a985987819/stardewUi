@@ -9,17 +9,17 @@
   --switch-thumb-size: 22px;
   --switch-frame-width: 4px;
   --switch-notch: 4px;
-  --switch-on-color: #71964a;
-  --switch-fill: #71964a;
-  --switch-border: #3d3d20;
-  --switch-shadow: #969b70;
-  --switch-highlight: #aebc97;
-  --switch-empty: #d3dfc8;
+  --switch-on-color: var(--star-raw-hex-71964a);
+  --switch-fill: var(--star-raw-hex-71964a);
+  --switch-border: var(--star-raw-hex-3d3d20);
+  --switch-shadow: var(--star-raw-hex-969b70);
+  --switch-highlight: var(--star-raw-hex-aebc97);
+  --switch-empty: var(--star-raw-hex-d3dfc8);
   --switch-thumb-translate: 24px;
-  --switch-wood: #fa9405;
-  --switch-wood-frame: #9b440d;
-  --switch-wood-highlight: #ffd9a3;
-  --switch-wood-shadow: #492b18;
+  --switch-wood: var(--star-raw-hex-fa9405);
+  --switch-wood-frame: var(--star-raw-hex-9b440d);
+  --switch-wood-highlight: var(--star-raw-hex-ffd9a3);
+  --switch-wood-shadow: var(--star-raw-hex-492b18);
 
   position: relative;
   display: inline-flex;
@@ -110,7 +110,7 @@
     height: 4px;
     border-top: 1px solid var(--switch-wood-frame);
     border-bottom: 1px solid var(--switch-wood-frame);
-    background: color-mix(in srgb, var(--switch-wood) 74%, #7d3b11);
+    background: color-mix(in srgb, var(--switch-wood) 74%, var(--star-raw-hex-7d3b11));
 
     &--lower {
       top: auto;

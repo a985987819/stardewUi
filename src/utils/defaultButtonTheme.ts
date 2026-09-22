@@ -1,11 +1,13 @@
 // Keep the default button warm and restrained; the pixel step supplies its
 // character, while the fill remains a calm surface for everyday actions.
-export const DEFAULT_BUTTON_FILL = '#E2D3B8'
-export const DEFAULT_BUTTON_HOVER_FILL = '#E8D8C4'
-export const DEFAULT_BUTTON_OUTER_BORDER = '#A38A6B'
-export const DEFAULT_BUTTON_INNER_BORDER = '#C8B599'
-export const DEFAULT_BUTTON_DISABLED_TEXT = '#B0BEC5'
-export const DEFAULT_BUTTON_DISABLED_OVERLAY = 'rgba(238, 229, 213, 0.62)'
+import { STAR_COLORS } from '../styles/colorTokens'
+
+export const DEFAULT_BUTTON_FILL = STAR_COLORS.button.default.fill
+export const DEFAULT_BUTTON_HOVER_FILL = STAR_COLORS.button.default.hoverFill
+export const DEFAULT_BUTTON_OUTER_BORDER = STAR_COLORS.button.default.outerBorder
+export const DEFAULT_BUTTON_INNER_BORDER = STAR_COLORS.button.default.innerBorder
+export const DEFAULT_BUTTON_DISABLED_TEXT = STAR_COLORS.button.default.disabledText
+export const DEFAULT_BUTTON_DISABLED_OVERLAY = STAR_COLORS.button.default.disabledOverlay
 
 type RgbColor = {
   r: number
@@ -110,7 +112,7 @@ export const getReadableButtonTextColor = (
 
 export const createDefaultButtonPalette = (
   outerBorderColor?: string,
-  fillColor = DEFAULT_BUTTON_FILL,
+  fillColor: string = DEFAULT_BUTTON_FILL,
   textColor?: string
 ) => {
   const fill = normalizeHexColor(fillColor)
@@ -125,9 +127,9 @@ export const createDefaultButtonPalette = (
       outerBorder: DEFAULT_BUTTON_OUTER_BORDER,
       innerBorder: DEFAULT_BUTTON_INNER_BORDER,
       text: {
-        normal: '#4A2C1A',
-        hover: '#4A2C1A',
-        active: '#4A2C1A',
+        normal: STAR_COLORS.ink.strongest,
+        hover: STAR_COLORS.ink.strongest,
+        active: STAR_COLORS.ink.strongest,
         disabled: DEFAULT_BUTTON_DISABLED_TEXT,
       },
       disabledOverlay: DEFAULT_BUTTON_DISABLED_OVERLAY,

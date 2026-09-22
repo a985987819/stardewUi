@@ -1,9 +1,9 @@
 .star-progress {
-  --star-progress-fill: #ce053c;
-  --star-progress-border: #7f2110;
-  --star-progress-shadow: #ba7f53;
-  --star-progress-highlight: #f9606c;
-  --star-progress-empty: #e8a7ac;
+  --star-progress-fill: var(--star-raw-hex-ce053c);
+  --star-progress-border: var(--star-raw-hex-7f2110);
+  --star-progress-shadow: var(--star-raw-hex-ba7f53);
+  --star-progress-highlight: var(--star-raw-hex-f9606c);
+  --star-progress-empty: var(--star-raw-hex-e8a7ac);
   --star-progress-segment-count: 10;
   --star-progress-cell-width: 15px;
   --star-progress-cell-gap: 4px;
@@ -120,7 +120,7 @@
 
   &__label {
     flex: none;
-    color: #4a2c1a;
+    color: var(--star-raw-hex-4a2c1a);
     font-size: 0.82rem;
     white-space: nowrap;
   }

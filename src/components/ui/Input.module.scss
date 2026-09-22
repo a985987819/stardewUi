@@ -13,14 +13,14 @@
  * the geometry constants in `Input.tsx`.
  */
 $input-frame-width: 4px;
-$input-ring-color: #a8895f;
-$input-text: #4a2c1a;
-$input-placeholder: #9c8660;
-$input-surface: #f7efc5;
-$input-bevel-dark: #ddc79b;
-$input-bevel-light: #f4ead6;
-$input-accent: #71964a;
-$input-hint: #5c4526;
+$input-ring-color: var(--star-raw-hex-a8895f);
+$input-text: var(--star-raw-hex-4a2c1a);
+$input-placeholder: var(--star-raw-hex-9c8660);
+$input-surface: var(--star-raw-hex-f7efc5);
+$input-bevel-dark: var(--star-raw-hex-ddc79b);
+$input-bevel-light: var(--star-raw-hex-f4ead6);
+$input-accent: var(--star-raw-hex-71964a);
+$input-hint: var(--star-raw-hex-5c4526);
 
 .star-input-wrapper {
   --star-input-surface: #{$input-surface};
@@ -58,38 +58,38 @@ $input-hint: #5c4526;
 // --------------------------------------------------------------- status tints
 
 .star-input-wrapper--warning {
-  --star-input-accent: #d7992e;
-  --star-input-ring: #bb8a33;
+  --star-input-accent: var(--star-raw-hex-d7992e);
+  --star-input-ring: var(--star-raw-hex-bb8a33);
 
   .star-input__message {
-    color: #a9752a;
+    color: var(--star-raw-hex-a9752a);
   }
 }
 
 .star-input-wrapper--error {
-  --star-input-accent: #c0574f;
-  --star-input-ring: #a35149;
+  --star-input-accent: var(--star-raw-hex-c0574f);
+  --star-input-ring: var(--star-raw-hex-a35149);
 
   .star-input__message {
-    color: #a35149;
+    color: var(--star-raw-hex-a35149);
   }
 }
 
 .star-input-wrapper--success {
-  --star-input-accent: #71964a;
-  --star-input-ring: #6d8a4c;
+  --star-input-accent: var(--star-raw-hex-71964a);
+  --star-input-ring: var(--star-raw-hex-6d8a4c);
 
   .star-input__message {
-    color: #5d7a3d;
+    color: var(--star-raw-hex-5d7a3d);
   }
 }
 
 // Declared last so a locked field stays muted regardless of its status.
 .star-input-wrapper.is-disabled {
-  --star-input-surface: #ece3cf;
-  --star-input-ring: #bfae90;
-  --star-input-text: #9b8b70;
-  --star-input-accent: #b8a890;
+  --star-input-surface: var(--star-raw-hex-ece3cf);
+  --star-input-ring: var(--star-raw-hex-bfae90);
+  --star-input-text: var(--star-raw-hex-9b8b70);
+  --star-input-accent: var(--star-raw-hex-b8a890);
 
   cursor: not-allowed;
 }
@@ -97,8 +97,8 @@ $input-hint: #5c4526;
 // Read-only keeps the normal weight — it is still selectable content, not a
 // broken control — but flattens the surface a touch to read as "view only".
 .star-input-wrapper.is-readonly {
-  --star-input-surface: #f3ecd7;
-  --star-input-bevel-light: #f3ecd7;
+  --star-input-surface: var(--star-raw-hex-f3ecd7);
+  --star-input-bevel-light: var(--star-raw-hex-f3ecd7);
 
   cursor: default;
 }

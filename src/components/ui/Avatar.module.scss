@@ -75,9 +75,9 @@
     font-weight: 700;
     line-height: 1;
     text-align: center;
-    text-shadow: 1px 1px 0 rgba(255, 248, 235, 0.5);
+    text-shadow: 1px 1px 0 var(--star-raw-rgba-255-248-235-0-5);
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 54%),
+      linear-gradient(135deg, var(--star-raw-rgba-255-255-255-0-34), transparent 54%),
       var(--avatar-bg);
   }
 
@@ -97,7 +97,7 @@
     z-index: 3;
     pointer-events: none;
     opacity: 0.46;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), transparent 36%);
+    background: linear-gradient(135deg, var(--star-raw-rgba-255-255-255-0-32), transparent 36%);
   }
 
   &--square &__image,

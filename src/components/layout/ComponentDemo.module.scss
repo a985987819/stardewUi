@@ -22,14 +22,14 @@
 
   &-toggle {
     @apply flex cursor-pointer items-center gap-1.5 px-4 py-2 text-sm;
-    background: rgba(255, 240, 210, 0.84);
+    background: var(--star-raw-rgba-255-240-210-0-84);
     color: var(--color-text);
-    border: 3px solid rgba(157, 65, 0, 0.38);
-    box-shadow: 2px 2px 0 rgba(77, 38, 8, 0.12);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-38);
+    box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-12);
 
     &:hover {
       transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0 rgba(77, 38, 8, 0.16);
+      box-shadow: 3px 3px 0 var(--star-raw-rgba-77-38-8-0-16);
     }
 
     &:active {
@@ -41,7 +41,7 @@
   &-code {
     margin-top: 18px;
     padding-top: 18px;
-    border-top: 3px solid rgba(157, 65, 0, 0.22);
+    border-top: 3px solid var(--star-raw-rgba-157-65-0-0-22);
   }
 
   &-code-block {

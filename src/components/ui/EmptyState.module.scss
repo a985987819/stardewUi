@@ -9,7 +9,7 @@
   flex-wrap: nowrap;
   gap: 16px;
   padding: 24px 16px;
-  color: var(--color-text-secondary, #6a350b);
+  color: var(--color-text-secondary, var(--star-raw-hex-6a350b));
   text-align: center;
   vertical-align: top;
 

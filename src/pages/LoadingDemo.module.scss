@@ -15,7 +15,7 @@
 
   &__panel {
     padding: 16px;
-    background: rgba(255, 248, 235, 0.85);
+    background: var(--star-raw-rgba-255-248-235-0-85);
     border: 3px solid var(--color-border);
     box-shadow: var(--shadow-pixel-sm);
   }
@@ -31,9 +31,9 @@
     height: 180px;
     padding: 12px;
     background:
-      linear-gradient(180deg, rgba(255, 245, 220, 0.72), rgba(245, 207, 143, 0.5)),
-      rgba(255, 232, 190, 0.4);
-    border: 3px solid rgba(157, 65, 0, 0.18);
+      linear-gradient(180deg, var(--star-raw-rgba-255-245-220-0-72), var(--star-raw-rgba-245-207-143-0-5)),
+      var(--star-raw-rgba-255-232-190-0-4);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-18);
   }
 
   &__button-row {
