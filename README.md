@@ -1,5 +1,9 @@
 # Stardew Valley UI
 
+[![npm version](https://img.shields.io/npm/v/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
+[![npm downloads](https://img.shields.io/npm/dm/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
+[![license](https://img.shields.io/npm/l/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
+
 一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
 
 面向业务项目发布：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。
