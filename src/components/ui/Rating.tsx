@@ -84,8 +84,8 @@ interface RatingIconButtonProps {
   onDoubleClick: () => void
 }
 
-/** Length of the shake-then-shrink motion; keep in sync with `$rating-out-duration`. */
-const OUT_MOTION_MS = 540
+/** Shared shake-then-shrink motion; half the former 540ms Rating exit. */
+const OUT_MOTION_MS = 270
 
 /**
  * One score icon. It remembers how it looked last render so it can play the

@@ -5,6 +5,7 @@ import {
   Columns2,
   CalendarDays,
   CalendarRange,
+  CheckSquare,
   Frame,
   Gauge,
   Heart,
@@ -23,6 +24,7 @@ import {
 import type { Lang } from '../i18n'
 import {
   StarCalendarDemoPage,
+  StarCheckboxDemoPage,
   StarAvatarDemoPage,
   StarDividerDemoPage,
   StarCardDemoPage,
@@ -301,6 +303,18 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <ToggleRight size={20} />,
     element: StarSwitchDemoPage,
+  },
+  {
+    routePath: 'checkbox',
+    component: 'Checkbox',
+    category: 'form',
+    title: { zh: '多选框', en: 'Checkbox' },
+    desc: {
+      zh: 'Card 风格方框承托红色对勾的多选控件，支持横竖排列、禁用项、尺寸和圆框。',
+      en: 'Card-framed multi-select checks with red reveal motion, layouts, disabled options, sizes, and round frames.',
+    },
+    icon: <CheckSquare size={20} />,
+    element: StarCheckboxDemoPage,
   },
   {
     routePath: 'input',

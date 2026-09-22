@@ -1,7 +1,4 @@
-// 增减动效的节奏：弹入沿用 Progress 格子的 360ms，摇晃 + 缩小合计 540ms。
-// React 侧用 540ms 做「动画没触发（reduced motion）」的兜底，改这里要一起改。
-$rating-pop-duration: 360ms;
-$rating-out-duration: 540ms;
+// Reusable state-change keyframes and timing live in styles/motion.scss.
 
 .star-rating {
   --star-rating-color: var(--star-raw-hex-e53935);
@@ -49,20 +46,20 @@ $rating-out-duration: 540ms;
 
   // 增加：整颗图标按 Progress 格子的弹入曲线弹一下（同一组关键帧、同样的时长与缓动）
   &__button[data-motion='in'] {
-    animation: star-rating-pop-in $rating-pop-duration cubic-bezier(0.22, 1.34, 0.36, 1) both;
+    animation: var(--star-motion-pop-in-name) var(--star-motion-pop-in-duration) cubic-bezier(0.22, 1.34, 0.36, 1) both;
   }
 
   // 减少：先左右摇晃，摇完再让点亮的那层一边缩小一边淡出，直到完全透明。
-  // 两段动画等长（都走 $rating-out-duration），结束时间一致，所以 React 里
+  // 两段动画共享同一个全局时长，结束时间一致，所以 React 里
   // 只靠一次 animationend 就能把 data-motion 摘干净。
   &__button[data-motion='out'] {
-    animation: star-rating-shake $rating-out-duration ease-in-out both;
+    animation: var(--star-motion-loss-shake-name) var(--star-motion-loss-duration) ease-in-out both;
   }
 
   &__button[data-motion='out'] &__glyph-fill {
     // 缓动必须单调递增（不能像摇晃那样带负超调），否则透明度会先掉到 0 又被弹回 1，
     // 看起来就只剩「缩小」而没有「变淡」。
-    animation: star-rating-fill-out $rating-out-duration cubic-bezier(0.4, 0, 0.7, 0.2) both;
+    animation: var(--star-motion-loss-shrink-name) var(--star-motion-loss-duration) cubic-bezier(0.4, 0, 0.7, 0.2) both;
   }
 
   &__glyph,
@@ -94,71 +91,6 @@ $rating-out-duration: 540ms;
     overflow: visible;
     fill: currentColor;
     shape-rendering: crispEdges;
-  }
-}
-
-// 与 star-progress-cell-in 完全一致的关键帧：0 → 1.1 → 1
-@keyframes star-rating-pop-in {
-  0% {
-    opacity: 0;
-    transform: scale(0);
-  }
-
-  68% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-// 摇晃：前 58% 来回摆三次，之后停住不动，好让缩小动画接着播
-@keyframes star-rating-shake {
-  0%,
-  58%,
-  100% {
-    transform: translateX(0);
-  }
-
-  12% {
-    transform: translateX(-2px);
-  }
-
-  28% {
-    transform: translateX(2px);
-  }
-
-  44% {
-    transform: translateX(-2px);
-  }
-}
-
-// 点亮层：同样等摇晃结束后（58%）才开始放大再缩没，缩小和变淡同步走。
-// 中间补一个 84% 的关键帧，把「缩小到一半、透明度也掉到一半以下」钉死，
-// 免得缓动曲线把淡出挤到最后几毫秒才发生。
-@keyframes star-rating-fill-out {
-  0%,
-  58% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  68% {
-    opacity: 0.92;
-    transform: scale(1.1);
-  }
-
-  84% {
-    opacity: 0.4;
-    transform: scale(0.6);
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(0);
   }
 }
 

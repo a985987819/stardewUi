@@ -663,6 +663,36 @@ import { StarSwitch } from 'stardew-valley-ui'
 
 ---
 
+### StarCheckbox - 多选框
+
+Card 风格边框的多选框组，默认水平排列；选中时红色对勾从左向右显示，取消时使用评分图标同款的摇晃、缩小、淡出动画。
+
+```tsx
+import { StarCheckbox } from 'stardew-valley-ui'
+
+const crops = [
+  { value: 'parsnip', label: '防风草' },
+  { value: 'potato', label: '土豆' },
+  { value: 'strawberry', label: '草莓', disabled: true },
+]
+
+<StarCheckbox options={crops} defaultValue={['parsnip']} />
+<StarCheckbox options={crops} direction="vertical" shape="round" size="large" />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| options | `CheckboxOption[]` | - | 选项列表；每项可设置 `value`、`label`、`disabled` |
+| value / defaultValue | `string[]` | `[]` | 受控选中值或非受控初始值 |
+| onChange | `(value: string[]) => void` | - | 返回完整的下一组选中值 |
+| direction | `'horizontal' \| 'vertical'` | `'horizontal'` | 选项排列方向 |
+| disabled | `boolean` | `false` | 禁用整个多选框组 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 控件尺寸 |
+| shape | `'square' \| 'round'` | `'square'` | Card 方框或圆形印章框 |
+| aria-label | `string` | `'Checkbox'` | 多选框组的无障碍名称 |
+
+---
+
 ### StarInput - 输入框
 
 木框凹陷的像素输入框：4px 阶梯边框 + 顶部内阴影，支持受控/非受控、前后缀、一键清空与校验状态。
