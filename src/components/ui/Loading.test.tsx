@@ -15,19 +15,29 @@ describe('StarLoading', () => {
     expect(container.querySelectorAll('[data-grown]')).toHaveLength(0)
   })
 
-  it('grows carrots clockwise once per second and advances the trailing dots', () => {
+  it('uses a 600ms default interval between growth steps', () => {
+    const { container } = render(<StarLoading text="" />)
+
+    act(() => { vi.advanceTimersByTime(599) })
+    expect(container.querySelectorAll('[data-grown]')).toHaveLength(0)
+
+    act(() => { vi.advanceTimersByTime(1) })
+    expect(container.querySelectorAll('[data-grown]')).toHaveLength(1)
+  })
+
+  it('grows carrots clockwise once every 600ms and advances the trailing dots', () => {
     const { container } = render(<StarLoading text="正在生长..." />)
-    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { vi.advanceTimersByTime(600) })
     expect(container.querySelectorAll('[data-grown]')).toHaveLength(1)
     expect(screen.getByRole('status')).toHaveAccessibleName('正在生长.')
 
-    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { vi.advanceTimersByTime(600) })
     expect(screen.getByRole('status')).toHaveAccessibleName('正在生长..')
 
-    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { vi.advanceTimersByTime(600) })
     expect(screen.getByRole('status')).toHaveAccessibleName('正在生长...')
 
-    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { vi.advanceTimersByTime(600) })
     expect(screen.getByRole('status')).toHaveAccessibleName('正在生长')
   })
 
@@ -41,13 +51,13 @@ describe('StarLoading', () => {
     expect(container.querySelectorAll('[data-grown]')).toHaveLength(1)
   })
 
-  it('resets all carrots one second after the eighth carrot has grown', () => {
+  it('resets all carrots one step after the eighth carrot has grown', () => {
     const { container } = render(<StarLoading text="" />)
-    for (let index = 0; index < 8; index += 1) act(() => { vi.advanceTimersByTime(1000) })
+    for (let index = 0; index < 8; index += 1) act(() => { vi.advanceTimersByTime(600) })
     const loading = screen.getByRole('status')
     expect(container.querySelectorAll('[data-grown]')).toHaveLength(8)
     expect(loading).toHaveAttribute('data-phase', 'complete')
-    act(() => { vi.advanceTimersByTime(1000) })
+    act(() => { vi.advanceTimersByTime(600) })
     expect(container.querySelectorAll('[data-grown]')).toHaveLength(0)
   })
 })

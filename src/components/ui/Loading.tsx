@@ -11,7 +11,7 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   text?: string
   /** Diameter, in pixels, of the complete sprinkler-and-carrot garden. */
   size?: number
-  /** Milliseconds between each carrot growth step. Lower values run faster. */
+  /** Milliseconds between each carrot growth step. Lower values run faster. Defaults to 600. */
   speed?: number
   gap?: number
   center?: boolean
@@ -21,7 +21,9 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
 
 const LOADING_DEFAULT_TEXT = '正在加载...'
 const CARROT_COUNT = 8
-const DEFAULT_GROW_SPEED = 1000
+// One full eight-carrot cycle lands at 4.8s: fast enough to read as "working",
+// slow enough to keep the trailing dots from flickering.
+const DEFAULT_GROW_SPEED = 600
 
 const initialState = 0
 
