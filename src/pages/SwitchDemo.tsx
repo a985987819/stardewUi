@@ -62,6 +62,22 @@ function SwitchField({ label, children }: { label: string; children: ReactNode }
   )
 }
 
+const controlledSwitchCode = `import { useState } from 'react'
+import { StarSwitch } from 'stardew-valley-ui'
+
+export function FarmSettings() {
+  const [barnLamp, setBarnLamp] = useState(true)
+  const [autoWatering, setAutoWatering] = useState(false)
+
+  return (
+    <>
+      <StarSwitch checked={barnLamp} onChange={setBarnLamp} aria-label="Barn lamp" />
+      <StarSwitch checked={autoWatering} onChange={setAutoWatering} aria-label="Auto watering" />
+      <output>{JSON.stringify({ barnLamp, autoWatering })}</output>
+    </>
+  )
+}`
+
 function StarSwitchDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
@@ -78,7 +94,11 @@ function StarSwitchDemoPage() {
         id="basic"
         title={t.demos[0][0]}
         description={t.demos[0][1]}
-        code={'<StarSwitch checked={lamp} onChange={setLamp} />'}
+        code={controlledSwitchCode}
+        data={[
+          { label: 'barnLamp', value: String(lamp) },
+          { label: 'autoWatering', value: String(watering) },
+        ]}
       >
         <SwitchField label={t.labels[0]}>
           <StarSwitch checked={lamp} onChange={setLamp} aria-label={t.labels[0]} />
@@ -92,6 +112,11 @@ function StarSwitchDemoPage() {
         title={t.demos[1][0]}
         description={t.demos[1][1]}
         code={'<StarSwitch size="large" color="#D7992E" />'}
+        data={[
+          { label: 'sound', value: String(sound) },
+          { label: 'mineLight', value: String(mineLight) },
+          { label: 'greenhouseHeat', value: String(heat) },
+        ]}
       >
         <SwitchField label={t.labels[2]}>
           <StarSwitch size="small" checked={sound} onChange={setSound} aria-label={t.labels[2]} />

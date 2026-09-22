@@ -80,13 +80,30 @@ const apiData = {
   ],
 }
 
-const code = `<StarCalendar defaultValue={new Date(2024, 4, 1).getTime()} items={items} iconMap={iconMap} />`
+const eventCalendarCode = `import { StarCalendar, type CalendarItem } from 'stardew-valley-ui'
 
-const navigationCode = `<StarCalendar
-  value={month}
-  onMonthChange={setMonth}
-  todayLabel="Today"   // 右上角「回到今日」，按东八区当天回到本月
-/>`
+const events: CalendarItem[] = [
+  { date: '2024-05-05', title: 'Flower Dance', meta: 'Cindersap Forest' },
+  { date: '2024-05-12', title: 'River Fishing', meta: 'Riverbank' },
+]
+
+export function FarmCalendar() {
+  return <StarCalendar defaultValue={new Date(2024, 4, 1).getTime()} items={events} />
+}`
+
+const navigationCode = `import { useState } from 'react'
+import { StarCalendar } from 'stardew-valley-ui'
+
+export function ControlledCalendar() {
+  const [month, setMonth] = useState(new Date(2024, 4, 1).getTime())
+
+  return (
+    <>
+      <StarCalendar value={month} onMonthChange={setMonth} todayLabel="Today" />
+      <output>Current month timestamp: {month}</output>
+    </>
+  )
+}`
 
 function StarCalendarDemoPage() {
   const { lang } = useI18n()
@@ -96,15 +113,14 @@ function StarCalendarDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]} code={code}><StarCalendar defaultValue={DEMO_MONTH} todayLabel={t.today} /></StarComponentDemo>
-      <StarComponentDemo id="events" title={t.events[0]} description={t.events[1]} code={code}><StarCalendar defaultValue={DEMO_MONTH} items={items[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
-      <StarComponentDemo id="navigation" title={t.navigation[0]} description={t.navigation[1]} code={navigationCode}>
+      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]} code={'<StarCalendar defaultValue={new Date(2024, 4, 1).getTime()} todayLabel="Today" />'}><StarCalendar defaultValue={DEMO_MONTH} todayLabel={t.today} /></StarComponentDemo>
+      <StarComponentDemo id="events" title={t.events[0]} description={t.events[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${items[lang].length} events` }, { label: 'event dates', value: items[lang].map((item) => item.date).join(', ') }]}><StarCalendar defaultValue={DEMO_MONTH} items={items[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
+      <StarComponentDemo id="navigation" title={t.navigation[0]} description={t.navigation[1]} code={navigationCode} data={[{ label: 'month timestamp', value: String(month) }]}>
         <div style={{ width: '100%' }}>
           <StarCalendar value={month} onMonthChange={setMonth} items={items[lang]} iconMap={iconMap} todayLabel={t.today} />
-          <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-text-tertiary)' }}>{t.monthValue}: <strong>{month}</strong></p>
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="icons" title={t.icons[0]} description={t.icons[1]} code={code}><StarCalendar defaultValue={DEMO_MONTH} items={customIconItems[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
+      <StarComponentDemo id="icons" title={t.icons[0]} description={t.icons[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${customIconItems[lang].length} events` }, { label: 'icon sources', value: 'iconNode, iconKey' }]}><StarCalendar defaultValue={DEMO_MONTH} items={customIconItems[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="Calendar API" data={apiData[lang]} /></div>
     </StarComponentPage>
   )

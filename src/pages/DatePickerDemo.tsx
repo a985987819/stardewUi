@@ -2,7 +2,7 @@
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarCard, StarDatePicker } from '../components/ui'
+import { StarDatePicker } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 import { normalizeToDayTimestamp } from '../utils/calendar'
 
@@ -59,11 +59,51 @@ const apiData = {
   ],
 }
 
-const code = `<StarDatePicker mode="range" minDate={minDate} maxDate={maxDate} />`
+const singlePickerCode = `import { useState } from 'react'
+import { StarDatePicker } from 'stardew-valley-ui'
 
-function TimestampPreview({ title, value }: { title: string; value: unknown }) {
-  return <StarCard title={title} showTitle style={{ width: '100%', marginTop: 16 }}><pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{JSON.stringify(value, null, 2)}</pre></StarCard>
-}
+export function HarvestDatePicker() {
+  const [dateTimestamp, setDateTimestamp] = useState(new Date(2024, 4, 13).getTime())
+
+  return (
+    <StarDatePicker
+      value={dateTimestamp}
+      onChange={(next) => {
+        if ('dateTimestamp' in next) setDateTimestamp(next.dateTimestamp)
+      }}
+    />
+  )
+}`
+
+const rangePickerCode = `import { useState } from 'react'
+import { StarDatePicker } from 'stardew-valley-ui'
+
+export function MiningTripPicker() {
+  const [range, setRange] = useState<{ startTimestamp: number | null; endTimestamp: number | null }>({
+    startTimestamp: new Date(2024, 4, 11).getTime(),
+    endTimestamp: new Date(2024, 4, 15).getTime(),
+  })
+
+  return (
+    <StarDatePicker
+      mode="range"
+      value={range}
+      onChange={(next) => {
+        if ('startTimestamp' in next) setRange(next)
+      }}
+    />
+  )
+}`
+
+const limitsPickerCode = `import { StarDatePicker } from 'stardew-valley-ui'
+
+const minDate = new Date(2024, 4, 10).getTime()
+const maxDate = new Date(2024, 4, 20).getTime()
+const disabledDates = [new Date(2024, 4, 16).getTime()]
+
+export function AvailableDates() {
+  return <StarDatePicker minDate={minDate} maxDate={maxDate} disabledDates={disabledDates} />
+}`
 
 function StarDatePickerDemoPage() {
   const { lang } = useI18n()
@@ -74,14 +114,14 @@ function StarDatePickerDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="single" title={t.single[0]} description={t.single[1]} code={code}>
-        <div style={{ width: '100%' }}><StarDatePicker value={singleValue} todayLabel={t.today} onChange={(next) => { if ('dateTimestamp' in next) setSingleValue(next.dateTimestamp) }} /><TimestampPreview title={t.returned} value={{ dateTimestamp: singleValue }} /></div>
+      <StarComponentDemo id="single" title={t.single[0]} description={t.single[1]} code={singlePickerCode} data={[{ label: 'dateTimestamp', value: String(singleValue) }]}>
+        <div style={{ width: '100%' }}><StarDatePicker value={singleValue} todayLabel={t.today} onChange={(next) => { if ('dateTimestamp' in next) setSingleValue(next.dateTimestamp) }} /></div>
       </StarComponentDemo>
-      <StarComponentDemo id="range" title={t.range[0]} description={t.range[1]} code={code}>
-        <div style={{ width: '100%' }}><StarDatePicker mode="range" value={rangeValue} todayLabel={t.today} onChange={(next) => { if ('startTimestamp' in next) setRangeValue(next) }} /><TimestampPreview title={t.returned} value={rangeValue} /></div>
+      <StarComponentDemo id="range" title={t.range[0]} description={t.range[1]} code={rangePickerCode} data={[{ label: 'startTimestamp', value: String(rangeValue.startTimestamp) }, { label: 'endTimestamp', value: String(rangeValue.endTimestamp) }]}>
+        <div style={{ width: '100%' }}><StarDatePicker mode="range" value={rangeValue} todayLabel={t.today} onChange={(next) => { if ('startTimestamp' in next) setRangeValue(next) }} /></div>
       </StarComponentDemo>
-      <StarComponentDemo id="limits" title={t.limits[0]} description={t.limits[1]} code={code}>
-        <div style={{ width: '100%' }}><StarDatePicker defaultValue={normalizeToDayTimestamp('2024-05-15')} minDate={minDate} maxDate={maxDate} disabledDates={[disabledDate]} todayLabel={t.today} /><TimestampPreview title={t.constraints} value={{ minDate, maxDate, disabledDates: [disabledDate] }} /></div>
+      <StarComponentDemo id="limits" title={t.limits[0]} description={t.limits[1]} code={limitsPickerCode} data={[{ label: 'minDate', value: String(minDate) }, { label: 'maxDate', value: String(maxDate) }, { label: 'disabledDates', value: JSON.stringify([disabledDate]) }]}>
+        <div style={{ width: '100%' }}><StarDatePicker defaultValue={normalizeToDayTimestamp('2024-05-15')} minDate={minDate} maxDate={maxDate} disabledDates={[disabledDate]} todayLabel={t.today} /></div>
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="DatePicker API" data={apiData[lang]} /></div>
     </StarComponentPage>

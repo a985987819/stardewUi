@@ -5,11 +5,21 @@ import StarCodeBlock from './CodeBlock'
 import { useI18n } from '../../i18n'
 import styles from './ComponentDemo.module.scss'
 
+interface ComponentDemoDataItem {
+  /** A concise name for one piece of live demo state or source data. */
+  label: React.ReactNode
+  /** The value currently driving the preview. Strings are rendered as code. */
+  value: React.ReactNode
+}
+
 interface ComponentDemoProps {
   title: string
   description?: string
   children: React.ReactNode
   code?: string
+  /** State and source data intentionally shown beside an interactive example. */
+  data?: ComponentDemoDataItem[]
+  dataLabel?: string
   defaultShowCode?: boolean
   id?: string
 }
@@ -25,6 +35,7 @@ const unique = (values: string[]) => [...new Set(values)]
  * pages only describe the meaningful usage; the shared frame owns the package
  * imports so the visible code never silently omits its component references.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- tests and page builders reuse this pure formatter.
 export function createCopyableDemoCode(code: string): string {
   if (code.includes("from 'stardew-valley-ui'") || code.includes('from "stardew-valley-ui"')) {
     return code
@@ -49,6 +60,8 @@ function StarComponentDemo({
   description,
   children,
   code,
+  data,
+  dataLabel,
   defaultShowCode = true,
   id,
 }: ComponentDemoProps) {
@@ -65,6 +78,22 @@ function StarComponentDemo({
     >
       {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
       <div className={styles['component-demo-preview']}>{children}</div>
+      {data?.length ? (
+        <section className={styles['component-demo-data']} aria-label={dataLabel ?? t('demo.liveData')}>
+          <div className={styles['component-demo-data-heading']}>
+            <span>{dataLabel ?? t('demo.liveData')}</span>
+            <span>{t('demo.liveDataHint')}</span>
+          </div>
+          <dl className={styles['component-demo-data-list']}>
+            {data.map((item, index) => (
+              <div key={index}>
+                <dt>{item.label}</dt>
+                <dd>{typeof item.value === 'string' ? <code>{item.value}</code> : item.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
       {code ? (
         <div className={styles['component-demo-toggle-wrapper']}>
           <button className={styles['component-demo-toggle']} type="button" onClick={() => setShowCode(!showCode)}>

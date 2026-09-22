@@ -68,18 +68,28 @@ function CheckboxMark({ checked }: { checked: boolean }) {
     if (wasChecked === checked) return undefined
 
     if (checked) {
-      setVisible(true)
-      setMotion('in')
+      // Defer the visibility flip one frame so React can paint the entering
+      // state instead of synchronously cascading another render in the effect.
+      const showTimer = window.setTimeout(() => {
+        setVisible(true)
+        setMotion('in')
+      }, 0)
       const timer = window.setTimeout(() => setMotion(null), CHECK_IN_DURATION_MS)
-      return () => window.clearTimeout(timer)
+      return () => {
+        window.clearTimeout(showTimer)
+        window.clearTimeout(timer)
+      }
     }
 
-    setMotion('out')
+    const hideMotionTimer = window.setTimeout(() => setMotion('out'), 0)
     const timer = window.setTimeout(() => {
       setMotion(null)
       setVisible(false)
     }, CHECK_OUT_DURATION_MS)
-    return () => window.clearTimeout(timer)
+    return () => {
+      window.clearTimeout(hideMotionTimer)
+      window.clearTimeout(timer)
+    }
   }, [checked])
 
   return (

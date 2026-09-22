@@ -85,6 +85,26 @@ const code = `<StarTab
 const externalCode = `<StarTab external items={items} />            // 选项卡在内容框上方
 <StarTab external position="bottom" items={items} /> // 选项卡在内容框下方`
 
+const controlledTabCode = `import { useState } from 'react'
+import { StarTab } from 'stardew-valley-ui'
+
+const seasons = [
+  { key: 'spring', label: 'Spring', content: 'Plant potatoes and strawberries.' },
+  { key: 'summer', label: 'Summer', content: 'Blueberries love the heat.' },
+  { key: 'fall', label: 'Fall', content: 'Pumpkins fill the shed.' },
+]
+
+export function SeasonTabs() {
+  const [activeKey, setActiveKey] = useState('spring')
+
+  return (
+    <>
+      <StarTab activeKey={activeKey} onChange={setActiveKey} items={seasons} />
+      <output>Active tab: {activeKey}</output>
+    </>
+  )
+}`
+
 function StarTabDemoPage() {
   const { lang } = useI18n()
   const copy = text[lang]
@@ -103,7 +123,7 @@ function StarTabDemoPage() {
 
   return (
     <StarComponentPage title={copy.title} description={copy.desc} toc={toc}>
-      <StarComponentDemo id="icon" title={copy.sections.icon[0]} description={copy.sections.icon[1]} code={code}>
+      <StarComponentDemo id="icon" title={copy.sections.icon[0]} description={copy.sections.icon[1]} code={code} data={[{ label: 'items', value: `${iconItems.length} locations` }]}>
         <div style={{ width: '100%' }}><StarTab items={iconItems} /></div>
       </StarComponentDemo>
       <StarComponentDemo id="external" title={copy.sections.external[0]} description={copy.sections.external[1]} code={externalCode}>
@@ -125,10 +145,9 @@ function StarTabDemoPage() {
       <StarComponentDemo id="disabled" title={copy.sections.disabled[0]} description={copy.sections.disabled[1]} code={code}>
         <div style={{ width: '100%' }}><StarTab items={[items[0], { ...items[1], label: lang === 'zh' ? '未解锁海滩' : 'Locked Beach', disabled: true }, items[2]]} /></div>
       </StarComponentDemo>
-      <StarComponentDemo id="controlled" title={copy.sections.controlled[0]} description={copy.sections.controlled[1]} code={code}>
+      <StarComponentDemo id="controlled" title={copy.sections.controlled[0]} description={copy.sections.controlled[1]} code={controlledTabCode} data={[{ label: 'activeKey', value: controlledKey }, { label: 'available keys', value: items.map((item) => item.key).join(', ') }]}>
         <div style={{ width: '100%' }}>
           <StarTab activeKey={controlledKey} onChange={setControlledKey} items={items} />
-          <p style={{ marginTop: 12, fontSize: 13, color: 'var(--color-text-tertiary)' }}>{copy.sections.current}: <strong>{controlledKey}</strong></p>
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="nodeContent" title={copy.sections.node[0]} description={copy.sections.node[1]} code={code}>

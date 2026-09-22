@@ -32,4 +32,18 @@ describe('ComponentDemo copy-ready code', () => {
     expect(screen.getByText('可直接复制的示例')).toBeInTheDocument()
     expect(screen.getByText((_, element) => element?.tagName === 'CODE' && element.textContent?.includes("import { StarRating } from 'stardew-valley-ui'") === true)).toBeInTheDocument()
   })
+
+  it('renders live values when a demo declares managed data', () => {
+    render(
+      <I18nProvider>
+        <StarComponentDemo title="Rating" data={[{ label: 'Friendship', value: '3 / 5' }]}>
+          <span>Preview</span>
+        </StarComponentDemo>
+      </I18nProvider>,
+    )
+
+    expect(screen.getByText('示例数据')).toBeInTheDocument()
+    expect(screen.getByText('Friendship')).toBeInTheDocument()
+    expect(screen.getByText('3 / 5')).toHaveTextContent('3 / 5')
+  })
 })

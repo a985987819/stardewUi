@@ -38,6 +38,66 @@
     }
   }
 
+  &-data {
+    width: min(100%, 620px);
+    margin: 0 auto 18px;
+    padding: 3px;
+    background: var(--star-raw-rgba-157-65-0-0-38);
+    box-shadow: 3px 3px 0 var(--star-raw-rgba-77-38-8-0-16);
+  }
+
+  &-data-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px 6px;
+    background: var(--star-raw-rgba-255-240-210-0-84);
+    color: var(--star-raw-hex-7a3514);
+    font-size: 12px;
+    font-weight: 700;
+
+    span:last-child {
+      color: var(--color-text-tertiary);
+      font-size: 11px;
+      font-weight: 400;
+    }
+  }
+
+  &-data-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    margin: 0;
+    background: var(--star-raw-rgba-157-65-0-0-22);
+
+    > div {
+      min-width: 0;
+      padding: 8px 10px;
+      background: var(--color-card-bg);
+    }
+
+    dt {
+      margin-bottom: 3px;
+      color: var(--color-text-tertiary);
+      font-size: 11px;
+    }
+
+    dd {
+      min-width: 0;
+      margin: 0;
+      color: var(--color-text);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    code {
+      color: var(--star-raw-hex-7a3514);
+      font-family: var(--font-mono, monospace);
+      font-size: 12px;
+    }
+  }
+
   &-code {
     margin-top: 18px;
     padding-top: 18px;

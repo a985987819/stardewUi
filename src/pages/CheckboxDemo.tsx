@@ -73,6 +73,40 @@ const makeOptions = (values: string[], disabledIndex?: number): CheckboxOption[]
   disabled: index === disabledIndex,
 }))
 
+const controlledCheckboxCode = `import { useState } from 'react'
+import { StarCheckbox, type CheckboxOption } from 'stardew-valley-ui'
+
+const cropOptions: CheckboxOption[] = [
+  { value: 'parsnip', label: 'Parsnip' },
+  { value: 'potato', label: 'Potato' },
+  { value: 'strawberry', label: 'Strawberry' },
+]
+
+export function CropChecklist() {
+  const [selectedCrops, setSelectedCrops] = useState<string[]>(['parsnip'])
+
+  return (
+    <>
+      <StarCheckbox options={cropOptions} value={selectedCrops} onChange={setSelectedCrops} />
+      <output>Selected: {selectedCrops.join(', ') || 'none'}</output>
+    </>
+  )
+}`
+
+const radioCheckboxCode = `import { useState } from 'react'
+import { StarCheckbox, type CheckboxOption } from 'stardew-valley-ui'
+
+const fenceOptions: CheckboxOption[] = [
+  { value: 'wood', label: 'Wood fence' },
+  { value: 'stone', label: 'Stone wall' },
+  { value: 'hardwood', label: 'Hardwood fence' },
+]
+
+export function FenceChoice() {
+  const [fence, setFence] = useState<string[]>(['wood'])
+  return <StarCheckbox radio options={fenceOptions} value={fence} onChange={setFence} />
+}`
+
 function StarCheckboxDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
@@ -84,7 +118,13 @@ function StarCheckboxDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={'<StarCheckbox options={crops} value={value} onChange={setValue} />'}>
+      <StarComponentDemo
+        id="basic"
+        title={t.demos[0][0]}
+        description={t.demos[0][1]}
+        code={controlledCheckboxCode}
+        data={[{ label: 'selected values', value: JSON.stringify(crops) }]}
+      >
         <StarCheckbox options={cropOptions} value={crops} onChange={setCrops} aria-label={t.demos[0][0]} />
       </StarComponentDemo>
       <StarComponentDemo id="vertical" title={t.demos[1][0]} description={t.demos[1][1]} code={'<StarCheckbox direction="vertical" options={[{ value: "key", label: "Mine key", disabled: true }]} />'}>
@@ -103,7 +143,13 @@ function StarCheckboxDemoPage() {
           <StarCheckbox shape="round" options={[{ value: 'round', label: t.shapes[1] }]} defaultValue={['round']} aria-label={t.shapes[1]} />
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="radio" title={t.demos[4][0]} description={t.demos[4][1]} code={'<StarCheckbox radio options={fences} value={fence} onChange={setFence} />'}>
+      <StarComponentDemo
+        id="radio"
+        title={t.demos[4][0]}
+        description={t.demos[4][1]}
+        code={radioCheckboxCode}
+        data={[{ label: 'selected value', value: JSON.stringify(fence) }]}
+      >
         <StarCheckbox radio options={makeOptions(t.radio)} value={fence} onChange={setFence} aria-label={t.demos[4][0]} />
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="Checkbox API" data={apiData[lang]} /></div>
