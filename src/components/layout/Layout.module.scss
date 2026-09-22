@@ -31,7 +31,6 @@
     position: absolute;
     inset: 72px 20px 20px;
     @include gap.gap-frame-fill(var(--color-bg-secondary), var(--color-border-dark), gap.$doc-frame-width);
-    clip-path: var(--doc-gap-clip);
     pointer-events: none;
   }
 

@@ -11,11 +11,10 @@
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   z-index: 101;
-  // Same gap frame as the header, so the two panels read as one chrome. The
-  // clip keeps the corner breaks open; the frame layers are background images,
-  // so they stay put while the nav scrolls.
+  // Same continuous gap frame as the header, so the two panels read as one
+  // chrome. The frame layers are backgrounds, so they stay put while the nav
+  // scrolls without needing a clipping mask that would cut the corner blocks.
   @include gap.gap-frame-fill(var(--color-bg-sidebar), var(--color-border-dark), gap.$doc-frame-width);
-  clip-path: var(--doc-gap-clip);
 
   &-nav {
     @apply flex flex-col gap-1;

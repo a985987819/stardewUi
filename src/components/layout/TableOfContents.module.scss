@@ -14,10 +14,7 @@
   padding: 16px;
   // Same gap frame as the rest of the chrome.
   @include gap.gap-frame-fill(var(--color-bg-card), var(--color-border-dark), gap.$doc-frame-width);
-  clip-path: var(--doc-gap-clip);
-  // `clip-path` clips `box-shadow` too, so the pixel drop shadow has to be a
-  // filter instead — which also makes it follow the broken corners.
-  filter: drop-shadow(4px 4px 0 var(--star-raw-rgba-0-0-0-0-15));
+  box-shadow: 4px 4px 0 var(--star-raw-rgba-0-0-0-0-15);
   z-index: 50;
 
   @media (max-width: 1400px) {

@@ -28,6 +28,21 @@ describe('Message', () => {
     return allElements.find((el) => el.textContent === text && el.children.length === 0) ?? null
   }
 
+  it('mounts the fixed message layer on document.body rather than a transformed app root', async () => {
+    const appRoot = document.createElement('div')
+    appRoot.className = 'starApp'
+    appRoot.style.transform = 'scale(0.965)'
+    document.body.appendChild(appRoot)
+
+    await act(async () => {
+      message.info('视口定位消息', { duration: 0, position: 'top-left' })
+    })
+
+    await waitForMessage('视口定位消息')
+
+    expect(document.getElementById('star-message-root')?.parentElement).toBe(document.body)
+  })
+
   describe('basic rendering', () => {
     it('renders a normal message', async () => {
       await act(async () => {

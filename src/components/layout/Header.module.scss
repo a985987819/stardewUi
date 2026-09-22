@@ -12,9 +12,10 @@
     position: absolute;
     inset: 0;
     z-index: -1;
-    // Gap frame: fill + the broken border, clipped so the corner breaks stay open.
+    // The mixin draws its fill and continuous gap frame together. Clipping this
+    // composite to its inner fill would cut its 4px border and leave stray
+    // square holes at all four corners.
     @include gap.gap-frame-fill(var(--color-bg-secondary), var(--color-border-dark), gap.$doc-frame-width);
-    clip-path: var(--doc-gap-clip);
     pointer-events: none;
   }
 
