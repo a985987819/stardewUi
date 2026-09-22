@@ -1,5 +1,8 @@
 export { StarCard, StarCardImage, StarCardMeta } from './Card'
 export { default as StarDialog } from './Dialog'
+export type { DialogMask, DialogPlacement, StarDialogProps, DialogAction } from './Dialog'
+export { default as StarDrawer } from './Drawer'
+export type { DrawerPlacement, StarDrawerProps } from './Drawer'
 export { default as StarEmptyState } from './EmptyState'
 export {
     EMPTY_STATE_DEFAULT_IMAGE_SRC,
@@ -10,7 +13,7 @@ export {
 export { default as StarTypewriter } from './Typewriter'
 export { default as StarLoading } from './Loading'
 export { message } from './Message'
-export type { MessageType, MessageProps } from './Message'
+export type { MessageAction, MessageOptions, MessagePosition, MessageProps, MessageType } from './Message'
 export { default as StarNineSliceButton } from './NineSliceButton'
 export type { StarLoadingProps } from './Loading'
 export type { StarNineSliceButtonProps, NineSliceButtonTheme } from './NineSliceButton'

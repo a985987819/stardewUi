@@ -1,0 +1,316 @@
+:global([data-star-app='true']) {
+  transform-origin: center center;
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s cubic-bezier(0.22, 0.8, 0.24, 1);
+  will-change: opacity, transform;
+}
+
+:global([data-star-app='true'].stardew-drawer-page-focused) {
+  opacity: 0.82;
+  transform: scale(0.965);
+}
+
+.stardew-drawer-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 4500;
+  pointer-events: none;
+}
+
+.stardew-drawer-layer[data-state='opening'],
+.stardew-drawer-layer[data-state='open'],
+.stardew-drawer-layer[data-state='closing'] {
+  pointer-events: auto;
+}
+
+.stardew-drawer {
+  position: fixed;
+  z-index: 1;
+  display: flex;
+  overflow: hidden;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+
+  &--right,
+  &--left {
+    top: 14px;
+    bottom: 14px;
+    width: min(420px, calc(100vw - 28px));
+  }
+
+  &--right {
+    right: 14px;
+  }
+
+  &--left {
+    left: 14px;
+  }
+
+  &--top,
+  &--bottom {
+    right: 14px;
+    left: 14px;
+    height: min(360px, calc(100vh - 28px));
+  }
+
+  &--top {
+    top: 14px;
+  }
+
+  &--bottom {
+    bottom: 14px;
+  }
+
+  &[data-state='opening'],
+  &[data-state='closing'] {
+    animation-duration: 0.2s;
+    animation-fill-mode: both;
+  }
+
+  &[data-state='opening'] {
+    animation-timing-function: cubic-bezier(0.22, 0.8, 0.24, 1);
+  }
+
+  &[data-state='closing'] {
+    animation-timing-function: cubic-bezier(0.42, 0, 0.78, 0.2);
+  }
+
+  &--right[data-state='opening'] {
+    animation-name: stardew-drawer-enter-right;
+  }
+
+  &--left[data-state='opening'] {
+    animation-name: stardew-drawer-enter-left;
+  }
+
+  &--top[data-state='opening'] {
+    animation-name: stardew-drawer-enter-top;
+  }
+
+  &--bottom[data-state='opening'] {
+    animation-name: stardew-drawer-enter-bottom;
+  }
+
+  &--right[data-state='closing'] {
+    animation-name: stardew-drawer-exit-right;
+  }
+
+  &--left[data-state='closing'] {
+    animation-name: stardew-drawer-exit-left;
+  }
+
+  &--top[data-state='closing'] {
+    animation-name: stardew-drawer-exit-top;
+  }
+
+  &--bottom[data-state='closing'] {
+    animation-name: stardew-drawer-exit-bottom;
+  }
+
+  &__mask {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, var(--star-raw-rgba-255-236-184-0-06) 25%, transparent 25%) 0 0 / 8px 8px,
+      var(--star-raw-rgba-38-25-17-0-58);
+    opacity: 0;
+    transition: opacity 0.18s ease-out;
+    will-change: opacity;
+  }
+
+  &__mask--clickable {
+    cursor: pointer;
+  }
+
+  .stardew-drawer-layer[data-state='opening'] &__mask,
+  .stardew-drawer-layer[data-state='open'] &__mask {
+    opacity: 1;
+  }
+
+  &__shell {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 8px 8px 0 var(--star-raw-rgba-48-28-14-0-34);
+
+    > :global([class*='stardew-card__body']) {
+      display: flex;
+      min-height: 0;
+      flex: 1;
+    }
+
+    :global([class*='stardew-card__body-content']) {
+      display: flex;
+      width: 100%;
+      min-height: 0;
+    }
+  }
+
+  &__content {
+    width: 100%;
+    min-height: 0;
+    overflow: auto;
+    padding: 4px 6px;
+    color: var(--star-raw-hex-4f2b17);
+    line-height: 1.6;
+  }
+
+  &__close {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 3px solid var(--star-raw-hex-7a3514);
+    background: var(--star-raw-hex-f7d37f);
+    color: var(--star-raw-hex-5e2615);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 20px;
+    line-height: 1;
+    box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-24);
+
+    &:hover {
+      background: var(--star-raw-hex-ffe6a5);
+      transform: translate(-1px, -1px);
+    }
+
+    &:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+  }
+
+  &__close--floating {
+    position: absolute;
+    z-index: 5;
+    top: 12px;
+    right: 12px;
+  }
+
+  @media (max-width: 560px) {
+    &--right,
+    &--left {
+      top: 8px;
+      bottom: 8px;
+      width: min(100% - 16px, 420px);
+    }
+
+    &--right {
+      right: 8px;
+    }
+
+    &--left {
+      left: 8px;
+    }
+
+    &--top,
+    &--bottom {
+      right: 8px;
+      left: 8px;
+      height: min(62vh, calc(100vh - 16px));
+    }
+
+    &--top {
+      top: 8px;
+    }
+
+    &--bottom {
+      bottom: 8px;
+    }
+  }
+}
+
+@keyframes stardew-drawer-enter-right {
+  from {
+    transform: translate3d(calc(100% + 24px), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-left {
+  from {
+    transform: translate3d(calc(-100% - 24px), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-top {
+  from {
+    transform: translate3d(0, calc(-100% - 24px), 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-bottom {
+  from {
+    transform: translate3d(0, calc(100% + 24px), 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-exit-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(100% + 24px), 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-exit-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-100% - 24px), 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-exit-top {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, calc(-100% - 24px), 0);
+  }
+}
+
+@keyframes stardew-drawer-exit-bottom {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, calc(100% + 24px), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stardew-drawer,
+  .stardew-drawer__mask,
+  :global([data-star-app='true']) {
+    animation: none !important;
+    transition: none !important;
+  }
+}

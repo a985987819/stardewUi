@@ -1,3 +1,5 @@
+@use './rawColorTokens';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,37 +13,40 @@
 }
 
 .starApp {
-  --color-primary: #b86a21;
-  --color-primary-rgb: 184, 106, 33;
-  --color-primary-dark: #9d4100;
-  --color-primary-light: #d98b45;
-  --color-primary-bg: rgba(184, 106, 33, 0.16);
-  --color-secondary: #c8882d;
-  --color-secondary-rgb: 200, 136, 45;
-  --color-secondary-dark: #a76419;
-  --color-secondary-light: #e0a24d;
-  --color-accent: #d9899a;
-  --color-accent-rgb: 217, 137, 154;
-  --color-success: #7a9d3d;
-  --color-warning: #d7992e;
-  --color-danger: #b9542f;
-  --color-info: #8b6fcb;
-  --color-bg: #f5cf8f;
-  --color-bg-secondary: #ffd9a3;
-  --color-bg-header: rgba(255, 214, 150, 0.95);
-  --color-bg-sidebar: #f7c57a;
-  --color-bg-card: #ffc675;
-  --color-bg-hover: #ffe0b2;
-  --color-bg-code: #2d2418;
-  --color-bg-code-header: #3d3428;
-  --color-bg-code-lines: #352c20;
-  --color-text: #4d2608;
-  --color-text-secondary: #6a350b;
-  --color-text-tertiary: #8d5d2a;
-  --color-text-light: #fff8eb;
-  --color-border: #d7770f;
-  --color-border-dark: #9d4100;
-  --color-border-light: #ffe0b2;
+  // Semantic tokens: use these for all new UI work. The neutral cream and
+  // garden-green pair keeps the pixel treatment lively without the former
+  // orange-brown cast.
+  --color-primary: #5e9c7a;
+  --color-primary-rgb: 94, 156, 122;
+  --color-primary-dark: #315e4b;
+  --color-primary-light: #8fc9a8;
+  --color-primary-bg: rgba(94, 156, 122, 0.16);
+  --color-secondary: #e8b95b;
+  --color-secondary-rgb: 232, 185, 91;
+  --color-secondary-dark: #93652f;
+  --color-secondary-light: #f5d58a;
+  --color-accent: #e68da4;
+  --color-accent-rgb: 230, 141, 164;
+  --color-success: #7ead51;
+  --color-warning: #e59d48;
+  --color-danger: #d96b57;
+  --color-info: #67b8c8;
+  --color-bg: #fff3d9;
+  --color-bg-secondary: #fce2b6;
+  --color-bg-header: rgba(255, 248, 231, 0.95);
+  --color-bg-sidebar: #f5d297;
+  --color-bg-card: #ffe0a0;
+  --color-bg-hover: #fff0c5;
+  --color-bg-code: #28332d;
+  --color-bg-code-header: #38453b;
+  --color-bg-code-lines: #303c34;
+  --color-text: #3a2f25;
+  --color-text-secondary: #665442;
+  --color-text-tertiary: #8a745b;
+  --color-text-light: #fff9ed;
+  --color-border: #c88a44;
+  --color-border-dark: #79543a;
+  --color-border-light: #fff0c5;
   --font-pixel: 'Stardew', monospace;
   --font-sans: 'Stardew', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Stardew', 'SF Mono', Monaco, Consolas, monospace;
@@ -60,21 +65,21 @@
   -moz-osx-font-smoothing: unset;
 
   @media (prefers-color-scheme: dark) {
-    --color-bg: #3f2412;
-    --color-bg-secondary: #5a3518;
-    --color-bg-header: rgba(63, 36, 18, 0.95);
-    --color-bg-sidebar: #4d2c15;
-    --color-bg-card: #71411d;
-    --color-bg-hover: #8a5527;
-    --color-bg-code: #1a1410;
-    --color-bg-code-header: #2a2420;
-    --color-bg-code-lines: #201a16;
-    --color-text: #fff1d8;
-    --color-text-secondary: #ffdcae;
-    --color-text-tertiary: #d9b884;
-    --color-border: #d48a43;
-    --color-border-dark: #f0be73;
-    --color-border-light: #9d5a26;
+    --color-bg: #23332c;
+    --color-bg-secondary: #31463a;
+    --color-bg-header: rgba(35, 51, 44, 0.95);
+    --color-bg-sidebar: #294034;
+    --color-bg-card: #3e5948;
+    --color-bg-hover: #547360;
+    --color-bg-code: #17231e;
+    --color-bg-code-header: #23332c;
+    --color-bg-code-lines: #1d2b24;
+    --color-text: #fff5df;
+    --color-text-secondary: #e7d6b6;
+    --color-text-tertiary: #c8b992;
+    --color-border: #d7a957;
+    --color-border-dark: #f0d08e;
+    --color-border-light: #4d705a;
     --shadow-pixel: 4px 4px 0 rgba(0, 0, 0, 0.4);
     --shadow-pixel-sm: 2px 2px 0 rgba(0, 0, 0, 0.3);
     --shadow-pixel-lg: 6px 6px 0 rgba(0, 0, 0, 0.5);

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Dialog from './Dialog'
+import styles from './Dialog.module.scss'
 
 describe('Dialog', () => {
   beforeEach(() => {
@@ -211,6 +212,59 @@ describe('Dialog', () => {
   })
 
   describe('遮罩层关闭', () => {
+    it('defaults to a viewport-centered dialog portal outside a transformed app root', async () => {
+      const appRoot = document.createElement('div')
+      appRoot.dataset.starApp = 'true'
+      appRoot.style.transform = 'scale(0.965)'
+      document.body.append(appRoot)
+
+      const { unmount } = render(<Dialog open={true} content="内容" typewriter={false} />, { container: appRoot })
+
+      await waitFor(() => {
+        expect(screen.getByText('内容')).toBeInTheDocument()
+      })
+
+      const overlay = document.querySelector(`.${styles['stardew-dialog-overlay']}`)
+      expect(overlay).toHaveClass(styles['stardew-dialog-overlay--center'])
+      expect(overlay?.parentElement).toBe(document.body)
+
+      unmount()
+      appRoot.remove()
+    })
+
+    it('supports a full-width bottom-center placement', async () => {
+      render(<Dialog open={true} placement="bottom" content="底部对话" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('底部对话')).toBeInTheDocument()
+      })
+
+      const overlay = document.querySelector(`.${styles['stardew-dialog-overlay']}`)
+      const dialog = document.querySelector(`.${styles['stardew-dialog']}`)
+      expect(overlay).toHaveClass(styles['stardew-dialog-overlay--bottom'])
+      expect(dialog).toHaveClass(styles['stardew-dialog--bottom'])
+    })
+
+    it('defaults to a dark backdrop mask', async () => {
+      render(<Dialog open={true} content="内容" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('内容')).toBeInTheDocument()
+      })
+
+      expect(document.querySelector(`.${styles['stardew-dialog-overlay--dark']}`)).toBeInTheDocument()
+    })
+
+    it('renders a light backdrop mask when requested', async () => {
+      render(<Dialog open={true} content="内容" mask="light" typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('内容')).toBeInTheDocument()
+      })
+
+      expect(document.querySelector(`.${styles['stardew-dialog-overlay--light']}`)).toBeInTheDocument()
+    })
+
     it('点击遮罩层应该触发onClose', async () => {
       const handleClose = vi.fn()
       const { container } = render(

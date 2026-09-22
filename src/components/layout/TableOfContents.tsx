@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
 import { useI18n } from '../../i18n'
 import styles from './TableOfContents.module.scss'
 
-interface TocItem {
+export interface TocItem {
   id: string
   title: string
   level: number
 }
 
-interface TableOfContentsProps {
+interface TableOfContentsProps extends Pick<HTMLAttributes<HTMLElement>, 'className'> {
   items: TocItem[]
 }
 
-function StarTableOfContents({ items }: TableOfContentsProps) {
+function StarTableOfContents({ items, className }: TableOfContentsProps) {
   const { t } = useI18n()
   const [activeId, setActiveId] = useState<string>('')
 
@@ -49,7 +49,7 @@ function StarTableOfContents({ items }: TableOfContentsProps) {
   if (items.length === 0) return null
 
   return (
-    <nav className={styles['table-of-contents']}>
+    <nav className={classNames(styles['table-of-contents'], className)}>
       <h3 className={styles['toc-title']}>{t('toc.title')}</h3>
       <ul className={styles['toc-list']}>
         {items.map((item) => (

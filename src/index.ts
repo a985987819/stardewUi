@@ -1,3 +1,6 @@
+import './styles/global.module.scss'
+
+export { BUTTON_VARIANT_COLORS, STAR_COLORS } from './styles/colorTokens'
 export * from './components/ui'
 export * from './hooks'
 export * from './types'

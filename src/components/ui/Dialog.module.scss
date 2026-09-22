@@ -7,10 +7,29 @@
   justify-content: center;
   padding: 32px 20px;
   isolation: isolate;
-  background: rgba(43, 24, 10, 0.9);
   backdrop-filter: blur(4px);
   overflow-y: auto;
   overscroll-behavior: contain;
+
+  &--dark {
+    background: var(--star-raw-rgba-43-24-10-0-84);
+  }
+
+  &--light {
+    background: var(--star-raw-rgba-251-235-200-0-68);
+    backdrop-filter: blur(2px);
+  }
+
+  &--center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  &--bottom {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 20px;
+  }
 
   &--clickable {
     cursor: pointer;
@@ -20,8 +39,13 @@
 .stardew-dialog {
   position: relative;
   z-index: 1;
-  width: min(1080px, 100%);
+  width: min(760px, 100%);
   cursor: default;
+
+  &--bottom {
+    width: 100%;
+    max-width: none;
+  }
 
   &__shell {
     width: 100%;
@@ -31,7 +55,7 @@
     display: flex;
     align-items: stretch;
     gap: 4px;
-    min-height: 350px;
+    min-height: 260px;
   }
 
   &__content-panel {
@@ -41,20 +65,20 @@
     gap: 4px;
     min-width: 0;
     min-height: 0;
-    padding: 18px 20px;
+    padding: 14px 16px;
     background:
-      linear-gradient(180deg, rgba(255, 249, 235, 0.22), rgba(215, 119, 15, 0.08)),
-      rgba(255, 247, 226, 0.14);
-    border: 3px solid rgba(157, 65, 0, 0.22);
+      linear-gradient(180deg, var(--star-raw-rgba-255-249-235-0-22), var(--star-raw-rgba-215-119-15-0-08)),
+      var(--star-raw-rgba-255-247-226-0-14);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-22);
     box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.16),
-      inset 0 -2px 0 rgba(157, 65, 0, 0.06);
+      inset 0 2px 0 var(--star-raw-rgba-255-255-255-0-16),
+      inset 0 -2px 0 var(--star-raw-rgba-157-65-0-0-06);
   }
 
   &__content {
     flex: 1;
-    min-height: 250px;
-    color: #4f2b17;
+    min-height: 170px;
+    color: var(--star-raw-hex-4f2b17);
     font-size: 1em;
     line-height: 1.6;
     white-space: pre-wrap;
@@ -76,7 +100,7 @@
     gap: 12px;
     width: 100%;
     padding-top: 14px;
-    border-top: 2px solid rgba(157, 65, 0, 0.18);
+    border-top: 2px solid var(--star-raw-rgba-157-65-0-0-18);
   }
 
   &__actions {
@@ -90,7 +114,7 @@
     align-items: center;
     gap: 8px;
     margin-left: auto;
-    color: #7a4c24;
+    color: var(--star-raw-hex-7a4c24);
     font-size: 0.9em;
     white-space: nowrap;
   }
@@ -108,7 +132,7 @@
 
   &__sidebar {
     display: flex;
-    width: 232px;
+    width: 188px;
     flex-shrink: 0;
     flex-direction: column;
     gap: 4px;
@@ -118,26 +142,26 @@
   &__name-panel {
     padding: 12px;
     background:
-      linear-gradient(180deg, rgba(255, 249, 235, 0.2), rgba(215, 119, 15, 0.06)),
-      rgba(255, 247, 226, 0.12);
-    border: 3px solid rgba(157, 65, 0, 0.22);
+      linear-gradient(180deg, var(--star-raw-rgba-255-249-235-0-2), var(--star-raw-rgba-215-119-15-0-06)),
+      var(--star-raw-rgba-255-247-226-0-12);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-22);
     box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -2px 0 rgba(157, 65, 0, 0.06);
+      inset 0 2px 0 var(--star-raw-rgba-255-255-255-0-14),
+      inset 0 -2px 0 var(--star-raw-rgba-157-65-0-0-06);
   }
 
   &__image-panel {
     flex: 1;
-    min-height: 282px;
+    min-height: 212px;
   }
 
   &__image-wrap {
     width: 100%;
     height: 100%;
-    min-height: 254px;
+    min-height: 184px;
     overflow: hidden;
-    background: rgba(255, 245, 220, 0.5);
-    border: 2px solid rgba(157, 65, 0, 0.22);
+    background: var(--star-raw-rgba-255-245-220-0-5);
+    border: 2px solid var(--star-raw-rgba-157-65-0-0-22);
   }
 
   &__image {
@@ -151,15 +175,15 @@
 
   &__name {
     display: flex;
-    min-height: 68px;
+    min-height: 54px;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #7a3514;
+    color: var(--star-raw-hex-7a3514);
     font-size: 1.25em;
     line-height: 1.2;
-    background: rgba(255, 245, 220, 0.32);
-    border: 2px solid rgba(157, 65, 0, 0.16);
+    background: var(--star-raw-rgba-255-245-220-0-32);
+    border: 2px solid var(--star-raw-rgba-157-65-0-0-16);
   }
 
   @media (max-width: 720px) {

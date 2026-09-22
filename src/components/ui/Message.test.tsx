@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { waitFor, act } from '@testing-library/react'
+import { waitFor, act, fireEvent } from '@testing-library/react'
 import { message } from './Message'
+import { MESSAGE_THEME_MAP } from './messageConfig'
 
 describe('Message', () => {
   beforeEach(() => {
@@ -27,6 +28,21 @@ describe('Message', () => {
     return allElements.find((el) => el.textContent === text && el.children.length === 0) ?? null
   }
 
+  it('mounts the fixed message layer on document.body rather than a transformed app root', async () => {
+    const appRoot = document.createElement('div')
+    appRoot.className = 'starApp'
+    appRoot.style.transform = 'scale(0.965)'
+    document.body.appendChild(appRoot)
+
+    await act(async () => {
+      message.info('视口定位消息', { duration: 0, position: 'top-left' })
+    })
+
+    await waitForMessage('视口定位消息')
+
+    expect(document.getElementById('star-message-root')?.parentElement).toBe(document.body)
+  })
+
   describe('basic rendering', () => {
     it('renders a normal message', async () => {
       await act(async () => {
@@ -51,6 +67,32 @@ describe('Message', () => {
         expect(findMessageContent('错误提示')).not.toBeNull()
       })
     })
+
+    it.each(['info', 'success', 'warning', 'error'] as const)(
+      'uses the %s theme for the message surface and pixel frame',
+      async (type) => {
+        const content = `${type} 色消息`
+
+        await act(async () => {
+          message({ content, type, duration: 0 })
+        })
+
+        await waitForMessage(content)
+
+        const contentNode = findMessageContent(content)
+        let card = contentNode?.parentElement ?? null
+
+        while (card && !card.style.getPropertyValue('--card-bg')) {
+          card = card.parentElement
+        }
+
+        expect(card).not.toBeNull()
+        expect(card?.style.getPropertyValue('--card-bg')).toBe(MESSAGE_THEME_MAP[type].fill.toLowerCase())
+        expect(card?.style.getPropertyValue('--card-border-dark')).not.toBe(
+          MESSAGE_THEME_MAP[type].fill.toLowerCase()
+        )
+      }
+    )
   })
 
   describe('config invocation', () => {
@@ -84,6 +126,29 @@ describe('Message', () => {
       const container = document.getElementById('star-message-root')
       expect(container?.querySelector('[class*="stardew-message-container--bottom-left"]')).toBeTruthy()
       expect(container?.querySelector('[class*="stardew-message-container--bottom-right"]')).toBeTruthy()
+    })
+
+    it.each([
+      'top-left',
+      'top',
+      'top-right',
+      'left',
+      'center',
+      'right',
+      'bottom-left',
+      'bottom',
+      'bottom-right',
+    ] as const)('renders a message in the %s position', async (position) => {
+      const content = `${position} 位置消息`
+
+      await act(async () => {
+        message.info(content, { position, duration: 0 })
+      })
+
+      await waitForMessage(content)
+
+      const container = document.getElementById('star-message-root')
+      expect(container?.querySelector(`[class*="stardew-message-container--${position}"]`)).toBeTruthy()
     })
 
     it('supports position in the config object', async () => {
@@ -163,11 +228,12 @@ describe('Message', () => {
   })
 
   describe('manual close', () => {
-    it('closes when calling the returned close method', async () => {
+    it('closes and calls onClose when calling the returned close method', async () => {
       let instance: { close: () => void }
+      const onClose = vi.fn()
 
       await act(async () => {
-        instance = message.success('通过方法关闭', 0)
+        instance = message.success('通过方法关闭', { duration: 0, onClose })
       })
 
       await waitForMessage('通过方法关闭')
@@ -179,6 +245,8 @@ describe('Message', () => {
       await waitFor(() => {
         expect(queryMessageContent('通过方法关闭')).toBeNull()
       })
+
+      expect(onClose).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -211,6 +279,49 @@ describe('Message', () => {
         (el) => el.textContent === '✅' && el.children.length === 0
       )
       expect(emojiElements.length).toBeGreaterThan(0)
+    })
+
+    it('calls onClick when the message surface is clicked', async () => {
+      const onClick = vi.fn()
+
+      await act(async () => {
+        message.info('点击消息主体', { duration: 0, onClick })
+      })
+
+      await waitForMessage('点击消息主体')
+
+      await act(async () => {
+        fireEvent.click(findMessageContent('点击消息主体') as Element)
+      })
+
+      expect(onClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders an action button and keeps its click separate from onClick', async () => {
+      const onClick = vi.fn()
+      const onActionClick = vi.fn()
+
+      await act(async () => {
+        message.info('收到南瓜', {
+          duration: 0,
+          onClick,
+          action: { label: '接受', onClick: onActionClick },
+        })
+      })
+
+      await waitForMessage('收到南瓜')
+      const action = Array.from(document.querySelectorAll('button')).find(
+        (button) => button.textContent === '接受'
+      )
+
+      expect(action).toBeTruthy()
+
+      await act(async () => {
+        fireEvent.click(action as HTMLButtonElement)
+      })
+
+      expect(onActionClick).toHaveBeenCalledTimes(1)
+      expect(onClick).not.toHaveBeenCalled()
     })
   })
 

@@ -96,7 +96,7 @@
 }
 
 .calendar-grid__cell--today .calendar-grid__button {
-  background: rgba(255, 243, 205, 0.5);
+  background: var(--star-raw-rgba-255-243-205-0-5);
 }
 
 .calendar-grid__cell--disabled .calendar-grid__button,

@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 import { I18nProvider } from '../i18n'
 import StarSidebar from '../components/layout/Sidebar'
-import { COMPONENT_ROUTES } from './componentRegistry'
+import { COMPONENT_CATALOGUE_CATEGORIES, COMPONENT_ROUTES, HIDDEN_COMPONENTS } from './componentRegistry'
 
 /**
  * The component library publishes one component through five files. This suite
@@ -54,6 +54,8 @@ const SHARED_ROUTE_MODULES: Record<string, string> = {}
 
 const cataloguedComponents = COMPONENT_ROUTES.map((entry) => entry.component)
 const cataloguedRoutePaths = COMPONENT_ROUTES.map((entry) => entry.routePath)
+const hiddenComponents: string[] = [...HIDDEN_COMPONENTS]
+const publicDemoPageModules = demoPageModules.filter((module) => !hiddenComponents.includes(module.replace(/Demo$/, '')))
 
 afterEach(cleanup)
 
@@ -65,7 +67,21 @@ describe('component catalogue sync', () => {
     for (const entry of COMPONENT_ROUTES) {
       expect(entry.routePath, `routePath of ${entry.component}`).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
       expect(entry.component, `component of ${entry.routePath}`).toMatch(/^[A-Z]\w*$/)
+      expect(COMPONENT_CATALOGUE_CATEGORIES, `${entry.component}.category`).toContain(entry.category)
     }
+  })
+
+  it('orders common components before specialised catalogue categories', () => {
+    const categoryIndexes = COMPONENT_ROUTES.map((entry) => COMPONENT_CATALOGUE_CATEGORIES.indexOf(entry.category))
+
+    expect(categoryIndexes).toEqual(categoryIndexes.toSorted((left, right) => left - right))
+    expect(COMPONENT_ROUTES.slice(0, 5).map(({ routePath }) => routePath)).toEqual([
+      'button',
+      'card',
+      'dialog',
+      'drawer',
+      'input',
+    ])
   })
 
   it('describes every entry in both languages', () => {
@@ -93,7 +109,7 @@ describe('component catalogue sync', () => {
   })
 
   it('has one demo page per entry and no orphan pages', () => {
-    expect([...demoPageModules].sort()).toEqual([...cataloguedComponents.map((name) => `${name}Demo`)].sort())
+    expect([...publicDemoPageModules].sort()).toEqual([...cataloguedComponents.map((name) => `${name}Demo`)].sort())
 
     for (const { component } of COMPONENT_ROUTES) {
       expect(existsSync(resolve(projectRoot, `src/pages/${component}Demo.tsx`)), `pages/${component}Demo.tsx`).toBe(
@@ -121,9 +137,16 @@ describe('component catalogue sync', () => {
         continue
       }
 
-      expect(cataloguedComponents, `components/ui/index.ts exports './${module}' with no catalogue entry`).toContain(
-        module
-      )
+      if (hiddenComponents.includes(module)) continue
+
+      expect(cataloguedComponents, `components/ui/index.ts exports './${module}' with no catalogue entry`).toContain(module)
+    }
+  })
+
+  it('keeps intentionally hidden components out of the public catalogue', () => {
+    for (const component of hiddenComponents) {
+      expect(cataloguedComponents, `${component} should remain hidden`).not.toContain(component)
+      expect(cataloguedRoutePaths, `${component} route should remain hidden`).not.toContain(component.toLowerCase())
     }
   })
 
@@ -141,7 +164,7 @@ describe('component catalogue sync', () => {
       .map((link) => link.getAttribute('href'))
       .filter((href): href is string => Boolean(href?.startsWith('/components/')))
 
-    expect(sidebarLinks.sort()).toEqual(cataloguedRoutePaths.map((routePath) => `/components/${routePath}`).sort())
+    expect(sidebarLinks).toEqual(cataloguedRoutePaths.map((routePath) => `/components/${routePath}`))
   })
 
   it('keeps the router, gallery and sidebar derived from the catalogue', () => {

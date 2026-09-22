@@ -11,6 +11,8 @@ import {
   type PointerEvent,
   type ReactNode,
 } from 'react'
+import defaultButtonImageSrc from '../../assets/defaultBtn.png'
+import regularButtonImageSrc from '../../assets/btnImg.png'
 import { useNineSliceBackground } from '../../hooks/useNineSliceBackground'
 import { drawDefaultButtonBackground } from '../../utils/defaultButtonCanvas'
 import {
@@ -21,7 +23,7 @@ import {
   DEFAULT_BUTTON_FILL,
   DEFAULT_BUTTON_HOVER_FILL,
 } from '../../utils/defaultButtonTheme'
-import { resolveAssetPath } from '../../utils/githubPages'
+import { BUTTON_VARIANT_COLORS, STAR_COLORS } from '../../styles/colorTokens'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
 
@@ -29,6 +31,7 @@ type NineSliceButtonVariant =
   | 'default'
   | 'primary'
   | 'secondary'
+  | 'info'
   | 'success'
   | 'warning'
   | 'danger'
@@ -70,24 +73,17 @@ export type StarNineSliceButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
 const cls = (...classNames: Array<string | false | undefined>) => classNames.filter(Boolean).join(' ')
 const DEFAULT_INSETS = { top: 8, right: 8, bottom: 8, left: 8 }
 const ICON_BUTTON_INSETS = { top: 80, right: 200, bottom: 80, left: 200 }
-const DEFAULT_BUTTON_IMAGE_SRC = resolveAssetPath('/defaultBtn.png')
+const DEFAULT_BUTTON_IMAGE_SRC = defaultButtonImageSrc
 
-const DEFAULT_COLOR_MAP: ButtonColorMap = {
-  default: { bg: '#F5E6CC', text: '#3A2E39' },
-  primary: { bg: '#8B5A32', text: '#FFF4D6' },
-  secondary: { bg: '#D6B477', text: '#4A2C1A' },
-  success: { bg: '#71964A', text: '#FFF7DC' },
-  warning: { bg: '#C28A45', text: '#FFF2D5' },
-  danger: { bg: '#B85C4A', text: '#FFF0DD' },
-  disabled: { bg: '#B0A999', text: '#E0D9C6' },
-  concise: { bg: '#F5E6CC', text: '#3A2E39' },
-}
+const DEFAULT_COLOR_MAP: ButtonColorMap = BUTTON_VARIANT_COLORS
 
 const STEPPED_BUTTON_TONES: Partial<Record<NineSliceButtonVariant, SteppedButtonTone>> = {
-  primary: { bg: '#8B5A32', border: '#4A2C1A', text: '#FFF4D6' },
-  secondary: { bg: '#D6B477', border: '#76502D', text: '#4A2C1A' },
-  success: { bg: '#71964A', border: '#40582C', text: '#FFF7DC' },
-  danger: { bg: '#B85C4A', border: '#71372D', text: '#FFF0DD' },
+  primary: { bg: STAR_COLORS.button.primary.fill, border: STAR_COLORS.button.primary.border, text: STAR_COLORS.button.primary.text },
+  secondary: { bg: STAR_COLORS.button.secondary.fill, border: STAR_COLORS.button.secondary.border, text: STAR_COLORS.button.secondary.text },
+  info: { bg: STAR_COLORS.button.info.fill, border: STAR_COLORS.button.info.border, text: STAR_COLORS.button.info.text },
+  success: { bg: STAR_COLORS.button.success.fill, border: STAR_COLORS.button.success.border, text: STAR_COLORS.button.success.text },
+  warning: { bg: STAR_COLORS.button.warning.fill, border: STAR_COLORS.button.warning.border, text: STAR_COLORS.button.warning.text },
+  danger: { bg: STAR_COLORS.button.danger.fill, border: STAR_COLORS.button.danger.border, text: STAR_COLORS.button.danger.text },
 }
 
 const drawDashedBorder = (
@@ -155,7 +151,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
     const usesRegularBackground = !isConcise && !usesPlainDefaultBackground && appearance !== 'classical' && !backgroundSrc
     const usesRegularImageBackground = usesRegularBackground && !usesPlainDefaultBackground && !hasIcon
     const usesRegularNineSliceBackground = usesRegularBackground && !usesPlainDefaultBackground && hasIcon
-    const resolvedBackgroundSrc = backgroundSrc ? resolveAssetPath(backgroundSrc) : resolveAssetPath('/btnImg.png')
+    const resolvedBackgroundSrc = backgroundSrc ?? regularButtonImageSrc
     const activeBackgroundSrc = usesRegularNineSliceBackground ? DEFAULT_BUTTON_IMAGE_SRC : resolvedBackgroundSrc
     const activeBackgroundInsets = usesRegularNineSliceBackground ? ICON_BUTTON_INSETS : backgroundInsets
     const [isHovered, setIsHovered] = useState(false)
@@ -176,6 +172,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       (effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
         effectiveVariant === 'secondary' ||
+        effectiveVariant === 'info' ||
         effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||
@@ -188,6 +185,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
         effectiveVariant === 'secondary' ||
+        effectiveVariant === 'info' ||
         effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||

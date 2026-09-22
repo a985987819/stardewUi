@@ -1,4 +1,8 @@
-import { resolveAssetPath } from './githubPages'
+import autumnButtonImageSrc from '../assets/autumnBtn.png'
+import springButtonImageSrc from '../assets/springBtn.png'
+import summerButtonImageSrc from '../assets/summerBtn.png'
+import winterButtonImageSrc from '../assets/winterBtn.png'
+import { STAR_COLORS } from '../styles/colorTokens'
 
 type HTMLImageWithSize = HTMLImageElement & {
   naturalWidth: number
@@ -44,8 +48,7 @@ type DrawSeasonalButtonOptions = {
 const imageCache = new Map<string, Promise<LoadedImage>>()
 
 const loadImage = (src: string) => {
-  const resolvedSrc = resolveAssetPath(src)
-  const cached = imageCache.get(resolvedSrc)
+  const cached = imageCache.get(src)
   if (cached) {
     return cached
   }
@@ -61,70 +64,70 @@ const loadImage = (src: string) => {
       })
     }
     img.onerror = () => {
-      imageCache.delete(resolvedSrc)
-      reject(new Error(`Failed to load seasonal button image: ${resolvedSrc}`))
+      imageCache.delete(src)
+      reject(new Error(`Failed to load seasonal button image: ${src}`))
     }
-    img.src = resolvedSrc
+    img.src = src
   })
 
-  imageCache.set(resolvedSrc, loading)
+  imageCache.set(src, loading)
   return loading
 }
 
 export const SEASONAL_BUTTON_PALETTES: Record<SeasonalButtonTheme, SeasonalButtonPalette> = {
   spring: {
-    normalFill: '#D9899A',
-    pressedFill: '#985565',
-    disabledFill: '#BDA6A0',
-    border: '#67412F',
+    normalFill: STAR_COLORS.season.spring.fill,
+    pressedFill: STAR_COLORS.season.spring.pressedFill,
+    disabledFill: STAR_COLORS.season.spring.disabledFill,
+    border: STAR_COLORS.season.spring.border,
     text: {
-      normal: '#FFF4E7',
-      hover: '#FFF4E7',
-      active: '#FFF4E7',
-      disabled: '#FFF4E7',
+      normal: STAR_COLORS.season.spring.text,
+      hover: STAR_COLORS.season.spring.text,
+      active: STAR_COLORS.season.spring.text,
+      disabled: STAR_COLORS.season.spring.text,
     },
   },
   summer: {
-    normalFill: '#6F9E4B',
-    pressedFill: '#456B32',
-    disabledFill: '#A5AE99',
-    border: '#4B3925',
+    normalFill: STAR_COLORS.season.summer.fill,
+    pressedFill: STAR_COLORS.season.summer.pressedFill,
+    disabledFill: STAR_COLORS.season.summer.disabledFill,
+    border: STAR_COLORS.season.summer.border,
     text: {
-      normal: '#FFF4D6',
-      hover: '#FFF4D6',
-      active: '#FFF4D6',
-      disabled: '#FFF4D6',
+      normal: STAR_COLORS.season.summer.text,
+      hover: STAR_COLORS.season.summer.text,
+      active: STAR_COLORS.season.summer.text,
+      disabled: STAR_COLORS.season.summer.text,
     },
   },
   autumn: {
-    normalFill: '#B85C3E',
-    pressedFill: '#773A2D',
-    disabledFill: '#B7A69A',
-    border: '#563421',
+    normalFill: STAR_COLORS.season.autumn.fill,
+    pressedFill: STAR_COLORS.season.autumn.pressedFill,
+    disabledFill: STAR_COLORS.season.autumn.disabledFill,
+    border: STAR_COLORS.season.autumn.border,
     text: {
-      normal: '#FFF0D5',
-      hover: '#FFF0D5',
-      active: '#FFF0D5',
-      disabled: '#FFF0D5',
+      normal: STAR_COLORS.season.autumn.text,
+      hover: STAR_COLORS.season.autumn.text,
+      active: STAR_COLORS.season.autumn.text,
+      disabled: STAR_COLORS.season.autumn.text,
     },
   },
   winter: {
-    normalFill: '#7699B5',
-    pressedFill: '#4E6B84',
-    disabledFill: '#AAB8BE',
-    border: '#435565',
+    normalFill: STAR_COLORS.season.winter.fill,
+    pressedFill: STAR_COLORS.season.winter.pressedFill,
+    disabledFill: STAR_COLORS.season.winter.disabledFill,
+    border: STAR_COLORS.season.winter.border,
     text: {
-      normal: '#F5F8F6',
-      hover: '#F5F8F6',
-      active: '#F5F8F6',
-      disabled: '#F5F8F6',
+      normal: STAR_COLORS.season.winter.text,
+      hover: STAR_COLORS.season.winter.text,
+      active: STAR_COLORS.season.winter.text,
+      disabled: STAR_COLORS.season.winter.text,
     },
   },
 }
 
 const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceConfig> = {
   spring: {
-    src: '/springBtn.png',
+    src: springButtonImageSrc,
     leftCap: 36,
     rightCap: 36,
     topHeight: 70,
@@ -133,7 +136,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 220,
   },
   summer: {
-    src: '/summerBtn.png',
+    src: summerButtonImageSrc,
     leftCap: 34,
     rightCap: 34,
     topHeight: 62,
@@ -142,7 +145,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 232,
   },
   autumn: {
-    src: '/autumnBtn.png',
+    src: autumnButtonImageSrc,
     leftCap: 42,
     rightCap: 42,
     topHeight: 76,
@@ -151,7 +154,7 @@ const SEASONAL_BUTTON_SOURCES: Record<SeasonalButtonTheme, SeasonalButtonSourceC
     decorationWidth: 196,
   },
   winter: {
-    src: '/winterBtn.png',
+    src: winterButtonImageSrc,
     leftCap: 38,
     rightCap: 38,
     topHeight: 64,
@@ -200,12 +203,12 @@ const applyStateOverlay = (
   height: number
 ) => {
   if (state === 'hover') {
-    applyOverlayWithinOpaquePixels(ctx, 'rgba(255, 255, 255, 0.04)', width, height)
+    applyOverlayWithinOpaquePixels(ctx, STAR_COLORS.canvas.seasonalHoverOverlay, width, height)
     return
   }
 
   if (state === 'disabled') {
-    applyOverlayWithinOpaquePixels(ctx, 'rgba(248, 250, 252, 0.32)', width, height)
+    applyOverlayWithinOpaquePixels(ctx, STAR_COLORS.canvas.seasonalDisabledOverlay, width, height)
   }
 }
 

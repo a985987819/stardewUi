@@ -1,7 +1,8 @@
 # Stardew Valley UI
 
-一个 **星露谷风格、像素化的前端组件库**，基于 React + TypeScript + Vite 构建，使用 Bun 作为默认包管理器和运行时。
-目标是打造一个复古像素风格的 UI 组件库，适合网页和应用开发。
+一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
+
+面向业务项目发布：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。
 
 ---
 
@@ -38,6 +39,7 @@ import 'stardew-valley-ui/style.css'
 ### 2. 使用组件
 
 ```tsx
+import { useState } from 'react'
 import { StarCard, StarNineSliceButton, StarDialog, message } from 'stardew-valley-ui'
 
 function App() {
@@ -69,6 +71,43 @@ function App() {
   )
 }
 ```
+
+---
+
+## 在其他前端项目中使用
+
+只需在应用的全局入口（例如 Vite 的 `main.tsx`、Next.js 的根布局或应用样式入口）**引入一次**样式。组件库的内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式。
+
+```tsx
+// main.tsx / app/layout.tsx
+import 'stardew-valley-ui/style.css'
+```
+
+内置的默认按钮、季节按钮、日历背景、空状态和加载动画素材均随构建产物发布，安装 npm 包即可使用。传入 `backgroundSrc`、`imageSrc`、`src` 等自定义图片地址时，资源的部署与缓存策略由宿主项目负责；Vite 项目中推荐传入静态导入得到的 URL：
+
+```tsx
+import customButtonBackground from './assets/custom-button.png'
+import { StarNineSliceButton } from 'stardew-valley-ui'
+
+export function SaveButton() {
+  return <StarNineSliceButton backgroundSrc={customButtonBackground}>保存</StarNineSliceButton>
+}
+```
+
+`StarDialog`、`message`、画布背景和浏览器存储 Hooks 会在客户端访问 DOM、Canvas 或 Storage。使用 Next.js、RSC 等 SSR 框架时，请将调用它们的交互组件标记为客户端组件（`'use client'`）；不要在服务端渲染阶段调用命令式的 `message(...)`。
+
+### 公开组件一览
+
+| 分类 | 导出 |
+|------|------|
+| 容器与展示 | `StarCard`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
+| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
+| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
+| 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
+
+完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
+
+更完整的素材、SSR / RSC 边界和维护者发布检查请见 [接入指南](docs/consumer-integration.md)。
 
 ---
 
@@ -233,6 +272,14 @@ import { StarDialog } from 'stardew-valley-ui'
   typewriter={false}
   onClose={() => setOpen(false)}
 />
+
+// 屏幕下方居中，并占满可用宽度
+<StarDialog
+  open={open}
+  placement="bottom"
+  content="明天再来继续探索吧。"
+  onClose={() => setOpen(false)}
+/>
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -243,10 +290,55 @@ import { StarDialog } from 'stardew-valley-ui'
 | image | `string` | - | 角色头像 |
 | name | `string` | - | 角色名称 |
 | actions | `DialogAction[] \| null` | - | 操作按钮，null 则不显示 |
+| mask | `'dark' \| 'light'` | `'dark'` | 遮罩风格 |
+| placement | `'center' \| 'bottom'` | `'center'` | 屏幕位置；`bottom` 在下方居中并占满可用宽度 |
 | maskClosable | `boolean` | `true` | 点击遮罩是否关闭 |
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |
 | onClose | `() => void` | - | 关闭回调 |
+
+---
+
+### StarDrawer - 抽屉
+
+从页面四边滑入的受控像素抽屉。开启时会默认缩小并柔化原页面，抽屉自身通过 body portal 保持完整尺寸；传入 `focusEffect={false}` 可关闭此视觉聚焦。
+
+```tsx
+import { useState } from 'react'
+import { StarDrawer, StarNineSliceButton } from 'stardew-valley-ui'
+
+function InventoryDrawer() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>打开背包</StarNineSliceButton>
+      <StarDrawer
+        open={open}
+        placement="right"
+        title="农场背包"
+        footer={<span>12 / 24 格</span>}
+        onClose={() => setOpen(false)}
+      >
+        <p>这里可以放置任意 React 内容。</p>
+      </StarDrawer>
+    </>
+  )
+}
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| open | `boolean` | - | 受控可见状态 |
+| placement | `'top' \| 'right' \| 'bottom' \| 'left'` | `'right'` | 抽屉进入方向 |
+| title | `ReactNode` | - | 可选标题 |
+| footer | `ReactNode` | - | 可选固定页脚 |
+| children | `ReactNode` | - | 抽屉主体内容 |
+| className | `string` | - | 添加到抽屉面板的类名 |
+| maskStyle | `CSSProperties` | - | 覆盖遮罩层的内联样式 |
+| focusEffect | `boolean` | `true` | 是否缩小并柔化原页面 |
+| maskClosable | `boolean` | `true` | 点击遮罩是否请求关闭 |
+| onClose | `() => void` | - | 点击关闭按钮、遮罩或 Escape 时触发 |
 
 ---
 
@@ -373,14 +465,15 @@ import { StarDatePicker } from 'stardew-valley-ui'
 
 ### StarLoading - 加载
 
-像素风加载动画组件，包子被吃掉的动画效果。
+像素风加载动画组件：中央洒水器带动八株胡萝卜沿扁圆轨迹顺时针成熟，提示文案的尾部点号会随每秒的生长节奏循环。
 
 ```tsx
 import { StarLoading } from 'stardew-valley-ui'
 
 <StarLoading />
 <StarLoading active={false} text="加载完成" />
-<StarLoading size={48} text="请稍候..." />
+<StarLoading size={144} text="请稍候..." />
+<StarLoading speed={500} text="快速生长" />
 <StarLoading center />
 <StarLoading fill />
 ```
@@ -389,7 +482,8 @@ import { StarLoading } from 'stardew-valley-ui'
 |------|------|--------|------|
 | active | `boolean` | `true` | 是否激活动画 |
 | text | `string` | `'正在加载...'` | 加载文字 |
-| size | `number` | `28` | 图标尺寸 |
+| size | `number` | `144` | 完整花圃的直径 |
+| speed | `number` | `1000` | 每株胡萝卜生长的间隔（毫秒）；数值越小动画越快 |
 | gap | `number` | `8` | 图标与文字间距 |
 | center | `boolean` | `false` | 居中显示 |
 | block | `boolean` | `false` | 块级显示 |
@@ -841,12 +935,19 @@ import type {
   NineSliceButtonTheme,
   StarCardProps,
   StarDialogProps,
+  DialogPlacement,
+  StarDrawerProps,
+  DrawerPlacement,
   MessageProps,
   MessageType,
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
   StarDisplayFrameProps,
+  StarAvatarProps,
+  AvatarShape,
+  AvatarSize,
+  StarDividerProps,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,
@@ -855,6 +956,10 @@ import type {
   StarTabProps,
   StarTabItem,
   SwitchProps,
+  StarRatingProps,
+  RatingIcon,
+  StarProgressProps,
+  ProgressVariant,
   GapBorderCornerData,
   CreateGapBorderCornersOptions,
   StarInputProps,
@@ -876,8 +981,18 @@ bun run build:lib
 输出到 `dist/` 目录：
 - `stardew-valley-ui.mjs` — ESM 格式
 - `stardew-valley-ui.cjs` — CommonJS 格式
-- `style.css` — 样式文件
+- `stardew-valley-ui.css` — 样式文件（通过 `stardew-valley-ui/style.css` 导入）
 - `index.d.ts` — 类型声明
+- 内置像素素材 — 自动由组件引用（在 Vite 库构建中会随 JS 嵌入或作为构建资产输出）
+
+发布前执行：
+
+```bash
+bun run build:lib
+bun run verify:package
+```
+
+`verify:package` 会校验 ESM、CommonJS、类型和样式子路径导出是否真实存在，并确保内置素材已经打入库产物、未遗留演示站专用路径。
 
 ### 构建演示站
 

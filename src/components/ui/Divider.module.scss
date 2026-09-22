@@ -1,12 +1,12 @@
 // 木栅栏分割线。
 //
-// 一个栅栏 = 20×28 的方块：12×24 的 #fa9405 主体 + 上、左、右三边各 4px 的 #9b440d 实心框。
+// 一个栅栏 = 20×28 的方块：12×24 的 var(--star-raw-hex-fa9405) 主体 + 上、左、右三边各 4px 的 var(--star-raw-hex-9b440d) 实心框。
 // **底边不画框**，木色直接落到最下沿（所以主体高是 28 - 4 = 24，而不是 20）；顶部两角 5px 圆角。
-// 立体感照 Progress 的像素格：整尺寸的 #492b18 投影块垫在后面、向左下各平移 3px 露出左下边。
-// 高光 #ffd9a3 贴在**外框内侧**（边框内部、贴着主体的上/右边沿）：3px 厚，长度各取所在边的一半
+// 立体感照 Progress 的像素格：整尺寸的 var(--star-raw-hex-492b18) 投影块垫在后面、向左下各平移 3px 露出左下边。
+// 高光 var(--star-raw-hex-ffd9a3) 贴在**外框内侧**（边框内部、贴着主体的上/右边沿）：3px 厚，长度各取所在边的一半
 // （内沿宽 12 → 6px，内沿高 24 → 12px），在右上角接成一个 Γ；外侧端是自由端、做圆角，
 // 拐角那头是方角、交给 __frame 的 overflow + 圆角裁掉。
-// 每格左右还各伸出一根横杆把栅栏连起来：5.5px 厚（上下各 1.5px #9b440d 描边 + 2.5px #fa9405 主体），
+// 每格左右还各伸出一根横杆把栅栏连起来：5.5px 厚（上下各 1.5px var(--star-raw-hex-9b440d) 描边 + 2.5px var(--star-raw-hex-fa9405) 主体），
 // 往外伸半个间距；横杆**不画竖向描边**，相邻两格的横杆在间隙正中首尾相接就看不出一道竖线，
 // 只有整条分割线最外侧的两端才补竖边收口。
 // 数值都是产品要求，要调只改下面这组变量。
@@ -34,10 +34,10 @@ $post-rail-length: $post-gap * 0.5;
 $post-rail-offset: 6px;
 $post-rail-gap: 5px;
 
-$post-body: #fa9405;
-$post-frame: #9b440d;
-$post-highlight: #ffd9a3;
-$post-shadow: #492b18;
+$post-body: var(--star-raw-hex-fa9405);
+$post-frame: var(--star-raw-hex-9b440d);
+$post-highlight: var(--star-raw-hex-ffd9a3);
+$post-shadow: var(--star-raw-hex-492b18);
 
 .star-divider {
   display: flex;

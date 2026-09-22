@@ -1,0 +1,21 @@
+.message-demo {
+  &__position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(108px, 1fr));
+    gap: 12px;
+    width: min(100%, 430px);
+  }
+
+  &__callback-status {
+    min-width: 150px;
+    color: var(--star-raw-hex-26746f);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 480px) {
+    &__position-grid {
+      grid-template-columns: repeat(2, minmax(108px, 1fr));
+    }
+  }
+}

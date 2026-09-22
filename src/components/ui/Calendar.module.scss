@@ -36,13 +36,13 @@
 .calendar__details {
   position: fixed;
   padding: 12px;
-  border: 2px solid #2c2c2c;
+  border: 2px solid var(--star-raw-hex-2c2c2c);
   border-radius: 4px;
-  background: #fbebc2;
-  color: #4e342e;
+  background: var(--star-raw-hex-fbebc2);
+  color: var(--star-raw-hex-4e342e);
   z-index: 1000;
   pointer-events: none;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 2px 2px 8px var(--star-raw-rgba-0-0-0-0-15);
   min-width: 150px;
   max-width: 250px;
 }

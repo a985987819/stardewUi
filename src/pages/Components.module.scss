@@ -43,9 +43,9 @@
 
   &-card-icon {
     @apply flex h-12 w-12 flex-shrink-0 items-center justify-center;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--star-raw-rgba-255-255-255-0-2);
     color: var(--color-text);
-    border: 3px solid rgba(157, 65, 0, 0.32);
+    border: 3px solid var(--star-raw-rgba-157-65-0-0-32);
   }
 
   &-card-content {

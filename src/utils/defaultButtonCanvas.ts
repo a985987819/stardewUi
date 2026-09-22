@@ -7,6 +7,7 @@ import {
   type PixelRect,
 } from './pixelCorners'
 import type { createDefaultButtonPalette } from './defaultButtonTheme'
+import { STAR_COLORS } from '../styles/colorTokens'
 
 type DefaultButtonPalette = ReturnType<typeof createDefaultButtonPalette>
 
@@ -144,13 +145,13 @@ export const drawDefaultButtonBackground = (
   ctx.save()
   ctx.translate(0, metrics.innerShadowOffsetY)
   tracePolygon(ctx, visibleFill)
-  ctx.strokeStyle = 'rgba(66, 39, 17, 0.28)'
+  ctx.strokeStyle = STAR_COLORS.canvas.buttonInnerShadow
   ctx.lineWidth = hairline
   ctx.stroke()
   ctx.restore()
 
   // Top highlight hairline, clear of the corner breaks.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'
+  ctx.fillStyle = STAR_COLORS.canvas.buttonTopHighlight
   ctx.fillRect(t * 2, t + hairline, Math.max(0, width - t * 4), hairline)
 
   ctx.restore()

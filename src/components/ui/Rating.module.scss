@@ -4,8 +4,8 @@ $rating-pop-duration: 360ms;
 $rating-out-duration: 540ms;
 
 .star-rating {
-  --star-rating-color: #e53935;
-  --star-rating-empty-color: #cdbda8;
+  --star-rating-color: var(--star-raw-hex-e53935);
+  --star-rating-empty-color: var(--star-raw-hex-cdbda8);
 
   display: inline-flex;
   align-items: center;
@@ -14,7 +14,7 @@ $rating-out-duration: 540ms;
   outline: none;
 
   &:focus-visible {
-    outline: 2px solid #67412f;
+    outline: 2px solid var(--star-raw-hex-67412f);
     outline-offset: 3px;
   }
 
@@ -76,15 +76,15 @@ $rating-out-duration: 540ms;
     position: relative;
     overflow: hidden;
     color: var(--star-rating-empty-color);
-    filter: drop-shadow(1px 2px 0 rgba(74, 44, 26, 0.34));
+    filter: drop-shadow(1px 2px 0 var(--star-raw-rgba-74-44-26-0-34));
   }
 
   &__glyph-fill {
     position: absolute;
     inset: 0;
     color: var(--star-rating-color);
-    -webkit-mask-image: linear-gradient(to right, #000 0 var(--star-rating-fill), transparent var(--star-rating-fill));
-    mask-image: linear-gradient(to right, #000 0 var(--star-rating-fill), transparent var(--star-rating-fill));
+    -webkit-mask-image: linear-gradient(to right, var(--star-raw-hex-000) 0 var(--star-rating-fill), transparent var(--star-rating-fill));
+    mask-image: linear-gradient(to right, var(--star-raw-hex-000) 0 var(--star-rating-fill), transparent var(--star-rating-fill));
   }
 
   svg {

@@ -1,14 +1,14 @@
-$tab-bg: #ffc675;
-$tab-bg-hover: #ffe0b2;
-$tab-bg-active: #fff3dc;
-$tab-border: #d7770f;
-$tab-border-dark: #9d4100;
-$tab-border-light: #ffe0b2;
-$tab-text: #4d2608;
-$tab-text-secondary: #6a350b;
-$tab-text-active: #9d4100;
-$tab-indicator: #fff8eb;
-$tab-indicator-shadow: rgba(255, 255, 255, 0.5);
+$tab-bg: var(--star-raw-hex-ffc675);
+$tab-bg-hover: var(--star-raw-hex-ffe0b2);
+$tab-bg-active: var(--star-raw-hex-fff3dc);
+$tab-border: var(--star-raw-hex-d7770f);
+$tab-border-dark: var(--star-raw-hex-9d4100);
+$tab-border-light: var(--star-raw-hex-ffe0b2);
+$tab-text: var(--star-raw-hex-4d2608);
+$tab-text-secondary: var(--star-raw-hex-6a350b);
+$tab-text-active: var(--star-raw-hex-9d4100);
+$tab-indicator: var(--star-raw-hex-fff8eb);
+$tab-indicator-shadow: var(--star-raw-rgba-255-255-255-0-5);
 
 // Slight stepped pixel corner: two 3px risers per corner (6px total).
 $tab-step-span: 6px;
@@ -62,7 +62,7 @@ $tab-step-span: 6px;
 
   &__nav-wrapper {
     position: relative;
-    background: rgba(0, 0, 0, 0.06);
+    background: var(--star-raw-rgba-0-0-0-0-06);
     border-bottom: 3px solid $tab-border;
   }
 
@@ -115,8 +115,8 @@ $tab-step-span: 6px;
       color: $tab-text-active;
       background: $tab-bg-active;
       text-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.4),
-        0 0 2px rgba(157, 65, 0, 0.2);
+        0 1px 0 var(--star-raw-rgba-255-255-255-0-4),
+        0 0 2px var(--star-raw-rgba-157-65-0-0-2);
       font-weight: 700;
     }
 
@@ -154,7 +154,7 @@ $tab-step-span: 6px;
     border-radius: 2px 2px 0 0;
     box-shadow:
       0 0 4px $tab-indicator-shadow,
-      0 0 8px rgba(255, 248, 235, 0.3);
+      0 0 8px var(--star-raw-rgba-255-248-235-0-3);
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
     z-index: 1;

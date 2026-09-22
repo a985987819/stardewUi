@@ -7,6 +7,7 @@
 ```bash
 bun run gen:component Switch \
   --zh 开关 --en Switch --icon ToggleRight \
+  --category form \
   --desc-zh "像素药丸形状的开关。" \
   --desc-en "A pixel pill switch."
 ```
@@ -41,7 +42,7 @@ componentRegistry.tsx ──► lazyPages.ts ──► pages/<Component>Demo.tsx
 
 `src/router/componentRegistry.sync.test.tsx` 会断言：
 
-1. `routePath` / `component` 唯一，`routePath` 为 kebab-case，`component` 为 PascalCase；
+1. `routePath` / `component` 唯一，`routePath` 为 kebab-case，`component` 为 PascalCase，`category` 必须属于目录分类；
 2. `title`、`desc` 的 `zh` / `en` 均非空，`icon` 存在 —— 侧边栏与总览页都会渲染它们；
 3. 每条条目的 `element` 对应 `lazyPages.ts` 中 `Star<Component>DemoPage = lazy(() => import('../pages/<Component>Demo'))`；
 4. `pages/` 下**每个 `*Demo.tsx` 都被某条目录引用**，且每条目录都有对应的 `pages/<Component>Demo.tsx`；
@@ -69,6 +70,14 @@ bun run test:run             # 全量测试（含守卫）
 | 懒加载导出 | `router/lazyPages.ts` 里的 `Star<Component>DemoPage` | `StarSwitchDemoPage` |
 | URL | `routePath` 为 kebab-case | `switch` / `nine-slice-button` |
 | 导出 | 组件文件同时提供具名与默认导出；公共入口只从 `ui/index.ts` 转出 | `export { StarSwitch }` |
+
+### 目录排序
+
+左侧目录和组件总览都会按 `componentRegistry.tsx` 中的 `category` 自动排序，不依赖条目的书写或追加位置。分类优先级为：
+
+`common` → `form` → `navigation` → `data-display` → `overlay` → `feedback` → `utility`
+
+将最常用于页面搭建的组件放入 `common`；新增组件请用脚手架的 `--category` 参数选最贴近的分类。未指定时脚手架会使用 `utility`，避免未经分类的新组件挤到高频入口之前。删除组件不需要额外维护顺序，派生目录会自动收紧。
 
 > 历史坑：按钮的演示页曾叫 `ButtonDemo.tsx` 而组件叫 `NineSliceButton.tsx`，两者对不上，
 > 生成器也就无法按组件名推算文件路径。现已统一为 `NineSliceButtonDemo.tsx`。
@@ -134,7 +143,7 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 ## 8. 命令速查
 
 ```bash
-bun run gen:component <Name> [--zh --en --icon --desc-zh --desc-en --route]  # 脚手架
+bun run gen:component <Name> [--zh --en --icon --desc-zh --desc-en --route --category]  # 脚手架
 bun run gen:component <Name> --dry-run                                       # 只看计划不落盘
 bun run rm:component <Name> [--no-verify] [--dry-run]                        # 移除组件（含清 README/i18n）
 bun run check:components                                                     # 目录同步守卫

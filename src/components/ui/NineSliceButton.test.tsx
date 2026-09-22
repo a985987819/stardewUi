@@ -1,6 +1,14 @@
 import '@testing-library/jest-dom/vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { STAR_COLORS } from '../../styles/colorTokens'
+import {
+  DEFAULT_BUTTON_DISABLED_OVERLAY,
+  DEFAULT_BUTTON_DISABLED_TEXT,
+  DEFAULT_BUTTON_FILL,
+  DEFAULT_BUTTON_HOVER_FILL,
+  DEFAULT_BUTTON_OUTER_BORDER,
+} from '../../utils/defaultButtonTheme'
 import NineSliceButton from './NineSliceButton'
 
 const { drawDefaultButtonBackground } = vi.hoisted(() => ({
@@ -40,10 +48,10 @@ vi.mock('../../utils/defaultButtonCanvas', () => ({
 
 vi.mock('../../utils/seasonalButtonCanvas', () => ({
   SEASONAL_BUTTON_PALETTES: {
-    spring: { normalFill: '#D9899A', pressedFill: '#985565', disabledFill: '#BDA6A0', border: '#67412F', text: { normal: '#FFF4E7', hover: '#FFF4E7', active: '#FFF4E7', disabled: '#FFF4E7' } },
-    summer: { normalFill: '#6F9E4B', pressedFill: '#456B32', disabledFill: '#A5AE99', border: '#4B3925', text: { normal: '#FFF4D6', hover: '#FFF4D6', active: '#FFF4D6', disabled: '#FFF4D6' } },
-    autumn: { normalFill: '#B85C3E', pressedFill: '#773A2D', disabledFill: '#B7A69A', border: '#563421', text: { normal: '#FFF0D5', hover: '#FFF0D5', active: '#FFF0D5', disabled: '#FFF0D5' } },
-    winter: { normalFill: '#7699B5', pressedFill: '#4E6B84', disabledFill: '#AAB8BE', border: '#435565', text: { normal: '#F5F8F6', hover: '#F5F8F6', active: '#F5F8F6', disabled: '#F5F8F6' } },
+    spring: { normalFill: '#E68DA4', pressedFill: '#B95E76', disabledFill: '#CDB2B8', border: '#754657', text: { normal: '#FFF8EE', hover: '#FFF8EE', active: '#FFF8EE', disabled: '#FFF8EE' } },
+    summer: { normalFill: '#78AD55', pressedFill: '#4E7B3A', disabledFill: '#B4C0A6', border: '#4A5C32', text: { normal: '#FFF9E8', hover: '#FFF9E8', active: '#FFF9E8', disabled: '#FFF9E8' } },
+    autumn: { normalFill: '#D77B50', pressedFill: '#A94F38', disabledFill: '#C8B1A2', border: '#71402B', text: { normal: '#FFF7E7', hover: '#FFF7E7', active: '#FFF7E7', disabled: '#FFF7E7' } },
+    winter: { normalFill: '#78AFC4', pressedFill: '#527A96', disabledFill: '#B4C7CD', border: '#405E70', text: { normal: '#F7FBFA', hover: '#F7FBFA', active: '#F7FBFA', disabled: '#F7FBFA' } },
   },
 }))
 
@@ -65,9 +73,9 @@ describe('NineSliceButton', () => {
     const button = screen.getByRole('button', { name: '默认按钮' })
     expect(button).toBeEnabled()
     expect(button.style.getPropertyValue('--nine-slice-button-primary-color')).toBe('')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#A38A6B')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe(DEFAULT_BUTTON_OUTER_BORDER)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
   })
 
   it('renders the default button with a dedicated canvas background', () => {
@@ -82,8 +90,8 @@ describe('NineSliceButton', () => {
     expect(canvas).not.toBeNull()
     expect(label).not.toBeNull()
     expect(getComputedStyle(label as Element).textShadow).not.toBe('none')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
   })
 
@@ -95,35 +103,35 @@ describe('NineSliceButton', () => {
     expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#2E6F40')
     expect(button.style.getPropertyValue('--nine-slice-button-default-inner-border')).not.toBe('')
     expect(button.style.getPropertyValue('--nine-slice-button-default-color')).not.toBe('')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
   })
 
   it('updates regular default text colors on hover and active states', () => {
     render(<NineSliceButton>状态按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '状态按钮' })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerEnter(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_HOVER_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerDown(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_HOVER_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
     expect(button.style.fontWeight).toBe('700')
 
     fireEvent.pointerUp(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E8D8C4')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_HOVER_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
     expect(button.style.fontWeight).toBe('')
 
     fireEvent.pointerLeave(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#4A2C1A')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.ink.strongest)
   })
 
   it('applies the supplied spring normal background, border, and text colors', () => {
@@ -131,9 +139,9 @@ describe('NineSliceButton', () => {
 
     const button = screen.getByRole('button', { name: '春季默认按钮' })
     expect(button.style.getPropertyValue('--nine-slice-button-primary-color')).toBe('')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#D9899A')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#67412F')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4E7')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.spring.fill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe(STAR_COLORS.season.spring.border)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.spring.text)
   })
 
   it('renders primary buttons with the shared stepped frame and supplied palette', () => {
@@ -145,9 +153,9 @@ describe('NineSliceButton', () => {
 
     expect(image).toBeNull()
     expect(canvas).not.toBeNull()
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#8B5A32')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe('#4A2C1A')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4D6')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.button.primary.fill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-outer-border')).toBe(STAR_COLORS.button.primary.border)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.button.primary.text)
   })
 
   it('uses btnImg.png only when the classical appearance is requested', () => {
@@ -162,7 +170,7 @@ describe('NineSliceButton', () => {
     const image = button.querySelector('img')
 
     expect(image).toBeNull()
-    expect(canvas).toHaveAttribute('data-src', '/btnImg.png')
+    expect(canvas).toHaveAttribute('data-src', expect.stringContaining('btnImg'))
     expect(canvas).toHaveAttribute('data-insets', '8,8,8,8')
   })
 
@@ -210,8 +218,8 @@ describe('NineSliceButton', () => {
 
     const button = screen.getByRole('button', { name: '夏季禁用按钮' })
     expect(button).toBeDisabled()
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#A5AE99')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4D6')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.summer.disabledFill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.summer.text)
   })
 
   it('applies disabled overlay and disabled text color to regular default buttons', () => {
@@ -222,10 +230,10 @@ describe('NineSliceButton', () => {
 
     expect(button).toBeDisabled()
     expect(image).toBeNull()
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#E2D3B8')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#B0BEC5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(DEFAULT_BUTTON_FILL)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(DEFAULT_BUTTON_DISABLED_TEXT)
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe(
-      'rgba(238, 229, 213, 0.62)'
+      DEFAULT_BUTTON_DISABLED_OVERLAY
     )
   })
 
@@ -239,37 +247,38 @@ describe('NineSliceButton', () => {
     const button = screen.getByRole('button', { name: '春季加载按钮' })
     expect(button).toBeDisabled()
     expect(button).toHaveAttribute('aria-busy', 'true')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#BDA6A0')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4E7')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.spring.disabledFill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.spring.text)
   })
 
   it('updates seasonal text color on hover and active states', () => {
     render(<NineSliceButton theme="autumn">秋季按钮</NineSliceButton>)
 
     const button = screen.getByRole('button', { name: '秋季按钮' })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#B85C3E')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF0D5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.autumn.fill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.autumn.text)
 
     fireEvent.pointerEnter(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#B85C3E')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF0D5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.autumn.fill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.autumn.text)
 
     fireEvent.pointerDown(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#773A2D')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF0D5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.autumn.pressedFill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.autumn.text)
 
     fireEvent.pointerUp(button, { button: 0 })
-    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe('#B85C3E')
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF0D5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-fill')).toBe(STAR_COLORS.season.autumn.fill)
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.autumn.text)
 
     fireEvent.pointerLeave(button)
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF0D5')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.autumn.text)
   })
 
   it.each([
-    ['secondary', '#D6B477', '#76502D', '#4A2C1A'],
-    ['success', '#71964A', '#40582C', '#FFF7DC'],
-    ['danger', '#B85C4A', '#71372D', '#FFF0DD'],
+    ['secondary', STAR_COLORS.button.secondary.fill, STAR_COLORS.button.secondary.border, STAR_COLORS.button.secondary.text],
+    ['info', STAR_COLORS.button.info.fill, STAR_COLORS.button.info.border, STAR_COLORS.button.info.text],
+    ['success', STAR_COLORS.button.success.fill, STAR_COLORS.button.success.border, STAR_COLORS.button.success.text],
+    ['danger', STAR_COLORS.button.danger.fill, STAR_COLORS.button.danger.border, STAR_COLORS.button.danger.text],
   ] as const)('uses the supplied %s palette', (variant, fill, border, text) => {
     render(<NineSliceButton variant={variant}>{variant}</NineSliceButton>)
 
@@ -285,9 +294,9 @@ describe('NineSliceButton', () => {
     const button = screen.getByRole('button', { name: '春季默认按钮' })
     const canvas = button.querySelector('canvas')
 
-    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe('#FFF4E7')
+    expect(button.style.getPropertyValue('--nine-slice-button-default-color')).toBe(STAR_COLORS.season.spring.text)
     expect(button.style.getPropertyValue('--nine-slice-button-default-disabled-overlay')).toBe('transparent')
-    expect(canvas).not.toHaveAttribute('data-src', '/defaultBtn.png')
-    expect(canvas).not.toHaveAttribute('data-src', '/btnImg.png')
+    expect(canvas).not.toHaveAttribute('data-src', expect.stringContaining('defaultBtn'))
+    expect(canvas).not.toHaveAttribute('data-src', expect.stringContaining('btnImg'))
   })
 })

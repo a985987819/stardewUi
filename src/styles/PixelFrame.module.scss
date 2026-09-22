@@ -8,11 +8,11 @@
 //   - 填色层铺满环的内侧，被角块压住的角形成一级台阶
 //
 // 这些矩形用同一个元素的 8 个 `linear-gradient` 背景图层画出来，不需要额外 DOM。
-// 填色由 `gap-frame-fill` 提供，配合 `createGapFrameClipPath(厚度)`（内缩矩形的
-// clip）使用 —— 层与 clip 全部对齐在同一只盒子上。
+// 填色和边框图层全部由 `gap-frame-fill` 在同一个盒子里绘制，不需要额外的
+// `clip-path`。对整个盒子做内缩裁切会同时切掉边框与角块，导致四角出现杂散像素。
 
 /// 应用外壳（页头 / 侧栏 / 内容底板 / 目录）的缺口边框厚度。
-/// 必须与 `App.tsx` 里的 `DOC_FRAME_WIDTH` 一致 —— 那边用它生成 `--doc-gap-clip`。
+/// 用于应用外壳的连续 gap frame 厚度。
 $doc-frame-width: 4px;
 
 /// 4 条边 + 4 个角块，作为背景图层画在元素自身的盒子上。
@@ -54,8 +54,7 @@ $doc-frame-width: 4px;
     right 0 bottom 0;
 }
 
-/// 单元素写法：填色 + 边框图层，配合 `createGapFrameClipPath(厚度)` 使用。
-/// 填色被 clip 裁到环的内侧，边框图层把环画在上层，合成一条连续的粗角框。
+/// 单元素写法：填色 + 边框图层。边框层绘制在填色上方，合成连续的粗角框。
 @mixin gap-frame-fill($fill, $border, $thickness) {
   background-color: $fill;
   @include gap-frame-layers($border, $thickness);

@@ -8,22 +8,22 @@ import { useI18n, type Lang } from '../i18n'
 const copy = {
   zh: {
     title: 'Switch 开关',
-    desc: '像素药丸形状的开关，用一格滑动表示「打开 / 关闭」，适合灯光、自动浇水、音效和难度设置。',
+    desc: '把木栅栏的暖色框架和进度格的缺角标记收进一个开关：像一枚在双横杆之间滑动的像素门闩，适合灯光、自动浇水、音效和难度设置。',
     toc: ['基础开关', '尺寸与配色', '禁用状态', 'API'],
     demos: [
       ['基础开关', '用受控状态记录开关值，点击或键盘操作都会触发 onChange。'],
-      ['尺寸与配色', 'small、medium、large 对应不同密度的设置项，color 决定打开时的轨道颜色。'],
+      ['尺寸与配色', 'small、medium、large 对应不同密度的设置项，color 决定打开标记的颜色，并自动生成深框、投影和高光。'],
       ['禁用状态', '任务未解锁或设置不可改时，禁用态保留形状但停止响应。'],
     ],
     labels: ['谷仓灯', '自动浇水', '音效', '矿洞照明', '温室加热', '已锁定的开关'],
   },
   en: {
     title: 'Switch',
-    desc: 'A pixel pill switch whose thumb slides between on and off — for lamps, auto-watering, sound, and difficulty settings.',
+    desc: 'A fence-warm frame with a progress-cell marker: a pixel gate latch sliding between two rails for lamps, auto-watering, sound, and difficulty settings.',
     toc: ['Basic Switch', 'Sizes & Colors', 'Disabled', 'API'],
     demos: [
       ['Basic Switch', 'Keep the value in state; clicking or using the keyboard both fire onChange.'],
-      ['Sizes & Colors', 'small, medium, and large fit different settings densities, while color sets the on-track.'],
+      ['Sizes & Colors', 'small, medium, and large fit different settings densities; color sets the active marker and derives its frame, shadow, and highlight.'],
       ['Disabled', 'When a quest is locked the switch keeps its shape but stops responding.'],
     ],
     labels: ['Barn lamp', 'Auto watering', 'Sound', 'Mine lighting', 'Greenhouse heat', 'Locked switch'],
@@ -42,14 +42,14 @@ const apiData = {
     { property: 'onChange', description: '状态变化回调', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'size', description: '开关尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
-    { property: 'color', description: '打开时的轨道颜色', type: 'string', default: "'#4ade80'" },
+    { property: 'color', description: '打开标记的颜色；深框、投影和高光从它自动推导', type: 'string', default: "'#71964A'" },
   ],
   en: [
     { property: 'checked', description: 'Controlled on/off state.', type: 'boolean', default: 'false' },
     { property: 'onChange', description: 'Change callback.', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'size', description: 'Switch size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
-    { property: 'color', description: 'Track color when on.', type: 'string', default: "'#4ade80'" },
+    { property: 'color', description: 'Active marker color; its frame, shadow, and highlight are derived from it.', type: 'string', default: "'#71964A'" },
   ],
 }
 

@@ -7,7 +7,7 @@
   &-header {
     @apply flex items-center justify-between px-4 py-2;
     background: var(--color-bg-code-header);
-    border-bottom: 3px solid #4a4030;
+    border-bottom: 3px solid var(--star-raw-hex-4a4030);
   }
 
   &-language {
@@ -20,10 +20,10 @@
     // This control sits on a dark code surface in both app themes. Keep the
     // icon on currentColor and use an explicit light swatch so it never gets
     // inherited from the warm, low-contrast page text variables.
-    background: #514531;
-    color: #fff7dc;
-    border: 2px solid #d7b676;
-    text-shadow: 1px 1px 0 #21180e;
+    background: var(--star-raw-hex-514531);
+    color: var(--star-raw-hex-fff7dc);
+    border: 2px solid var(--star-raw-hex-d7b676);
+    text-shadow: 1px 1px 0 var(--star-raw-hex-21180e);
 
     :global(svg) {
       color: currentColor;
@@ -31,13 +31,13 @@
     }
 
     &:hover {
-      background: #746042;
-      color: #ffffff;
-      border-color: #ffe0a0;
+      background: var(--star-raw-hex-746042);
+      color: var(--star-raw-hex-ffffff);
+      border-color: var(--star-raw-hex-ffe0a0);
     }
 
     &:focus-visible {
-      outline: 2px solid #fff7dc;
+      outline: 2px solid var(--star-raw-hex-fff7dc);
       outline-offset: 2px;
     }
   }
@@ -49,12 +49,12 @@
   &-lines {
     @apply flex flex-col py-4 select-none;
     background: var(--color-bg-code-lines);
-    border-right: 3px solid #4a4030;
+    border-right: 3px solid var(--star-raw-hex-4a4030);
   }
 
   &-line-number {
     @apply px-3 text-[13px] leading-relaxed;
-    color: #8a7a6a;
+    color: var(--star-raw-hex-8a7a6a);
     font-family: var(--font-mono);
   }
 
@@ -65,7 +65,7 @@
     code {
       @apply text-[13px] leading-relaxed;
       font-family: var(--font-mono);
-      color: #d4c4a1;
+      color: var(--star-raw-hex-d4c4a1);
     }
   }
 }

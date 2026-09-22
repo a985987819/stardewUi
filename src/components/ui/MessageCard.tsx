@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react'
 import { classNames } from '../../utils/classNames'
 import StarCard from './Card'
 import {
@@ -6,6 +6,7 @@ import {
   MESSAGE_THEME_MAP,
   resolveMessagePlacement,
   type MessageBottom,
+  type MessageAction,
   type MessagePosition,
   type MessageType,
 } from './messageConfig'
@@ -21,6 +22,8 @@ export interface StarMessageCardProps {
   duration?: number
   position?: MessagePosition
   bottom?: MessageBottom
+  onClick?: () => void
+  action?: MessageAction
   /** Stable, module-level handler. Receives the message id so it never needs to be re-created. */
   onDismiss: (id: string) => void
 }
@@ -32,6 +35,8 @@ function StarMessageCard({
   duration = 3000,
   position,
   bottom,
+  onClick,
+  action,
   onDismiss,
 }: StarMessageCardProps) {
   const [visible, setVisible] = useState(false)
@@ -82,28 +87,69 @@ function StarMessageCard({
     }, EXIT_ANIMATION_MS)
   }, [id, onDismiss])
 
+  const handleMessageClick = useCallback(() => {
+    onClick?.()
+  }, [onClick])
+
+  const handleActionClick = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation()
+      action?.onClick()
+    },
+    [action]
+  )
+
   const theme = MESSAGE_THEME_MAP[type]
+  const entranceClass =
+    placement.startsWith('bottom')
+      ? styles['stardew-message--from-bottom']
+      : placement === 'left'
+        ? styles['stardew-message--from-left']
+        : placement === 'right'
+          ? styles['stardew-message--from-right']
+          : undefined
 
   return (
     <StarCard
       className={classNames(
         styles['stardew-message'],
         styles[`stardew-message--${type}`],
-        placement !== 'top' && styles['stardew-message--bottom'],
+        entranceClass,
         visible && styles['stardew-message--visible']
       )}
+      color={theme.fill}
       size="small"
+      onClick={onClick ? handleMessageClick : undefined}
+      style={
+        {
+          '--message-accent': theme.border,
+          '--message-action-bg': theme.border,
+          '--message-action-text': theme.fill,
+        } as CSSProperties
+      }
     >
       <div className={styles['stardew-message__body']}>
         <div className={styles['stardew-message__icon-box']} aria-hidden>
           <span className={styles['stardew-message__icon']}>{MESSAGE_ICON_MAP[type]}</span>
         </div>
         <span className={styles['stardew-message__content']}>{content}</span>
+        {action ? (
+          <button
+            type="button"
+            className={styles['stardew-message__action']}
+            onClick={handleActionClick}
+          >
+            {action.label}
+          </button>
+        ) : null}
         <button
           type="button"
           aria-label="Close message"
           className={styles['stardew-message__close']}
-          onClick={handleClose}
+          onClick={(event) => {
+            event.stopPropagation()
+            handleClose()
+          }}
           style={{ color: theme.text }}
         >
           ×

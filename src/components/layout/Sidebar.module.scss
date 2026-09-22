@@ -1,12 +1,20 @@
 @use "../../styles/PixelFrame.module.scss" as gap;
 
 .doc-sidebar {
-  @apply fixed top-[60px] left-0 bottom-0 w-[260px] overflow-y-auto py-6;
-  // Same gap frame as the header, so the two panels read as one chrome. The
-  // clip keeps the corner breaks open; the frame layers are background images,
-  // so they stay put while the nav scrolls.
+  @apply sticky top-0 w-[260px] overflow-y-auto py-6;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  margin-top: 60px;
+  height: calc(100dvh - 60px);
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  z-index: 101;
+  // Same continuous gap frame as the header, so the two panels read as one
+  // chrome. The frame layers are backgrounds, so they stay put while the nav
+  // scrolls without needing a clipping mask that would cut the corner blocks.
   @include gap.gap-frame-fill(var(--color-bg-sidebar), var(--color-border-dark), gap.$doc-frame-width);
-  clip-path: var(--doc-gap-clip);
 
   &-nav {
     @apply flex flex-col gap-1;
@@ -83,10 +91,10 @@
   }
 
   @media (max-width: 1024px) {
-    @apply -translate-x-full z-[90];
+    display: none;
 
     &.is-open {
-      @apply translate-x-0;
+      display: block;
     }
   }
 }

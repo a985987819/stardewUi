@@ -1,19 +1,20 @@
 @use "../../styles/PixelFrame.module.scss" as gap;
 
 .table-of-contents {
-  position: fixed;
-  top: 100px;
-  right: 24px;
+  position: sticky;
+  top: 84px;
+  align-self: start;
+  flex: 0 0 200px;
+  margin-left: auto;
   width: 200px;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100dvh - 108px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 16px;
   // Same gap frame as the rest of the chrome.
   @include gap.gap-frame-fill(var(--color-bg-card), var(--color-border-dark), gap.$doc-frame-width);
-  clip-path: var(--doc-gap-clip);
-  // `clip-path` clips `box-shadow` too, so the pixel drop shadow has to be a
-  // filter instead — which also makes it follow the broken corners.
-  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.15));
+  box-shadow: 4px 4px 0 var(--star-raw-rgba-0-0-0-0-15);
   z-index: 50;
 
   @media (max-width: 1400px) {

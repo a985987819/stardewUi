@@ -12,6 +12,7 @@ import styles from './Message.module.scss'
 
 export type {
   MessageBottom,
+  MessageAction,
   MessageOptions,
   MessagePosition,
   MessageProps,
@@ -54,8 +55,11 @@ function getMessageHost(): { container: MessageContainer; root: Root } | null {
   container.id = MESSAGE_ROOT_ID
 
   if (!container.isConnected) {
-    const appRoot = document.querySelector('[class*="starApp"]')
-    ;(appRoot ?? document.body).appendChild(container)
+    // Fixed positioning is viewport-relative only when no transformed ancestor
+    // establishes a containing block. Drawer focus effects intentionally scale
+    // the app root, so mounting toast containers inside it offsets every one of
+    // the nine placements. Keep this overlay directly under body, like Drawer.
+    document.body.appendChild(container)
   }
 
   const root = createRoot(container)
@@ -115,6 +119,8 @@ function renderMessages() {
                 duration={msg.duration}
                 position={msg.position}
                 bottom={msg.bottom}
+                onClick={msg.onClick}
+                action={msg.action}
                 onDismiss={dismissMessage}
               />
             ))}
@@ -135,10 +141,7 @@ export function message(props: MessageProps | string, options?: MessageOptions |
   renderMessages()
 
   return {
-    close: () => {
-      messages.delete(id)
-      renderMessages()
-    },
+    close: () => dismissMessage(id),
   }
 }
 
