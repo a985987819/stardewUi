@@ -30,6 +30,7 @@ type NineSliceButtonVariant =
   | 'default'
   | 'primary'
   | 'secondary'
+  | 'info'
   | 'success'
   | 'warning'
   | 'danger'
@@ -77,6 +78,7 @@ const DEFAULT_COLOR_MAP: ButtonColorMap = {
   default: { bg: '#F5E6CC', text: '#3A2E39' },
   primary: { bg: '#8B5A32', text: '#FFF4D6' },
   secondary: { bg: '#D6B477', text: '#4A2C1A' },
+  info: { bg: '#69B8AE', text: '#153D3A' },
   success: { bg: '#71964A', text: '#FFF7DC' },
   warning: { bg: '#C28A45', text: '#FFF2D5' },
   danger: { bg: '#B85C4A', text: '#FFF0DD' },
@@ -87,7 +89,9 @@ const DEFAULT_COLOR_MAP: ButtonColorMap = {
 const STEPPED_BUTTON_TONES: Partial<Record<NineSliceButtonVariant, SteppedButtonTone>> = {
   primary: { bg: '#8B5A32', border: '#4A2C1A', text: '#FFF4D6' },
   secondary: { bg: '#D6B477', border: '#76502D', text: '#4A2C1A' },
+  info: { bg: '#69B8AE', border: '#26746F', text: '#153D3A' },
   success: { bg: '#71964A', border: '#40582C', text: '#FFF7DC' },
+  warning: { bg: '#D1A13B', border: '#785316', text: '#3F2A08' },
   danger: { bg: '#B85C4A', border: '#71372D', text: '#FFF0DD' },
 }
 
@@ -177,6 +181,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
       (effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
         effectiveVariant === 'secondary' ||
+        effectiveVariant === 'info' ||
         effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||
@@ -189,6 +194,7 @@ const StarNineSliceButton = forwardRef<HTMLButtonElement, StarNineSliceButtonPro
         effectiveVariant === 'default' ||
         effectiveVariant === 'primary' ||
         effectiveVariant === 'secondary' ||
+        effectiveVariant === 'info' ||
         effectiveVariant === 'success' ||
         effectiveVariant === 'warning' ||
         effectiveVariant === 'danger' ||

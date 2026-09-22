@@ -33,6 +33,40 @@
       right: 20px;
       transform: none;
     }
+
+    &--top-left {
+      left: 20px;
+      transform: none;
+    }
+
+    &--top-right {
+      left: auto;
+      right: 20px;
+      transform: none;
+    }
+
+    &--left {
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+    }
+
+    &--center {
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &--right {
+      top: 50%;
+      left: auto;
+      right: 20px;
+      transform: translateY(-50%);
+    }
+
+    &--bottom {
+      top: auto;
+      bottom: 20px;
+    }
   }
 
   &-layer {
@@ -41,9 +75,21 @@
     gap: 12px;
   }
 
+  &--from-bottom {
+    transform: translateY(20px);
+  }
+
+  &--from-left {
+    transform: translateX(-20px);
+  }
+
+  &--from-right {
+    transform: translateX(20px);
+  }
+
   &--visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(0);
   }
 
   &--normal {
@@ -84,7 +130,7 @@
     justify-content: center;
     align-self: stretch;
     padding-right: 10px;
-    border-right: 3px solid rgba(58, 46, 57, 0.18);
+    border-right: 3px solid color-mix(in srgb, var(--message-accent) 28%, transparent);
   }
 
   &__body {
@@ -124,6 +170,35 @@
 
     &:active {
       transform: translate(1px, 1px);
+    }
+  }
+
+  &__action {
+    flex-shrink: 0;
+    min-height: 30px;
+    padding: 5px 10px 6px;
+    border: 3px solid var(--message-accent);
+    border-radius: 0;
+    background: var(--message-action-bg);
+    color: var(--message-action-text);
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2), 2px 2px 0 rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.18);
+    transition:
+      transform 0.1s steps(2),
+      filter 0.1s steps(2);
+
+    &:hover {
+      filter: brightness(1.08);
+      transform: translate(-1px, -1px);
+    }
+
+    &:active {
+      transform: translate(1px, 1px);
+      box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.18);
     }
   }
 }

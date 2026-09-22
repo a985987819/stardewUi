@@ -268,6 +268,7 @@ describe('NineSliceButton', () => {
 
   it.each([
     ['secondary', '#D6B477', '#76502D', '#4A2C1A'],
+    ['info', '#69B8AE', '#26746F', '#153D3A'],
     ['success', '#71964A', '#40582C', '#FFF7DC'],
     ['danger', '#B85C4A', '#71372D', '#FFF0DD'],
   ] as const)('uses the supplied %s palette', (variant, fill, border, text) => {

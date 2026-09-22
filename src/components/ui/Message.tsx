@@ -12,6 +12,7 @@ import styles from './Message.module.scss'
 
 export type {
   MessageBottom,
+  MessageAction,
   MessageOptions,
   MessagePosition,
   MessageProps,
@@ -115,6 +116,8 @@ function renderMessages() {
                 duration={msg.duration}
                 position={msg.position}
                 bottom={msg.bottom}
+                onClick={msg.onClick}
+                action={msg.action}
                 onDismiss={dismissMessage}
               />
             ))}
@@ -135,10 +138,7 @@ export function message(props: MessageProps | string, options?: MessageOptions |
   renderMessages()
 
   return {
-    close: () => {
-      messages.delete(id)
-      renderMessages()
-    },
+    close: () => dismissMessage(id),
   }
 }
 

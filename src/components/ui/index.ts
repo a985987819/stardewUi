@@ -10,7 +10,7 @@ export {
 export { default as StarTypewriter } from './Typewriter'
 export { default as StarLoading } from './Loading'
 export { message } from './Message'
-export type { MessageType, MessageProps } from './Message'
+export type { MessageAction, MessageOptions, MessagePosition, MessageProps, MessageType } from './Message'
 export { default as StarNineSliceButton } from './NineSliceButton'
 export type { StarLoadingProps } from './Loading'
 export type { StarNineSliceButtonProps, NineSliceButtonTheme } from './NineSliceButton'
