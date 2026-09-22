@@ -243,6 +243,53 @@ describe('BackToTop', () => {
     expect(getButton()).not.toHaveClass(styles['star-back-to-top--visible'])
   })
 
+  it('flies away when the caller changes `flightKey`, without a click', () => {
+    vi.useFakeTimers()
+    vi.stubGlobal('scrollTo', vi.fn())
+    const { rerender } = render(<StarBackToTop flightKey="/components/button" />)
+
+    scrollPageTo(600)
+    expect(getButton()).toHaveClass(styles['star-back-to-top--visible'])
+
+    // A route change: the router does the scrolling itself, the plane takes the
+    // credit and leaves the corner exactly as it would after a real click.
+    rerender(<StarBackToTop flightKey="/components/card" />)
+
+    const button = getButton()
+
+    expect(button).toHaveAttribute('data-motion', 'flying')
+    expect(button).not.toHaveClass(styles['star-back-to-top--visible'])
+
+    // And it lands the same way: the new page is already at the top, so the plane
+    // stays gone instead of blinking back into view.
+    scrollPageTo(0)
+
+    act(() => {
+      vi.advanceTimersByTime(BACK_TO_TOP_FLIGHT_MS)
+    })
+
+    expect(button).not.toHaveAttribute('data-motion')
+    expect(button).not.toHaveClass(styles['star-back-to-top--visible'])
+  })
+
+  it('does not fly for the `flightKey` it mounted with', () => {
+    render(<StarBackToTop flightKey="/components/button" />)
+
+    expect(getButton()).not.toHaveAttribute('data-motion')
+  })
+
+  it('stays parked when `flightKey` changes while the plane is hidden', () => {
+    const { rerender } = render(<StarBackToTop flightKey="/a" />)
+
+    rerender(<StarBackToTop flightKey="/b" />)
+    rerender(<StarBackToTop flightKey="/c" />)
+
+    // The animation starts at full opacity, so firing it here would blink a plane
+    // into a corner it had never occupied — a router may bump this freely.
+    expect(getButton()).not.toHaveAttribute('data-motion')
+    expect(getButton()).not.toHaveClass(styles['star-back-to-top--visible'])
+  })
+
   it('accepts a custom label, offsets, class, and artwork', () => {
     render(
       <StarBackToTop label="回到顶部" bottom={120} right={48} className="farm-top">

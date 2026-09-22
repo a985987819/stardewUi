@@ -42,7 +42,7 @@ const PINNED_OFFSET = 108
 const copy = {
   zh: {
     title: '回到顶部 BackToTop',
-    desc: '页面滚动之后才浮现的像素纸飞机，机头朝着页面顶部。它自己盯着滚动位置，点击后向上飞出去并淡出，调用方不必操心什么时候该显示。',
+    desc: '页面滚动之后才浮现的像素纸飞机，机头朝着页面顶部。它自己盯着滚动位置，点击后向上飞出去并淡出，调用方不必操心什么时候该显示。文档站把它挂在了布局上：每个页面右下角都有同一只，换页时它还会替路由飞走一次。',
     toc: ['基础用法', '联系人长列表', '自定义显示', 'API'],
     demos: [
       [
@@ -51,7 +51,7 @@ const copy = {
       ],
       [
         '联系人长列表',
-        '这份村民名单长过一屏，负责把页面撑出滚动条。进入本页时会自动滚到底部，好让纸飞机立刻出现在右下角。',
+        '这份村民名单长过一屏，负责把页面撑出滚动条。往下滚一点，右下角那只纸飞机就会浮出来 —— 它由布局挂载，所以在本页也一样管用。',
       ],
       [
         '自定义显示',
@@ -73,7 +73,7 @@ const copy = {
   },
   en: {
     title: 'BackToTop',
-    desc: 'A pixel paper plane with its nose up, appearing only once the page has scrolled. It watches the scroll position itself, flies out of the corner when clicked, and leaves the caller out of it.',
+    desc: 'A pixel paper plane with its nose up, appearing only once the page has scrolled. It watches the scroll position itself, flies out of the corner when clicked, and leaves the caller out of it. The docs site mounts it in the layout, so every page has the same plane in the corner — and it flies away on navigation too.',
     toc: ['Basic Usage', 'Long Contact List', 'Controlled Visibility', 'API'],
     demos: [
       [
@@ -82,7 +82,7 @@ const copy = {
       ],
       [
         'Long Contact List',
-        'This villager roster is taller than a viewport, which is what gives the page something to scroll. The demo drops you at the bottom so the plane is right there in the corner.',
+        'This villager roster is taller than a viewport, which is what gives the page something to scroll. Scroll down a little and the plane surfaces in the corner — it is mounted by the layout, so it works here like anywhere else.',
       ],
       [
         'Controlled Visibility',
@@ -150,6 +150,12 @@ const apiData = {
       type: '(visible: boolean) => void',
       default: '-',
     },
+    {
+      property: 'flightKey',
+      description: '这个值一变就让纸飞机飞一次（隐藏时不动），适合把路由的 pathname 传进来',
+      type: 'string | number',
+      default: '-',
+    },
     { property: 'className', description: '附加类名', type: 'string', default: '-' },
   ],
   en: [
@@ -177,6 +183,12 @@ const apiData = {
       type: '(visible: boolean) => void',
       default: '-',
     },
+    {
+      property: 'flightKey',
+      description: 'Bump it to play the fly-away; a hidden plane stays put, so a router can bump it on every navigation.',
+      type: 'string | number',
+      default: '-',
+    },
     { property: 'className', description: 'Extra class name.', type: 'string', default: '-' },
   ],
 }
@@ -184,7 +196,6 @@ const apiData = {
 function StarBackToTopDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
-  const [visible, setVisible] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const [pinned, setPinned] = useState(false)
   const toc = t.toc.map((title, index) => ({
@@ -193,14 +204,9 @@ function StarBackToTopDemoPage() {
     level: 1,
   }))
 
-  // 进页面先落到底部：纸飞机是「滚动之后才出现」的组件，停在顶部就什么都演示不了。
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'auto' })
-    })
-
-    return () => cancelAnimationFrame(frame)
-  }, [])
+  // 本页右下角那只纸飞机是布局挂的全站共用实例，所以读数由滚动位置推出来就行：
+  // 组件的 threshold 默认是 0，两者本来就该一致。
+  const planeShown = scrollY > 0
 
   // 只给读数用的滚动监听；组件内部那份是它自己的，不对外暴露。
   useEffect(() => {
@@ -217,16 +223,13 @@ function StarBackToTopDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      {/* 固定的纸飞机整页只需要一只，它就是本页实际在跑的那份实例。 */}
-      <StarBackToTop onVisibleChange={setVisible} />
-
       <StarComponentDemo
         id="basic"
         title={t.demos[0][0]}
         description={t.demos[0][1]}
         data={[
           { label: t.liveScrollTop, value: `${scrollY}px` },
-          { label: t.liveVisible, value: visible ? t.liveOn : t.liveOff },
+          { label: t.liveVisible, value: planeShown ? t.liveOn : t.liveOff },
         ]}
         code="<StarBackToTop />"
       >
@@ -282,7 +285,10 @@ function StarBackToTopDemoPage() {
         code={`<StarBackToTop threshold={400} bottom={32} right={32} />
 
 // 或者完全接管显示时机
-<StarBackToTop visible={pinned} bottom={${32 + PINNED_OFFSET}} />`}
+<StarBackToTop visible={pinned} bottom={${32 + PINNED_OFFSET}} />
+
+// 换页时替路由飞走一次
+<StarBackToTop flightKey={pathname} />`}
       >
         <div className={styles['back-to-top-demo__actions']}>
           <StarNineSliceButton size="small" variant="primary" onClick={() => setPinned((current) => !current)}>

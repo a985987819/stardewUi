@@ -4,6 +4,7 @@ export const zhDict: Record<string, string> = {
   'nav.guide': '指南',
   'nav.components': '组件',
   'nav.api': 'API',
+  'nav.backToTop': '回到顶部',
   'header.github': '查看 GitHub',
   'home.badge': '像素农场 UI Kit',
   'home.desc':
@@ -68,6 +69,7 @@ export const enDict: Record<string, string> = {
   'nav.guide': 'Guide',
   'nav.components': 'Components',
   'nav.api': 'API',
+  'nav.backToTop': 'Back to top',
   'header.github': 'GitHub',
   'home.badge': 'Pixel Farm UI Kit',
   'home.desc':

@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type CSSProperties,
   type HTMLAttributes,
@@ -72,6 +73,18 @@ export interface StarBackToTopProps extends HTMLAttributes<HTMLButtonElement> {
   label?: string
   /** Called whenever the plane appears or disappears, including on mount. */
   onVisibleChange?: (visible: boolean) => void
+  /**
+   * Plays the fly-away every time this value changes, for a caller that resets
+   * the scroll itself. Pass a router's route key and the plane acknowledges the
+   * jump it never made: the new page starts at the top and the plane leaves the
+   * corner, exactly as if it had been clicked.
+   *
+   * A plane that is not on screen does not fly. There would be nothing to send
+   * off, and starting the animation anyway would blink a fully opaque plane into
+   * a corner it had never occupied — so a caller may bump this on every
+   * navigation without checking first.
+   */
+  flightKey?: string | number
 }
 
 const prefersReducedMotion = () =>
@@ -97,7 +110,9 @@ const prefersReducedMotion = () =>
  *
  * Clicking adds one more beat before the scroll finishes: the plane climbs out of
  * the corner and fades to nothing over `BACK_TO_TOP_FLIGHT_MS`, then stays out of
- * sight until the page actually lands back at the top.
+ * sight until the page actually lands back at the top. `flightKey` borrows that
+ * same flight for a caller that does its own scrolling — a router, say, which
+ * resets the document on navigation and wants the plane to take the credit.
  */
 function StarBackToTop({
   threshold = 0,
@@ -112,6 +127,7 @@ function StarBackToTop({
   style,
   onClick,
   onVisibleChange,
+  flightKey,
   ...rest
 }: StarBackToTopProps) {
   const controlled = visibleProp !== undefined
@@ -144,6 +160,30 @@ function StarBackToTop({
   useEffect(() => {
     onVisibleChange?.(shown)
   }, [onVisibleChange, shown])
+
+  // The flight effect below has to read the current visibility without listing it
+  // as a dependency: a navigation and the scroll listener's own update land in the
+  // same commit, and re-running on `shown` would replay a flight that was already
+  // decided. The sync effect is declared first, so it always runs before the reader.
+  const shownRef = useRef(shown)
+  const lastFlightKey = useRef(flightKey)
+
+  useEffect(() => {
+    shownRef.current = shown
+  }, [shown])
+
+  useEffect(() => {
+    // Mounting is not a navigation — the first value seen is the baseline.
+    if (lastFlightKey.current === flightKey) return
+
+    lastFlightKey.current = flightKey
+    // Nothing on screen to send off, and a plane that was never visible must stay
+    // that way: the animation starts at full opacity, so firing it here would blink
+    // the plane into a corner it had never occupied.
+    if (!shownRef.current) return
+
+    setFlying(true)
+  }, [flightKey])
 
   // Hand the plane back over once it is safe to do so. The flight animation keeps
   // its end state (`forwards`), so the plane is invisible either way; what this
