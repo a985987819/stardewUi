@@ -49,6 +49,24 @@
     }
   }
 
+  &-category {
+    width: 100%;
+    background: transparent;
+    border-top: 1px solid var(--star-raw-rgba-157-65-0-0-16);
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 4px solid transparent;
+    font: inherit;
+    text-align: left;
+
+    &.level-1 {
+      @apply px-6 py-2 text-xs;
+      color: var(--star-raw-hex-7a3514);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+  }
+
   &-icon {
     @apply flex items-center justify-center w-[18px] h-[18px];
   }

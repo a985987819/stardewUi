@@ -3,11 +3,16 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { Book, Box, ChevronDown, Search } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { useI18n } from '../../i18n'
-import { COMPONENT_ROUTES } from '../../router/componentRegistry'
+import {
+  COMPONENT_CATALOGUE_CATEGORIES,
+  COMPONENT_CATALOGUE_CATEGORY_META,
+  COMPONENT_ROUTES,
+} from '../../router/componentRegistry'
 import styles from './Sidebar.module.scss'
 
 interface MenuItem {
-  path: string
+  id: string
+  path?: string
   labelZh: string
   labelEn: string
   icon?: ReactNode
@@ -16,23 +21,31 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   {
+    id: '/guide',
     path: '/guide',
     labelZh: '指南',
     labelEn: 'Guide',
     icon: <Book size={18} />,
   },
   {
+    id: '/components',
     path: '/components',
     labelZh: '组件',
     labelEn: 'Components',
     icon: <Box size={18} />,
-    children: [
-      ...COMPONENT_ROUTES.map((component) => ({
-        path: `/components/${component.routePath}`,
-        labelZh: component.title.zh,
-        labelEn: component.title.en,
-      })),
-    ],
+    children: COMPONENT_CATALOGUE_CATEGORIES.map((category) => ({
+      id: `category-${category}`,
+      labelZh: COMPONENT_CATALOGUE_CATEGORY_META[category].zh,
+      labelEn: COMPONENT_CATALOGUE_CATEGORY_META[category].en,
+      children: COMPONENT_ROUTES
+        .filter((component) => component.category === category)
+        .map((component) => ({
+          id: `/components/${component.routePath}`,
+          path: `/components/${component.routePath}`,
+          labelZh: component.title.zh,
+          labelEn: component.title.en,
+        })),
+    })),
   },
 ]
 
@@ -43,72 +56,101 @@ function bilingualLabel(item: Pick<MenuItem, 'labelZh' | 'labelEn'>) {
 function StarSidebar() {
   const location = useLocation()
   const { t } = useI18n()
-  const [expandedKeys, setExpandedKeys] = useState<string[]>(['/components'])
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([
+    '/components',
+    ...COMPONENT_CATALOGUE_CATEGORIES.map((category) => `category-${category}`),
+  ])
   const [searchQuery, setSearchQuery] = useState('')
 
-  const toggleExpand = (path: string) => {
-    setExpandedKeys((prev) => (prev.includes(path) ? prev.filter((key) => key !== path) : [...prev, path]))
+  const toggleExpand = (id: string) => {
+    setExpandedKeys((prev) => (prev.includes(id) ? prev.filter((key) => key !== id) : [...prev, id]))
   }
 
-  const isExpanded = (path: string) => expandedKeys.includes(path)
+  const isExpanded = (id: string) => expandedKeys.includes(id)
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(`${path}/`)
 
   const filteredMenuItems = useMemo(() => {
     if (!searchQuery.trim()) return menuItems
 
     const query = searchQuery.toLowerCase()
-    return menuItems.map((item) => {
-      if (!item.children) return item
+    const filterItem = (item: MenuItem): MenuItem | null => {
+      if (!item.children) {
+        return `${item.labelZh} ${item.labelEn}`.toLowerCase().includes(query) ? item : null
+      }
 
-      const filteredChildren = item.children.filter((child) =>
-        `${child.labelZh} ${child.labelEn}`.toLowerCase().includes(query)
-      )
-      return { ...item, children: filteredChildren }
-    })
+      const children = item.children.map(filterItem).filter((child): child is MenuItem => child !== null)
+      return children.length > 0 || item.id === '/components' ? { ...item, children } : null
+    }
+
+    return menuItems.map(filterItem).filter((item): item is MenuItem => item !== null)
   }, [searchQuery])
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
-    if (e.target.value && !expandedKeys.includes('/components')) {
-      setExpandedKeys((prev) => [...prev, '/components'])
+    if (e.target.value) {
+      setExpandedKeys([
+        '/components',
+        ...COMPONENT_CATALOGUE_CATEGORIES.map((category) => `category-${category}`),
+      ])
     }
   }
 
   const renderMenuItem = (item: MenuItem, level = 0) => {
-    const isComponentsMenu = item.path === '/components'
+    const isComponentsMenu = item.id === '/components'
     const hasChildren = Boolean(item.children)
     const hasVisibleChildren = Boolean(item.children?.length)
-    const expanded = isExpanded(item.path)
-    const active = isActive(item.path)
+    const expanded = isExpanded(item.id)
+    const active = item.path
+      ? isActive(item.path)
+      : Boolean(item.children?.some((child) => child.path && isActive(child.path)))
 
     if (searchQuery && hasChildren && !hasVisibleChildren && !isComponentsMenu) {
       return null
     }
 
     return (
-      <div key={item.path} className={styles['doc-sidebar-item']}>
-        <NavLink
-          to={item.path}
-          className={classNames(
-            styles['doc-sidebar-link'],
-            active && styles['is-active'],
-            level > 0 && styles[`level-${level}`]
-          )}
-          onClick={(event) => {
-            if (hasChildren) {
-              event.preventDefault()
-              toggleExpand(item.path)
-            }
-          }}
-        >
-          {item.icon ? <span className={styles['doc-sidebar-icon']}>{item.icon}</span> : null}
-          <span className={styles['doc-sidebar-text']}>{bilingualLabel(item)}</span>
-          {hasChildren ? (
+      <div key={item.id} className={styles['doc-sidebar-item']}>
+        {item.path ? (
+          <NavLink
+            to={item.path}
+            className={classNames(
+              styles['doc-sidebar-link'],
+              active && styles['is-active'],
+              level > 0 && styles[`level-${level}`]
+            )}
+            onClick={(event) => {
+              if (hasChildren) {
+                event.preventDefault()
+                toggleExpand(item.id)
+              }
+            }}
+          >
+            {item.icon ? <span className={styles['doc-sidebar-icon']}>{item.icon}</span> : null}
+            <span className={styles['doc-sidebar-text']}>{bilingualLabel(item)}</span>
+            {hasChildren ? (
+              <span className={classNames(styles['doc-sidebar-arrow'], expanded && styles['is-expanded'])}>
+                <ChevronDown size={16} />
+              </span>
+            ) : null}
+          </NavLink>
+        ) : (
+          <button
+            type="button"
+            className={classNames(
+              styles['doc-sidebar-link'],
+              styles['doc-sidebar-category'],
+              active && styles['is-active'],
+              styles[`level-${level}`]
+            )}
+            onClick={() => toggleExpand(item.id)}
+            aria-expanded={expanded}
+          >
+            <span className={styles['doc-sidebar-text']}>{bilingualLabel(item)}</span>
             <span className={classNames(styles['doc-sidebar-arrow'], expanded && styles['is-expanded'])}>
-              <ChevronDown size={16} />
+              <ChevronDown size={14} />
             </span>
-          ) : null}
-        </NavLink>
+          </button>
+        )}
 
         {hasChildren && expanded ? (
           <div className={styles['doc-sidebar-children']}>
