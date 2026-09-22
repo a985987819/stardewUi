@@ -380,7 +380,7 @@ setTimeout(() => close(), 1000)
 
 ### StarCalendar - 日历
 
-像素风日历组件，支持事件标记。
+像素风日历组件，支持事件标记。工具栏的月份标题可点击，弹出年月下拉做快速跳转；右上角「回到今日」按东八区（UTC+8）当天回到本月。
 
 ```tsx
 import { StarCalendar } from 'stardew-valley-ui'
@@ -407,6 +407,11 @@ import { StarCalendar } from 'stardew-valley-ui'
 | iconMap | `Record<string, ReactNode \| string>` | - | 图标映射 |
 | showOutsideDays | `boolean` | `true` | 是否显示非当月日期 |
 | onMonthChange | `(timestamp: number) => void` | - | 月份切换回调 |
+| todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
+| showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
+| todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区 |
+
+> 翻月、「回到今日」和下拉选月都会走 `onMonthChange`；目标月份和当前一致时不会重复触发。
 
 `CalendarItem`：
 
@@ -425,7 +430,7 @@ import { StarCalendar } from 'stardew-valley-ui'
 
 ### StarDatePicker - 日期选择器
 
-支持单选和范围选择的日期选择器。
+支持单选和范围选择的日期选择器。工具栏与 `StarCalendar` 共用：点击月份标题弹出年月下拉，右上角「回到今日」按东八区（UTC+8）当天把视图带回本月（只移动视图，不改动已选日期）。
 
 ```tsx
 import { StarDatePicker } from 'stardew-valley-ui'
@@ -460,6 +465,9 @@ import { StarDatePicker } from 'stardew-valley-ui'
 | maxDate | `number` | - | 最大日期 |
 | disabledDates | `number[]` | `[]` | 禁用日期 |
 | showOutsideDays | `boolean` | `true` | 显示非当月日期 |
+| todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
+| showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
+| todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区；仅影响「今日」的判断与按钮落点，不会改动选中值 |
 
 ---
 
@@ -616,6 +624,19 @@ import { StarTab } from 'stardew-valley-ui'
 | defaultActiveKey | `string` | - | 默认激活项 |
 | onChange | `(key: string) => void` | - | 切换回调 |
 | position | `'top' \| 'bottom'` | `'top'` | 选项卡位置 |
+| external | `boolean` | `false` | 外接导航：选项卡条移到内容框外，内容仍留在带边框的框里 |
+
+```tsx
+// 选项卡在内容框上方
+<StarTab external items={items} />
+
+// 选项卡挂在内容框下方
+<StarTab external position="bottom" items={items} />
+```
+
+`external` 与 `position` 正交：默认（`false`）时选项卡和内容同处一个框；开启后内容框保留边框，
+每个选项卡以独立像素边框显示，选中项会向内容框平移 4px 并紧贴其边缘。导出结构上，
+`role="tabpanel"` 始终落在内容框上，`role="tablist"` 的位置随 `external` 变化，可以据此做样式或测试断言。
 
 ---
 
