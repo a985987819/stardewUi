@@ -30,8 +30,6 @@
   display: flex;
   overflow: hidden;
   pointer-events: auto;
-  --drawer-offset-x: 0px;
-  --drawer-offset-y: 0px;
   transform: translate3d(0, 0, 0);
   will-change: transform, opacity;
 
@@ -44,12 +42,10 @@
 
   &--right {
     right: 14px;
-    --drawer-offset-x: calc(100% + 24px);
   }
 
   &--left {
     left: 14px;
-    --drawer-offset-x: calc(-100% - 24px);
   }
 
   &--top,
@@ -61,22 +57,40 @@
 
   &--top {
     top: 14px;
-    --drawer-offset-y: calc(-100% - 24px);
   }
 
   &--bottom {
     bottom: 14px;
-    --drawer-offset-y: calc(100% + 24px);
+  }
+
+  &[data-state='opening'],
+  &[data-state='closing'] {
+    animation-duration: 0.2s;
+    animation-fill-mode: both;
   }
 
   &[data-state='opening'] {
-    animation: stardew-drawer-enter 0.2s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+    animation-timing-function: cubic-bezier(0.22, 0.8, 0.24, 1);
   }
 
   &[data-state='closing'] {
-    animation-duration: 0.2s;
     animation-timing-function: cubic-bezier(0.42, 0, 0.78, 0.2);
-    animation-fill-mode: both;
+  }
+
+  &--right[data-state='opening'] {
+    animation-name: stardew-drawer-enter-right;
+  }
+
+  &--left[data-state='opening'] {
+    animation-name: stardew-drawer-enter-left;
+  }
+
+  &--top[data-state='opening'] {
+    animation-name: stardew-drawer-enter-top;
+  }
+
+  &--bottom[data-state='opening'] {
+    animation-name: stardew-drawer-enter-bottom;
   }
 
   &--right[data-state='closing'] {
@@ -212,9 +226,39 @@
   }
 }
 
-@keyframes stardew-drawer-enter {
+@keyframes stardew-drawer-enter-right {
   from {
-    transform: translate3d(var(--drawer-offset-x), var(--drawer-offset-y), 0);
+    transform: translate3d(calc(100% + 24px), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-left {
+  from {
+    transform: translate3d(calc(-100% - 24px), 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-top {
+  from {
+    transform: translate3d(0, calc(-100% - 24px), 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stardew-drawer-enter-bottom {
+  from {
+    transform: translate3d(0, calc(100% + 24px), 0);
   }
 
   to {

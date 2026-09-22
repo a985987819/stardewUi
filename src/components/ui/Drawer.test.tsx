@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import Drawer from './Drawer'
 import styles from './Drawer.module.scss'
 
+const DRAWER_TRANSITION_MS = 200
+
 describe('Drawer', () => {
   afterEach(() => {
     vi.useRealTimers()
@@ -21,6 +23,28 @@ describe('Drawer', () => {
 
     expect(document.querySelector(`.${styles[`stardew-drawer--${placement}`]}`)).toBeInTheDocument()
   })
+
+  it.each(['top', 'right', 'bottom', 'left'] as const)(
+    'keeps the %s entry state for the full transition duration',
+    async (placement) => {
+      vi.useFakeTimers()
+      render(<Drawer open placement={placement}>抽屉内容</Drawer>)
+
+      await act(async () => {
+        vi.advanceTimersByTime(32)
+      })
+
+      const drawer = document.querySelector(`.${styles['stardew-drawer']}`)
+      expect(drawer).toHaveAttribute('data-placement', placement)
+      expect(drawer).toHaveAttribute('data-state', 'opening')
+
+      await act(async () => {
+        vi.advanceTimersByTime(DRAWER_TRANSITION_MS)
+      })
+
+      expect(drawer).toHaveAttribute('data-state', 'open')
+    }
+  )
 
   it.each(['top', 'right', 'bottom', 'left'] as const)(
     'uses the explicit %s closing state while it exits',
@@ -42,6 +66,29 @@ describe('Drawer', () => {
       expect(drawer).toHaveAttribute('data-placement', placement)
       expect(drawer).toHaveAttribute('data-state', 'closing')
       expect(drawer).toHaveClass(styles[`stardew-drawer--${placement}`])
+    }
+  )
+
+  it.each(['top', 'right', 'bottom', 'left'] as const)(
+    'keeps the %s placement while closing after its caller resets the prop',
+    async (placement) => {
+      vi.useFakeTimers()
+      const { rerender } = render(<Drawer open placement={placement}>抽屉内容</Drawer>)
+
+      await act(async () => {
+        vi.advanceTimersByTime(32)
+      })
+
+      rerender(<Drawer open={false}>抽屉内容</Drawer>)
+
+      await act(async () => {
+        vi.advanceTimersByTime(16)
+      })
+
+      const drawer = document.querySelector(`.${styles['stardew-drawer']}`)
+      expect(drawer).toHaveAttribute('data-placement', placement)
+      expect(drawer).toHaveClass(styles[`stardew-drawer--${placement}`])
+      expect(drawer).toHaveAttribute('data-state', 'closing')
     }
   )
 

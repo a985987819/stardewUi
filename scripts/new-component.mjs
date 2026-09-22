@@ -25,7 +25,8 @@
  * The router, the gallery page and the sidebar all derive from the catalogue, so
  * a patched entry is what makes the component appear in the left navigation.
  *
- * Flags: --route <kebab> --icon <LucideName> --no-verify --dry-run --help
+ * Flags: --route <kebab> --icon <LucideName> --category <catalogue category>
+ *        --no-verify --dry-run --help
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
@@ -45,6 +46,8 @@ const PATHS = {
 
 const ICON_MODULE = 'lucide-react'
 const DEFAULT_ICON = 'Square'
+const DEFAULT_CATEGORY = 'utility'
+const CATALOGUE_CATEGORIES = ['common', 'form', 'navigation', 'data-display', 'overlay', 'feedback', 'utility']
 
 const USAGE = `用法: bun run gen:component <Name> [options]
 
@@ -55,6 +58,7 @@ const USAGE = `用法: bun run gen:component <Name> [options]
   --desc-zh <一句话>     中文描述
   --desc-en <sentence>   English description
   --route <kebab-case>   URL 片段（默认由 <Name> 转 kebab-case）
+  --category <category>  目录分类：${CATALOGUE_CATEGORIES.join('、')}（默认 ${DEFAULT_CATEGORY}）
   --no-verify            生成后不运行同步守卫
   --dry-run              只打印计划，不写文件
   --help                 显示这段帮助
@@ -76,7 +80,7 @@ const fail = (message) => {
 // ---------------------------------------------------------------- arguments
 
 function parseArgs(argv) {
-  const options = { name: undefined, verify: true, dryRun: false, help: false }
+  const options = { name: undefined, category: DEFAULT_CATEGORY, verify: true, dryRun: false, help: false }
   const aliases = {
     '--zh': 'zh',
     '--en': 'en',
@@ -84,6 +88,7 @@ function parseArgs(argv) {
     '--desc-zh': 'descZh',
     '--desc-en': 'descEn',
     '--route': 'route',
+    '--category': 'category',
   }
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -321,9 +326,10 @@ function Star${name}DemoPage() {
 export default Star${name}DemoPage
 `
 
-const registryEntryTemplate = ({ name, routePath, zh, en, descZh, descEn, icon }) => `  {
+const registryEntryTemplate = ({ name, routePath, category, zh, en, descZh, descEn, icon }) => `  {
     routePath: '${routePath}',
     component: '${name}',
+    category: '${category}',
     title: { zh: ${quote(zh)}, en: ${quote(en)} },
     desc: {
       zh: ${quote(descZh)},
@@ -360,6 +366,9 @@ async function main() {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(routePath)) {
     fail(`--route 必须是 kebab-case（例如 nine-slice-button），收到 "${routePath}"`)
   }
+  if (!CATALOGUE_CATEGORIES.includes(options.category)) {
+    fail(`--category 必须是以下之一：${CATALOGUE_CATEGORIES.join('、')}，收到 "${options.category}"`)
+  }
 
   const targets = {
     component: `${PATHS.componentDir}/${name}.tsx`,
@@ -393,7 +402,7 @@ async function main() {
       `Star${name}DemoPage`,
       PATHS.registry
     ),
-    registryEntryTemplate({ name, routePath, zh, en, descZh, descEn, icon }),
+    registryEntryTemplate({ name, routePath, category: options.category, zh, en, descZh, descEn, icon }),
     PATHS.registry
   )
 
@@ -414,7 +423,7 @@ async function main() {
     `写文件   ${targets.demo}`,
     `追加导出 ${PATHS.uiBarrel}  ->  Star${name}`,
     `追加导出 ${PATHS.lazyPages}   ->  Star${name}DemoPage`,
-    `追加条目 ${PATHS.registry}  ->  /components/${routePath}`,
+    `追加条目 ${PATHS.registry}  ->  /components/${routePath}（${options.category}）`,
   ]
 
   if (options.dryRun) {

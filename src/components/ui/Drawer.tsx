@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { classNames } from '../../utils/classNames'
 import StarCard from './Card'
@@ -70,31 +70,38 @@ function StarDrawer({
   onClose,
 }: StarDrawerProps) {
   const [rendered, setRendered] = useState(open)
+  const renderedRef = useRef(open)
   const [motionState, setMotionState] = useState<DrawerMotionState>(open ? 'opening' : 'closed')
+  const [activePlacement, setActivePlacement] = useState<DrawerPlacement>(placement)
 
   useEffect(() => {
+    let enterTimer: ReturnType<typeof setTimeout> | null = null
     let exitTimer: ReturnType<typeof setTimeout> | null = null
     let frameId: number | null = null
 
     if (open) {
       frameId = window.requestAnimationFrame(() => {
+        setActivePlacement(placement)
+        renderedRef.current = true
         setRendered(true)
         setMotionState('opening')
-        frameId = window.requestAnimationFrame(() => setMotionState('open'))
+        enterTimer = setTimeout(() => setMotionState('open'), DRAWER_TRANSITION_MS)
       })
-    } else {
+    } else if (renderedRef.current) {
       frameId = window.requestAnimationFrame(() => setMotionState('closing'))
       exitTimer = setTimeout(() => {
         setMotionState('closed')
+        renderedRef.current = false
         setRendered(false)
       }, DRAWER_TRANSITION_MS)
     }
 
     return () => {
       if (frameId !== null) window.cancelAnimationFrame(frameId)
+      if (enterTimer !== null) clearTimeout(enterTimer)
       if (exitTimer !== null) clearTimeout(exitTimer)
     }
-  }, [open])
+  }, [open, placement])
 
   useEffect(() => {
     if (!rendered || !focusEffect || typeof document === 'undefined') return
@@ -134,11 +141,11 @@ function StarDrawer({
       <aside
         className={classNames(
           styles['stardew-drawer'],
-          styles[`stardew-drawer--${placement}`],
+          styles[`stardew-drawer--${activePlacement}`],
           className
         )}
         data-state={motionState}
-        data-placement={placement}
+        data-placement={activePlacement}
         role="dialog"
         aria-modal="true"
         aria-label={typeof title === 'string' ? title : 'Drawer'}
