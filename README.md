@@ -260,7 +260,7 @@ import { StarCard } from 'stardew-valley-ui'
 
 ### StarDialog - 对话框
 
-星露谷风格的对话/对话框组件，支持打字机效果和分页。
+星露谷风格的剧情对话组件，适合镇民来访、任务信件和需要停下来确认的重要选择。默认会把身后的农场缩小并柔化，让当前台词像一段真正发生的事件；对话本体会从无到有、略微弹跳后落稳，并在关闭时淡出。传入 `focusEffect={false}` 可保留完整场景，传入 `motion={false}` 可关闭这段进退场动画。
 
 ```tsx
 import { StarDialog } from 'stardew-valley-ui'
@@ -268,8 +268,8 @@ import { StarDialog } from 'stardew-valley-ui'
 // 基础用法
 <StarDialog
   open={open}
-  title="镇长"
-  content="欢迎来到鹈鹕镇！"
+  title="镇长刘易斯"
+  content="欢迎来到鹈鹕镇。明早去农场南边的信箱看看，那里有你的第一份差事。"
   onClose={() => setOpen(false)}
 />
 
@@ -277,7 +277,7 @@ import { StarDialog } from 'stardew-valley-ui'
 <StarDialog
   open={open}
   title="皮埃尔"
-  content="欢迎光临！"
+  content="雨要下大了。把这包防风的种子带走吧，春天可不等人。"
   image="/character.png"
   name="皮埃尔"
   onClose={() => setOpen(false)}
@@ -286,15 +286,15 @@ import { StarDialog } from 'stardew-valley-ui'
 // 多页内容
 <StarDialog
   open={open}
-  title="信件"
-  content={['第一页内容', '第二页内容', '第三页内容']}
+  title="一封带松针香味的信"
+  content={['矿洞口的石头松了。', '带把镐子来，别忘了在天黑前回家。', '——山里的朋友']}
   onClose={() => setOpen(false)}
 />
 
 // 关闭打字机效果
 <StarDialog
   open={open}
-  content="直接显示"
+  content="出货箱已经收走了今晚最后一篮蓝莓。"
   typewriter={false}
   onClose={() => setOpen(false)}
 />
@@ -303,8 +303,43 @@ import { StarDialog } from 'stardew-valley-ui'
 <StarDialog
   open={open}
   placement="bottom"
-  content="明天再来继续探索吧。"
+  content="矿洞将在午夜封门。把战利品收好，明天再往深处走。"
   onClose={() => setOpen(false)}
+/>
+
+// 保留完整农场画面：适合路过公告板时读到的日常提醒
+<StarDialog
+  open={open}
+  focusEffect={false}
+  title="早晨的公告板"
+  content="花舞节还有三天。今天去镇上时，别忘了带上最喜欢的花。"
+  onClose={() => setOpen(false)}
+/>
+
+// 路过公告时不需要演出，直接显示即可
+<StarDialog
+  open={open}
+  motion={false}
+  title="广场公告板"
+  content="今天的面包刚出炉。若你正好进城，别让它在雨里放凉。"
+  onClose={() => setOpen(false)}
+/>
+
+// 一张只需读完的便笺，不留默认操作区
+<StarDialog
+  open={open}
+  footer={null}
+  title="贴在谷仓门上的便笺"
+  content="明天会下雨。水桶和种子都放在门边。"
+  onClose={() => setOpen(false)}
+/>
+
+// 用当前剧情需要的操作替换默认页脚
+<StarDialog
+  open={open}
+  title="幽暗矿洞的遗物"
+  content="这枚刻着螺旋纹的石片还带着余温。"
+  footer={<button type="button" onClick={() => setOpen(false)}>放进背包</button>}
 />
 ```
 
@@ -316,8 +351,11 @@ import { StarDialog } from 'stardew-valley-ui'
 | image | `string` | - | 角色头像 |
 | name | `string` | - | 角色名称 |
 | actions | `DialogAction[] \| null` | - | 操作按钮，null 则不显示 |
+| footer | `ReactNode \| null` | 默认页脚 | 不传时显示内置操作与分页；传 `null` 完全移除页脚；传节点时替换为自定义页脚 |
 | mask | `'dark' \| 'light'` | `'dark'` | 遮罩风格 |
 | placement | `'center' \| 'bottom'` | `'center'` | 屏幕位置；`bottom` 在下方居中并占满可用宽度 |
+| focusEffect | `boolean` | `true` | 是否缩小、柔化身后的页面，让当前剧情成为画面焦点 |
+| motion | `boolean` | `true` | 是否播放 `0 → 105% → 100%` 的进场和缩小淡出的退场动画 |
 | maskClosable | `boolean` | `true` | 点击遮罩是否关闭 |
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |

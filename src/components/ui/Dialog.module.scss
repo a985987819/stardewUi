@@ -1,3 +1,21 @@
+// The portal keeps the dialog at its native pixel size while the farm behind it
+// gently steps back. This mirrors Drawer without coupling the two components'
+// lifecycle classes: either overlay can be open independently.
+:global([data-star-app='true']) {
+  transform-origin: center center;
+  transition:
+    opacity 0.2s ease-out,
+    filter 0.2s ease-out,
+    transform 0.2s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+:global([data-star-app='true'].stardew-dialog-page-focused) {
+  filter: saturate(0.82) blur(1px);
+  opacity: 0.82;
+  transform: scale(0.965);
+  will-change: filter, opacity, transform;
+}
+
 .stardew-dialog-overlay {
   position: fixed;
   inset: 0;
@@ -7,16 +25,44 @@
   justify-content: center;
   padding: 32px 20px;
   isolation: isolate;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(0);
   overflow-y: auto;
   overscroll-behavior: contain;
 
   &--dark {
-    background: var(--star-raw-rgba-43-24-10-0-84);
+    &::before {
+      background: var(--star-raw-rgba-43-24-10-0-84);
+    }
   }
 
   &--light {
-    background: var(--star-raw-rgba-251-235-200-0-68);
+    &::before {
+      background: var(--star-raw-rgba-251-235-200-0-68);
+    }
+  }
+
+  &::before {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: transparent;
+    content: '';
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease-out;
+  }
+
+  &[data-state='opening'],
+  &[data-state='open'] {
+    backdrop-filter: blur(4px);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &--light[data-state='opening'],
+  &--light[data-state='open'] {
     backdrop-filter: blur(2px);
   }
 
@@ -36,15 +82,40 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  :global([data-star-app='true']) {
+    transition: none !important;
+  }
+}
+
 .stardew-dialog {
   position: relative;
   z-index: 1;
   width: min(760px, 100%);
   cursor: default;
+  transform-origin: center center;
+
+  &[data-state='opening'],
+  &[data-state='closing'] {
+    animation-duration: 0.22s;
+    animation-fill-mode: both;
+    will-change: opacity, transform;
+  }
+
+  &[data-state='opening'] {
+    animation-name: stardew-dialog-enter;
+    animation-timing-function: cubic-bezier(0.16, 0.85, 0.3, 1.15);
+  }
+
+  &[data-state='closing'] {
+    animation-name: stardew-dialog-exit;
+    animation-timing-function: cubic-bezier(0.52, 0, 0.78, 0.2);
+  }
 
   &--bottom {
     width: 100%;
     max-width: none;
+    transform-origin: center bottom;
   }
 
   &__shell {
@@ -101,6 +172,10 @@
     width: 100%;
     padding-top: 14px;
     border-top: 2px solid var(--star-raw-rgba-157-65-0-0-18);
+  }
+
+  &__footer--custom {
+    justify-content: space-between;
   }
 
   &__actions {
@@ -218,5 +293,42 @@
       justify-content: flex-end;
       margin-left: 0;
     }
+  }
+}
+
+@keyframes stardew-dialog-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  72% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes stardew-dialog-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stardew-dialog,
+  .stardew-dialog-overlay::before {
+    animation: none !important;
+    transition: none !important;
   }
 }

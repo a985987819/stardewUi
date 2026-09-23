@@ -14,7 +14,7 @@ describe('tab external navigation styles', () => {
     expect(tab).toMatch(/\.star-tab__item\s*\{[^}]*border:\s*6px solid \$tab-strip-border/s)
     expect(tab).toMatch(/\.star-tab__nav\s*\{[^}]*justify-content:\s*center;[^}]*gap:\s*2px;[^}]*padding:\s*0/s)
     expect(tab).toMatch(/\.star-tab__item\s*\{[^}]*border-bottom-width:\s*0;[^}]*border-radius:\s*12px 12px 0 0;[^}]*padding:\s*5px;[^}]*background:\s*#ffcb78/s)
-    expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[^}]*\.star-tab__item\s*\{[^}]*border-top-width:\s*0;[^}]*border-radius:\s*0 0 12px 12px/s)
+    expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__item\s*\{[^}]*border-top-width:\s*0;[^}]*border-radius:\s*0 0 12px 12px/s)
   })
 
   it('resolves the strip border colour from the shared raw palette', () => {
@@ -29,5 +29,11 @@ describe('tab external navigation styles', () => {
     expect(tab).toMatch(/\.star-tab__nav-wrapper\s*\{[^}]*z-index:\s*1/s)
     expect(tab).toMatch(/\.star-tab__item--active\s*\{[^}]*background:\s*#ffcb78;[^}]*transform:\s*translateY\(4px\)/s)
     expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__item--active\s*\{[^}]*transform:\s*translateY\(-4px\)/)
+  })
+
+  it('animates external tab travel and lets bottom tabs paint over their panel seam', () => {
+    expect(tab).toMatch(/\.star-tab__item\s*\{[\s\S]*?transform 0\.18s steps\(3, jump-start\)/)
+    expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav-wrapper\s*\{[^}]*z-index:\s*3/s)
+    expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav\s*\{[^}]*padding-bottom:\s*4px/s)
   })
 })

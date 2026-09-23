@@ -4,6 +4,11 @@
   &-desc {
     @apply mb-4 text-sm;
     color: var(--color-text-secondary);
+
+    strong {
+      color: var(--star-raw-hex-7a3514);
+      font-weight: 700;
+    }
   }
 
   &-preview {

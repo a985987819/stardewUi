@@ -46,4 +46,16 @@ describe('ComponentDemo copy-ready code', () => {
     expect(screen.getByText('Friendship')).toBeInTheDocument()
     expect(screen.getByText('3 / 5')).toHaveTextContent('3 / 5')
   })
+
+  it('renders marked API names as semantic emphasis in a scenario caption', () => {
+    render(
+      <I18nProvider>
+        <StarComponentDemo title="Dialog" description="Use **motion** when the key should make an entrance.">
+          <span>Preview</span>
+        </StarComponentDemo>
+      </I18nProvider>,
+    )
+
+    expect(screen.getByText('motion').tagName).toBe('STRONG')
+  })
 })

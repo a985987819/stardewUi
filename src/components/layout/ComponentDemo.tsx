@@ -14,7 +14,8 @@ interface ComponentDemoDataItem {
 
 interface ComponentDemoProps {
   title: string
-  description?: string
+  /** Supports React content and `**API**` emphasis inside a prose string. */
+  description?: React.ReactNode
   children: React.ReactNode
   code?: string
   /** State and source data intentionally shown beside an interactive example. */
@@ -29,6 +30,20 @@ const lucideComponentPattern = /<([A-Z][A-Za-z0-9]*)\b/g
 const lucideComponents = new Set(['Search'])
 
 const unique = (values: string[]) => [...new Set(values)]
+
+function renderDescription(description: React.ReactNode) {
+  if (typeof description !== 'string') return description
+
+  // A tiny deliberate subset of Markdown, kept local to demo captions. It lets
+  // a scenario explain its API lever without handing arbitrary HTML to docs.
+  return description.split(/(\*\*[^*]+\*\*)/).map((part, index) =>
+    part.startsWith('**') && part.endsWith('**') ? (
+      <strong key={index}>{part.slice(2, -2)}</strong>
+    ) : (
+      part
+    )
+  )
+}
 
 /**
  * Turns the concise JSX passed by a demo page into a copy-ready snippet. Demo
@@ -76,7 +91,7 @@ function StarComponentDemo({
       showTitle
       title={title}
     >
-      {description ? <p className={styles['component-demo-desc']}>{description}</p> : null}
+      {description ? <p className={styles['component-demo-desc']}>{renderDescription(description)}</p> : null}
       <div className={styles['component-demo-preview']}>{children}</div>
       {data?.length ? (
         <section className={styles['component-demo-data']} aria-label={dataLabel ?? t('demo.liveData')}>

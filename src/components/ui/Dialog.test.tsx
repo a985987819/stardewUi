@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Dialog from './Dialog'
 import styles from './Dialog.module.scss'
+
+const DIALOG_TRANSITION_MS = 220
 
 describe('Dialog', () => {
   beforeEach(() => {
@@ -120,6 +122,92 @@ describe('Dialog', () => {
     })
   })
 
+  describe('页脚', () => {
+    it('omitting footer keeps the built-in actions and pager', async () => {
+      render(<Dialog open content={['第一页', '第二页']} typewriter={false} />)
+
+      await waitFor(() => {
+        expect(document.querySelector(`.${styles['stardew-dialog__footer']}`)).toBeInTheDocument()
+        expect(screen.getByText('1 / 2')).toBeInTheDocument()
+      })
+
+      fireEvent.keyDown(window, { key: 'ArrowRight' })
+      await waitFor(() => {
+        expect(screen.getByText('确认')).toBeInTheDocument()
+        expect(screen.getByText('2 / 2')).toBeInTheDocument()
+      })
+    })
+
+    it('removes the entire footer when footer is null', async () => {
+      render(<Dialog open content="没有页脚的便笺" footer={null} typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('没有页脚的便笺')).toBeInTheDocument()
+      })
+
+      expect(document.querySelector(`.${styles['stardew-dialog__footer']}`)).not.toBeInTheDocument()
+      expect(screen.queryByText('确认')).not.toBeInTheDocument()
+    })
+
+    it('replaces the built-in footer with a caller-provided node', async () => {
+      render(
+        <Dialog
+          open
+          content={['第一页', '第二页']}
+          footer={<button type="button">把钥匙放进背包</button>}
+          typewriter={false}
+        />
+      )
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: '把钥匙放进背包' })).toBeInTheDocument()
+      })
+
+      expect(screen.queryByText('确认')).not.toBeInTheDocument()
+      expect(screen.queryByText('1 / 2')).not.toBeInTheDocument()
+      expect(document.querySelector(`.${styles['stardew-dialog__footer--custom']}`)).toBeInTheDocument()
+    })
+  })
+
+  describe('出现与消失动效', () => {
+    it('keeps the dialog mounted through its opening and closing states', async () => {
+      const { rerender } = render(<Dialog open content="矿洞的门缓缓打开" typewriter={false} />)
+      const dialog = document.querySelector(`.${styles['stardew-dialog']}`)
+
+      expect(dialog).toHaveAttribute('data-state', 'opening')
+
+      await act(async () => {
+        vi.advanceTimersByTime(DIALOG_TRANSITION_MS + 24)
+      })
+      expect(dialog).toHaveAttribute('data-state', 'open')
+
+      rerender(<Dialog open={false} content="矿洞的门缓缓打开" typewriter={false} />)
+      await act(async () => {
+        vi.advanceTimersByTime(24)
+      })
+
+      expect(dialog).toHaveAttribute('data-state', 'closing')
+      expect(screen.getByText('矿洞的门缓缓打开')).toBeInTheDocument()
+
+      await act(async () => {
+        vi.advanceTimersByTime(DIALOG_TRANSITION_MS)
+      })
+      expect(screen.queryByText('矿洞的门缓缓打开')).not.toBeInTheDocument()
+    })
+
+    it('can disable the transition with motion={false}', async () => {
+      const { rerender } = render(<Dialog open content="路过的公告" motion={false} typewriter={false} />)
+      const dialog = document.querySelector(`.${styles['stardew-dialog']}`)
+
+      expect(dialog).toHaveAttribute('data-state', 'open')
+
+      rerender(<Dialog open={false} content="路过的公告" motion={false} typewriter={false} />)
+      await waitFor(() => {
+        expect(screen.queryByText('路过的公告')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('分页功能', () => {
     it('应该显示分页指示器', async () => {
       const content = ['第一页', '第二页', '第三页']
@@ -212,6 +300,47 @@ describe('Dialog', () => {
   })
 
   describe('遮罩层关闭', () => {
+    it('defaults to focusing the app scene and can leave it unchanged on request', async () => {
+      const appRoot = document.createElement('div')
+      appRoot.dataset.starApp = 'true'
+      document.body.append(appRoot)
+      const { rerender, unmount } = render(<Dialog open content="内容" typewriter={false} />, { container: appRoot })
+
+      await waitFor(() => {
+        expect(appRoot).toHaveClass('stardew-dialog-page-focused')
+      })
+
+      rerender(<Dialog open content="内容" focusEffect={false} typewriter={false} />)
+      expect(appRoot).not.toHaveClass('stardew-dialog-page-focused')
+
+      unmount()
+      appRoot.remove()
+    })
+
+    it('keeps the scene focused until every open dialog releases it', async () => {
+      const appRoot = document.createElement('div')
+      appRoot.dataset.starApp = 'true'
+      document.body.append(appRoot)
+      const { rerender, unmount } = render(
+        <>
+          <Dialog open content="第一封信" typewriter={false} />
+          <Dialog open content="第二封信" typewriter={false} />
+        </>,
+        { container: appRoot }
+      )
+
+      await waitFor(() => {
+        expect(appRoot).toHaveClass('stardew-dialog-page-focused')
+      })
+
+      rerender(<Dialog open content="第二封信" typewriter={false} />)
+      expect(appRoot).toHaveClass('stardew-dialog-page-focused')
+
+      unmount()
+      expect(appRoot).not.toHaveClass('stardew-dialog-page-focused')
+      appRoot.remove()
+    })
+
     it('defaults to a viewport-centered dialog portal outside a transformed app root', async () => {
       const appRoot = document.createElement('div')
       appRoot.dataset.starApp = 'true'
