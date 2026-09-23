@@ -46,15 +46,14 @@
       letter-spacing: 0.1em;
     }
 
-    h1 {
+    &-title {
       margin: 14px 0 10px;
-      color: inherit;
-      font-size: clamp(30px, 5vw, 46px);
-      line-height: 1.1;
+      max-width: 100%;
     }
 
-    p {
+    &-desc {
       max-width: 720px;
+      min-height: 1.6em;
       margin: 0;
       color: inherit;
     }

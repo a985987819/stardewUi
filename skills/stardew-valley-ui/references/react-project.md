@@ -4,22 +4,25 @@
 
 ```bash
 npm install stardew-valley-ui
+# or: bun add / pnpm add / yarn add stardew-valley-ui
 ```
 
-Use one style-loading approach, never both:
+In the consuming application, load styles once with one of these public approaches:
 
 ```tsx
-// Recommended for Vite, Next.js, SSR, and CSP-restricted applications.
+// Recommended for Vite, Next.js, SSR/RSC, and CSP-restricted applications.
 import 'stardew-valley-ui/style.css'
 import { StarCard, StarNineSliceButton } from 'stardew-valley-ui'
 ```
 
 ```tsx
-// Client-only applications may use automatic runtime style injection instead.
+// Client-only applications may opt into automatic runtime style injection instead.
 import { StarCard, StarNineSliceButton } from 'stardew-valley-ui/auto'
 ```
 
-The package requires React and ReactDOM version 18 or later as peer dependencies.
+The package requires React and ReactDOM version 18 or later as peer dependencies. In a new
+integration, prefer the explicit stylesheet route; use `/auto` only when runtime injection
+fits the host application's CSP and client-only rendering model.
 
 ## Minimal pattern
 
@@ -42,6 +45,10 @@ export function FarmNotice() {
   )
 }
 ```
+
+Use this shape in actual tasks: import from the package root, keep component state in the
+application, and place the one stylesheet import at the app entry rather than in each leaf
+component. Confirm every prop against the installed `dist/index.d.ts` before relying on it.
 
 ## SSR and assets
 

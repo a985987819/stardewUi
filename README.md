@@ -139,13 +139,13 @@ export function SaveButton() {
 
 ## 让 AI Agent 直接使用
 
-仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/README.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它会在 UI 接入、组件选择、像素风页面搭建和接入复查任务中提供公开 API、样式加载、SSR 与许可证约束，避免 Agent 凭印象编造 Props。
+仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/SKILL.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它把「安装组件库 → 选择唯一的样式入口 → 按公开 API 实现 → 执行项目检查」收敛为一条真实接入流程，避免 Agent 凭印象编造 Props。
 
 ```bash
 skills add a985987819/stardewUi
 ```
 
-也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills 目录。安装后直接描述页面目标即可，例如“用 Stardew Valley UI 做一个农场库存页”；精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释了技能的安装、工作流程与需求模板。
+也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills 目录。安装后可直接描述页面目标，或明确调用 `$stardew-valley-ui`，例如“用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css，并用 StarDialog 确认丢弃操作”。精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释技能的安装、实际调用方式与需求模板。
 
 ---
 

@@ -1,3 +1,4 @@
+import { StarTitle, StarTypewriter } from '../components/ui'
 import styles from './Guide.module.scss'
 
 const principles = [
@@ -12,8 +13,10 @@ function StarGuideDesignSystemPage() {
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
         <span>THE TOWN NOTICEBOARD</span>
-        <h1>设计规范</h1>
-        <p>这一套组件的目标不是把每个页面都扮成游戏截图，而是用可读、可点、可复用的像素语言，让产品界面有自己的季节感。</p>
+        <StarTitle level={1} className={styles['guide-intro-title']}>设计规范</StarTitle>
+        <p className={styles['guide-intro-desc']}>
+          <StarTypewriter text="这一套组件的目标不是把每个页面都扮成游戏截图，而是用可读、可点、可复用的像素语言，让产品界面有自己的季节感。" speed={60} />
+        </p>
       </header>
 
       <section className={styles['guide-principles']}>

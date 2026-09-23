@@ -1,11 +1,15 @@
 import StarCodeBlock from '../components/layout/CodeBlock'
+import { StarTitle, StarTypewriter } from '../components/ui'
 import styles from './Guide.module.scss'
 
 const installCommand = `# 从 GitHub 安装（推荐）
 skills add a985987819/stardewUi
 
 # 或手动复制仓库中的目录
-# skills/stardew-valley-ui/ → 你的 Agent skills 目录`
+# skills/stardew-valley-ui/ → 你的 Agent skills 目录
+
+# 安装后可在需求开头明确调用
+# $stardew-valley-ui 用 StarCard 做一个农场库存页`
 
 const agentBrief = `请在我的 React 项目中使用 stardew-valley-ui 完成这个界面：
 
@@ -24,23 +28,22 @@ const reviewBrief = `请检查这次 StardewValley UI 的接入：
 5. 是否遵守本项目“仅限非商业用途”的许可。`
 
 const workflow = [
-  ['1', '发现', 'Agent 根据 SKILL.md 的 description 判断任务是否与星露谷像素 UI、组件接入或视觉复查相关。'],
-  ['2', '加载', '命中后才读取 SKILL.md；日常对话不会被完整 API 文档占满。'],
-  ['3', '路由', 'React 项目读取接入说明；需要选组件或查 API 时，再打开组件目录。'],
-  ['4', '核对', '以本地类型声明和公开导出为准，不凭记忆虚构 props、变体或回调。'],
-  ['5', '交付', '按像素设计语言完成实现，并检查样式、响应式、键盘操作与许可证边界。'],
+  ['1', '发现', 'Agent 根据 SKILL.md 的 description 判断任务是否需要安装、接入或复查 StardewValley UI。'],
+  ['2', '加载', '命中后才读取 Skill；也可在需求开头写 $stardew-valley-ui 主动调用。'],
+  ['3', '接入', '确认 npm 包后只选一种样式入口；真实 React 项目再读取接入说明。'],
+  ['4', '核对', '需要组件或 Props 时才查目录，并以本地类型声明和公开导出为准。'],
+  ['5', '交付', '按像素设计语言完成实现，跑项目检查，并报告样式入口、客户端边界与许可限制。'],
 ]
 
 const catalog = [
-  ['容器与展示', 'StarCard · StarDisplayFrame · StarAvatar · StarDivider · StarEmptyState · StarLoading'],
+  ['容器与展示', 'StarTitle · StarCard · StarDisplayFrame · StarAvatar · StarDivider · StarEmptyState · StarLoading'],
   ['操作与表单', 'StarNineSliceButton · StarInput · StarSwitch · StarCheckbox · StarRating · StarProgress'],
   ['反馈与浮层', 'StarDialog · StarDrawer · StarPopup · message · StarTypewriter'],
   ['日期与导航', 'StarCalendar · StarDatePicker · StarTab'],
 ]
 
 const skillTree = `stardew-valley-ui/
-├── SKILL.md                         # 触发条件、设计规则、交付清单
-├── README.md                        # 人类可读的安装说明
+├── SKILL.md                         # 安装、实际调用、规则与交付清单
 └── references/
     ├── react-project.md             # React、样式、SSR 与验证
     └── component-catalog.md         # 组件选择与公开 API 范围`
@@ -50,8 +53,10 @@ function StarGuideAgentUsePage() {
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
         <span>AI SKILL · STARDEW VALLEY UI</span>
-        <h1>让 Agent 真正会用</h1>
-        <p>这不是一段一次性的提示词，而是一份可安装、按需加载的项目知识包：让 AI 知道什么时候该用、去哪里查、哪些规则绝不能越界。</p>
+        <StarTitle level={1} className={styles['guide-intro-title']}>让 Agent 真正会用</StarTitle>
+        <p className={styles['guide-intro-desc']}>
+          <StarTypewriter text="这不是一段一次性的提示词，而是一份可安装、按需加载的项目知识包：让 AI 知道什么时候该用、去哪里查、哪些规则绝不能越界。" speed={60} />
+        </p>
         <div className={styles['guide-chip-row']}>
           <span>React + TypeScript</span>
           <span>公开 API 对照</span>
@@ -63,12 +68,12 @@ function StarGuideAgentUsePage() {
       <section className={styles['guide-block']}>
         <div className={styles['guide-heading']}>
           <span>01</span>
-          <div><h2>快速开始</h2><p>安装后照常描述需求；当任务命中技能描述时，兼容的 Agent 会自行加载相关规则。</p></div>
+          <div><h2>快速开始</h2><p>安装后直接描述需求；匹配任务会自动加载，也可在开头写 <code>$stardew-valley-ui</code> 明确调用。</p></div>
         </div>
         <ol className={styles['guide-quick-list']}>
           <li><strong>安装技能</strong><p>使用 skills CLI，或把仓库中的技能目录复制到 Agent 识别的 skills 位置。</p><StarCodeBlock code={installCommand} language="bash" /></li>
-          <li><strong>直接提需求</strong><p>不需要背诵命令。说明页面目标、数据与交互，例如“用 Stardew Valley UI 做一个农场库存页”。</p></li>
-          <li><strong>按规则验收</strong><p>要求 Agent 复查公开导入、样式加载、可访问性、客户端边界和非商业许可。</p></li>
+          <li><strong>直接提需求</strong><p>说明页面目标、数据与交互，例如“$stardew-valley-ui 用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css”。</p></li>
+          <li><strong>按真实流程验收</strong><p>让 Agent 确认安装状态、只选一种样式入口、复查公开导入与可访问性，再运行项目检查并说明客户端边界和非商业许可。</p></li>
         </ol>
       </section>
 
@@ -88,7 +93,7 @@ function StarGuideAgentUsePage() {
       </section>
 
       <section className={styles['guide-block']}>
-        <div className={styles['guide-heading']}><span>04</span><div><h2>技能目录</h2><p>一个好的 Skill 需要短入口、可追溯的参考资料，以及清楚的人类安装说明。</p></div></div>
+        <div className={styles['guide-heading']}><span>04</span><div><h2>技能目录</h2><p>一个好的 Skill 需要短入口、可追溯的参考资料，以及清楚的安装与实际调用说明。</p></div></div>
         <StarCodeBlock code={skillTree} language="text" />
       </section>
 

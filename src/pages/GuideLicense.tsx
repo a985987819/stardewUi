@@ -1,3 +1,4 @@
+import { StarTitle, StarTypewriter } from '../components/ui'
 import styles from './Guide.module.scss'
 
 function StarGuideLicensePage() {
@@ -5,8 +6,10 @@ function StarGuideLicensePage() {
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
         <span>PLEASE READ BEFORE PLANTING</span>
-        <h1>版权相关</h1>
-        <p>本项目以非商业学习与个人创作为边界。使用前请确认你的用途不涉及收费、销售、获客或为商业客户交付。</p>
+        <StarTitle level={1} className={styles['guide-intro-title']}>版权相关</StarTitle>
+        <p className={styles['guide-intro-desc']}>
+          <StarTypewriter text="本项目以非商业学习与个人创作为边界。使用前请确认你的用途不涉及收费、销售、获客或为商业客户交付。" speed={60} />
+        </p>
       </header>
 
       <section className={styles['guide-license-panel']}>

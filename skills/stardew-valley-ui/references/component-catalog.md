@@ -6,6 +6,7 @@ source for exact props and valid values.
 | Need | Prefer |
 | --- | --- |
 | Framed content, content panels, rich item display | `StarCard`, `StarDisplayFrame`, `StarAvatar`, `StarDivider`, `StarEmptyState`, `StarLoading` |
+| Page and panel headings | `StarTitle` |
 | Primary actions and simple input | `StarNineSliceButton`, `StarInput`, `StarSwitch`, `StarCheckbox`, `StarRating`, `StarProgress` |
 | Dialogs, drawers, notices, contextual help | `StarDialog`, `StarDrawer`, `StarPopup`, `message`, `StarTypewriter` |
 | Date selection and segmented navigation | `StarCalendar`, `StarDatePicker`, `StarTab` |
@@ -22,3 +23,5 @@ source for exact props and valid values.
   containers merely to imitate a dashboard.
 - Prefer `StarEmptyState` and `StarLoading` rather than plain text when data is absent or
   loading, so status remains visually consistent.
+- Prefer `StarTitle` for a prominent page or task heading; ordinary semantic section headings
+  should remain native headings unless the visual hierarchy calls for the pixel treatment.
