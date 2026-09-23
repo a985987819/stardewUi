@@ -38,6 +38,13 @@ const CONTACTS: ReadonlyArray<readonly [string, string, string, string, number]>
 
 /** 受控示例里那只纸飞机，比默认位置高出来的距离，px。 */
 const PINNED_OFFSET = 108
+/** Let the reader register the page before its guided scroll begins. */
+const PAGE_ARRIVAL_DELAY_MS = 420
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false
 
 const copy = {
   zh: {
@@ -47,15 +54,15 @@ const copy = {
     demos: [
       [
         '基础用法',
-        '组件监听滚动：页面停在顶部时隐藏，一旦滚动就浮现。点击后纸飞机向上飞出去、同时淡到全透明，页面平滑回到顶部，上面的读数会跟着变化。',
+        '**threshold** 默认是 0：页面一离开顶部，纸飞机就浮现。点击后它向上飞出去、同时淡到全透明，页面按 **scrollBehavior** 平滑回到顶部，上面的读数会跟着变化。',
       ],
       [
         '联系人长列表',
-        '这份村民名单长过一屏，负责把页面撑出滚动条。往下滚一点，右下角那只纸飞机就会浮出来 —— 它由布局挂载，所以在本页也一样管用。',
+        '这份村民名单长过一屏，负责把页面撑出滚动条。往下滚一点，右下角那只纸飞机就会浮出来 —— 它由布局挂载，所以本页使用默认 **container** 也一样管用。',
       ],
       [
         '自定义显示',
-        'threshold 决定滚多少像素才浮现，bottom / right 决定停靠位置；传 visible 则显示时机完全由调用方接管。',
+        '**threshold** 决定滚多少像素才浮现，**bottom / right** 决定停靠位置；传 **visible** 则显示时机完全由调用方接管。',
       ],
     ],
     liveScrollTop: '页面滚动',
@@ -78,15 +85,15 @@ const copy = {
     demos: [
       [
         'Basic Usage',
-        'The component listens for scrolling: hidden while the page sits at the top, floating in as soon as it moves. Clicking sends the plane climbing out of its corner as it fades to nothing, while the page scrolls smoothly back up. The readout follows along.',
+        '**threshold** defaults to 0, so the plane appears as soon as the page leaves the top. Clicking sends it climbing out of its corner as it fades to nothing, while **scrollBehavior** returns the page smoothly. The readout follows along.',
       ],
       [
         'Long Contact List',
-        'This villager roster is taller than a viewport, which is what gives the page something to scroll. Scroll down a little and the plane surfaces in the corner — it is mounted by the layout, so it works here like anywhere else.',
+        'This villager roster is taller than a viewport, which is what gives the page something to scroll. Scroll down a little and the plane surfaces in the corner — it is mounted by the layout, so the default **container** works here like anywhere else.',
       ],
       [
         'Controlled Visibility',
-        'threshold decides how far the page must scroll, bottom / right decide where the plane parks, and passing visible hands the timing over to the caller entirely.',
+        '**threshold** decides how far the page must scroll, **bottom / right** decide where the plane parks, and passing **visible** hands the timing over to the caller entirely.',
       ],
     ],
     liveScrollTop: 'Scroll offset',
@@ -207,6 +214,30 @@ function StarBackToTopDemoPage() {
   // 本页右下角那只纸飞机是布局挂的全站共用实例，所以读数由滚动位置推出来就行：
   // 组件的 threshold 默认是 0，两者本来就该一致。
   const planeShown = scrollY > 0
+
+  // This is the one page whose primary interaction only appears after a scroll.
+  // Let its route settle visibly first, then take a guided trip through the long
+  // roster so a first-time reader can see why the paper plane appears. Layout's
+  // route-level reset runs earlier and therefore stays intact for every other
+  // documentation page. Reduced-motion readers still get the destination with
+  // no travel animation.
+  useEffect(() => {
+    let frameId: number | null = null
+    const timerId = window.setTimeout(() => {
+      frameId = window.requestAnimationFrame(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          left: 0,
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        })
+      })
+    }, PAGE_ARRIVAL_DELAY_MS)
+
+    return () => {
+      window.clearTimeout(timerId)
+      if (frameId !== null) window.cancelAnimationFrame(frameId)
+    }
+  }, [])
 
   // 只给读数用的滚动监听；组件内部那份是它自己的，不对外暴露。
   useEffect(() => {

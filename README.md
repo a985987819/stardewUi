@@ -6,7 +6,7 @@
 
 一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
 
-面向业务项目发布：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。
+面向个人学习、研究和非商业原型：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。商业用途不被允许，详见下方版权说明与根目录 [LICENSE](LICENSE)。
 
 ---
 
@@ -126,7 +126,7 @@ export function SaveButton() {
 
 | 分类 | 导出 |
 |------|------|
-| 容器与展示 | `StarCard`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
+| 容器与展示 | `StarCard`、`StarTitle`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
 | 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
 | 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
@@ -134,6 +134,18 @@ export function SaveButton() {
 完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
 
 更完整的素材、SSR / RSC 边界和维护者发布检查请见 [接入指南](docs/consumer-integration.md)。
+
+---
+
+## 让 AI Agent 直接使用
+
+仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/SKILL.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它把「安装组件库 → 选择唯一的样式入口 → 按公开 API 实现 → 执行项目检查」收敛为一条真实接入流程，避免 Agent 凭印象编造 Props。
+
+```bash
+skills add a985987819/stardewUi
+```
+
+也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills 目录。安装后可直接描述页面目标，或明确调用 `$stardew-valley-ui`，例如“用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css，并用 StarDialog 确认丢弃操作”。精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释技能的安装、实际调用方式与需求模板。
 
 ---
 
@@ -260,7 +272,7 @@ import { StarCard } from 'stardew-valley-ui'
 
 ### StarDialog - 对话框
 
-星露谷风格的对话/对话框组件，支持打字机效果和分页。
+星露谷风格的剧情对话组件，适合镇民来访、任务信件和需要停下来确认的重要选择。默认会把身后的农场缩小并柔化，让当前台词像一段真正发生的事件；对话本体会从无到有、略微弹跳后落稳，并在关闭时淡出。传入 `focusEffect={false}` 可保留完整场景，传入 `motion={false}` 可关闭这段进退场动画。
 
 ```tsx
 import { StarDialog } from 'stardew-valley-ui'
@@ -268,8 +280,8 @@ import { StarDialog } from 'stardew-valley-ui'
 // 基础用法
 <StarDialog
   open={open}
-  title="镇长"
-  content="欢迎来到鹈鹕镇！"
+  title="镇长刘易斯"
+  content="欢迎来到鹈鹕镇。明早去农场南边的信箱看看，那里有你的第一份差事。"
   onClose={() => setOpen(false)}
 />
 
@@ -277,7 +289,7 @@ import { StarDialog } from 'stardew-valley-ui'
 <StarDialog
   open={open}
   title="皮埃尔"
-  content="欢迎光临！"
+  content="雨要下大了。把这包防风的种子带走吧，春天可不等人。"
   image="/character.png"
   name="皮埃尔"
   onClose={() => setOpen(false)}
@@ -286,15 +298,15 @@ import { StarDialog } from 'stardew-valley-ui'
 // 多页内容
 <StarDialog
   open={open}
-  title="信件"
-  content={['第一页内容', '第二页内容', '第三页内容']}
+  title="一封带松针香味的信"
+  content={['矿洞口的石头松了。', '带把镐子来，别忘了在天黑前回家。', '——山里的朋友']}
   onClose={() => setOpen(false)}
 />
 
 // 关闭打字机效果
 <StarDialog
   open={open}
-  content="直接显示"
+  content="出货箱已经收走了今晚最后一篮蓝莓。"
   typewriter={false}
   onClose={() => setOpen(false)}
 />
@@ -303,8 +315,43 @@ import { StarDialog } from 'stardew-valley-ui'
 <StarDialog
   open={open}
   placement="bottom"
-  content="明天再来继续探索吧。"
+  content="矿洞将在午夜封门。把战利品收好，明天再往深处走。"
   onClose={() => setOpen(false)}
+/>
+
+// 保留完整农场画面：适合路过公告板时读到的日常提醒
+<StarDialog
+  open={open}
+  focusEffect={false}
+  title="早晨的公告板"
+  content="花舞节还有三天。今天去镇上时，别忘了带上最喜欢的花。"
+  onClose={() => setOpen(false)}
+/>
+
+// 路过公告时不需要演出，直接显示即可
+<StarDialog
+  open={open}
+  motion={false}
+  title="广场公告板"
+  content="今天的面包刚出炉。若你正好进城，别让它在雨里放凉。"
+  onClose={() => setOpen(false)}
+/>
+
+// 一张只需读完的便笺，不留默认操作区
+<StarDialog
+  open={open}
+  footer={null}
+  title="贴在谷仓门上的便笺"
+  content="明天会下雨。水桶和种子都放在门边。"
+  onClose={() => setOpen(false)}
+/>
+
+// 用当前剧情需要的操作替换默认页脚
+<StarDialog
+  open={open}
+  title="幽暗矿洞的遗物"
+  content="这枚刻着螺旋纹的石片还带着余温。"
+  footer={<button type="button" onClick={() => setOpen(false)}>放进背包</button>}
 />
 ```
 
@@ -316,8 +363,11 @@ import { StarDialog } from 'stardew-valley-ui'
 | image | `string` | - | 角色头像 |
 | name | `string` | - | 角色名称 |
 | actions | `DialogAction[] \| null` | - | 操作按钮，null 则不显示 |
+| footer | `ReactNode \| null` | 默认页脚 | 不传时显示内置操作与分页；传 `null` 完全移除页脚；传节点时替换为自定义页脚 |
 | mask | `'dark' \| 'light'` | `'dark'` | 遮罩风格 |
 | placement | `'center' \| 'bottom'` | `'center'` | 屏幕位置；`bottom` 在下方居中并占满可用宽度 |
+| focusEffect | `boolean` | `true` | 是否缩小、柔化身后的页面，让当前剧情成为画面焦点 |
+| motion | `boolean` | `true` | 是否播放 `0 → 105% → 100%` 的进场和缩小淡出的退场动画 |
 | maskClosable | `boolean` | `true` | 点击遮罩是否关闭 |
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |
@@ -912,6 +962,47 @@ import { StarDisplayFrame } from 'stardew-valley-ui'
 
 ---
 
+### StarTitle - 标题
+
+用于页面、任务和面板抬头的像素标题。组件以 Canvas 将每一层逐像素绘制，默认使用 `50px` 粗体和
+`#ce9f00` 主色；可传入任意 Canvas 支持的 CSS `color`，文字内部的右上方 45° 高光与斑驳明暗点会由主色推导。外围由 `#493213` 的硬边偏移组合成
+3px 锯齿描边（局部再外翻 1px 小齿与深浅碎片），每个字之间预留约 `4px` 间距，最后从字面下方 `5px` 开始投下长 `4px` 的
+`rgba(41, 58, 44, 0.6)` 阴影（可通过 `showShadow={false}` 隐藏）。主文字也会加入低密度、
+基于文本固定分布的同色系斑驳色点，因此有手绘像素质感而不会在重渲染时闪烁。四层独立出图，不会混成一种颜色。
+
+```tsx
+import { StarTitle } from 'stardew-valley-ui'
+
+// 默认是语义化 h2
+<StarTitle>春季收获</StarTitle>
+
+// 按页面结构调整标题层级
+<StarTitle level={1} id="page-title">星露谷账本</StarTitle>
+
+// 中文标题同样以 Canvas 像素层绘制
+<StarTitle>太中了</StarTitle>
+
+// 主色会同步推导高光与斑驳；可调整尺寸、字距或关闭投影
+<StarTitle color="#5f8f7a" fontSize={34} letterSpacing={10} showShadow={false}>
+  Forest ledger
+</StarTitle>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| level | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `2` | 标题语义层级，决定渲染的 `h1`–`h6` 标签 |
+| children | `string \| number` | - | Canvas 绘制的标题文本 |
+| color | `string` | `'#ce9f00'` | 文字主色；Canvas 会从此色推导高光与斑驳明暗点 |
+| fontSize | `number` | `50` | Canvas 字体大小（px） |
+| letterSpacing | `number` | `4` | 字符间距（px；最小为 `0`） |
+| showShadow | `boolean` | `true` | 是否显示 60% 透明度的硬像素投影 |
+| className | `string` | - | 追加到根标题元素的类名 |
+| ...rest | `HTMLAttributes<HTMLHeadingElement>` | - | 其余原生标题属性（`id` / `aria-*` / `style` 等） |
+
+描边仍是固定的 3px 像素轮廓；`color`、`fontSize`、`letterSpacing` 与 `showShadow` 用于控制字面外观，不需要额外嵌套元素。
+
+---
+
 ## Hooks
 
 ### useToggle
@@ -1065,6 +1156,8 @@ import type {
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
+  StarTitleProps,
+  StarTitleLevel,
   StarDisplayFrameProps,
   StarAvatarProps,
   AvatarShape,
@@ -1204,8 +1297,11 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 
 ## 版权说明
 
-由于版权问题，本项目 **不会直接使用星露谷的官方素材**。
-所有 UI 元素均由我自己编写或通过 AI 生成，力求还原星露谷风格，但不会涉及版权风险。
+本项目采用 **非商业许可证**：仅可用于个人学习、研究、作品集展示、非营利开源实验及不对外运营的内部原型。不得将本项目或其衍生成果用于销售、收费服务、商业网站、营销获客、商业客户交付，或其他直接、间接盈利活动。
+
+使用或修改时必须保留许可证和来源说明；不得暗示本项目是《星露谷物语》官方作品、合作项目或已获得权利人背书。本项目 **不会直接使用《星露谷物语》的官方素材**；相关名称、标识及游戏素材的权利归各自权利人所有。
+
+完整条款以根目录 [LICENSE](LICENSE) 为准。若你的用途涉及商业或法律判断，请不要使用本项目，并咨询有资质的专业人士。
 
 ---
 

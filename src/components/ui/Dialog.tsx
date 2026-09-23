@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
@@ -17,6 +17,30 @@ export interface DialogAction {
 export type DialogMask = 'dark' | 'light'
 export type DialogPlacement = 'center' | 'bottom'
 
+const DIALOG_TRANSITION_MS = 220
+type DialogMotionState = 'closed' | 'opening' | 'open' | 'closing'
+
+const PAGE_FOCUS_CLASS = 'stardew-dialog-page-focused'
+const focusedAppRoots = new Map<HTMLElement, number>()
+
+function addPageFocus(appRoot: HTMLElement) {
+  const currentCount = focusedAppRoots.get(appRoot) ?? 0
+  focusedAppRoots.set(appRoot, currentCount + 1)
+  appRoot.classList.add(PAGE_FOCUS_CLASS)
+}
+
+function removePageFocus(appRoot: HTMLElement) {
+  const nextCount = (focusedAppRoots.get(appRoot) ?? 1) - 1
+
+  if (nextCount > 0) {
+    focusedAppRoots.set(appRoot, nextCount)
+    return
+  }
+
+  focusedAppRoots.delete(appRoot)
+  appRoot.classList.remove(PAGE_FOCUS_CLASS)
+}
+
 export interface StarDialogProps {
   open: boolean
   title?: string
@@ -24,10 +48,19 @@ export interface StarDialogProps {
   image?: string
   name?: string
   actions?: DialogAction[] | null
+  /**
+   * Footer content. Omit it for the built-in actions and pager, pass `null` to
+   * remove the footer, or pass a React node to replace the built-in region.
+   */
+  footer?: ReactNode | null
   /** Backdrop tone. `dark` preserves focus; `light` keeps the page context visible. */
   mask?: DialogMask
   /** Viewport position. `bottom` centers the dialog along the lower edge at full available width. */
   placement?: DialogPlacement
+  /** Scale and soften the underlying application while the dialog is visible. */
+  focusEffect?: boolean
+  /** Play the dialog's pop-in and fade-out transition. */
+  motion?: boolean
   maskClosable?: boolean
   typewriter?: boolean
   typewriterSpeed?: number
@@ -56,14 +89,22 @@ function StarDialog({
   image,
   name,
   actions,
+  footer,
   mask = 'dark',
   placement = 'center',
+  focusEffect = true,
+  motion = true,
   maskClosable = true,
   typewriter = true,
   typewriterSpeed = 100,
   showPagination,
   onClose,
 }: StarDialogProps) {
+  const [rendered, setRendered] = useState(open)
+  const renderedRef = useRef(open)
+  const [motionState, setMotionState] = useState<DialogMotionState>(
+    open && motion ? 'opening' : open ? 'open' : 'closed'
+  )
   const [currentPage, setCurrentPage] = useState(0)
   const [titleKey, setTitleKey] = useState(0)
   const [contentKey, setContentKey] = useState(0)
@@ -112,7 +153,44 @@ function StarDialog({
   }
 
   useEffect(() => {
-    if (!open) return
+    let frameId: number | null = null
+    let transitionTimer: ReturnType<typeof setTimeout> | null = null
+
+    if (open) {
+      frameId = window.requestAnimationFrame(() => {
+        renderedRef.current = true
+        setRendered(true)
+        setMotionState(motion ? 'opening' : 'open')
+
+        if (motion) {
+          transitionTimer = setTimeout(() => setMotionState('open'), DIALOG_TRANSITION_MS)
+        }
+      })
+    } else if (renderedRef.current) {
+      if (!motion) {
+        frameId = window.requestAnimationFrame(() => {
+          renderedRef.current = false
+          setMotionState('closed')
+          setRendered(false)
+        })
+      } else {
+        frameId = window.requestAnimationFrame(() => setMotionState('closing'))
+        transitionTimer = setTimeout(() => {
+          renderedRef.current = false
+          setMotionState('closed')
+          setRendered(false)
+        }, DIALOG_TRANSITION_MS)
+      }
+    }
+
+    return () => {
+      if (frameId !== null) window.cancelAnimationFrame(frameId)
+      if (transitionTimer !== null) clearTimeout(transitionTimer)
+    }
+  }, [motion, open])
+
+  useEffect(() => {
+    if (!rendered) return
 
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -120,7 +198,20 @@ function StarDialog({
     return () => {
       document.body.style.overflow = previousOverflow
     }
-  }, [open])
+  }, [rendered])
+
+  // The dialog lives in a body portal, so this only transforms the scene behind
+  // it. Count active dialogs: closing one of two story beats must not snap the
+  // farm back to full size while the other is still asking for attention.
+  useEffect(() => {
+    if (!rendered || !focusEffect || typeof document === 'undefined') return
+
+    const appRoot = document.querySelector('[data-star-app="true"]') as HTMLElement | null
+    if (!appRoot) return
+
+    addPageFocus(appRoot)
+    return () => removePageFocus(appRoot)
+  }, [focusEffect, rendered])
 
   const handlePrev = useCallback(() => {
     if (!isFirstPage) {
@@ -206,10 +297,10 @@ function StarDialog({
   // 单页时默认不出分页：一个没人能点的「1 / 1」只是多余的一行
   const showPager = showPagination ?? totalPages > 1
   // 分页和动作都没有时，整条页脚（含它的上分隔线）一起收掉，免得留一条空线
-  const showFooter = showActions || showPager
+  const defaultFooter = showActions || showPager
   const hasSidebar = Boolean(image || name)
 
-  if (!open) return null
+  if (!rendered) return null
 
   const portalTarget = typeof document !== 'undefined' ? document.body : null
 
@@ -224,6 +315,7 @@ function StarDialog({
         styles[`stardew-dialog-overlay--${placement}`],
         maskClosable && styles['stardew-dialog-overlay--clickable']
       )}
+      data-state={motionState}
       onClick={handleOverlayClick}
     >
       <div
@@ -231,6 +323,7 @@ function StarDialog({
         role="dialog"
         aria-modal="true"
         aria-label={dialogLabel}
+        data-state={motionState}
         onClick={(event) => event.stopPropagation()}
       >
         <StarCard
@@ -279,56 +372,62 @@ function StarDialog({
                 )}
               </div>
 
-              {showFooter ? (
-                <div className={styles['stardew-dialog__footer']}>
-                  {showActions ? (
-                    <div className={styles['stardew-dialog__actions']}>
-                      {finalActions.map((action, index) => (
+              {footer === undefined ? (
+                defaultFooter ? (
+                  <div className={styles['stardew-dialog__footer']}>
+                    {showActions ? (
+                      <div className={styles['stardew-dialog__actions']}>
+                        {finalActions.map((action, index) => (
+                          <StarNineSliceButton
+                            key={index}
+                            type="button"
+                            size="small"
+                            variant={action.variant ?? 'default'}
+                            disabled={action.disabled}
+                            onClick={action.onClick}
+                          >
+                            {action.label}
+                          </StarNineSliceButton>
+                        ))}
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+
+                    {showPager ? (
+                      <div className={styles['stardew-dialog__pagination']}>
                         <StarNineSliceButton
-                          key={index}
                           type="button"
                           size="small"
-                          variant={action.variant ?? 'default'}
-                          disabled={action.disabled}
-                          onClick={action.onClick}
+                          className={styles['stardew-dialog__nav-btn']}
+                          onClick={handlePrev}
+                          disabled={isFirstPage}
+                          title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
                         >
-                          {action.label}
+                          <ChevronUp size={18} />
                         </StarNineSliceButton>
-                      ))}
-                    </div>
-                  ) : (
-                    <div />
-                  )}
-
-                  {showPager ? (
-                    <div className={styles['stardew-dialog__pagination']}>
-                      <StarNineSliceButton
-                        type="button"
-                        size="small"
-                        className={styles['stardew-dialog__nav-btn']}
-                        onClick={handlePrev}
-                        disabled={isFirstPage}
-                        title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-                      >
-                        <ChevronUp size={18} />
-                      </StarNineSliceButton>
-                      <span className={styles['stardew-dialog__page-indicator']}>
-                        {currentPage + 1} / {totalPages}
-                      </span>
-                      <StarNineSliceButton
-                        type="button"
-                        size="small"
-                        className={styles['stardew-dialog__nav-btn']}
-                        onClick={handleNext}
-                        disabled={isLastPage}
-                        title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-                      >
-                        <ChevronDown size={18} />
-                      </StarNineSliceButton>
-                    </div>
-                  ) : null}
+                        <span className={styles['stardew-dialog__page-indicator']}>
+                          {currentPage + 1} / {totalPages}
+                        </span>
+                        <StarNineSliceButton
+                          type="button"
+                          size="small"
+                          className={styles['stardew-dialog__nav-btn']}
+                          onClick={handleNext}
+                          disabled={isLastPage}
+                          title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
+                        >
+                          <ChevronDown size={18} />
+                        </StarNineSliceButton>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null
+              ) : footer === null ? null : (
+                <div className={classNames(styles['stardew-dialog__footer'], styles['stardew-dialog__footer--custom'])}>
+                  {footer}
                 </div>
-              ) : null}
+              )}
             </div>
 
             {hasSidebar ? (

@@ -4,6 +4,11 @@
   &-desc {
     @apply mb-4 text-sm;
     color: var(--color-text-secondary);
+
+    strong {
+      color: var(--star-raw-hex-7a3514);
+      font-weight: 700;
+    }
   }
 
   &-preview {
@@ -35,6 +40,11 @@
     &:active {
       transform: translate(1px, 1px);
       box-shadow: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-secondary);
+      outline-offset: 3px;
     }
   }
 

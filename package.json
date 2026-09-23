@@ -19,7 +19,7 @@
     "ui-components",
     "component-library"
   ],
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "main": "./dist/stardew-valley-ui.cjs",
   "module": "./dist/stardew-valley-ui.mjs",
   "types": "./dist/index.d.ts",

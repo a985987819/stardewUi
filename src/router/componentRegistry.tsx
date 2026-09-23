@@ -44,6 +44,7 @@ import {
   StarRatingDemoPage,
   StarSwitchDemoPage,
   StarTabDemoPage,
+  StarTitleDemoPage,
   StarTypewriterDemoPage,
 } from './lazyPages'
 
@@ -100,17 +101,28 @@ export const COMPONENT_CATALOGUE_CATEGORIES = [
 export type ComponentCatalogueCategory = (typeof COMPONENT_CATALOGUE_CATEGORIES)[number]
 
 /** Labels travel with the catalogue so the sidebar never needs a second map. */
+export interface ComponentCatalogueCategoryMeta extends Record<Lang, string> {
+  /** The category's Stardew-inspired rainbow hue, used by component-page titles. */
+  color: string
+}
+
+/**
+ * Labels and their corresponding title colours travel with the catalogue so
+ * the sidebar, routes, and page headers never need separate category maps.
+ */
 export const COMPONENT_CATALOGUE_CATEGORY_META: Record<
   ComponentCatalogueCategory,
-  Record<Lang, string>
+  ComponentCatalogueCategoryMeta
 > = {
-  common: { zh: '通用', en: 'General' },
-  layout: { zh: '布局', en: 'Layout' },
-  navigation: { zh: '导航', en: 'Navigation' },
-  'data-entry': { zh: '数据录入', en: 'Data Entry' },
-  'data-display': { zh: '数据展示', en: 'Data Display' },
-  feedback: { zh: '反馈', en: 'Feedback' },
-  other: { zh: '其他', en: 'Other' },
+  // A muted harvest rainbow: familiar to Stardew Valley without overpowering
+  // StarTitle's hand-drawn pixel outline and highlight.
+  common: { zh: '通用', en: 'General', color: '#d4a72c' },
+  layout: { zh: '布局', en: 'Layout', color: '#c97832' },
+  navigation: { zh: '导航', en: 'Navigation', color: '#4b78a9' },
+  'data-entry': { zh: '数据录入', en: 'Data Entry', color: '#6c9b5a' },
+  'data-display': { zh: '数据展示', en: 'Data Display', color: '#6667a4' },
+  feedback: { zh: '反馈', en: 'Feedback', color: '#b4584b' },
+  other: { zh: '其他', en: 'Other', color: '#95649a' },
 }
 
 const COMPONENT_CATALOGUE_CATEGORY_ORDER = new Map(
@@ -390,6 +402,19 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <ArrowUp size={20} />,
     element: StarBackToTopDemoPage,
+  },
+  {
+    routePath: 'title',
+    component: 'Title',
+    category: 'common',
+    usageRank: 2,
+    title: { zh: '标题', en: 'Title' },
+    desc: {
+      zh: '带金色内高光、深色锯齿描边和下落阴影的像素标题。',
+      en: 'A pixel title with a gold fill, inner highlight, jagged dark outline, and drop shadow.',
+    },
+    icon: <Type size={20} />,
+    element: StarTitleDemoPage,
   },
 ]
 

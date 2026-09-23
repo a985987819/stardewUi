@@ -1,6 +1,11 @@
 .guide-section {
   @apply mb-10;
 
+  & > h1,
+  & > h2 {
+    scroll-margin-top: 84px;
+  }
+
   h2 {
     @apply text-2xl font-semibold m-0 mb-4;
     color: var(--color-text);
@@ -22,5 +27,281 @@
 
   .code-block {
     @apply my-4;
+  }
+
+  .guide-intro {
+    margin: 0 0 34px;
+    padding: 28px 30px;
+    color: var(--color-text-light);
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    border: 4px solid var(--color-border-dark);
+    box-shadow: var(--shadow-pixel-lg);
+
+    span {
+      display: inline-block;
+      padding: 3px 6px;
+      color: var(--color-primary-dark);
+      background: var(--color-secondary-light);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    &-title {
+      margin: 14px 0 10px;
+      max-width: 100%;
+    }
+
+    &-desc {
+      max-width: 720px;
+      min-height: 1.6em;
+      margin: 0;
+      color: inherit;
+    }
+  }
+
+  .guide-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+
+    span {
+      padding: 5px 8px;
+      color: var(--color-primary-dark);
+      background: color-mix(in srgb, var(--color-secondary-light) 88%, white);
+      border: 2px solid var(--color-border-dark);
+      box-shadow: 2px 2px 0 var(--color-border-dark);
+      font-size: 12px;
+      line-height: 1;
+    }
+  }
+
+  .guide-block {
+    margin: 0 0 34px;
+    padding: 24px;
+    background: var(--color-bg-card);
+    border: 3px solid var(--color-border-dark);
+    box-shadow: var(--shadow-pixel-sm);
+  }
+
+  .guide-heading {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+
+    > span {
+      display: grid;
+      flex: 0 0 34px;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      color: var(--color-text-light);
+      background: var(--color-primary);
+      border: 3px solid var(--color-border-dark);
+      box-shadow: 3px 3px 0 var(--color-border-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0 0 4px;
+    }
+
+    p { margin: 0; }
+  }
+
+  .guide-quick-list {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: quick-start;
+
+    li {
+      position: relative;
+      min-height: 34px;
+      padding: 2px 0 0 52px;
+      counter-increment: quick-start;
+
+      &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        color: var(--color-primary-dark);
+        background: var(--color-secondary-light);
+        border: 3px solid var(--color-border-dark);
+        content: counter(quick-start);
+        font-size: 13px;
+        font-weight: 700;
+      }
+    }
+
+    strong { color: var(--color-text); }
+    p { margin: 5px 0 10px; }
+    :global(.code-block) { margin: 0; }
+  }
+
+  .guide-workflow {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .guide-workflow-step {
+    position: relative;
+    min-height: 176px;
+    padding: 15px 14px;
+    background: var(--color-bg-hover);
+    border: 2px solid var(--color-border);
+
+    > span {
+      display: inline-grid;
+      width: 23px;
+      height: 23px;
+      place-items: center;
+      color: var(--color-text-light);
+      background: var(--color-primary-dark);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    h3 {
+      margin: 12px 0 6px;
+      color: var(--color-text);
+      font-size: 17px;
+    }
+
+    p { margin: 0; font-size: 13px; }
+  }
+
+  .guide-scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .guide-scenario {
+    padding: 18px;
+    background: linear-gradient(180deg, var(--color-bg-hover), var(--color-bg-card));
+    border: 3px solid var(--color-border-dark);
+
+    > span {
+      display: inline-block;
+      padding: 3px 6px;
+      color: var(--color-primary-dark);
+      background: var(--color-secondary-light);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    h3 { margin: 12px 0 6px; color: var(--color-text); font-size: 20px; }
+    p { margin: 0 0 14px; }
+    code {
+      display: inline-block;
+      padding: 5px 7px;
+      overflow-wrap: anywhere;
+      color: var(--color-text-light);
+      background: var(--color-primary-dark);
+      font-size: 12px;
+    }
+  }
+
+  .guide-catalog {
+    display: grid;
+    gap: 10px;
+
+    > div {
+      display: grid;
+      grid-template-columns: 142px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      padding: 12px 14px;
+      background: var(--color-bg-hover);
+      border-left: 6px solid var(--color-secondary);
+    }
+
+    strong { color: var(--color-text); font-size: 14px; }
+    code { color: var(--color-text-secondary); font-family: inherit; font-size: 13px; line-height: 1.7; }
+  }
+
+  .guide-subheading {
+    margin: 28px 0 10px;
+    color: var(--color-text);
+    font-size: 19px;
+  }
+
+  .guide-callout {
+    margin-top: 28px;
+    padding: 16px 18px;
+    color: var(--color-text);
+    background: var(--color-bg-hover);
+    border: 3px solid var(--color-border);
+    box-shadow: var(--shadow-pixel-sm);
+    line-height: 1.8;
+  }
+
+  .guide-principles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 34px;
+  }
+
+  .guide-principle {
+    display: flex;
+    gap: 14px;
+    padding: 18px;
+    background: var(--color-bg-card);
+    border: 3px solid var(--color-border-dark);
+    box-shadow: var(--shadow-pixel-sm);
+
+    > span {
+      color: var(--color-primary-dark);
+      font-size: 18px;
+    }
+
+    h2 {
+      margin-bottom: 6px;
+      font-size: 18px;
+    }
+
+    p { margin: 0; }
+  }
+
+  .guide-steps {
+    padding-left: 24px;
+
+    li {
+      margin-bottom: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+    }
+  }
+
+  .guide-license-panel {
+    margin: 20px 0;
+    padding: 20px 22px;
+    background: var(--color-bg-card);
+    border: 3px solid var(--color-border-dark);
+    box-shadow: var(--shadow-pixel-sm);
+
+    h2 { margin-bottom: 10px; font-size: 20px; }
+    ul { margin-bottom: 0; }
+  }
+
+  @media (max-width: 680px) {
+    .guide-intro { padding: 22px 20px; }
+    .guide-principles { grid-template-columns: 1fr; }
+    .guide-block { padding: 20px 16px; }
+    .guide-workflow { grid-template-columns: 1fr; }
+    .guide-workflow-step { min-height: auto; }
+    .guide-scenario-grid { grid-template-columns: 1fr; }
+    .guide-catalog > div { grid-template-columns: 1fr; gap: 5px; }
   }
 }

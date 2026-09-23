@@ -5,7 +5,7 @@ import { I18nProvider } from '../i18n'
 import Home from './Home'
 
 describe('Home', () => {
-  it('renders the product-focused hero copy and feature copy', () => {
+  it('renders the welcome page with its primary routes and license boundary', () => {
     window.localStorage.setItem('star-ui-lang', JSON.stringify('zh'))
 
     render(
@@ -16,11 +16,13 @@ describe('Home', () => {
       </I18nProvider>
     )
 
-    expect(screen.getByText('像素农场 UI Kit')).toBeInTheDocument()
-    expect(screen.getByText('一套带着星露谷泥土香气的 React 组件库。按钮像工具箱里的铜锤，卡片像镇长公告栏，日历会提醒你别错过花舞节。')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /开始逛农场/ })).toBeInTheDocument()
-    expect(screen.getByText('把组件种进田里')).toBeInTheDocument()
-    expect(screen.getByText('先试玩，再接入')).toBeInTheDocument()
-    expect(screen.getByText('界面也能有季节')).toBeInTheDocument()
+    expect(screen.getByText('给你的界面，')).toBeInTheDocument()
+    expect(screen.getByText('种下一座小镇')).toBeInTheDocument()
+    expect(screen.getByText('把种子放进项目')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /浏览组件田地/ })).toHaveAttribute('href', '/components')
+    expect(screen.getByRole('link', { name: /从使用指南开始/ })).toHaveAttribute('href', '/guide/self-use')
+    expect(screen.getByRole('link', { name: /Agent 帮我使用/ })).toHaveAttribute('href', '/guide/agent-use')
+    expect(screen.getByRole('link', { name: /查看版权相关/ })).toHaveAttribute('href', '/guide/license')
+    expect(screen.getByText('许可提醒：本项目仅供非商业学习、研究与原型使用。')).toBeInTheDocument()
   })
 })

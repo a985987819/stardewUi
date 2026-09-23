@@ -1,0 +1,30 @@
+.star-title {
+  display: block;
+  width: fit-content;
+  margin: 0;
+  font-family: var(--font-pixel, 'Stardew', monospace);
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.star-title__canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+// Canvas is only the paint layer; this span gives the semantic heading a name.
+.star-title__accessible {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
