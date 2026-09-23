@@ -182,7 +182,7 @@ describe('component catalogue sync', () => {
     // of the component list (which is how `/components/switch` went missing).
     expect(routerIndex, 'router must map COMPONENT_ROUTES').toContain('COMPONENT_ROUTES.map')
     expect(gallery, 'gallery must map COMPONENT_ROUTES').toContain('COMPONENT_ROUTES.map')
-    expect(sidebar, 'sidebar must derive grouped entries from COMPONENT_ROUTES').toContain('COMPONENT_ROUTES\n        .filter')
+    expect(sidebar, 'sidebar must derive grouped entries from COMPONENT_ROUTES').toMatch(/COMPONENT_ROUTES\s*\.filter/)
     expect(sidebar, 'sidebar labels must come from the catalogue, not i18n keys').not.toContain("t('sidebar.")
   })
 })
