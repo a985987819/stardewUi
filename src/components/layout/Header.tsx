@@ -11,7 +11,7 @@ function StarHeader() {
   const { t } = useI18n()
 
   const navItems = [
-    { path: '/guide', label: t('nav.guide') },
+    { path: '/guide/self-use', label: t('nav.guide') },
     { path: '/components', label: t('nav.components') },
     { path: '/api', label: t('nav.api') },
   ]
@@ -40,7 +40,7 @@ function StarHeader() {
 
         <div className={styles['doc-header-actions']}>
           <StarLangSwitch />
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer" className={styles['doc-header-github']}>
+          <a href="https://github.com/a985987819/stardewUi" target="_blank" rel="noopener noreferrer" className={styles['doc-header-github']}>
             <ExternalLink size={20} />
           </a>
           <button className={styles['doc-header-menu-btn']} onClick={() => setIsMenuOpen(!isMenuOpen)}>

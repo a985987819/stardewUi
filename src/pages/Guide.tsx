@@ -29,6 +29,11 @@ function StarGuidePage() {
 
   return (
     <div className={styles['guide-section']}>
+      <header className={styles['guide-intro']}>
+        <span>FIRST DAY CHECKLIST</span>
+        <h1>自行使用</h1>
+        <p>把组件库放进背包，再从最常用的一把工具开始；下面这条路线适合在自己的 React 项目里慢慢搭一座小镇。</p>
+      </header>
       <h2>{t('guide.install')}</h2>
       <p>{t('guide.installDesc')}</p>
       <StarCodeBlock code={installCode} language="bash" />

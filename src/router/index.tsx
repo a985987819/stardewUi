@@ -4,7 +4,13 @@ import StarLayout from '../components/layout/Layout'
 import StarHomePage from '../pages/Home'
 // Demo pages are code-split per route so the landing page only ships the shell.
 // `StarLayout` provides the Suspense boundary for these children.
-import { StarComponentsPage, StarGuidePage } from './lazyPages'
+import {
+  StarComponentsPage,
+  StarGuideAgentUsePage,
+  StarGuideDesignSystemPage,
+  StarGuideLicensePage,
+  StarGuideSelfUsePage,
+} from './lazyPages'
 import { COMPONENT_ROUTES } from './componentRegistry'
 
 export const router = createBrowserRouter(
@@ -14,7 +20,11 @@ export const router = createBrowserRouter(
       element: <StarLayout />,
       children: [
         { index: true, element: <StarHomePage /> },
-        { path: 'guide', element: <StarGuidePage /> },
+        { path: 'guide', element: <Navigate to="/guide/self-use" replace /> },
+        { path: 'guide/self-use', element: <StarGuideSelfUsePage /> },
+        { path: 'guide/agent-use', element: <StarGuideAgentUsePage /> },
+        { path: 'guide/design-system', element: <StarGuideDesignSystemPage /> },
+        { path: 'guide/license', element: <StarGuideLicensePage /> },
         { path: 'components', element: <StarComponentsPage /> },
         ...COMPONENT_ROUTES.map(({ routePath, element: Component }) => ({
           path: `components/${routePath}`,

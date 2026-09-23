@@ -27,6 +27,7 @@ class IntersectionObserverMock {
 
 vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 vi.stubGlobal('IntersectionObserver', IntersectionObserverMock)
+vi.stubGlobal('scrollTo', vi.fn())
 
 Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
   value: () =>

@@ -12,7 +12,10 @@ import { lazy } from 'react'
  * `./componentRegistry.sync.test.tsx` fails the suite when the two drift apart.
  * Append new entries at the end with `bun run gen:component <Name>`.
  */
-export const StarGuidePage = lazy(() => import('../pages/Guide'))
+export const StarGuideSelfUsePage = lazy(() => import('../pages/Guide'))
+export const StarGuideAgentUsePage = lazy(() => import('../pages/GuideAgentUse'))
+export const StarGuideDesignSystemPage = lazy(() => import('../pages/GuideDesignSystem'))
+export const StarGuideLicensePage = lazy(() => import('../pages/GuideLicense'))
 export const StarComponentsPage = lazy(() => import('../pages/Components'))
 export const StarNineSliceButtonDemoPage = lazy(() => import('../pages/NineSliceButtonDemo'))
 export const StarCalendarDemoPage = lazy(() => import('../pages/CalendarDemo'))

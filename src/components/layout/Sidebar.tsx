@@ -22,10 +22,15 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     id: '/guide',
-    path: '/guide',
     labelZh: '指南',
     labelEn: 'Guide',
     icon: <Book size={18} />,
+    children: [
+      { id: '/guide/self-use', path: '/guide/self-use', labelZh: '自行使用', labelEn: 'Use it yourself' },
+      { id: '/guide/agent-use', path: '/guide/agent-use', labelZh: 'Agent 帮我使用', labelEn: 'Use it with an agent' },
+      { id: '/guide/design-system', path: '/guide/design-system', labelZh: '设计规范', labelEn: 'Design system' },
+      { id: '/guide/license', path: '/guide/license', labelZh: '版权相关', labelEn: 'License & attribution' },
+    ],
   },
   {
     id: '/components',
@@ -57,6 +62,7 @@ function StarSidebar() {
   const location = useLocation()
   const { t } = useI18n()
   const [expandedKeys, setExpandedKeys] = useState<string[]>([
+    '/guide',
     '/components',
     ...COMPONENT_CATALOGUE_CATEGORIES.map((category) => `category-${category}`),
   ])
@@ -89,6 +95,7 @@ function StarSidebar() {
     setSearchQuery(e.target.value)
     if (e.target.value) {
       setExpandedKeys([
+        '/guide',
         '/components',
         ...COMPONENT_CATALOGUE_CATEGORIES.map((category) => `category-${category}`),
       ])
