@@ -85,7 +85,13 @@ describe('component catalogue sync', () => {
       expect(entries.map(({ usageRank }) => usageRank)).toEqual(entries.map(({ usageRank }) => usageRank).toSorted())
       expect(COMPONENT_CATALOGUE_CATEGORY_META[category].zh).toBeTruthy()
       expect(COMPONENT_CATALOGUE_CATEGORY_META[category].en).toBeTruthy()
+      expect(COMPONENT_CATALOGUE_CATEGORY_META[category].color).toMatch(/^#[\da-f]{6}$/i)
     }
+
+    const categoryColors = COMPONENT_CATALOGUE_CATEGORIES.map(
+      (category) => COMPONENT_CATALOGUE_CATEGORY_META[category].color
+    )
+    expect(new Set(categoryColors).size).toBe(COMPONENT_CATALOGUE_CATEGORIES.length)
   })
 
   it('describes every entry in both languages', () => {

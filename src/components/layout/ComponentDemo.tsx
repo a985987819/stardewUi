@@ -31,6 +31,28 @@ const lucideComponents = new Set(['Search'])
 
 const unique = (values: string[]) => [...new Set(values)]
 
+function toExampleName(value: string) {
+  const name = value
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean)
+    .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`)
+    .join('')
+
+  return `${name || 'Component'}Example`
+}
+
+function withExplicitStyles(code: string) {
+  if (code.includes("stardew-valley-ui/style.css") || code.includes("stardew-valley-ui/auto")) return code
+  return `import 'stardew-valley-ui/style.css'\n${code}`
+}
+
+function indentJsx(code: string) {
+  return code
+    .split('\n')
+    .map((line) => (line ? `      ${line}` : ''))
+    .join('\n')
+}
+
 function renderDescription(description: React.ReactNode) {
   if (typeof description !== 'string') return description
 
@@ -47,14 +69,17 @@ function renderDescription(description: React.ReactNode) {
 
 /**
  * Turns the concise JSX passed by a demo page into a copy-ready snippet. Demo
- * pages only describe the meaningful usage; the shared frame owns the package
- * imports so the visible code never silently omits its component references.
+ * pages only describe the meaningful usage. The shared frame turns a compact,
+ * stateless line into the place it belongs in a React application, while
+ * preserving authored stateful examples as complete components.
  */
 // eslint-disable-next-line react-refresh/only-export-components -- tests and page builders reuse this pure formatter.
-export function createCopyableDemoCode(code: string): string {
-  if (code.includes("from 'stardew-valley-ui'") || code.includes('from "stardew-valley-ui"')) {
-    return code
-  }
+export function createCopyableDemoCode(code: string, exampleName = 'ComponentExample'): string {
+  const filePath = `src/components/examples/${exampleName}.tsx`
+  const fileHeader = `// ${filePath}`
+  const hasAuthoredPackageImport = code.includes("from 'stardew-valley-ui'") || code.includes('from "stardew-valley-ui"')
+
+  if (hasAuthoredPackageImport) return `${fileHeader}\n${withExplicitStyles(code)}`
 
   const libraryImports = unique([...code.matchAll(libraryComponentPattern)].map(([, component]) => component))
   const iconImports = unique(
@@ -63,11 +88,12 @@ export function createCopyableDemoCode(code: string): string {
       .filter((component) => lucideComponents.has(component)),
   )
   const imports = [
+    "import 'stardew-valley-ui/style.css'",
     libraryImports.length > 0 ? `import { ${libraryImports.join(', ')} } from 'stardew-valley-ui'` : null,
     iconImports.length > 0 ? `import { ${iconImports.join(', ')} } from 'lucide-react'` : null,
   ].filter((statement): statement is string => statement !== null)
 
-  return imports.length > 0 ? `${imports.join('\n')}\n\n${code}` : code
+  return `${fileHeader}\n${imports.join('\n')}\n\nexport function ${exampleName}() {\n  return (\n    <>\n${indentJsx(code)}\n    </>\n  )\n}`
 }
 
 function StarComponentDemo({
@@ -77,12 +103,13 @@ function StarComponentDemo({
   code,
   data,
   dataLabel,
-  defaultShowCode = true,
+  defaultShowCode = false,
   id,
 }: ComponentDemoProps) {
   const [showCode, setShowCode] = useState(defaultShowCode)
   const { t } = useI18n()
-  const copyableCode = code ? createCopyableDemoCode(code) : undefined
+  const exampleName = toExampleName(id ?? title)
+  const copyableCode = code ? createCopyableDemoCode(code, exampleName) : undefined
 
   return (
     <StarCard
@@ -111,14 +138,20 @@ function StarComponentDemo({
       ) : null}
       {code ? (
         <div className={styles['component-demo-toggle-wrapper']}>
-          <button className={styles['component-demo-toggle']} type="button" onClick={() => setShowCode(!showCode)}>
+          <button
+            className={styles['component-demo-toggle']}
+            type="button"
+            aria-expanded={showCode}
+            aria-controls={id ? `${id}-code` : undefined}
+            onClick={() => setShowCode(!showCode)}
+          >
             {showCode ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             <span>{showCode ? t('demo.hideCode') : t('demo.showCode')}</span>
           </button>
         </div>
       ) : null}
       {showCode && copyableCode ? (
-        <div className={styles['component-demo-code']}>
+        <div id={id ? `${id}-code` : undefined} className={styles['component-demo-code']}>
           <div className={styles['component-demo-code-heading']}>
             <span>{t('demo.copyReady')}</span>
             <span>{t('demo.copyReadyHint')}</span>
