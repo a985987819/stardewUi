@@ -137,6 +137,18 @@ export function SaveButton() {
 
 ---
 
+## 让 AI Agent 直接使用
+
+仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/README.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它会在 UI 接入、组件选择、像素风页面搭建和接入复查任务中提供公开 API、样式加载、SSR 与许可证约束，避免 Agent 凭印象编造 Props。
+
+```bash
+skills add a985987819/stardewUi
+```
+
+也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills 目录。安装后直接描述页面目标即可，例如“用 Stardew Valley UI 做一个农场库存页”；精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释了技能的安装、工作流程与需求模板。
+
+---
+
 ## 组件列表
 
 ### StarNineSliceButton - 九宫格按钮
