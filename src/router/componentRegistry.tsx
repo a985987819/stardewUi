@@ -9,6 +9,7 @@ import {
   Columns2,
   Frame,
   Gauge,
+  Grid2X2,
   Heart,
   Inbox,
   LayoutList,
@@ -46,6 +47,7 @@ import {
   StarTabDemoPage,
   StarTitleDemoPage,
   StarTypewriterDemoPage,
+  StarPixelTextDemoPage,
 } from './lazyPages'
 
 /**
@@ -415,6 +417,19 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <Type size={20} />,
     element: StarTitleDemoPage,
+  },
+  {
+    routePath: 'pixel-text',
+    component: 'PixelText',
+    category: 'other',
+    usageRank: 2,
+    title: { zh: '像素化文本', en: 'Pixel Text' },
+    desc: {
+      zh: '将文本栅格化为粗颗粒像素字形，可用于表情、徽章和复古 HUD。',
+      en: 'Rasterize text into chunky pixel glyphs for emojis, badges, and retro HUDs.',
+    },
+    icon: <Grid2X2 size={20} />,
+    element: StarPixelTextDemoPage,
   },
 ]
 

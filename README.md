@@ -126,7 +126,7 @@ export function SaveButton() {
 
 | 分类 | 导出 |
 |------|------|
-| 容器与展示 | `StarCard`、`StarTitle`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
+| 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
 | 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
 | 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
@@ -1002,6 +1002,38 @@ import { StarTitle } from 'stardew-valley-ui'
 描边仍是固定的 3px 像素轮廓；`color`、`fontSize`、`letterSpacing` 与 `showShadow` 用于控制字面外观，不需要额外嵌套元素。
 
 ---
+
+### StarPixelText - 像素化文本
+
+把短文本先绘制进离屏 Canvas，再缩小成采样格并以 `imageSmoothingEnabled = false` 放大。它不是模糊滤镜：每个采样点都会成为一块清晰的粗颗粒像素，尤其适合把 emoji、徽章字符和复古 HUD 标签转成锯齿字形。
+
+```tsx
+import { StarPixelText } from 'stardew-valley-ui'
+
+// 直接包裹纯文本
+<StarPixelText pixelSize={8}>😄</StarPixelText>
+
+// 受控文本；输入变化后自动重新栅格化
+<StarPixelText text={emoji} pixelSize={10} fontSize={128} />
+
+// 使用同一份 Canvas 源字形做 before/after 叠放时，可避免对比线两侧错位
+<StarPixelText text="😆" pixelSize={9} renderMode="source" />
+
+// 普通短标签同样适用
+<StarPixelText pixelSize={7}>Farm!</StarPixelText>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| text | `string \| number` | - | 要栅格化的文本；存在时优先于 `children` |
+| children | `string \| number` | - | 未传 `text` 时要栅格化的纯文本 |
+| pixelSize | `number` | `8` | 一个可见方格像素的边长（px） |
+| fontSize | `number` | `120` | 降采样前源 Canvas 的字体大小（px） |
+| fontFamily | `string` | emoji 兼容字体栈 | 源 Canvas 使用的字体族 |
+| padding | `number` | `12` | 字形四周保留的空白（px） |
+| renderMode | `'pixelated' \| 'source'` | `'pixelated'` | 输出粗颗粒像素，或保留同尺寸的原始 Canvas 字形；后者适合无缝前后对比 |
+| aria-label | `string` | 文本本身 | Canvas 图像的无障碍名称 |
+| className / ...rest | `CanvasHTMLAttributes<HTMLCanvasElement>` | - | 追加样式及其余原生 Canvas 属性 |
 
 ## Hooks
 

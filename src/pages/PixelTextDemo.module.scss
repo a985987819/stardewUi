@@ -1,0 +1,33 @@
+.emoji-samples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 18px;
+  width: min(100%, 760px);
+  padding: 22px;
+  background-color: var(--star-raw-rgba-255-249-235-0-28);
+  background-image: linear-gradient(90deg, var(--star-raw-rgba-121-84-58-0-9) 1px, transparent 1px), linear-gradient(var(--star-raw-rgba-121-84-58-0-9) 1px, transparent 1px);
+  background-size: 12px 12px;
+  border: 3px dashed var(--color-border);
+}
+
+.converter { display: grid; grid-template-columns: minmax(220px, 290px) minmax(0, 1fr); gap: 26px; width: min(100%, 860px); align-items: stretch; }
+.converter-controls { display: grid; align-content: center; gap: 17px; }
+.converter-controls label { display: grid; gap: 8px; color: var(--color-text); font-size: 13px; }
+.converter-controls label > span { display: flex; justify-content: space-between; gap: 10px; }
+.converter-controls output { color: var(--color-text-tertiary); font-family: var(--font-mono, monospace); }
+.converter-controls input[type='text'], .converter-controls input:not([type]) { width: 100%; padding: 11px 12px; color: var(--color-text); font: 25px 'Segoe UI Emoji', sans-serif; background: var(--star-raw-rgba-255-249-235-0-75); border: 3px solid var(--color-border-dark); box-shadow: inset 2px 2px 0 var(--star-raw-rgba-121-84-58-0-12); }
+.converter-controls input:focus-visible, .comparison-range:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; }
+.converter-controls input[type='range'] { width: 100%; accent-color: var(--color-primary); cursor: ew-resize; }
+.comparison { width: 100%; min-width: 0; }
+.comparison-labels { display: flex; justify-content: space-between; padding: 0 4px 8px; color: var(--color-text-secondary); font-size: 12px; }
+.comparison-stage { position: relative; display: grid; min-height: 232px; overflow: hidden; place-items: center; background-color: var(--star-raw-rgba-111-150-74-0-15); background-image: linear-gradient(45deg, var(--star-raw-rgba-255-255-255-0-19) 25%, transparent 25%, transparent 75%, var(--star-raw-rgba-255-255-255-0-19) 75%), linear-gradient(45deg, var(--star-raw-rgba-255-255-255-0-19) 25%, transparent 25%, transparent 75%, var(--star-raw-rgba-255-255-255-0-19) 75%); background-position: 0 0, 12px 12px; background-size: 24px 24px; border: 4px solid var(--color-border-dark); }
+.source-layer, .pixel-reveal { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.source-layer canvas, .pixel-reveal canvas { max-width: none; }
+.comparison-divider { position: absolute; top: 0; bottom: 0; width: 4px; margin-left: -2px; background: var(--color-text); box-shadow: 2px 0 0 var(--color-secondary-light), -2px 0 0 var(--color-secondary-light); pointer-events: none; }
+.comparison-divider span { position: absolute; top: 50%; left: 50%; display: grid; width: 30px; height: 30px; place-items: center; color: var(--color-text-light); font-family: sans-serif; font-size: 17px; line-height: 1; background: var(--color-text); border: 3px solid var(--color-secondary-light); transform: translate(-50%, -50%); }
+.comparison-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; cursor: ew-resize; opacity: 0; }
+.wrapped { display: grid; width: min(100%, 520px); min-height: 145px; place-items: center; padding: 18px; background: var(--color-bg-secondary); border: 3px solid var(--color-border); }
+
+@media (max-width: 640px) { .converter { grid-template-columns: 1fr; } .emoji-samples { gap: 10px; padding: 14px; } .comparison-stage { min-height: 185px; } }
