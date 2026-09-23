@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { StarCard } from '../ui/Card'
+import { StarTitle, StarTypewriter } from '../ui'
 import type { DocLayoutOutletContext } from './docLayoutContext'
 import type { TocItem } from './TableOfContents'
 import styles from './ComponentPage.module.scss'
@@ -28,12 +28,12 @@ function StarComponentPage({ title, description, children, toc }: ComponentPageP
 
   return (
     <div className={styles['component-page']}>
-      <StarCard className={styles['component-page-header-card']}>
-        <div className={styles['component-page-header']}>
-          <h1 className={styles['component-page-title']}>{title}</h1>
-          <p className={styles['component-page-desc']}>{description}</p>
-        </div>
-      </StarCard>
+      <header className={styles['component-page-header']}>
+        <StarTitle level={1} className={styles['component-page-header-title']}>{title}</StarTitle>
+        <p className={styles['component-page-header-desc']}>
+          <StarTypewriter text={description} speed={60} startDelay={120} />
+        </p>
+      </header>
       <div className={styles['component-page-content']}>{children}</div>
     </div>
   )

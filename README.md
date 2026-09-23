@@ -126,7 +126,7 @@ export function SaveButton() {
 
 | 分类 | 导出 |
 |------|------|
-| 容器与展示 | `StarCard`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
+| 容器与展示 | `StarCard`、`StarTitle`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
 | 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
 | 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
@@ -962,6 +962,38 @@ import { StarDisplayFrame } from 'stardew-valley-ui'
 
 ---
 
+### StarTitle - 标题
+
+用于页面、任务和面板抬头的金色像素标题。组件以 Canvas 将每一层逐像素绘制，默认使用 `50px` 粗体：文字为
+`#ce9f00`，文字内部沿右上方 45° 受光边缘绘制 `2px #fbf13a` 高光；外围由 `#493213` 的硬边偏移组合成
+3px 锯齿描边（局部再外翻 1px 小齿与深浅碎片），每个字之间预留约 `8px` 间距，最后从字面下方 `5px` 开始投下长 `4px` 的
+`rgba(41, 58, 44, 0.7)` 阴影。主文字也会加入低密度、
+基于文本固定分布的暖金/深金斑驳色点，因此有手绘像素质感而不会在重渲染时闪烁。四层独立出图，不会混成一种颜色。
+
+```tsx
+import { StarTitle } from 'stardew-valley-ui'
+
+// 默认是语义化 h2
+<StarTitle>春季收获</StarTitle>
+
+// 按页面结构调整标题层级
+<StarTitle level={1} id="page-title">星露谷账本</StarTitle>
+
+// 中文标题同样以 Canvas 像素层绘制
+<StarTitle>太中了</StarTitle>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| level | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `2` | 标题语义层级，决定渲染的 `h1`–`h6` 标签 |
+| children | `string \| number` | - | Canvas 绘制的标题文本 |
+| className | `string` | - | 追加到根标题元素的类名 |
+| ...rest | `HTMLAttributes<HTMLHeadingElement>` | - | 其余原生标题属性（`id` / `aria-*` / `style` 等） |
+
+外观颜色、2px 高光、3px 描边和阴影均为默认固定样式；可通过 `className` 覆盖字体尺寸或布局，但不需要额外嵌套元素。
+
+---
+
 ## Hooks
 
 ### useToggle
@@ -1115,6 +1147,8 @@ import type {
   StarCalendarProps,
   CalendarItem,
   StarDatePickerProps,
+  StarTitleProps,
+  StarTitleLevel,
   StarDisplayFrameProps,
   StarAvatarProps,
   AvatarShape,

@@ -1,22 +1,25 @@
 .component-page {
   @apply max-w-full;
 
-  &-header-card {
+  &-header {
+    display: grid;
+    justify-items: start;
+    gap: 16px;
+    min-height: 118px;
+    padding: 4px 2px 8px;
     margin-bottom: 32px;
   }
 
-  &-header {
-    padding: 8px 4px;
+  &-header-title {
+    max-width: 100%;
   }
 
-  &-title {
-    @apply m-0 mb-3 text-2xl font-semibold;
-    color: var(--color-text);
-  }
-
-  &-desc {
-    @apply m-0 text-base leading-relaxed;
+  &-header-desc {
+    min-height: 1.6em;
+    margin: 0;
     color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
   }
 
   &-content {

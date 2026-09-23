@@ -44,6 +44,7 @@ import {
   StarRatingDemoPage,
   StarSwitchDemoPage,
   StarTabDemoPage,
+  StarTitleDemoPage,
   StarTypewriterDemoPage,
 } from './lazyPages'
 
@@ -390,6 +391,19 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <ArrowUp size={20} />,
     element: StarBackToTopDemoPage,
+  },
+  {
+    routePath: 'title',
+    component: 'Title',
+    category: 'common',
+    usageRank: 2,
+    title: { zh: '标题', en: 'Title' },
+    desc: {
+      zh: '带金色内高光、深色锯齿描边和下落阴影的像素标题。',
+      en: 'A pixel title with a gold fill, inner highlight, jagged dark outline, and drop shadow.',
+    },
+    icon: <Type size={20} />,
+    element: StarTitleDemoPage,
   },
 ]
 
