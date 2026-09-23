@@ -1303,6 +1303,10 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 
 完整条款以根目录 [LICENSE](LICENSE) 为准。若你的用途涉及商业或法律判断，请不要使用本项目，并咨询有资质的专业人士。
 
+## 致谢
+
+欢迎页的交互节奏与视觉气质受到 [Animal Island UI](https://github.com/guokaigdg/animal-island-ui) 启发。详细说明见 [docs/acknowledgements.md](docs/acknowledgements.md)；本项目未复制其代码或素材。
+
 ---
 
 ## 参与共建

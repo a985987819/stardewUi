@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import StarLoading from '../ui/Loading'
+import StarProgress from '../ui/Progress'
 import { resolveAssetPath } from '../../utils/githubPages'
 import styles from './StartupLoader.module.scss'
 
@@ -75,9 +76,14 @@ function StarStartupLoader({ onComplete }: StartupLoaderProps) {
           <span>晨间准备</span>
           <span>{progress}%</span>
         </div>
-        <div className={styles['startup-loader__track']}>
-          <span className={styles['startup-loader__fill']} style={{ width: `${progress}%` }} />
-        </div>
+        <StarProgress
+          className={styles['startup-loader__progress-bar']}
+          value={loaded}
+          max={total}
+          segmentSize={1}
+          color="#71964A"
+          aria-label={`正在加载 ${loaded} / ${total} 项资源`}
+        />
         <p>{loaded} / {total} 件素材已归位</p>
       </section>
     </main>

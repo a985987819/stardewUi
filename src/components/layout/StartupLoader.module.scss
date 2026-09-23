@@ -111,20 +111,23 @@
     font-size: 13px;
   }
 
-  &__track {
-    height: 16px;
-    padding: 3px;
-    overflow: hidden;
-    background: #6a350b;
-    border: 2px solid #4d2608;
-  }
+  &__progress-bar {
+    display: flex;
+    width: 100%;
+    justify-content: center;
 
-  &__fill {
-    display: block;
-    height: 100%;
-    min-width: 4px;
-    background: repeating-linear-gradient(90deg, var(--color-success) 0 10px, var(--color-primary-light) 10px 14px);
-    transition: width 0.16s steps(4, jump-end);
+    :global(.star-progress__segments) {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      max-width: none;
+      grid-template-columns: none;
+    }
+
+    :global(.star-progress__cell) {
+      flex: 1 1 0;
+      min-width: 0;
+    }
   }
 
   &__progress p {
@@ -132,10 +135,6 @@
     color: #6a350b;
     font-size: 11px;
     text-align: right;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    &__fill { transition: none; }
   }
 
   @media (max-width: 520px) {
