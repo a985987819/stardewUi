@@ -152,8 +152,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     usageRank: 2,
     title: { zh: '分割线', en: 'Divider' },
     desc: {
-      zh: '由像素木栅栏等距排列组成的分割线，默认按容器宽度自动铺满。',
-      en: 'A divider built from evenly spaced pixel fence posts that fills its container width by default.',
+      zh: '由像素木栅栏或像素星星等距排列组成的分割线，默认按容器宽度自动铺满。',
+      en: 'A divider built from evenly spaced pixel fence posts or pixel stars that fills its container width by default.',
     },
     icon: <Columns2 size={20} />,
     element: StarDividerDemoPage,

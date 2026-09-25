@@ -1,5 +1,9 @@
-// 木栅栏分割线。
+// 木栅栏 / 星星分割线。
 //
+// 两种图案共用同一套排版骨架：等距横排、30px 间隔、左右各留一个「半间距」的内边距、底部留 3px 给投影；
+// 换 icon 只换图案本身，节奏不变。四层颜色也共用同一组 --star-divider-* 变量，所以改 color 会同时改两种图案。
+//
+// —— 栅栏（默认）——
 // 一个栅栏 = 20×28 的方块：12×24 的 var(--star-raw-hex-fa9405) 主体 + 上、左、右三边各 4px 的 var(--star-raw-hex-9b440d) 实心框。
 // **底边不画框**，木色直接落到最下沿（所以主体高是 28 - 4 = 24，而不是 20）；顶部两角 5px 圆角。
 // 立体感照 Progress 的像素格：整尺寸的 var(--star-raw-hex-492b18) 投影块垫在后面、向左下各平移 3px 露出左下边。
@@ -9,6 +13,14 @@
 // 每格左右还各伸出一根横杆把栅栏连起来：5.5px 厚（上下各 1.5px var(--star-raw-hex-9b440d) 描边 + 2.5px var(--star-raw-hex-fa9405) 主体），
 // 往外伸半个间距；横杆**不画竖向描边**，相邻两格的横杆在间隙正中首尾相接就看不出一道竖线，
 // 只有整条分割线最外侧的两端才补竖边收口。
+//
+// —— 星星（icon="star"）——
+// 一颗星 = 9×9 的像素格，格子边长 3px（与栅栏的高光/投影同厚）。四层由组件按同一份栅格算好、按 d 路径画进一个 36×36 的 svg：
+// 主体 var(--star-raw-hex-fa9405)、外描边 var(--star-raw-hex-9b440d)（8 邻域膨胀一格，斜边才不会豁口）、
+// 上/右内侧的高光 var(--star-raw-hex-ffd9a3)（只取主对角线右上那一半，否则星星全是轮廓、高光会绕成一圈白边）、
+// 以及整块向左下偏移一格（3px）的 var(--star-raw-hex-492b18) 投影。
+// 颜色与栅栏完全同源，所以两种图案受同一个右上光源照射。这里只负责上色和尺寸。
+//
 // 数值都是产品要求，要调只改下面这组变量。
 
 $post-width: 20px;
@@ -34,17 +46,23 @@ $post-rail-length: $post-gap * 0.5;
 $post-rail-offset: 6px;
 $post-rail-gap: 5px;
 
-$post-body: var(--star-raw-hex-fa9405);
-$post-frame: var(--star-raw-hex-9b440d);
-$post-highlight: var(--star-raw-hex-ffd9a3);
-$post-shadow: var(--star-raw-hex-492b18);
+// 四层颜色不再写死：组件按 color 实时推导出一套（外框、高光、投影跟着主体走），
+// 以 --star-divider-* 自定义属性挂在根节点上。下面这组 var() 的兜底值只是默认木色，
+// 万一样式被单独引用、没有 JS 注入变量时仍然成立。
+$post-body: var(--star-divider-body, var(--star-raw-hex-fa9405));
+$post-frame: var(--star-divider-frame, var(--star-raw-hex-9b440d));
+$post-highlight: var(--star-divider-highlight, var(--star-raw-hex-ffd9a3));
+$post-shadow: var(--star-divider-shadow, var(--star-raw-hex-492b18));
+
+// 星星：9 格主体 + 四周各 1 格外描边 + 左/下各 1 格投影 = 12×12 格，格子 3px
+$star-size: 36px; // = STAR_DIVIDER_WIDTH / STAR_DIVIDER_HEIGHT（12 格 × 3px）
 
 .star-divider {
   display: flex;
   gap: $post-gap;
   width: 100%;
   // 首尾两根横杆、第一块栅栏的左侧投影、以及所有栅栏的下方投影都要有地方露出来，
-  // 否则会被 overflow 裁掉（左右各留一个「半间距」给横杆）
+  // 否则会被 overflow 裁掉（左右各留一个「半间距」给横杆；星星沿用同样的内缩，节奏才一致）
   padding: 0 $post-rail-length $post-shadow-width $post-rail-length;
   overflow: hidden;
 
@@ -139,5 +157,39 @@ $post-shadow: var(--star-raw-hex-492b18);
       // 下端是自由端 → 圆角；上端接上高光 → 方角
       border-radius: 0 0 $post-highlight-radius $post-highlight-radius;
     }
+  }
+
+  // 星星：一个 30×30 的盒子（已含左/下各 3px 的投影），四层像素路径叠在同一个 svg 里
+  &__star {
+    position: relative;
+    display: block;
+    flex: none;
+    width: $star-size;
+    height: $star-size;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      // 每格都是整 3px 的方块，关掉抗锯齿才不会在格子缝里透出底色
+      shape-rendering: crispEdges;
+    }
+  }
+
+  // 四层与栅栏同色：投影垫在最下面，外描边压住它，主体再压住描边，高光最后点到主体上
+  &__star-shadow {
+    fill: $post-shadow;
+  }
+
+  &__star-frame {
+    fill: $post-frame;
+  }
+
+  &__star-body {
+    fill: $post-body;
+  }
+
+  &__star-highlight {
+    fill: $post-highlight;
   }
 }

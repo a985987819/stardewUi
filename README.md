@@ -1035,6 +1035,42 @@ import { StarPixelText } from 'stardew-valley-ui'
 | aria-label | `string` | 文本本身 | Canvas 图像的无障碍名称 |
 | className / ...rest | `CanvasHTMLAttributes<HTMLCanvasElement>` | - | 追加样式及其余原生 Canvas 属性 |
 
+---
+
+### StarDivider - 分割线
+
+由像素木栅栏或像素星星等距排列组成的分割线，默认按容器宽度自动铺满。
+
+```tsx
+import { StarDivider } from 'stardew-valley-ui'
+
+// 木栅栏（默认）
+<StarDivider />
+
+// 像素星星：换图案，不换节奏
+<StarDivider icon="star" />
+
+// 固定个数，适合窄栏
+<StarDivider count={5} />
+<StarDivider icon="star" count={5} />
+
+// 换主体色：外框、高光、投影一起重算
+<StarDivider color="#78ad55" />
+<StarDivider icon="star" color="#78ad55" />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| count | `number` | - | 固定图案个数；不传则按容器宽度自动铺满（格数向上取整，宽度不是整步距时最后一格被 `overflow` 截断） |
+| icon | `'fence' \| 'star'` | `'fence'` | 图案类型：20×28 的木栅栏，或 36×36 的像素星星 |
+| color | `string` | `'#fa9405'` | 主体色，支持 `#rgb` / `#rrggbb`；外框、高光与左下投影据此实时推导，非法值回退到默认木色 |
+
+两种图案共用同一套颜色与光照方向：主体 `#fa9405`、外描边 `#9b440d`、右上高光 `#ffd9a3`、左下投影 `#492b18`。
+传 `color` 时这四层会整体换成以该色为基准的一套 —— 外框混向暖黑、高光是主体的淡色、投影是主体的深色，
+所以换个色相进来不会留下旧的木头棕。推导逻辑独立导出为 `deriveDividerPalette`，需要自己算一套配色时可以直接调用。
+栅栏每格还带两根连接横杆，星星则只保留图案本身，间距仍是 30px。几何常量从包根导出：
+栅栏的 `FENCE_POST_*`，星星的 `STAR_DIVIDER_CELL` / `STAR_DIVIDER_GAP` / `STAR_DIVIDER_WIDTH` / `STAR_DIVIDER_HEIGHT` / `STAR_DIVIDER_PITCH`。
+
 ## Hooks
 
 ### useToggle
@@ -1195,6 +1231,7 @@ import type {
   AvatarShape,
   AvatarSize,
   StarDividerProps,
+  DividerIcon,
   StarLoadingProps,
   StarPopupProps,
   PopupPlacement,

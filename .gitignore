@@ -20,6 +20,7 @@ pnpm-lock.yaml
 
 # Local agent scratch space and probe files.
 .workbuddy/
+.workbuddy-ai/
 .tmp_*
 .commitmsg.txt
 

@@ -57,6 +57,14 @@ export {
   DEFAULT_PROGRESS_HIGHLIGHT,
   type ProgressPalette,
 } from './utils/progressPalette'
+export {
+  deriveDividerPalette,
+  DEFAULT_DIVIDER_COLOR,
+  DEFAULT_DIVIDER_FRAME,
+  DEFAULT_DIVIDER_HIGHLIGHT,
+  DEFAULT_DIVIDER_SHADOW,
+  type DividerPalette,
+} from './utils/dividerPalette'
 // The `StarGapBorder` component is gone, but its corner generator is kept: it is
 // the reference implementation of the stepped "gap border" corner, and
 // `pixelCorners` / the canvas painters still describe the house style in its terms.
