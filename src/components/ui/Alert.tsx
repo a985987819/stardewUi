@@ -17,6 +17,8 @@ export interface StarAlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   children?: ReactNode
   /** Shows the semantic pixel icon in front of the text. */
   showIcon?: boolean
+  /** Custom icon shown in the icon slot instead of the built-in glyph; needs `showIcon`. */
+  icon?: ReactNode
   /** Shows a pixel × that dismisses the banner. */
   closable?: boolean
   /** Called after the built-in close button dismisses the banner. */
@@ -54,6 +56,7 @@ function StarAlert({
   title,
   children,
   showIcon = false,
+  icon,
   closable = false,
   onClose,
   closeLabel = 'Close',
@@ -93,7 +96,7 @@ function StarAlert({
       <span className={styles['star-alert__stripe']} aria-hidden />
       {showIcon ? (
         <span className={styles['star-alert__icon']} aria-hidden>
-          <IconGlyph size={14} strokeWidth={2.5} />
+          {icon ?? <IconGlyph size={14} strokeWidth={2.5} />}
         </span>
       ) : null}
       <div className={styles['star-alert__body']}>

@@ -73,3 +73,16 @@ describe('Skeleton', () => {
     expect(skeleton.style.getPropertyValue('--star-skeleton-clip-avatar')).toContain('polygon')
   })
 })
+
+describe('Skeleton avatarShape', () => {
+  it('keeps the stepped square by default and rounds it for circle', () => {
+    const { rerender } = render(<Skeleton avatar data-testid="skeleton" />)
+    const avatar = screen.getByTestId('skeleton').querySelector(`.${styles['star-skeleton__avatar']}`)
+    expect(avatar).not.toHaveClass(styles['star-skeleton__avatar--circle'])
+
+    rerender(<Skeleton avatar avatarShape="circle" data-testid="skeleton" />)
+    expect(
+      screen.getByTestId('skeleton').querySelector(`.${styles['star-skeleton__avatar']}`),
+    ).toHaveClass(styles['star-skeleton__avatar--circle'])
+  })
+})

@@ -218,6 +218,40 @@ $textarea-hint: var(--star-raw-hex-5c4526);
   pointer-events: none;
 }
 
+// Clear button (`allowClear`): a pixel × at the bottom-right; when the
+// counter is also shown it steps left so the two never overlap.
+.star-textarea__clear {
+  position: absolute;
+  right: calc(#{$textarea-frame-width} + 4px);
+  bottom: calc(#{$textarea-frame-width} + 3px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+
+  background: transparent;
+
+  color: $textarea-placeholder;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--star-textarea-accent, $textarea-placeholder);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--star-raw-hex-d7992e);
+    outline-offset: 1px;
+  }
+}
+
+.star-textarea__clear ~ .star-textarea__count {
+  right: calc(#{$textarea-frame-width} + 26px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .star-textarea__glow {
     transition: none !important;

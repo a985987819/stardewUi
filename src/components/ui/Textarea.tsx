@@ -6,9 +6,11 @@ import {
   useState,
   type CSSProperties,
   type ChangeEvent,
+  type KeyboardEvent,
   type ReactNode,
   type TextareaHTMLAttributes,
 } from 'react'
+import { X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Textarea.module.scss'
@@ -44,6 +46,12 @@ export interface StarTextareaProps
   autoSize?: boolean
   /** Visible text rows before the field starts scrolling. */
   rows?: number
+  /** Shows a pixel × that wipes the text back to `''` while typing. */
+  allowClear?: boolean
+  /** Accessible name of the built-in clear button. */
+  clearLabel?: string
+  /** Fires when the user presses Enter without Shift (IME composition ignored). */
+  onPressEnter?: (event: KeyboardEvent<HTMLTextAreaElement>) => void
 }
 
 /**
@@ -77,6 +85,9 @@ function StarTextarea({
   block = false,
   autoSize = false,
   rows = 4,
+  allowClear = false,
+  clearLabel = 'Clear',
+  onPressEnter,
   disabled = false,
   readOnly = false,
   maxLength,
@@ -112,6 +123,24 @@ function StarTextarea({
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     commit(event.target.value)
   }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    rest.onKeyDown?.(event)
+    if (
+      event.key === 'Enter' &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing
+    ) {
+      onPressEnter?.(event)
+    }
+  }
+
+  const handleClear = () => {
+    controlRef.current?.focus()
+    commit('')
+  }
+
+  const showClear = allowClear && !disabled && !readOnly && text.length > 0
 
   const cssVariables: TextareaCssVariables = {
     '--star-textarea-clip': TEXTAREA_CLIP_PATH,
@@ -155,12 +184,23 @@ function StarTextarea({
           className={styles['star-textarea__control']}
           value={text}
           onChange={handleChange}
+          onKeyDown={onPressEnter ? handleKeyDown : undefined}
           rows={rows}
           disabled={disabled}
           readOnly={readOnly}
           maxLength={maxLength}
           placeholder={placeholder}
         />
+        {showClear ? (
+          <button
+            type="button"
+            className={styles['star-textarea__clear']}
+            aria-label={clearLabel}
+            onClick={handleClear}
+          >
+            <X size={10} strokeWidth={3} aria-hidden />
+          </button>
+        ) : null}
         {showCount ? (
           <span className={styles['star-textarea__count']} aria-hidden>
             {maxLength ? `${text.length}/${maxLength}` : String(text.length)}

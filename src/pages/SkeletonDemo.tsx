@@ -12,7 +12,7 @@ const copy = {
     toc: ['基础用法', '带头像', '加载切换', '矿洞电梯', 'API'],
     demos: [
       ['基础用法', '默认一条加粗标题行加三段长短交替的段落行，最后一行收短到 60%，模拟自然排版的呼吸感。'],
-      ['带头像', 'avatar 选项在左侧立一块 36px 的方形占位，适合列表、留言板等"头像 + 正文"的场景。'],
+      ['带头像', 'avatar 选项在左侧立一块 36px 占位：默认方形，avatarShape="circle" 则换成圆头像，适合列表、留言板等“头像 + 正文”的场景。'],
       ['加载切换', 'loading 为 false 时骨架整体退场，children 直接接管位置；点击按钮模拟数据到达。'],
       ['矿洞电梯', '点「下矿」让电梯下行：下落期间骨架支架先撑住界面，1.5 秒后电梯门开——这一层挖到了什么全看运气。'],
     ],
@@ -38,7 +38,7 @@ const copy = {
     toc: ['Basic Usage', 'With Avatar', 'Loading Toggle', 'Mine Elevator', 'API'],
     demos: [
       ['Basic Usage', 'A bold title row plus three alternating paragraph rows by default, with the last row shortened to 60% so the block breathes like real typesetting.'],
-      ['With Avatar', 'The avatar option stands a 36px square block on the left, suited to lists and message boards with an "avatar + body" layout.'],
+      ['With Avatar', 'The avatar option stands a 36px block on the left — square by default, or a circle with avatarShape="circle" — suited to lists and message boards with an "avatar + body" layout.'],
       ['Loading Toggle', 'When loading is false the skeleton exits entirely and children take its place; click the button to simulate data arriving.'],
       ['Mine Elevator', 'Click "descend" to ride the elevator down: the striped supports hold the page while it falls, and 1.5 seconds later the doors open onto whatever this floor holds.'],
     ],
@@ -65,14 +65,16 @@ const apiData = {
     { property: 'loading', description: '是否显示骨架；为 false 时渲染 children', type: 'boolean', default: 'true' },
     { property: 'rows', description: '段落占位行数', type: 'number', default: '3' },
     { property: 'title', description: '是否显示加粗标题行', type: 'boolean', default: 'true' },
-    { property: 'avatar', description: '是否在左侧显示方形头像占位', type: 'boolean', default: 'false' },
+    { property: 'avatar', description: '是否在左侧显示头像占位', type: 'boolean', default: 'false' },
+    { property: 'avatarShape', description: '头像占位的形状', type: "'square' | 'circle'", default: "'square'" },
     { property: 'children', description: 'loading 为 false 时渲染的真实内容', type: 'ReactNode', default: '-' },
   ],
   en: [
     { property: 'loading', description: 'Shows the skeleton; when false, children render instead.', type: 'boolean', default: 'true' },
     { property: 'rows', description: 'Number of paragraph placeholder rows.', type: 'number', default: '3' },
     { property: 'title', description: 'Shows the bold title row.', type: 'boolean', default: 'true' },
-    { property: 'avatar', description: 'Shows a square avatar block on the left.', type: 'boolean', default: 'false' },
+    { property: 'avatar', description: 'Shows an avatar block on the left.', type: 'boolean', default: 'false' },
+    { property: 'avatarShape', description: 'Shape of the avatar block.', type: "'square' | 'circle'", default: "'square'" },
     { property: 'children', description: 'Real content rendered when loading is false.', type: 'ReactNode', default: '-' },
   ],
 }
@@ -85,7 +87,8 @@ const basicCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
 const avatarCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
-<StarSkeleton avatar rows={2} />`
+<StarSkeleton avatar rows={2} />
+<StarSkeleton avatar avatarShape="circle" rows={2} />`
 
 const toggleCode = `import { useState } from 'react'
 import { StarSkeleton } from 'stardew-valley-ui'
@@ -145,8 +148,9 @@ function StarSkeletonDemoPage() {
         description={t.demos[1][1]}
         code={avatarCode}
       >
-        <div style={{ width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
           <StarSkeleton avatar rows={2} />
+          <StarSkeleton avatar avatarShape="circle" rows={2} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo

@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
+import { deriveProgressPalette } from '../../utils/progressPalette'
 import styles from './Tooltip.module.scss'
 
 export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right'
@@ -31,6 +32,8 @@ export interface StarTooltipProps
   mouseLeaveDelay?: number
   /** Shows the pixel arrow pointing back at the trigger. */
   arrow?: boolean
+  /** Custom bubble fill; the frame ring derives from it (cream ink, like Badge). */
+  color?: string
   /** Fires when hover wants to change visibility. */
   onOpenChange?: (open: boolean) => void
   /** Trigger element. */
@@ -50,6 +53,9 @@ const TOOLTIP_ARROW_CLIP =
 type TooltipCssVariables = CSSProperties & {
   '--star-tooltip-clip': string
   '--star-tooltip-arrow-clip': string
+  '--star-tooltip-ring'?: string
+  '--star-tooltip-surface'?: string
+  '--star-tooltip-ink'?: string
 }
 
 /**
@@ -65,6 +71,7 @@ function StarTooltip({
   mouseEnterDelay = 100,
   mouseLeaveDelay = 150,
   arrow = true,
+  color,
   onOpenChange,
   children,
   className,
@@ -111,6 +118,18 @@ function StarTooltip({
   const cssVariables: TooltipCssVariables = {
     '--star-tooltip-clip': TOOLTIP_CLIP_PATH,
     '--star-tooltip-arrow-clip': TOOLTIP_ARROW_CLIP,
+    // A custom colour repaints the whole plate: fill, derived frame ring,
+    // and cream ink so text stays readable on saturated fills (like Badge).
+    ...(color
+      ? (() => {
+          const palette = deriveProgressPalette(color)
+          return {
+            '--star-tooltip-ring': palette.border,
+            '--star-tooltip-surface': palette.fill,
+            '--star-tooltip-ink': 'var(--star-raw-hex-f4ead6)',
+          } as Partial<TooltipCssVariables>
+        })()
+      : null),
   }
 
   return (

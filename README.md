@@ -976,6 +976,9 @@ import { StarTextarea } from 'stardew-valley-ui'
 
 // 校验状态与字数统计
 <StarTextarea label="任务描述" status="error" message="再补充些细节" showCount maxLength={80} />
+
+// 一键清空 + 回车提交
+<StarTextarea label="便签" allowClear onPressEnter={pin} />
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -990,6 +993,9 @@ import { StarTextarea } from 'stardew-valley-ui'
 | showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
 | block | `boolean` | `false` | 撑满容器宽度 |
 | autoSize | `boolean` | `false` | 随内容自适应高度（开启后禁用手动拉伸） |
+| allowClear | `boolean` | `false` | 显示一键清空按钮（有内容且可编辑时出现） |
+| clearLabel | `string` | `'Clear'` | 清空按钮的无障碍名称 |
+| onPressEnter | `(event: KeyboardEvent) => void` | - | 按下回车时触发（Shift+Enter 与输入法选词不触发） |
 
 其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`onFocus`…）会透传到内部的 `<textarea>`，右下角可竖向拖拽调高。
 
@@ -1005,6 +1011,7 @@ import { StarBadge } from 'stardew-valley-ui'
 <StarBadge count={7} />
 <StarBadge count={120} />          // 显示 99+
 <StarBadge dot color="#71964A" />  // 8px 方点
+<StarBadge text="限定" color="#308BE2" />  // 文字角标
 
 // 包裹目标：徽标钉在其右上角
 <StarBadge count={12}>
@@ -1019,6 +1026,7 @@ import { StarBadge } from 'stardew-valley-ui'
 | overflowCount | `number` | `99` | 数值折叠上限 |
 | showZero | `boolean` | `false` | count 为 0 时是否显示 |
 | color | `string` | `'#E53935'` | 底色；边框色由它自动推导 |
+| text | `ReactNode` | - | 用文字或表情代替数字角标 |
 | children | `ReactNode` | - | 包裹目标；徽标钉在其右上角 |
 
 ---
@@ -1035,6 +1043,9 @@ import { StarAlert } from 'stardew-valley-ui'
 
 // 可关闭
 <StarAlert type="success" title="播种成功" closable onClose={log}>防风草已种下。</StarAlert>
+
+// 自定义图标
+<StarAlert type="success" title="祝尼魔任务" showIcon icon={<span>★</span>}>给 Gunther 捐 60 件展品。</StarAlert>
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -1042,7 +1053,8 @@ import { StarAlert } from 'stardew-valley-ui'
 | type | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | 语义类型，决定色带与标题颜色 |
 | title | `ReactNode` | - | 加粗标题 |
 | children | `ReactNode` | - | 横幅正文 |
-| showIcon | `boolean` | `false` | 显示与色带同色的语义图标 |
+| showIcon | `boolean` | `false` | 显示与色带同色的语义图标（可用 icon 替换） |
+| icon | `ReactNode` | - | 自定义图标，替换内置的语义图标 |
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
 | onClose | `() => void` | - | 关闭后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
@@ -1058,6 +1070,7 @@ import { StarSkeleton } from 'stardew-valley-ui'
 
 <StarSkeleton rows={3} />
 <StarSkeleton avatar rows={2} />
+<StarSkeleton avatar avatarShape="circle" rows={2} />
 
 // 与真实内容切换
 <StarSkeleton loading={ready} rows={2}>
@@ -1070,7 +1083,8 @@ import { StarSkeleton } from 'stardew-valley-ui'
 | loading | `boolean` | `true` | 为 `false` 时渲染 children |
 | rows | `number` | `3` | 段落占位行数；末行自动收短到 60% |
 | title | `boolean` | `true` | 是否显示加粗标题行 |
-| avatar | `boolean` | `false` | 是否在左侧显示方形头像占位 |
+| avatar | `boolean` | `false` | 是否在左侧显示头像占位 |
+| avatarShape | `'square' \| 'circle'` | `'square'` | 头像占位的形状 |
 | active | `boolean` | `true` | 是否播放条纹步进动画 |
 | children | `ReactNode` | - | loading 为 `false` 时渲染的真实内容 |
 
@@ -1088,6 +1102,9 @@ import { StarTooltip } from 'stardew-valley-ui'
 </StarTooltip>
 
 <StarTooltip title="上方气泡" placement="bottom">…</StarTooltip>
+
+// 彩色气泡
+<StarTooltip title="季节作物" color="#71964A" placement="bottom">…</StarTooltip>
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -1099,6 +1116,7 @@ import { StarTooltip } from 'stardew-valley-ui'
 | mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒）；`0` 立即显示 |
 | mouseLeaveDelay | `number` | `150` | 移开隐藏延迟（毫秒） |
 | arrow | `boolean` | `true` | 是否显示指向触发元素的像素箭头 |
+| color | `string` | `'#F7EFC5'` | 底色；边框与奶油墨色由它自动推导 |
 | onOpenChange | `(open: boolean) => void` | - | 可见性将要变化时触发 |
 
 ---
@@ -1117,6 +1135,16 @@ import { StarPagination } from 'stardew-valley-ui'
 
 // 只有一页时整个退场
 <StarPagination total={8} hideOnSinglePage />
+
+// 每页条数切换：换档时当前页重锚到原来那条数据所在的页
+<StarPagination
+  total={45}
+  defaultCurrent={9}
+  defaultPageSize={5}
+  showSizeChanger
+  pageSizeOptions={[5, 10, 20]}
+  onShowSizeChange={(page, size) => console.log(page, size)}
+/>
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -1125,6 +1153,10 @@ import { StarPagination } from 'stardew-valley-ui'
 | pageSize | `number` | `10` | 每页条数 |
 | current | `number` | - | 受控当前页（1-based）；不传则组件自持状态 |
 | defaultCurrent | `number` | `1` | 非受控模式的初始页码 |
+| defaultPageSize | `number` | `10` | 非受控模式的初始每页条数 |
+| showSizeChanger | `boolean` | `false` | 是否显示每页条数切换器 |
+| pageSizeOptions | `number[]` | `[10, 20, 50]` | 条数切换器的可选档位（自动并入当前值并排序） |
+| onShowSizeChange | `(page: number, pageSize: number) => void` | - | 换档时触发，参数为重锚后的 (页码, 条数) |
 | onChange | `(page: number, pageSize: number) => void` | - | 页码变化时触发 |
 | hideOnSinglePage | `boolean` | `false` | 只有一页时是否隐藏 |
 | showTotal | `(total: number, range: [number, number]) => ReactNode` | - | 自定义总条数文案，range 为当前页起止条目 |
@@ -1139,7 +1171,7 @@ import { StarPagination } from 'stardew-valley-ui'
 import { StarCollapse } from 'stardew-valley-ui'
 
 const seasons = [
-  { key: 'spring', label: '春季', content: '种下防风草和土豆。' },
+  { key: 'spring', label: '春季', content: '种下防风草和土豆。', extra: <span>收成 ×24</span> },
   { key: 'summer', label: '夏季', content: '蓝莓和辣椒是大户。', disabled: false },
 ]
 
@@ -1147,12 +1179,16 @@ const seasons = [
 
 // 手风琴：同时只摊开一节
 <StarCollapse accordion items={seasons} />
+
+// 箭头排在头部另一端
+<StarCollapse expandIconPosition="end" items={seasons} />
 ```
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| items | `CollapseItem[]` | - | 分节列表；每项含 `key`、`label`、`content`、`disabled?` |
+| items | `CollapseItem[]` | - | 分节列表；每项含 `key`、`label`、`content`、`disabled?`、`extra?`（钉在头部右侧，点击不触发折叠） |
 | accordion | `boolean` | `false` | 手风琴模式：同时只展开一节 |
+| expandIconPosition | `'start' \| 'end'` | `'start'` | 像素箭头的位置 |
 | activeKeys | `string[]` | - | 受控展开键；不传则组件自持状态 |
 | defaultActiveKeys | `string[]` | `[]` | 非受控初始展开键 |
 | onChange | `(keys: string[]) => void` | - | 展开集合变化时触发 |

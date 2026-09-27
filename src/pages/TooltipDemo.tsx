@@ -32,7 +32,7 @@ const copy = {
     toc: ['四个方向', '富内容', '工具箱', 'API'],
     demos: [
       ['四个方向', 'placement 决定气泡出现在目标的哪一侧，箭头始终指向触发元素；悬停有 100ms 进入延迟、150ms 离开延迟，扫过界面不会乱闪。'],
-      ['富内容', 'title 接受任意 ReactNode——多行文案、粗体强调都可以放进气泡；宽度上限 240px，超出自动换行。'],
+      ['富内容', 'title 接受任意 ReactNode——多行文案、粗体强调都可以放进气泡；宽度上限 240px，超出自动换行；color 则给气泡整体换装，边框、底色、奶油墨色一起变。'],
       ['工具箱', '像物品栏一样悬停工具查看说明；下方切换 mouseEnterDelay——0ms 时扫过一排工具气泡会连成一片，500ms 则要稍作停留。'],
     ],
     trigger: '悬停我',
@@ -45,6 +45,8 @@ const copy = {
     controlled: '受控开关',
     rich: '矿洞三层有吸血鬼……带够武器再下去！',
     richStrong: '矿洞三层',
+    seasonal: '季节作物',
+    seasonalTip: '杨桃夏季下种，秋季丰收——种子店见！',
     toolbox: '工具箱',
     toolDelay: '悬停延迟',
   },
@@ -54,7 +56,7 @@ const copy = {
     toc: ['Four Placements', 'Rich Content', 'Toolbox', 'API'],
     demos: [
       ['Four Placements', 'placement picks which side of the trigger the bubble floats on, with the arrow always pointing back; 100ms enter and 150ms leave delays keep it from flashing as the pointer sweeps past.'],
-      ['Rich Content', 'title accepts any ReactNode — multi-line copy and bold emphasis both fit; the bubble caps at 240px and wraps beyond that.'],
+      ['Rich Content', 'title accepts any ReactNode — multi-line copy and bold emphasis both fit; the bubble caps at 240px and wraps beyond that. And color repaints the whole bubble: ring, surface and cream ink together.'],
       ['Toolbox', 'Hover a tool to read its tooltip like an inventory card; switch mouseEnterDelay below — at 0ms sweeping the row flashes every bubble, at 500ms it takes a deliberate pause.'],
     ],
     trigger: 'Hover me',
@@ -67,10 +69,12 @@ const copy = {
     controlled: 'Controlled',
     rich: 'Floor 3 has vampires... gear up before heading down!',
     richStrong: 'Mine floor 3',
+    seasonal: 'Seasonal crop',
+    seasonalTip: 'Starfruit goes in during summer, pays off in fall — see you at the seed shop!',
     toolbox: 'Toolbox',
     toolDelay: 'Hover delay',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; trigger: string; top: string; bottom: string; left: string; right: string; noArrow: string; defaultOpenLabel: string; controlled: string; rich: string; richStrong: string; toolbox: string; toolDelay: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; trigger: string; top: string; bottom: string; left: string; right: string; noArrow: string; defaultOpenLabel: string; controlled: string; rich: string; richStrong: string; seasonal: string; seasonalTip: string; toolbox: string; toolDelay: string }>
 
 const apiData = {
   zh: [
@@ -81,6 +85,8 @@ const apiData = {
     { property: 'mouseEnterDelay', description: '悬停显示延迟（毫秒）', type: 'number', default: '100' },
     { property: 'mouseLeaveDelay', description: '移开隐藏延迟（毫秒）', type: 'number', default: '150' },
     { property: 'onOpenChange', description: '可见性将要变化时触发', type: '(open: boolean) => void', default: '-' },
+    { property: 'arrow', description: '是否显示指向触发元素的像素箭头', type: 'boolean', default: 'true' },
+    { property: 'color', description: '底色；边框与奶油墨色由它自动推导', type: 'string', default: "'#F7EFC5'" },
     { property: 'children', description: '触发元素', type: 'ReactNode', default: '-' },
   ],
   en: [
@@ -91,6 +97,8 @@ const apiData = {
     { property: 'mouseEnterDelay', description: 'Hover-in delay in ms.', type: 'number', default: '100' },
     { property: 'mouseLeaveDelay', description: 'Hover-out delay in ms.', type: 'number', default: '150' },
     { property: 'onOpenChange', description: 'Fires when visibility is about to change.', type: '(open: boolean) => void', default: '-' },
+    { property: 'arrow', description: 'Whether the pixel arrow points at the trigger.', type: 'boolean', default: 'true' },
+    { property: 'color', description: 'Fill colour; ring and cream ink derive from it.', type: 'string', default: "'#F7EFC5'" },
     { property: 'children', description: 'Trigger element.', type: 'ReactNode', default: '-' },
   ],
 }
@@ -119,6 +127,11 @@ const richCode = `import { StarTooltip } from 'stardew-valley-ui'
   mouseLeaveDelay={400}
 >
   <button>Mine</button>
+</StarTooltip>
+
+// color repaints the whole bubble
+<StarTooltip title="Seasonal crop" color="#71964A" placement="bottom">
+  <button>Season</button>
 </StarTooltip>`
 
 const toolboxCode = `import { useState } from 'react'
@@ -201,6 +214,11 @@ function StarTooltipDemoPage() {
             mouseLeaveDelay={400}
           >
             <button type="button" style={triggerStyle}>{t.trigger}</button>
+          </StarTooltip>
+        </div>
+        <div style={{ paddingBottom: 24, textAlign: 'center' }}>
+          <StarTooltip title={t.seasonalTip} color="#71964A" placement="bottom">
+            <button type="button" style={triggerStyle}>{t.seasonal}</button>
           </StarTooltip>
         </div>
       </StarComponentDemo>

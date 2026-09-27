@@ -9,12 +9,13 @@ const copy = {
   zh: {
     title: '多行输入 Textarea',
     desc: '木框凹陷的多行输入框，是 Input 的高个子兄弟：同款 4px 阶梯木框与羊皮纸凹槽，用来写长信、备注和任务描述；支持状态染色、字数统计与拖拽调高。',
-    toc: ['基础用法', '状态与校验', '字数统计', '礼物附言', 'API'],
+    toc: ['基础用法', '状态与校验', '字数统计', '礼物附言', '便签板', 'API'],
     demos: [
       ['基础用法', 'label 标注用途，rows 控制初始可见行数；autoSize 随内容自动长高并禁用拖拽，size 调整字号，color 可微调强调色。'],
       ['状态与校验', 'status 给木框和光标染色，message 在框下展示提示或校验文案；error 状态的提示会以 role="alert" 播报。'],
       ['字数统计', 'showCount 在右下角显示已输入字数，配合 maxLength 变为 已输入/上限；超限输入会被原生拦截。'],
       ['礼物附言', '给朋友的礼物写一句附言：空着报错、不足六字警告、合格成功——status 与 message 跟着输入实时变化，合格后才能打包。'],
+      ['便签板', 'allowClear 在计数器左边立起一枚小 ×，随时清空；回车直接把便签钉到板上（onPressEnter，中文输入法选词回车不会误触，Shift+Enter 仍然换行）。'],
     ],
     letterLabel: '给皮埃尔的信',
     letterPlaceholder: '亲爱的皮埃尔，最近的种子……',
@@ -32,16 +33,24 @@ const copy = {
     giftPack: '打包礼物',
     giftPacked: '已放进背包，快去送吧！',
     giftAgain: '再写一张',
+    noteLabel: '便签',
+    notePlaceholder: '写一条待办，回车钉到板上……',
+    noteHint: '回车钉板，Shift+Enter 换行；写岔了点 × 随时清空。',
+    noteClear: '清空',
+    notePin: '钉到板上',
+    noteEmpty: '板上还没有便签。',
+    noteRemove: '撢下',
   },
   en: {
     title: 'Textarea',
     desc: "A recessed multi-line field — Input's taller sibling: the same 4px stepped wooden frame and parchment groove, for letters, notes, and quest descriptions; with status tints, a character counter, and drag-to-resize.",
-    toc: ['Basic Usage', 'Status & Validation', 'Character Count', 'Gift Note', 'API'],
+    toc: ['Basic Usage', 'Status & Validation', 'Character Count', 'Gift Note', 'Sticky Notes', 'API'],
     demos: [
       ['Basic Usage', 'A label names the purpose and rows set the visible height; autoSize grows the field with its content and disables the grip, size adjusts the type, and color tints the accent.'],
       ['Status & Validation', 'status tints the frame and caret, and message renders hints or validation copy below; error messages announce via role="alert".'],
       ['Character Count', 'showCount displays the typed length at the bottom-right, becoming typed/limit with maxLength; typing past the limit is blocked natively.'],
       ['Gift Note', 'Write a note for a friend\'s gift: empty errors, under six characters warns, and a pass turns success — status and message follow every keystroke, and only a pass can be wrapped.'],
+      ['Sticky Notes', 'allowClear raises a tiny × left of the counter for an instant wipe; Enter pins the note straight onto the board (onPressEnter — IME composing won\'t misfire, Shift+Enter still breaks a line).'],
     ],
     letterLabel: 'Letter to Pierre',
     letterPlaceholder: 'Dear Pierre, about the seeds lately...',
@@ -59,8 +68,15 @@ const copy = {
     giftPack: 'Wrap the gift',
     giftPacked: 'In the backpack — go deliver it!',
     giftAgain: 'Write another',
+    noteLabel: 'Sticky note',
+    notePlaceholder: 'Write a to-do, hit Enter to pin...',
+    noteHint: 'Enter pins, Shift+Enter breaks a line; the × wipes the field anytime.',
+    noteClear: 'Clear',
+    notePin: 'Pin it',
+    noteEmpty: 'No notes pinned yet.',
+    noteRemove: 'Tear off',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; letterLabel: string; letterPlaceholder: string; questLabel: string; questMessage: string; bioLabel: string; bioPlaceholder: string; bioDraft: string; gift: string; giftLabel: string; giftPlaceholder: string; giftEmpty: string; giftShort: string; giftPerfect: string; giftPack: string; giftPacked: string; giftAgain: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; letterLabel: string; letterPlaceholder: string; questLabel: string; questMessage: string; bioLabel: string; bioPlaceholder: string; bioDraft: string; gift: string; giftLabel: string; giftPlaceholder: string; giftEmpty: string; giftShort: string; giftPerfect: string; giftPack: string; giftPacked: string; giftAgain: string; noteLabel: string; notePlaceholder: string; noteHint: string; noteClear: string; notePin: string; noteEmpty: string; noteRemove: string }>
 
 const apiData = {
   zh: [
@@ -75,6 +91,9 @@ const apiData = {
     { property: 'message', description: '框下方的提示或校验文案', type: 'ReactNode', default: '-' },
     { property: 'showCount', description: '显示字数统计', type: 'boolean', default: 'false' },
     { property: 'block', description: '铺满容器宽度', type: 'boolean', default: 'false' },
+    { property: 'allowClear', description: '显示一键清空按钮（有内容且可编辑时出现）', type: 'boolean', default: 'false' },
+    { property: 'clearLabel', description: '清空按钮的无障碍名称', type: 'string', default: "'Clear'" },
+    { property: 'onPressEnter', description: '按下回车时触发（Shift+Enter 与输入法选词不触发）', type: '(event: KeyboardEvent) => void', default: '-' },
   ],
   en: [
     { property: 'value', description: 'Controlled text; omit to let the field keep its own state.', type: 'string', default: '-' },
@@ -88,6 +107,9 @@ const apiData = {
     { property: 'message', description: 'Hint or validation copy under the field.', type: 'ReactNode', default: '-' },
     { property: 'showCount', description: 'Shows the character counter.', type: 'boolean', default: 'false' },
     { property: 'block', description: 'Stretches to the container width.', type: 'boolean', default: 'false' },
+    { property: 'allowClear', description: 'Shows a clear button while editable with content.', type: 'boolean', default: 'false' },
+    { property: 'clearLabel', description: 'Accessible name of the clear button.', type: 'string', default: "'Clear'" },
+    { property: 'onPressEnter', description: 'Fires on bare Enter (Shift+Enter and IME composing excluded).', type: '(event: KeyboardEvent) => void', default: '-' },
   ],
 }
 
@@ -132,10 +154,37 @@ export function GiftNote() {
   )
 }`
 
+const noteCode = `import { useState } from 'react'
+import { StarTextarea } from 'stardew-valley-ui'
+
+export function StickyNotes() {
+  const [text, setText] = useState('')
+  const [notes, setNotes] = useState([])
+  // Enter pins the note; Shift+Enter keeps typing a new line.
+  const pin = () => {
+    if (!text.trim()) return
+    setNotes((current) => [...current, text.trim()])
+    setText('')
+  }
+  return (
+    <StarTextarea
+      label="Sticky note"
+      rows={2}
+      block
+      showCount
+      maxLength={40}
+      allowClear
+      value={text}
+      onChange={setText}
+      onPressEnter={pin}
+    />
+  )
+}`
+
 function StarTextareaDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
-  const toc = t.toc.map((title, index) => ({ id: ['basic', 'status', 'count', 'gift', 'api'][index], title, level: 1 }))
+  const toc = t.toc.map((title, index) => ({ id: ['basic', 'status', 'count', 'gift', 'note', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -189,6 +238,22 @@ function StarTextareaDemoPage() {
           againLabel={t.giftAgain}
         />
       </StarComponentDemo>
+      <StarComponentDemo
+        id="note"
+        title={t.demos[4][0]}
+        description={t.demos[4][1]}
+        code={noteCode}
+      >
+        <StickyNotes
+          label={t.noteLabel}
+          placeholder={t.notePlaceholder}
+          hint={t.noteHint}
+          clearLabel={t.noteClear}
+          pinLabel={t.notePin}
+          emptyLabel={t.noteEmpty}
+          removeLabel={t.noteRemove}
+        />
+      </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable title="Textarea API" data={apiData[lang]} />
       </div>
@@ -214,6 +279,88 @@ function CountTextarea({ label, placeholder }: { label: string; placeholder: str
 }
 
 export default StarTextareaDemoPage
+
+const noteChipStyle = {
+  padding: '4px 10px',
+  border: '2px solid #b5895a',
+  background: '#fff3dc',
+  color: '#4a2c1a',
+  fontSize: 12,
+  display: 'inline-flex',
+  gap: 6,
+  alignItems: 'center',
+} as const
+
+const noteButtonStyle = { padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
+
+function StickyNotes({
+  label,
+  placeholder,
+  hint,
+  clearLabel,
+  pinLabel,
+  emptyLabel,
+  removeLabel,
+}: {
+  label: string
+  placeholder: string
+  hint: string
+  clearLabel: string
+  pinLabel: string
+  emptyLabel: string
+  removeLabel: string
+}) {
+  const [text, setText] = useState('')
+  const [notes, setNotes] = useState<string[]>([])
+
+  const pin = () => {
+    const next = text.trim()
+    if (!next) return
+    setNotes((current) => [...current, next])
+    setText('')
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      <StarTextarea
+        label={label}
+        placeholder={placeholder}
+        rows={2}
+        block
+        showCount
+        maxLength={40}
+        allowClear
+        clearLabel={clearLabel}
+        value={text}
+        onChange={setText}
+        onPressEnter={pin}
+      />
+      <span style={{ fontSize: 12, opacity: 0.75 }}>{hint}</span>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button type="button" style={noteButtonStyle} onClick={pin}>{pinLabel}</button>
+      </div>
+      {notes.length === 0 ? (
+        <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>{emptyLabel}</p>
+      ) : (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {notes.map((note, index) => (
+            <span key={`${index}-${note}`} style={noteChipStyle}>
+              {note}
+              <button
+                type="button"
+                aria-label={`${removeLabel}: ${note}`}
+                onClick={() => setNotes((current) => current.filter((_, i) => i !== index))}
+                style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, fontSize: 12, color: 'inherit', fontFamily: 'inherit' }}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function GiftNote({
   label,

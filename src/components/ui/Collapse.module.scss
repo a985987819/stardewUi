@@ -112,6 +112,24 @@ $collapse-shadow: var(--star-raw-rgba-157-65-0-0-28);
   }
 }
 
+// `expandIconPosition="end"`: without an extra slot the chevron drifts to the
+// far edge on its own; with one, the extra (which owns the auto margin) wins.
+.star-collapse__header--icon-end .star-collapse__chevron:last-child {
+  margin-left: auto;
+}
+
+// Header-right parking spot for counts, tags, or actions. Clicks are stopped
+// in `Collapse.tsx`, so decorating a section never folds it.
+.star-collapse__extra {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+
+  font-size: 12px;
+  font-weight: 400;
+}
+
 // -------------------------------------------------------------------- panel
 
 .star-collapse__panel {

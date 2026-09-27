@@ -34,7 +34,7 @@ const copy = {
     desc: '一块钉在布告板上的羊皮纸横幅：左侧一条语义色带标明消息性质（信息/成功/警告/错误），标题加粗、正文紧随其后；错误横幅会以 role="alert" 播报，closable 时右上角有一枚像素 ×。',
     toc: ['四种类型', '可关闭', '布告板', 'API'],
     demos: [
-      ['四种类型', '四条横幅共用一套羊皮纸材质，只切换左侧色带与标题墨色；色板与 Input 的 status 保持一致，表单校验和横幅永远说同一种颜色语言。'],
+      ['四种类型', '四条横幅共用一套羊皮纸材质，只切换左侧色带与标题墨色；色板与 Input 的 status 保持一致，表单校验和横幅永远说同一种颜色语言；showIcon 开槽后还能用 icon 换上自己的图标。'],
       ['可关闭', '设置 closable 后右上角出现像素 ×，点击后横幅整体退场并触发 onClose。'],
       ['布告板', '点「张贴告示」把新横幅钉上板：类型按 信息 → 成功 → 警告 → 错误 轮转，每张都能单独撢下，板上最多同时留三张。'],
     ],
@@ -52,6 +52,8 @@ const copy = {
     board: '布告板',
     postNext: '张贴下一张告示',
     boardEmpty: '板子上空空如也——贴一张试试。',
+    starTitle: '祝尼魔任务',
+    starBody: '给 Gunther 捐 60 件展品，祝尼魔会亲自道谢。',
     boardClose: '撣下这张告示',
   },
   en: {
@@ -59,7 +61,7 @@ const copy = {
     desc: 'A parchment banner pinned to the notice board: a semantic stripe on the left marks the message kind (info/success/warning/error), with a bold title followed by body text. Error banners announce themselves via role="alert", and closable adds a pixel × up top.',
     toc: ['Four Types', 'Closable', 'Notice Board', 'API'],
     demos: [
-      ['Four Types', 'All four banners share one parchment material; only the stripe colour and title ink change. The palette matches the Input status colours, so form validation and banners always speak the same colour language.'],
+      ['Four Types', 'All four banners share one parchment material; only the stripe colour and title ink change. The palette matches the Input status colours, so form validation and banners always speak the same colour language — and once showIcon opens the slot, icon swaps in your own mark.'],
       ['Closable', 'With closable set, a pixel × appears at the top-right; clicking it removes the banner and fires onClose.'],
       ['Notice Board', 'Click "post" to pin a new banner onto the board: kinds rotate info → success → warning → error, each can be taken down alone, and the board holds three at most.'],
     ],
@@ -78,14 +80,18 @@ const copy = {
     postNext: 'Post the next notice',
     boardEmpty: 'The board is bare — pin something.',
     boardClose: 'Take this notice down',
+    starTitle: 'Junimo quest',
+    starBody: 'Donate 60 exhibits to Gunther and the junimo will thank you in person.',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; planted: string; plantedBody: string; storm: string; stormBody: string; full: string; fullBody: string; ghost: string; ghostBody: string; closableTitle: string; closableBody: string; dismissLabel: string; board: string; postNext: string; boardEmpty: string; boardClose: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; planted: string; plantedBody: string; storm: string; stormBody: string; full: string; fullBody: string; ghost: string; ghostBody: string; closableTitle: string; closableBody: string; dismissLabel: string; board: string; postNext: string; boardEmpty: string; boardClose: string; starTitle: string; starBody: string }>
 
 const apiData = {
   zh: [
     { property: 'type', description: '语义类型，决定色带与标题颜色', type: "'info' | 'success' | 'warning' | 'error'", default: "'info'" },
     { property: 'title', description: '加粗标题', type: 'ReactNode', default: '-' },
     { property: 'children', description: '横幅正文', type: 'ReactNode', default: '-' },
+    { property: 'showIcon', description: '显示与色带同色的语义图标（可用 icon 替换）', type: 'boolean', default: 'false' },
+    { property: 'icon', description: '自定义图标，替换内置的语义图标', type: 'ReactNode', default: '-' },
     { property: 'closable', description: '是否显示关闭按钮', type: 'boolean', default: 'false' },
     { property: 'onClose', description: '点击关闭后触发', type: '() => void', default: '-' },
     { property: 'closeLabel', description: '关闭按钮的无障碍名称', type: 'string', default: "'Close'" },
@@ -94,6 +100,8 @@ const apiData = {
     { property: 'type', description: 'Semantic kind; drives the stripe and title colours.', type: "'info' | 'success' | 'warning' | 'error'", default: "'info'" },
     { property: 'title', description: 'Bold heading.', type: 'ReactNode', default: '-' },
     { property: 'children', description: 'Banner body.', type: 'ReactNode', default: '-' },
+    { property: 'showIcon', description: 'Shows the built-in semantic icon (replace it with icon).', type: 'boolean', default: 'false' },
+    { property: 'icon', description: 'Custom icon swapping out the built-in glyph.', type: 'ReactNode', default: '-' },
     { property: 'closable', description: 'Shows the built-in close button.', type: 'boolean', default: 'false' },
     { property: 'onClose', description: 'Fired after the banner is dismissed.', type: '() => void', default: '-' },
     { property: 'closeLabel', description: 'Accessible name of the close button.', type: 'string', default: "'Close'" },
@@ -105,7 +113,8 @@ const typesCode = `import { StarAlert } from 'stardew-valley-ui'
 <StarAlert type="info" title="Weather forecast">Rain tomorrow.</StarAlert>
 <StarAlert type="success" title="Planted" showIcon>Parsnip seeds are in.</StarAlert>
 <StarAlert type="warning" title="Backpack full">Tidy up first.</StarAlert>
-<StarAlert type="error" title="Mine danger" showIcon>Leave floor 40 now!</StarAlert>`
+<StarAlert type="error" title="Mine danger" showIcon>Leave floor 40 now!</StarAlert>
+<StarAlert type="success" title="Junimo quest" showIcon icon={<span>★</span>}>Donate 60 exhibits.</StarAlert>`
 
 const closableCode = `import { useState } from 'react'
 import { StarAlert } from 'stardew-valley-ui'
@@ -168,6 +177,7 @@ function StarAlertDemoPage() {
           <StarAlert type="success" title={t.planted} showIcon>{t.plantedBody}</StarAlert>
           <StarAlert type="warning" title={t.full}>{t.fullBody}</StarAlert>
           <StarAlert type="error" title={t.ghost} showIcon>{t.ghostBody}</StarAlert>
+          <StarAlert type="success" title={t.starTitle} showIcon icon={<span style={{ fontFamily: 'var(--font-pixel)', fontSize: 14, lineHeight: 1 }}>★</span>}>{t.starBody}</StarAlert>
         </div>
       </StarComponentDemo>
       <StarComponentDemo

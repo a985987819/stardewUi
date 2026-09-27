@@ -71,6 +71,12 @@ $skeleton-edge-light: var(--star-raw-hex-f4ead6);
   animation: star-skeleton-march 480ms steps(4, jump-none) infinite;
 }
 
+// Circle shape (`avatarShape="circle"`): a plain disc drops the stepped cut.
+.star-skeleton__avatar--circle {
+  clip-path: none;
+  border-radius: 50%;
+}
+
 // One full horizontal cycle of the 45° stripe pattern: 8px / cos(45°).
 @keyframes star-skeleton-march {
   from {

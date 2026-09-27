@@ -78,3 +78,37 @@ describe('Textarea', () => {
     expect(field?.style.getPropertyValue('--star-textarea-clip')).toContain('polygon')
   })
 })
+
+describe('Textarea allowClear and onPressEnter', () => {
+  it('wipes the text back to empty through the built-in clear button', () => {
+    const onChange = vi.fn()
+    render(<Textarea allowClear clearLabel="清空" defaultValue="南瓜汤" onChange={onChange} />)
+
+    fireEvent.click(screen.getByRole('button', { name: '清空' }))
+    expect(onChange).toHaveBeenLastCalledWith('')
+    expect(screen.getByRole('textbox')).toHaveValue('')
+  })
+
+  it('hides the clear button while empty, disabled, or readOnly', () => {
+    const { rerender } = render(<Textarea allowClear value="南瓜汤" />)
+    expect(screen.getByRole('button', { name: 'Clear' })).toBeInTheDocument()
+
+    rerender(<Textarea allowClear value="" />)
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+
+    rerender(<Textarea allowClear value="南瓜汤" disabled />)
+    expect(screen.queryByRole('button', { name: 'Clear' })).not.toBeInTheDocument()
+  })
+
+  it('fires onPressEnter for bare Enter but not Shift+Enter', () => {
+    const onPressEnter = vi.fn()
+    render(<Textarea onPressEnter={onPressEnter} />)
+
+    const field = screen.getByRole('textbox')
+    fireEvent.keyDown(field, { key: 'Enter' })
+    expect(onPressEnter).toHaveBeenCalledTimes(1)
+
+    fireEvent.keyDown(field, { key: 'Enter', shiftKey: true })
+    expect(onPressEnter).toHaveBeenCalledTimes(1)
+  })
+})

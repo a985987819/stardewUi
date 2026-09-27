@@ -76,3 +76,24 @@ describe('Badge', () => {
     expect(badge.style.getPropertyValue('--star-badge-clip')).toContain('polygon')
   })
 })
+
+describe('Badge text mode', () => {
+  it('shows custom text instead of the count and stays visible at zero', () => {
+    const { rerender } = render(<Badge text="NEW" color="#308BE2" data-testid="badge" />)
+
+    const badge = screen.getByTestId('badge')
+    expect(badge).toHaveTextContent('NEW')
+
+    // text mode ignores the count family: zero without showZero stays visible.
+    rerender(<Badge text="NEW" count={0} data-testid="badge" />)
+    expect(screen.getByTestId('badge')).toHaveTextContent('NEW')
+  })
+
+  it('keeps dot mode dominant over text', () => {
+    render(<Badge dot text="NEW" data-testid="badge" />)
+
+    const badge = screen.getByTestId('badge')
+    expect(badge).toHaveClass(styles['star-badge--dot'])
+    expect(badge).toHaveTextContent('')
+  })
+})

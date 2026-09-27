@@ -81,3 +81,28 @@ describe('Alert', () => {
     expect(alert.style.getPropertyValue('--star-alert-clip')).toContain('polygon')
   })
 })
+
+describe('Alert custom icon', () => {
+  it('renders a custom node in the icon slot instead of the built-in glyph', () => {
+    render(
+      <Alert
+        type="warning"
+        showIcon
+        icon={<span data-testid="custom-icon">!</span>}
+        data-testid="alert"
+      />,
+    )
+
+    const alert = screen.getByTestId('alert')
+    expect(alert.querySelector(`.${styles['star-alert__icon']}`)).toBeInTheDocument()
+    expect(screen.getByTestId('custom-icon')).toBeInTheDocument()
+    expect(alert.querySelector('svg')).not.toBeInTheDocument()
+  })
+
+  it('still hides the icon slot entirely without showIcon', () => {
+    render(<Alert icon={<span data-testid="custom-icon">!</span>} data-testid="alert" />)
+
+    expect(screen.getByTestId('alert').querySelector(`.${styles['star-alert__icon']}`)).not.toBeInTheDocument()
+    expect(screen.queryByTestId('custom-icon')).not.toBeInTheDocument()
+  })
+})

@@ -49,13 +49,13 @@ if (components.length === 0) {
  * component to pass.
  */
 const COMMON_API_BY_COMPONENT = {
-  Badge: ['count', 'dot', 'overflowCount', 'showZero', 'color', 'children'],
-  Alert: ['type', 'title', 'children', 'closable', 'onClose', 'showIcon'],
-  Skeleton: ['loading', 'title', 'rows', 'avatar', 'active', 'children'],
-  Textarea: ['value', 'defaultValue', 'onChange', 'label', 'message', 'status', 'rows', 'showCount', 'block', 'autoSize'],
-  Tooltip: ['title', 'placement', 'open', 'defaultOpen', 'mouseEnterDelay', 'mouseLeaveDelay', 'onOpenChange', 'arrow'],
-  Pagination: ['total', 'pageSize', 'current', 'defaultCurrent', 'onChange', 'hideOnSinglePage', 'showTotal'],
-  Collapse: ['items', 'accordion', 'activeKeys', 'defaultActiveKeys', 'onChange'],
+  Badge: ['count', 'dot', 'overflowCount', 'showZero', 'color', 'text', 'children'],
+  Alert: ['type', 'title', 'children', 'closable', 'onClose', 'showIcon', 'icon'],
+  Skeleton: ['loading', 'title', 'rows', 'avatar', 'avatarShape', 'active', 'children'],
+  Textarea: ['value', 'defaultValue', 'onChange', 'label', 'message', 'status', 'rows', 'showCount', 'block', 'autoSize', 'allowClear', 'clearLabel', 'onPressEnter'],
+  Tooltip: ['title', 'placement', 'open', 'defaultOpen', 'mouseEnterDelay', 'mouseLeaveDelay', 'onOpenChange', 'arrow', 'color'],
+  Pagination: ['total', 'pageSize', 'current', 'defaultCurrent', 'defaultPageSize', 'onChange', 'showSizeChanger', 'pageSizeOptions', 'onShowSizeChange', 'hideOnSinglePage', 'showTotal'],
+  Collapse: ['items', 'accordion', 'expandIconPosition', 'activeKeys', 'defaultActiveKeys', 'onChange'],
 }
 
 /** Props that never need a demo instance: pass-throughs and DOM plumbing. */

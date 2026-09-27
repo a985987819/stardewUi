@@ -17,6 +17,11 @@ export interface StarBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /** Fill colour of the badge; its frame edge is derived from it. */
   color?: string
   /**
+   * Custom content shown instead of the count, e.g. `'NEW'`. When set, the
+   * badge is always visible regardless of `count` or `showZero`.
+   */
+  text?: ReactNode
+  /**
    * Wrap target content to pin the badge to its top-right corner. Without
    * children the badge renders standalone.
    */
@@ -45,6 +50,7 @@ function StarBadge({
   overflowCount = 99,
   showZero = false,
   color = '#E53935',
+  text,
   children,
   className,
   style,
@@ -59,7 +65,7 @@ function StarBadge({
       : Number.isFinite(count)
         ? Math.max(0, Math.floor(count))
         : 0
-  const visible = dot || safeCount === undefined || safeCount > 0 || showZero
+  const visible = dot || text !== undefined || safeCount === undefined || safeCount > 0 || showZero
 
   if (!visible) {
     if (children) return <span className={classNames(styles['star-badge__wrapper'], className)}>{children}</span>
@@ -68,11 +74,13 @@ function StarBadge({
 
   const label = dot
     ? undefined
-    : safeCount !== undefined
-      ? safeCount > overflowCount
-        ? `${overflowCount}+`
-        : String(safeCount)
-      : undefined
+    : text !== undefined
+      ? text
+      : safeCount !== undefined
+        ? safeCount > overflowCount
+          ? `${overflowCount}+`
+          : String(safeCount)
+        : undefined
 
   const cssVariables: BadgeCssVariables = {
     '--star-badge-clip': BADGE_CLIP_PATH,

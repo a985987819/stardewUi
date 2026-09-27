@@ -40,11 +40,12 @@ const copy = {
   zh: {
     title: '分页 Pagination',
     desc: '翻看公告板上一页页委托的像素翻页器：方形羊皮纸页码块像栅栏柱一样排开，当前页像盖了墨章一样变深，长页码用省略号搭桥，首尾永远可见。',
-    toc: ['基础用法', '长列表省略', '单页隐藏', '委托板', 'API'],
+    toc: ['基础用法', '长列表省略', '单页隐藏', '每页条数', '委托板', 'API'],
     demos: [
       ['基础用法', 'total 是总条数，pageSize 决定每页几条；onChange 回调返回最新页码和页大小，前后箭头在边界自动禁用。'],
       ['长列表省略', '页数超过 7 时自动折叠：始终保留第 1 页和最后一页，当前页前后各留一个邻居，其余用省略号占位。'],
       ['单页隐藏', 'hideOnSinglePage 让只有一页时整个翻页器退场，避免孤零零一块木牌挂在页脚。'],
+      ['每页条数', 'showSizeChanger 在页码旁立起一个木框下拉，pageSizeOptions 决定档位；换档时当前页会重锚到「原来那条数据」所在的新页——停在末页第 9 页第 41 条，换成每页 20 条后落在第 3 页。'],
       ['委托板', '拖动滑块调委托总量、点按钮切每页条数，看页码条与省略号实时变形；当前页的委托就贴在翻页器下面。'],
     ],
     quests: '条委托',
@@ -52,15 +53,17 @@ const copy = {
     questBoard: '委托板',
     questTotal: '委托总量',
     questPerPage: '每页条数',
+    sizeLog: '最近一次切换',
   },
   en: {
     title: 'Pagination',
     desc: 'A pixel pager for flipping through notice-board quests one page at a time: square parchment chips joined like fence posts, the active page darkened like an ink stamp, with ellipsis bridges over long runs while the first and last pages stay visible.',
-    toc: ['Basic Usage', 'Long-Run Ellipsis', 'Hide on Single Page', 'Quest Board', 'API'],
+    toc: ['Basic Usage', 'Long-Run Ellipsis', 'Hide on Single Page', 'Page Size', 'Quest Board', 'API'],
     demos: [
       ['Basic Usage', 'total is the item count and pageSize splits it into pages; onChange reports the next page and page size, and the arrows disable themselves at the edges.'],
       ['Long-Run Ellipsis', 'Past 7 pages the run folds up: page 1 and the last page always stay, one neighbour on each side of the active page, and ellipses hold the gaps.'],
       ['Hide on Single Page', 'hideOnSinglePage dismisses the whole pager when everything fits on one page, so no lonely wooden board hangs at the footer.'],
+      ['Page Size', 'showSizeChanger raises a wooden select beside the chips, and pageSizeOptions sets the gears; switching re-anchors the page onto the item you were looking at — parked on the last page at item 41 of 5-per-page, a jump to 20 lands you on page 3.'],
       ['Quest Board', 'Drag the slider to change the quest total and tap to switch the page size — watch the chips and ellipses reshape live; the active page\'s quests pin right below the pager.'],
     ],
     quests: 'quests',
@@ -68,8 +71,9 @@ const copy = {
     questBoard: 'Quest Board',
     questTotal: 'Quest total',
     questPerPage: 'Per page',
+    sizeLog: 'Last change',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; quests: string; currentPage: string; questBoard: string; questTotal: string; questPerPage: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; quests: string; currentPage: string; questBoard: string; questTotal: string; questPerPage: string; sizeLog: string }>
 
 const apiData = {
   zh: [
@@ -77,6 +81,10 @@ const apiData = {
     { property: 'pageSize', description: '每页条数', type: 'number', default: '10' },
     { property: 'current', description: '受控当前页（从 1 开始）；不传则组件自持状态', type: 'number', default: '-' },
     { property: 'defaultCurrent', description: '非受控模式的初始页码', type: 'number', default: '1' },
+    { property: 'defaultPageSize', description: '非受控模式的初始每页条数', type: 'number', default: '10' },
+    { property: 'showSizeChanger', description: '是否显示每页条数切换器', type: 'boolean', default: 'false' },
+    { property: 'pageSizeOptions', description: '条数切换器的可选档位（自动并入当前值并排序）', type: 'number[]', default: '[10, 20, 50]' },
+    { property: 'onShowSizeChange', description: '换档时触发，参数为重锚后的 (页码, 条数)', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'onChange', description: '页码变化时触发', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'hideOnSinglePage', description: '只有一页时是否隐藏', type: 'boolean', default: 'false' },
     { property: 'ariaLabel', description: '翻页器的无障碍名称', type: 'string', default: "'Pagination'" },
@@ -86,6 +94,10 @@ const apiData = {
     { property: 'pageSize', description: 'Items per page.', type: 'number', default: '10' },
     { property: 'current', description: 'Controlled active page (1-based); omit to own the state.', type: 'number', default: '-' },
     { property: 'defaultCurrent', description: 'Initial page for the uncontrolled mode.', type: 'number', default: '1' },
+    { property: 'defaultPageSize', description: 'Initial page size for the uncontrolled mode.', type: 'number', default: '10' },
+    { property: 'showSizeChanger', description: 'Shows the page-size select.', type: 'boolean', default: 'false' },
+    { property: 'pageSizeOptions', description: 'Gear list for the select (the active size always joins, sorted).', type: 'number[]', default: '[10, 20, 50]' },
+    { property: 'onShowSizeChange', description: 'Fires on a gear change with the re-anchored (page, pageSize).', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'onChange', description: 'Fires when the page changes.', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'hideOnSinglePage', description: 'Hides the pager when everything fits on one page.', type: 'boolean', default: 'false' },
     { property: 'ariaLabel', description: 'Accessible name of the pager.', type: 'string', default: "'Pagination'" },
@@ -128,6 +140,17 @@ export function QuestBoard() {
   )
 }`
 
+const sizeCode = `import { StarPagination } from 'stardew-valley-ui'
+
+<StarPagination
+  total={45}
+  defaultCurrent={9}
+  defaultPageSize={5}
+  showSizeChanger
+  pageSizeOptions={[5, 10, 20]}
+  onShowSizeChange={(page, size) => console.log(page, size)}
+/>`
+
 const boardCode = `import { useState } from 'react'
 import { StarPagination } from 'stardew-valley-ui'
 
@@ -148,7 +171,7 @@ export function QuestBoard() {
 function StarPaginationDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
-  const toc = t.toc.map((title, index) => ({ id: ['basic', 'ellipsis', 'hide', 'board', 'api'][index], title, level: 1 }))
+  const toc = t.toc.map((title, index) => ({ id: ['basic', 'ellipsis', 'hide', 'size', 'board', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -183,9 +206,17 @@ function StarPaginationDemoPage() {
         </div>
       </StarComponentDemo>
       <StarComponentDemo
-        id="board"
+        id="size"
         title={t.demos[3][0]}
         description={t.demos[3][1]}
+        code={sizeCode}
+      >
+        <SizeChangerPager logLabel={t.sizeLog} />
+      </StarComponentDemo>
+      <StarComponentDemo
+        id="board"
+        title={t.demos[4][0]}
+        description={t.demos[4][1]}
         code={boardCode}
       >
         <QuestBoard pool={QUEST_POOL[lang]} totalLabel={t.questTotal} perPageLabel={t.questPerPage} />
@@ -212,6 +243,27 @@ function ControlledPagination({ pagerLabel }: { pagerLabel: string }) {
       />
       <span style={{ fontSize: 12, opacity: 0.75 }}>current: {page} / 5</span>
     </>
+  )
+}
+
+function SizeChangerPager({ logLabel }: { logLabel: string }) {
+  const [log, setLog] = useState('')
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
+      <StarPagination
+        total={45}
+        defaultCurrent={9}
+        defaultPageSize={5}
+        showSizeChanger
+        pageSizeOptions={[5, 10, 20]}
+        onShowSizeChange={(page, size) => setLog(`onShowSizeChange(${page}, ${size})`)}
+        ariaLabel="公告分页 4"
+      />
+      {log ? (
+        <span style={{ fontSize: 12, opacity: 0.75 }}>{logLabel}: <code>{log}</code></span>
+      ) : null}
+    </div>
   )
 }
 

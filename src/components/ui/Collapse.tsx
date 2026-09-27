@@ -20,6 +20,8 @@ export interface CollapseItem {
   content: ReactNode
   /** Locks the header so the section can never open. */
   disabled?: boolean
+  /** Right-aligned header slot for counts, tags, or actions; clicks stay put. */
+  extra?: ReactNode
 }
 
 export interface StarCollapseProps
@@ -28,6 +30,8 @@ export interface StarCollapseProps
   items: CollapseItem[]
   /** Only one section may stay open at a time. */
   accordion?: boolean
+  /** Which side of the header the chevron sits on. */
+  expandIconPosition?: 'start' | 'end'
   /** Controlled open keys; leave undefined to let the component own them. */
   activeKeys?: string[]
   /** Initial open keys for the uncontrolled mode. */
@@ -57,6 +61,7 @@ type CollapseCssVariables = CSSProperties & {
 function StarCollapse({
   items,
   accordion = false,
+  expandIconPosition = 'start',
   activeKeys,
   defaultActiveKeys = [],
   onChange,
@@ -113,7 +118,10 @@ function StarCollapse({
             <button
               type="button"
               id={headerId}
-              className={styles['star-collapse__header']}
+              className={classNames(
+                styles['star-collapse__header'],
+                expandIconPosition === 'end' && styles['star-collapse__header--icon-end'],
+              )}
               aria-expanded={isOpen}
               // Points at the panel even while it is unmounted, so assistive
               // tech can announce the target the header will unfold.
@@ -121,13 +129,33 @@ function StarCollapse({
               aria-disabled={item.disabled || undefined}
               onClick={() => toggle(item.key, item.disabled)}
             >
-              <ChevronDown
-                size={14}
-                strokeWidth={3}
-                aria-hidden
-                className={styles['star-collapse__chevron']}
-              />
+              {expandIconPosition === 'start' ? (
+                <ChevronDown
+                  size={14}
+                  strokeWidth={3}
+                  aria-hidden
+                  className={styles['star-collapse__chevron']}
+                />
+              ) : null}
               <span className={styles['star-collapse__label']}>{item.label}</span>
+              {expandIconPosition === 'end' ? (
+                <ChevronDown
+                  size={14}
+                  strokeWidth={3}
+                  aria-hidden
+                  className={styles['star-collapse__chevron']}
+                />
+              ) : null}
+              {item.extra ? (
+                // Extra is a parking spot, not a toggle: keep the header's
+                // click from folding the section underneath it.
+                <span
+                  className={styles['star-collapse__extra']}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {item.extra}
+                </span>
+              ) : null}
             </button>
             {isOpen ? (
               <div

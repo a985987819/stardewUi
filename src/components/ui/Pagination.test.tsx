@@ -97,3 +97,55 @@ describe('Pagination', () => {
     expect(screen.getByRole('button', { name: 'Page 3' })).toHaveClass(styles['is-active'])
   })
 })
+
+describe('Pagination size changer', () => {
+  it('starts at defaultPageSize and re-anchors the page when the size changes', () => {
+    const onChange = vi.fn()
+    const onShowSizeChange = vi.fn()
+    render(
+      <Pagination
+        total={45}
+        defaultPageSize={5}
+        defaultCurrent={9}
+        showSizeChanger
+        pageSizeOptions={[5, 10, 20]}
+        onChange={onChange}
+        onShowSizeChange={onShowSizeChange}
+      />,
+    )
+
+    // 45 items at 5 per page → 9 pages; the pager opens on the last page.
+    expect(screen.getByRole('button', { name: 'Page 9' })).toHaveAttribute('aria-current', 'page')
+
+    // First visible item was 41; at 20 per page that re-anchors to page 3 of 3.
+    fireEvent.change(screen.getByRole('combobox', { name: 'Pagination page size' }), {
+      target: { value: '20' },
+    })
+    expect(onShowSizeChange).toHaveBeenCalledWith(3, 20)
+    expect(onChange).toHaveBeenCalledWith(3, 20)
+    expect(screen.getByRole('button', { name: 'Page 3' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('keeps a controlled pageSize owned by the outside', () => {
+    const onChange = vi.fn()
+    render(
+      <Pagination total={45} pageSize={10} current={2} showSizeChanger pageSizeOptions={[5, 10]} onChange={onChange} />,
+    )
+
+    fireEvent.change(screen.getByRole('combobox', { name: 'Pagination page size' }), {
+      target: { value: '5' },
+    })
+
+    // The callback reports the re-anchored page at the new size...
+    expect(onChange).toHaveBeenCalledWith(3, 5)
+    // ...but the controlled size still drives the chips (5 pages of 10).
+    expect(screen.getByRole('button', { name: 'Page 5' })).toBeInTheDocument()
+  })
+
+  it('joins the active size into the options when it is missing', () => {
+    render(<Pagination total={45} pageSize={7} showSizeChanger />)
+
+    const combo = screen.getByRole('combobox', { name: 'Pagination page size' })
+    expect(combo).toHaveValue('7')
+  })
+})

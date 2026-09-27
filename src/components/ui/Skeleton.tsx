@@ -13,6 +13,8 @@ export interface StarSkeletonProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   title?: boolean
   /** Shows a square avatar block on the left. */
   avatar?: boolean
+  /** Shape of the avatar block when `avatar` is on. */
+  avatarShape?: 'circle' | 'square'
   /** Plays the stripe-marching animation; turn off for a calm placeholder. */
   active?: boolean
   /** Real content swapped in when loading turns false. */
@@ -45,6 +47,7 @@ function StarSkeleton({
   rows = 3,
   title = true,
   avatar = false,
+  avatarShape = 'square',
   active = true,
   children,
   className,
@@ -74,7 +77,13 @@ function StarSkeleton({
       style={{ ...cssVariables, ...style }}
     >
       {avatar ? (
-        <span className={styles['star-skeleton__avatar']} aria-hidden />
+        <span
+          className={classNames(
+            styles['star-skeleton__avatar'],
+            avatarShape === 'circle' && styles['star-skeleton__avatar--circle'],
+          )}
+          aria-hidden
+        />
       ) : null}
       <div className={styles['star-skeleton__body']}>
         {title ? (

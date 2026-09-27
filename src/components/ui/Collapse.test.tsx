@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Collapse from './Collapse'
 import type { CollapseItem } from './Collapse'
+import styles from './Collapse.module.scss'
 
 const items: CollapseItem[] = [
   { key: 'spring', label: '春季', content: '种防风草。' },
@@ -81,5 +82,34 @@ describe('Collapse', () => {
     // The spring panel is closed (unmounted), yet the header still names it.
     const header = screen.getByRole('button', { name: '春季' })
     expect(header).toHaveAttribute('aria-controls', expect.stringMatching(/panel$/))
+  })
+})
+
+describe('Collapse extras and icon position', () => {
+  it('places the chevron after the label when expandIconPosition is end', () => {
+    render(<Collapse items={items} expandIconPosition="end" />)
+
+    const header = screen.getByRole('button', { name: '春季' })
+    expect(header).toHaveClass(styles['star-collapse__header--icon-end'])
+
+    const order = Array.from(header.children).map((child) => child.getAttribute('class') ?? '')
+    expect(order.findIndex((name) => name.includes('star-collapse__label'))).toBeLessThan(
+      order.findIndex((name) => name.includes('star-collapse__chevron')),
+    )
+  })
+
+  it('renders extra in the header and keeps its clicks from folding', () => {
+    const onChange = vi.fn()
+    render(
+      <Collapse
+        items={[{ key: 'spring', label: '春季', content: '种防风草。', extra: <span data-testid="extra">3 天</span> }]}
+        onChange={onChange}
+      />,
+    )
+
+    expect(screen.getByTestId('extra')).toBeInTheDocument()
+    fireEvent.click(screen.getByTestId('extra'))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.queryByText('种防风草。')).not.toBeInTheDocument()
   })
 })

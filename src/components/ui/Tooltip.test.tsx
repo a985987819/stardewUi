@@ -124,3 +124,15 @@ describe('Tooltip', () => {
     }
   })
 })
+
+describe('Tooltip color', () => {
+  it('repaints the plate with the derived ring and cream ink', () => {
+    openTooltip({ open: true, color: '#71964A' })
+
+    const trigger = screen.getByRole('button', { name: '矿车' })
+    const root = trigger.parentElement!
+    expect(root.style.getPropertyValue('--star-tooltip-surface')).toBe('#71964a')
+    expect(root.style.getPropertyValue('--star-tooltip-ring')).not.toBe('')
+    expect(root.style.getPropertyValue('--star-tooltip-ink')).not.toBe('')
+  })
+})
