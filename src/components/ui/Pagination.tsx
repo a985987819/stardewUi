@@ -84,7 +84,10 @@ function StarPagination({
   style,
   ...rest
 }: StarPaginationProps) {
-  const totalPages = Math.max(1, Math.ceil(total / Math.max(1, pageSize)))
+  // Board counts are finite and non-negative: NaN or negative totals collapse
+  // to an empty board instead of leaking NaN into the page chips.
+  const safeTotal = Number.isFinite(total) ? Math.max(0, total) : 0
+  const totalPages = Math.max(1, Math.ceil(safeTotal / Math.max(1, pageSize)))
   const [innerCurrent, setInnerCurrent] = useState(defaultCurrent)
   const activePage = current ?? innerCurrent
 
@@ -152,9 +155,9 @@ function StarPagination({
 
       {showTotal ? (
         <span className={styles['star-pagination__total']}>
-          {showTotal(total, [
+          {showTotal(safeTotal, [
             (activePage - 1) * pageSize + 1,
-            Math.min(activePage * pageSize, total),
+            Math.min(activePage * pageSize, safeTotal),
           ])}
         </span>
       ) : null}

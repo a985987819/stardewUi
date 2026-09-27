@@ -75,6 +75,16 @@ describe('Pagination', () => {
     expect(screen.getByRole('navigation')).toBeInTheDocument()
   })
 
+  it('collapses NaN and negative totals to an empty board instead of leaking NaN', () => {
+    const { container, rerender } = render(<Pagination total={Number.NaN} />)
+    expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument()
+    expect(container.textContent).not.toContain('NaN')
+
+    rerender(<Pagination total={-20} />)
+    expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument()
+    expect(container.textContent).not.toContain('-')
+  })
+
   it('renders the custom total copy with the visible range', () => {
     render(<Pagination total={45} defaultCurrent={2} showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条 / 共 ${total} 条`} />)
 

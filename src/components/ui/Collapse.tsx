@@ -115,7 +115,9 @@ function StarCollapse({
               id={headerId}
               className={styles['star-collapse__header']}
               aria-expanded={isOpen}
-              aria-controls={isOpen ? panelId : undefined}
+              // Points at the panel even while it is unmounted, so assistive
+              // tech can announce the target the header will unfold.
+              aria-controls={panelId}
               aria-disabled={item.disabled || undefined}
               onClick={() => toggle(item.key, item.disabled)}
             >

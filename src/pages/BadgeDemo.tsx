@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
@@ -8,30 +9,48 @@ const copy = {
   zh: {
     title: '徽标 Badge',
     desc: '像物品栏角落的数量角标：一枚带阶梯角的像素小牌钉在目标右上角，超过上限自动折叠为 N+；红点模式不显示数字，只标记"有新东西"。',
-    toc: ['基础用法', '红点与上限', '包裹目标', 'API'],
+    toc: ['基础用法', '红点与上限', '包裹目标', '收获日', 'API'],
     demos: [
       ['基础用法', '独立摆放的计数牌，适合直接展示数量；color 决定底色，边框色由它自动推导。'],
       ['红点与上限', '超过 overflowCount 显示 N+；count 为 0 时默认隐藏，showZero 强制显示；dot 模式只渲染一个 8px 方点。'],
       ['包裹目标', '把按钮、头像或图标放进 children，徽标会钉在它的右上角并外扩半步，像物品栏的堆叠计数。'],
+      ['收获日', '点「浇水」让 count 涨上去，点「摘一颗」收走一枚；count 归零时徽标悄悄退场——勾选 showZero 后会留下一块写着 0 的空牌，超过 99 自动折成 99+。'],
     ],
     inbox: '收件箱',
     backpack: '背包',
     mails: [{ label: '新邮件', value: '12' }],
+    harvest: '收获日',
+    crop: '苹果树',
+    water: '浇水 +5',
+    pick: '摘一颗',
+    collectAll: '一键收仓',
+    restock: '补货',
+    cropCount: '当前数量',
+    showZeroLabel: 'count 为 0 时仍显示',
   },
   en: {
     title: 'Badge',
     desc: 'An inventory-style counter: a tiny stepped pixel plate pinned to the top-right corner of its target, collapsing to N+ past the limit; dot mode marks "something new" without a number.',
-    toc: ['Basic Usage', 'Dot & Overflow', 'Wrap Target', 'API'],
+    toc: ['Basic Usage', 'Dot & Overflow', 'Wrap Target', 'Harvest Day', 'API'],
     demos: [
       ['Basic Usage', 'A standalone counter plate; color sets the fill and its frame edge is derived automatically.'],
       ['Dot & Overflow', 'Counts above overflowCount collapse to N+; zero counts hide by default unless showZero is set; dot mode renders an 8px square instead of a number.'],
       ['Wrap Target', 'Put a button, avatar, or icon in children and the badge pins to its top-right corner, half a step outside like an inventory stack counter.'],
+      ['Harvest Day', 'Water to raise the count, pick to take one off; the badge slips away at zero — unless showZero leaves a blank plate printed with 0, and anything past 99 folds into 99+.'],
     ],
     inbox: 'Inbox',
     backpack: 'Backpack',
     mails: [{ label: 'Unread mails', value: '12' }],
+    harvest: 'Harvest Day',
+    crop: 'Apple tree',
+    water: 'Water +5',
+    pick: 'Pick one',
+    collectAll: 'Collect all',
+    restock: 'Restock',
+    cropCount: 'Current count',
+    showZeroLabel: 'Show at zero',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; inbox: string; backpack: string; mails: { label: string; value: string }[] }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; inbox: string; backpack: string; mails: { label: string; value: string }[]; harvest: string; crop: string; water: string; pick: string; collectAll: string; restock: string; cropCount: string; showZeroLabel: string }>
 
 const apiData = {
   zh: [
@@ -70,10 +89,22 @@ export function MailboxButton() {
   )
 }`
 
+const harvestCode = `import { useState } from 'react'
+import { StarBadge, StarDisplayFrame } from 'stardew-valley-ui'
+
+export function AppleTree() {
+  const [apples, setApples] = useState(24)
+  return (
+    <StarBadge count={apples} color="#D7992E">
+      <StarDisplayFrame>Apple tree</StarDisplayFrame>
+    </StarBadge>
+  )
+}`
+
 function StarBadgeDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
-  const toc = t.toc.map((title, index) => ({ id: ['basic', 'dot', 'wrap', 'api'][index], title, level: 1 }))
+  const toc = t.toc.map((title, index) => ({ id: ['basic', 'dot', 'wrap', 'harvest', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -123,6 +154,22 @@ function StarBadgeDemoPage() {
           </StarBadge>
         </div>
       </StarComponentDemo>
+      <StarComponentDemo
+        id="harvest"
+        title={t.demos[3][0]}
+        description={t.demos[3][1]}
+        code={harvestCode}
+      >
+        <HarvestGame
+          crop={t.crop}
+          waterLabel={t.water}
+          pickLabel={t.pick}
+          collectLabel={t.collectAll}
+          restockLabel={t.restock}
+          countLabel={t.cropCount}
+          showZeroLabel={t.showZeroLabel}
+        />
+      </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable title="Badge API" data={apiData[lang]} />
       </div>
@@ -131,3 +178,45 @@ function StarBadgeDemoPage() {
 }
 
 export default StarBadgeDemoPage
+
+const demoButtonStyle = { padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
+
+function HarvestGame({
+  crop,
+  waterLabel,
+  pickLabel,
+  collectLabel,
+  restockLabel,
+  countLabel,
+  showZeroLabel,
+}: {
+  crop: string
+  waterLabel: string
+  pickLabel: string
+  collectLabel: string
+  restockLabel: string
+  countLabel: string
+  showZeroLabel: string
+}) {
+  const [count, setCount] = useState(24)
+  const [showZero, setShowZero] = useState(false)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, alignItems: 'center', width: '100%' }}>
+      <StarBadge count={count} showZero={showZero} color="#D7992E">
+        <StarDisplayFrame>{crop}</StarDisplayFrame>
+      </StarBadge>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button type="button" style={demoButtonStyle} onClick={() => setCount((value) => value + 5)}>{waterLabel}</button>
+        <button type="button" style={demoButtonStyle} onClick={() => setCount((value) => Math.max(0, value - 1))}>{pickLabel}</button>
+        <button type="button" style={demoButtonStyle} onClick={() => setCount(0)}>{collectLabel}</button>
+        <button type="button" style={demoButtonStyle} onClick={() => setCount(24)}>{restockLabel}</button>
+      </div>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
+        <input type="checkbox" checked={showZero} onChange={(event) => setShowZero(event.target.checked)} />
+        {showZeroLabel}
+      </label>
+      <span style={{ fontSize: 12, opacity: 0.75 }}>{countLabel}: {count}</span>
+    </div>
+  )
+}

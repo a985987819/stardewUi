@@ -99,4 +99,28 @@ describe('Tooltip', () => {
       vi.useRealTimers()
     }
   })
+
+  it('dismisses the bubble with Escape while focus sits inside the trigger', () => {
+    const onOpenChange = vi.fn()
+    openTooltip({ defaultOpen: true, onOpenChange })
+
+    expect(screen.getByRole('tooltip')).toBeInTheDocument()
+
+    fireEvent.keyDown(screen.getByRole('button', { name: '矿车' }), { key: 'Escape' })
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('keeps running after unmounting mid-hover without timer warnings', () => {
+    vi.useFakeTimers()
+    try {
+      const { unmount } = openTooltip({ mouseEnterDelay: 300 })
+      fireEvent.mouseEnter(screen.getByRole('button', { name: '矿车' }).parentElement!)
+
+      expect(() => unmount()).not.toThrow()
+      expect(() => vi.advanceTimersByTime(300)).not.toThrow()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })

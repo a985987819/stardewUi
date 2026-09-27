@@ -74,4 +74,12 @@ describe('Collapse', () => {
     expect(panelId).toBeTruthy()
     expect(screen.getByText('钓冰鱼。').parentElement).toHaveAttribute('aria-labelledby', header.id)
   })
+
+  it('keeps aria-controls on headers whose panels are still folded away', () => {
+    render(<Collapse items={items} />)
+
+    // The spring panel is closed (unmounted), yet the header still names it.
+    const header = screen.getByRole('button', { name: '春季' })
+    expect(header).toHaveAttribute('aria-controls', expect.stringMatching(/panel$/))
+  })
 })

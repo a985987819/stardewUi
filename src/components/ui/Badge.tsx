@@ -51,7 +51,15 @@ function StarBadge({
   ...rest
 }: StarBadgeProps) {
   const palette = deriveProgressPalette(color)
-  const visible = dot || count === undefined || count > 0 || showZero
+  // Quantities are whole and non-negative: NaN and negatives read as "nothing
+  // earned yet", and fractions floor to the whole items actually earned.
+  const safeCount =
+    count === undefined
+      ? undefined
+      : Number.isFinite(count)
+        ? Math.max(0, Math.floor(count))
+        : 0
+  const visible = dot || safeCount === undefined || safeCount > 0 || showZero
 
   if (!visible) {
     if (children) return <span className={classNames(styles['star-badge__wrapper'], className)}>{children}</span>
@@ -60,10 +68,10 @@ function StarBadge({
 
   const label = dot
     ? undefined
-    : count !== undefined
-      ? count > overflowCount
+    : safeCount !== undefined
+      ? safeCount > overflowCount
         ? `${overflowCount}+`
-        : String(count)
+        : String(safeCount)
       : undefined
 
   const cssVariables: BadgeCssVariables = {

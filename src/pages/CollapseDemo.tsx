@@ -14,7 +14,7 @@ const copy = {
     demos: [
       ['基础用法', 'defaultActiveKeys 指定初始展开的分节；点击头部切换，onChange 返回最新的展开键列表。'],
       ['手风琴模式', 'accordion 让整块手账同时只摊开一节——打开新的会自动合上旧的，再点一次则全部合上。'],
-      ['受控展开', 'activeKeys 由外部持有，onChange 同步最新键集合；页面上会实时显示当前展开的键。'],
+      ['受控展开', 'activeKeys 由外部持有，onChange 同步最新键集合；下方按钮能一键摊开或收起整本手账，展开的键实时打印在页面上。'],
       ['禁用分节', 'disabled 的分节头颜色变浅、点击无效，用来标记尚未解锁或暂不可用的内容。'],
     ],
     season: '四季手账',
@@ -27,6 +27,8 @@ const copy = {
     locked: '温室',
     lockedBody: '修复谷仓旁的废墟后解锁。',
     openKeys: '当前展开',
+    spreadAll: '全部摊开',
+    foldAll: '全部收起',
   },
   en: {
     title: 'Collapse',
@@ -35,7 +37,7 @@ const copy = {
     demos: [
       ['Basic Usage', 'defaultActiveKeys picks the sections open at first; clicking a header toggles it, and onChange reports the next list of open keys.'],
       ['Accordion', 'accordion keeps a single section open at a time — opening one folds the previous, and clicking the open one closes everything.'],
-      ['Controlled', 'activeKeys is held outside the component and onChange reports the next set; the currently open keys are printed live below the board.'],
+      ['Controlled', 'activeKeys is held outside the component and onChange reports the next set; the buttons below spread the whole journal open or fold it away in one click, with the open keys printed live.'],
       ['Disabled Sections', 'A disabled header dims and refuses clicks, marking content that is locked or not yet available.'],
     ],
     season: 'Season journal',
@@ -48,8 +50,10 @@ const copy = {
     locked: 'Greenhouse',
     lockedBody: 'Unlocks after repairing the ruin by the barn.',
     openKeys: 'Open keys',
+    spreadAll: 'Spread all open',
+    foldAll: 'Fold all away',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; season: string; spring: string; springBody: string; summer: string; summerBody: string; winter: string; winterBody: string; locked: string; lockedBody: string; openKeys: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; season: string; spring: string; springBody: string; summer: string; summerBody: string; winter: string; winterBody: string; locked: string; lockedBody: string; openKeys: string; spreadAll: string; foldAll: string }>
 
 const apiData = {
   zh: [
@@ -147,7 +151,7 @@ function StarCollapseDemoPage() {
         code={controlledCode}
       >
         <div style={{ width: '100%' }}>
-          <ControlledCollapse items={seasonItems} ariaLabel={t.season} openKeysLabel={t.openKeys} />
+          <ControlledCollapse items={seasonItems} ariaLabel={t.season} openKeysLabel={t.openKeys} spreadAllLabel={t.spreadAll} foldAllLabel={t.foldAll} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -173,11 +177,32 @@ function StarCollapseDemoPage() {
   )
 }
 
-function ControlledCollapse({ items, ariaLabel, openKeysLabel }: { items: CollapseItem[]; ariaLabel: string; openKeysLabel: string }) {
+function ControlledCollapse({
+  items,
+  ariaLabel,
+  openKeysLabel,
+  spreadAllLabel,
+  foldAllLabel,
+}: {
+  items: CollapseItem[]
+  ariaLabel: string
+  openKeysLabel: string
+  spreadAllLabel: string
+  foldAllLabel: string
+}) {
   const [keys, setKeys] = useState<string[]>([])
+  const boardButtonStyle = { padding: '4px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button type="button" style={boardButtonStyle} onClick={() => setKeys(items.map((item) => item.key))}>
+          {spreadAllLabel}
+        </button>
+        <button type="button" style={boardButtonStyle} onClick={() => setKeys([])}>
+          {foldAllLabel}
+        </button>
+      </div>
       <StarCollapse items={items} activeKeys={keys} onChange={setKeys} ariaLabel={ariaLabel} />
       <span style={{ fontSize: 12, opacity: 0.75 }}>
         {openKeysLabel}: [{keys.map((key) => `'${key}'`).join(', ')}]

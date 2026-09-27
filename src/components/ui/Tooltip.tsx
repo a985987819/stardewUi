@@ -1,10 +1,12 @@
 // Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
+  useEffect,
   useId,
   useRef,
   useState,
   type CSSProperties,
   type HTMLAttributes,
+  type KeyboardEvent,
   type ReactNode,
 } from 'react'
 import { classNames } from '../../utils/classNames'
@@ -74,6 +76,9 @@ function StarTooltip({
   const [hoverOpen, setHoverOpen] = useState(defaultOpen)
   const timerRef = useRef<number | undefined>(undefined)
 
+  // A hover timer left running past unmount would poke a dead component.
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
+
   const isControlled = open !== undefined
   const visible = isControlled ? open : hoverOpen
 
@@ -96,6 +101,12 @@ function StarTooltip({
   // Keyboard focus counts as "hovering" too; blur closes without a delay.
   const handleFocus = () => schedule(true, 0)
   const handleBlur = () => schedule(false, 0)
+  // Escape mirrors blur: while focus sits inside the trigger, pressing it
+  // dismisses the bubble right away, per the WAI-ARIA tooltip pattern.
+  const handleKeyDown = (event: KeyboardEvent<HTMLSpanElement>) => {
+    rest.onKeyDown?.(event)
+    if (event.key === 'Escape' && visible) schedule(false, 0)
+  }
 
   const cssVariables: TooltipCssVariables = {
     '--star-tooltip-clip': TOOLTIP_CLIP_PATH,
@@ -116,6 +127,7 @@ function StarTooltip({
       onMouseLeave={handleLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
       aria-describedby={visible ? bubbleId : undefined}
     >
       {children}

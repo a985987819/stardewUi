@@ -31,6 +31,21 @@ describe('Badge', () => {
     expect(container).not.toBeEmptyDOMElement()
   })
 
+  it('treats NaN, negative, and fractional counts as whole harvests', () => {
+    const { rerender } = render(<Badge count={Number.NaN} data-testid="badge" />)
+    expect(screen.queryByTestId('badge')).not.toBeInTheDocument()
+
+    // Negative counts read as "nothing earned" instead of a negative plate.
+    rerender(<Badge count={-5} data-testid="badge" />)
+    expect(screen.queryByTestId('badge')).not.toBeInTheDocument()
+    rerender(<Badge count={-5} showZero data-testid="badge" />)
+    expect(screen.getByTestId('badge')).toHaveTextContent('0')
+
+    // Fractions floor to the whole items actually earned.
+    rerender(<Badge count={7.9} data-testid="badge" />)
+    expect(screen.getByTestId('badge')).toHaveTextContent('7')
+  })
+
   it('renders a square dot without a number in dot mode', () => {
     render(<Badge dot data-testid="dot" />)
 
