@@ -25,6 +25,12 @@
  * The router, the gallery page and the sidebar all derive from the catalogue, so
  * a patched entry is what makes the component appear in the left navigation.
  *
+ * Patches are EOL-aware: the worktree mixes LF and CRLF files (`core.autocrlf`
+ * is on, there is no .gitattributes), and the seam between an appended line and
+ * the file's own terminator is where the historic `},\r,` sparse-array hole
+ * came from. Duplicates are rejected before anything is written, and a
+ * post-patch guard rejects double commas at list seams.
+ *
  * Flags: --route <kebab> --icon <LucideName> --category <catalogue category>
  *        --no-verify --dry-run --help
  */
@@ -79,6 +85,14 @@ const fail = (message) => {
   console.error(`\n✗ ${message}\n`)
   process.exit(1)
 }
+
+/**
+ * The file's own line terminator, so patched seams never mix EOLs. The worktree
+ * is mixed LF/CRLF (`core.autocrlf` is on, there is no .gitattributes): the
+ * registry is LF today while lazyPages.ts is CRLF, and tomorrow's checkout can
+ * flip either. Every seam below joins with what the file already uses.
+ */
+const detectEol = (source) => (source.includes('\r\n') ? '\r\n' : '\n')
 
 // ---------------------------------------------------------------- arguments
 
@@ -160,22 +174,54 @@ function insertNamedImport(source, module, identifier, relativePath) {
 
   if (names.includes(identifier)) return source
 
+  const eol = detectEol(source)
   const merged = [...names, identifier].sort((a, b) => a.localeCompare(b))
-  const block = `import {\n${merged.map((name) => `  ${name},`).join('\n')}\n`
+  const block = `import {${eol}${merged.map((name) => `  ${name},`).join(eol)}${eol}`
 
   return `${source.slice(0, openIndex)}${block}${source.slice(markerIndex)}`
 }
 
-const appendLine = (source, line) => `${source.trimEnd()}\n${line}\n`
+const appendLine = (source, line) => {
+  const eol = detectEol(source)
+  // Multi-line payloads (the barrel appends two export lines, the registry
+  // entry is a whole object literal) arrive with `\n` from the templates —
+  // map every logical newline onto the file's own terminator.
+  const body = line.replace(/\r?\n/g, eol)
+  return `${source.trimEnd()}${eol}${body}${eol}`
+}
 
 /** Appends the new entry right before the closing bracket of COMPONENT_ROUTES. */
 function appendRegistryEntry(source, entry, relativePath) {
   const closingIndex = source.lastIndexOf('\n]')
   if (closingIndex === -1) fail(`在 ${relativePath} 中找不到 COMPONENT_ROUTES 的结尾 "]"`)
 
-  const tail = source.slice(0, closingIndex)
+  const eol = detectEol(source)
+  // The tail ends with the last entry's own terminator: `…},` on LF files, or
+  // `…},\r` on CRLF files (whose `\n` is the one at closingIndex). Strip that
+  // `\r` before testing — `endsWith(',')` misses a comma followed by `\r`,
+  // which is exactly how a second comma once produced `},\r,`: valid
+  // TypeScript, but a sparse array hole that only failed much later.
+  const tail = source.slice(0, closingIndex).replace(/\r$/, '')
   const separator = tail.endsWith(',') ? '' : ','
-  return `${tail}${separator}\n${entry.trimEnd()}${source.slice(closingIndex)}`
+  const body = entry.trimEnd().replace(/\r?\n/g, eol)
+  return `${tail}${separator}${eol}${body}${eol}${source.slice(closingIndex + 1)}`
+}
+
+/**
+ * Rejects a `,,` (or `,\r,`) the run *introduced* — valid TypeScript that
+ * creates a sparse array element, so nothing else fails until the sync guard,
+ * long after the cause is obvious. A double comma already in the source is not
+ * ours to judge and passes untouched.
+ */
+function assertNoDoubleComma(before, after, relativePath) {
+  const introduced = after.match(/,\s*,/)
+  if (introduced && !before.match(/,\s*,/)) {
+    const at = introduced.index
+    fail(
+      `${relativePath} 补丁后出现连续逗号（会产生数组空洞）：\n` +
+        `  …${after.slice(Math.max(0, at - 48), at + 48).replace(/\r/g, '␍').replace(/\n/g, '␊')}…`
+    )
+  }
 }
 
 async function assertIconExists(icon) {
@@ -390,6 +436,17 @@ async function main() {
   if (new RegExp(`component: '${name}'`).test(registry)) fail(`componentRegistry.tsx 里已经有 component: '${name}'`)
   if (new RegExp(`routePath: '${routePath}'`).test(registry)) fail(`componentRegistry.tsx 里已经有 routePath: '${routePath}'`)
 
+  // The file-collision check above cannot see drift where only the *exports*
+  // were wired by hand (or by an aborted run): appending again would produce a
+  // duplicate export that only fails at tsc, minutes later. Fail here instead.
+  const barrel = read(PATHS.uiBarrel)
+  if (new RegExp(`\\bStar${name}\\b`).test(barrel)) fail(`${PATHS.uiBarrel} 里已经有 Star${name} 的导出`)
+
+  const lazyPages = read(PATHS.lazyPages)
+  if (new RegExp(`\\bStar${name}DemoPage\\b`).test(lazyPages)) {
+    fail(`${PATHS.lazyPages} 里已经有 Star${name}DemoPage 的导出`)
+  }
+
   // `usageRank` is per category and the sync guard requires each category to run
   // 1..n without holes or ties, so the newcomer takes the next free slot. Deriving
   // it from the registry keeps that invariant true without a second source of truth.
@@ -417,14 +474,18 @@ async function main() {
   )
 
   const nextBarrel = appendLine(
-    read(PATHS.uiBarrel),
+    barrel,
     `export { default as Star${name} } from './${name}'\nexport type { Star${name}Props } from './${name}'`
   )
 
   const nextLazyPages = appendLine(
-    read(PATHS.lazyPages),
+    lazyPages,
     `export const Star${name}DemoPage = lazy(() => import('../pages/${name}Demo'))`
   )
+
+  assertNoDoubleComma(registry, nextRegistry, PATHS.registry)
+  assertNoDoubleComma(barrel, nextBarrel, PATHS.uiBarrel)
+  assertNoDoubleComma(lazyPages, nextLazyPages, PATHS.lazyPages)
 
   const plan = [
     `写文件   ${targets.component}`,

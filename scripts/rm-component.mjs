@@ -66,6 +66,14 @@ const fail = (message) => {
 
 const warn = (message) => console.warn(`  ! ${message}`)
 
+/**
+ * The file's own line terminator. The worktree mixes LF and CRLF
+ * (`core.autocrlf` is on, there is no .gitattributes), and every regex or join
+ * below that hardcodes `\n` either misses CRLF lines entirely or leaves a
+ * stray `\r` behind after the removal.
+ */
+const detectEol = (source) => (source.includes('\r\n') ? '\r\n' : '\n')
+
 // ---------------------------------------------------------------- arguments
 
 function parseArgs(argv) {
@@ -130,8 +138,13 @@ function findEntry(source, name, relativePath) {
     // the closing `]`) on its own line — one extra character here and a
     // middle-of-list removal glues two entries onto one line without failing any
     // test, because `},  {` is still valid TypeScript.
+    //
+    // CRLF files: the `},` line ends `\r\n`, and the `\n` belongs to the *next*
+    // line, so the bare `\r` after the comma must be swallowed too — otherwise
+    // it fuses with the previous line's half of the CRLF pair and leaves a
+    // stray line break behind.
     start: openIndex,
-    end: closeIndex + closeMarker.length,
+    end: source[closeIndex + closeMarker.length] === '\r' ? closeIndex + closeMarker.length + 1 : closeIndex + closeMarker.length,
     block,
     routePath: pick(/routePath: '([^']+)'/, 'routePath'),
     zh: pick(/title: \{ zh: '([^']*)'/, 'title.zh'),
@@ -167,7 +180,8 @@ function removeNamedImport(source, module, identifier, relativePath) {
     return source.slice(0, lineStart) + source.slice(lineEnd + 1)
   }
 
-  const block = `import {\n${kept.map((name) => `  ${name},`).join('\n')}\n`
+  const eol = detectEol(source)
+  const block = `import {${eol}${kept.map((name) => `  ${name},`).join(eol)}${eol}`
 
   // `markerIndex` sits on the closing `}` — keep it, so the block stays balanced.
   return `${source.slice(0, openIndex)}${block}${source.slice(markerIndex)}`
@@ -324,18 +338,27 @@ function main() {
   if (!iconStillUsed) nextRegistry = removeNamedImport(nextRegistry, ICON_MODULE, entry.icon, PATHS.registry)
 
   // --- lazy pages -------------------------------------------------------
-  const lazyPattern = new RegExp(`^export const Star${name}DemoPage = .*$\\n?`, 'm')
+  // `.*` cannot cross `\r`, so on CRLF files the old `.*$\n?` stopped short of
+  // the line's own terminator and left a lone `\r` behind. Consume the whole
+  // line ending explicitly instead of relying on `$`.
+  const lazyPattern = new RegExp(`^export const Star${name}DemoPage = .*(?:\\r?\\n|$)`, 'm')
   const lazySource = read(PATHS.lazyPages)
-  if (!lazyPattern.test(lazySource)) warn(`${PATHS.lazyPages} 里没有 Star${name}DemoPage 的声明`)
+  if (!new RegExp(`^export const Star${name}DemoPage = `, 'm').test(lazySource)) {
+    warn(`${PATHS.lazyPages} 里没有 Star${name}DemoPage 的声明`)
+  }
   const nextLazyPages = lazySource.replace(lazyPattern, '')
 
   // --- ui barrel --------------------------------------------------------
+  // Line-based matching on a file whose EOL style is not ours to assume:
+  // split on both terminators (so `$` in barrelPattern sees a clean line) and
+  // re-join with the file's own.
   const barrelSource = read(PATHS.uiBarrel)
+  const barrelEol = detectEol(barrelSource)
   const barrelPattern = new RegExp(`^export .*from '\\./${escapeRegExp(name)}'$`)
-  const barrelLines = barrelSource.split('\n')
+  const barrelLines = barrelSource.split(/\r?\n/)
   const barrelRemoved = barrelLines.filter((line) => barrelPattern.test(line))
   if (barrelRemoved.length === 0) warn(`${PATHS.uiBarrel} 里没有 from './${name}' 的导出`)
-  const nextBarrel = barrelLines.filter((line) => !barrelPattern.test(line)).join('\n')
+  const nextBarrel = barrelLines.filter((line) => !barrelPattern.test(line)).join(barrelEol)
 
   // --- i18n + README ----------------------------------------------------
   const dictionariesSource = read(PATHS.dictionaries)
