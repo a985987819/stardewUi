@@ -9,6 +9,7 @@ const common = read('src/components/ui/CalendarCommon.module.scss')
 const calendar = read('src/components/ui/Calendar.module.scss')
 const datePicker = read('src/components/ui/DatePicker.module.scss')
 const grid = read('src/components/ui/CalendarGrid.module.scss')
+const wheel = read('src/components/ui/WheelPicker.module.scss')
 
 describe('calendar + date picker shared styles', () => {
   it('owns the sizing tokens in one place', () => {
@@ -49,5 +50,26 @@ describe('calendar + date picker shared styles', () => {
 
   it('keeps the grid from overflowing its container', () => {
     expect(grid).toContain('repeat(7, minmax(0, 1fr))')
+  })
+
+  it('lets the wheel picker reuse the calendar family palette', () => {
+    // 行内轮盘是「从日历里弹出来的一层」，和工具栏的年月下拉必须是同一张配方：
+    // 引同一个配色来源，而不是自己再写一组牛皮纸色。
+    expect(wheel).toContain('@use "./CalendarToolbar.module.scss" as toolbar')
+    expect(wheel).toContain('toolbar.$toolbar-panel-bg')
+    expect(wheel).toContain('toolbar.$toolbar-panel-border')
+
+    // 日期数字共用日历的字号与字色令牌，两块控件看起来才是一个家族。
+    expect(wheel).toContain('@use "./CalendarCommon.module.scss" as common')
+    expect(wheel).toContain('common.$day-font-size')
+    expect(wheel).toContain('common.$day-color')
+  })
+
+  it('sizes the wheel rows from one variable so JS and SCSS cannot drift', () => {
+    // 窗口高度、选中框高度、行高必须是同一个数；三处都读
+    // `--date-picker-wheel-row`，整列高度只需改这一个值。
+    expect(wheel).toContain('--date-picker-wheel-row')
+    expect(wheel).toContain('height: calc(var(--date-picker-wheel-row) * 5)')
+    expect(wheel).not.toMatch(/height:\s*180px/)
   })
 })

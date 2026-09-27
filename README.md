@@ -550,12 +550,15 @@ import { StarCalendar } from 'stardew-valley-ui'
 
 ### StarDatePicker - 日期选择器
 
-支持单选和范围选择的日期选择器。工具栏与 `StarCalendar` 共用：点击月份标题弹出年月下拉，右上角「回到今日」按东八区（UTC+8）当天把视图带回本月（只移动视图，不改动已选日期）。
+支持单选和范围选择的日期选择器，提供两种交互类型（`interaction`）：
+
+- **`calendar`（默认）** — 月历网格形式。工具栏与 `StarCalendar` 共用：点击月份标题弹出年月下拉，右上角「回到今日」按东八区（UTC+8）当天把视图带回本月（只移动视图，不改动已选日期）。
+- **`inline`** — 行内形式。触发器下方弹出**年 / 月 / 日三列可无限滚动的轮盘**，三列同时出现、各自独立滚动（31 号之后接 1、2、3；12 月之后接 1 月）。在面板里改动的是草稿，只有点「确定」才触发 `onChange`，点「取消」原样丢弃；超出 `minDate` / `maxDate` 时「确定」按钮自动禁用。切换年月后若原日期越界（1 月 31 日 → 2 月），轮盘自动落到当月最后一天。
 
 ```tsx
 import { StarDatePicker } from 'stardew-valley-ui'
 
-// 单选模式
+// 单选模式（月历）
 <StarDatePicker
   mode="single"
   onChange={(value) => console.log(value.dateTimestamp)}
@@ -565,6 +568,12 @@ import { StarDatePicker } from 'stardew-valley-ui'
 <StarDatePicker
   mode="range"
   onChange={(value) => console.log(value.startTimestamp, value.endTimestamp)}
+/>
+
+// 行内三列轮盘：点「确定」才写回，点「取消」丢弃
+<StarDatePicker
+  interaction="inline"
+  onChange={(value) => console.log(value.dateTimestamp)}
 />
 
 // 限制日期范围
@@ -578,15 +587,19 @@ import { StarDatePicker } from 'stardew-valley-ui'
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | mode | `'single' \| 'range'` | `'single'` | 选择模式 |
+| interaction | `'calendar' \| 'inline'` | `'calendar'` | 交互类型：月历形式或三列轮盘的行内形式 |
 | value | `number \| { startTimestamp: number \| null; endTimestamp: number \| null }` | - | 受控值 |
 | defaultValue | 同 value | - | 默认值 |
 | onChange | `(value) => void` | - | 变化回调 |
 | minDate | `number` | - | 最小日期 |
 | maxDate | `number` | - | 最大日期 |
 | disabledDates | `number[]` | `[]` | 禁用日期 |
-| showOutsideDays | `boolean` | `true` | 显示非当月日期 |
+| showOutsideDays | `boolean` | `true` | 显示非当月日期（仅 `calendar`） |
+| confirmLabel | `string` | `'确定'` | `inline` 形式「确定」按钮文案 |
+| cancelLabel | `string` | `'取消'` | `inline` 形式「取消」按钮文案 |
+| columnLabels | `[string, string, string]` | `['年', '月', '日']` | `inline` 形式三列的无障碍名称 |
 | todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
-| showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
+| showToday | `boolean` | `true` | 是否显示「回到今日」按钮（仅 `calendar`） |
 | todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区；仅影响「今日」的判断与按钮落点，不会改动选中值 |
 
 ---

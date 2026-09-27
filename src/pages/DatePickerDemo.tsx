@@ -15,9 +15,10 @@ const copy = {
   zh: {
     title: 'DatePicker 日期选择',
     desc: '日期选择器用于挑选播种日、预约升级、规划节日前后的采矿假期，并输出稳定时间戳。',
-    toc: ['单日选择', '范围选择', '限制条件', 'API'],
+    toc: ['单日选择', '范围选择', '行内轮盘', '限制条件', 'API'],
     single: ['单日选择', '选择一个具体日期，例如草莓成熟日或工具取回日。'],
     range: ['范围选择', '选择一段连续时间，例如连续三天冲矿洞或节前备货。'],
+    inline: ['行内轮盘', '把交互换成三列可无限滚动的轮盘：点一下触发器，年、月、日同时滚出来，确认后才会写回。'],
     limits: ['限制条件', '用 minDate、maxDate 和 disabledDates 封锁不可选日期。'],
     today: '回到今日',
     returned: '返回值',
@@ -26,35 +27,44 @@ const copy = {
   en: {
     title: 'DatePicker',
     desc: 'Pick planting days, upgrade appointments, and mining-vacation ranges while returning stable timestamps.',
-    toc: ['Single Date', 'Range Selection', 'Constraints', 'API'],
+    toc: ['Single Date', 'Range Selection', 'Inline Wheel', 'Constraints', 'API'],
     single: ['Single Date', 'Choose one date such as a strawberry harvest or tool pickup day.'],
     range: ['Range Selection', 'Choose a continuous span, such as three mine-push days before a festival.'],
+    inline: ['Inline Wheel', 'Swap in three endlessly scrolling wheels: one click opens year, month, and day together, and nothing is committed until you confirm.'],
     limits: ['Constraints', 'Use minDate, maxDate, and disabledDates to block unavailable days.'],
     today: 'Today',
     returned: 'Returned value',
     constraints: 'Constraints',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; single: [string, string]; range: [string, string]; limits: [string, string]; today: string; returned: string; constraints: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; single: [string, string]; range: [string, string]; inline: [string, string]; limits: [string, string]; today: string; returned: string; constraints: string }>
 
 const apiData = {
   zh: [
     { property: 'mode', description: '选择模式：单日或范围', type: "'single' | 'range'", default: "'single'" },
+    { property: 'interaction', description: '交互类型：月历形式或三列轮盘的行内形式', type: "'calendar' | 'inline'", default: "'calendar'" },
     { property: 'value', description: '受控选中值', type: 'number | DateRange', default: '-' },
     { property: 'defaultValue', description: '非受控初始值', type: 'number | DateRange', default: '-' },
     { property: 'onChange', description: '返回标准化后的选择值', type: '(value) => void', default: '-' },
     { property: 'disabledDates', description: '显式禁用日期', type: 'number[]', default: '[]' },
+    { property: 'confirmLabel', description: '行内形式「确定」按钮文案', type: 'string', default: "'确定'" },
+    { property: 'cancelLabel', description: '行内形式「取消」按钮文案', type: 'string', default: "'取消'" },
+    { property: 'columnLabels', description: '行内形式三列的无障碍名称（年、月、日）', type: '[string, string, string]', default: "['年', '月', '日']" },
     { property: 'todayLabel', description: '「回到今日」按钮文案', type: 'string', default: "'回到今日'" },
-    { property: 'showToday', description: '是否显示「回到今日」按钮', type: 'boolean', default: 'true' },
+    { property: 'showToday', description: '是否显示「回到今日」按钮（仅月历形式）', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: '计算「今日」所用的时区偏移（分钟），480 即东八区', type: 'number', default: '480' },
   ],
   en: [
     { property: 'mode', description: 'Selection mode.', type: "'single' | 'range'", default: "'single'" },
+    { property: 'interaction', description: 'Interaction: month grid or the inline three-wheel form.', type: "'calendar' | 'inline'", default: "'calendar'" },
     { property: 'value', description: 'Controlled selected value.', type: 'number | DateRange', default: '-' },
     { property: 'defaultValue', description: 'Initial uncontrolled value.', type: 'number | DateRange', default: '-' },
     { property: 'onChange', description: 'Returns normalized selected value.', type: '(value) => void', default: '-' },
     { property: 'disabledDates', description: 'Explicit disabled dates.', type: 'number[]', default: '[]' },
+    { property: 'confirmLabel', description: 'Label of the inline confirm button.', type: 'string', default: "'确定'" },
+    { property: 'cancelLabel', description: 'Label of the inline cancel button.', type: 'string', default: "'取消'" },
+    { property: 'columnLabels', description: 'Accessible names of the inline wheels (year, month, day).', type: '[string, string, string]', default: "['年', '月', '日']" },
     { property: 'todayLabel', description: 'Label of the today button.', type: 'string', default: "'回到今日'" },
-    { property: 'showToday', description: 'Whether the today button is rendered.', type: 'boolean', default: 'true' },
+    { property: 'showToday', description: 'Whether the today button is rendered (calendar form only).', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: 'Timezone offset in minutes used to resolve today; 480 is UTC+8.', type: 'number', default: '480' },
   ],
 }
@@ -95,6 +105,25 @@ export function MiningTripPicker() {
   )
 }`
 
+const inlinePickerCode = `import { useState } from 'react'
+import { StarDatePicker } from 'stardew-valley-ui'
+
+export function FestiveDatePicker() {
+  const [dateTimestamp, setDateTimestamp] = useState(new Date(2024, 4, 13).getTime())
+
+  return (
+    <StarDatePicker
+      // 月历换成三列可无限滚动的轮盘：年 / 月 / 日同时出来，
+      // 点「确定」才写回 onChange，点「取消」原样丢弃。
+      interaction="inline"
+      value={dateTimestamp}
+      onChange={(next) => {
+        if ('dateTimestamp' in next) setDateTimestamp(next.dateTimestamp)
+      }}
+    />
+  )
+}`
+
 const limitsPickerCode = `import { StarDatePicker } from 'stardew-valley-ui'
 
 const minDate = new Date(2024, 4, 10).getTime()
@@ -109,8 +138,9 @@ function StarDatePickerDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
   const [singleValue, setSingleValue] = useState(initialSingleValue)
+  const [inlineValue, setInlineValue] = useState(initialSingleValue)
   const [rangeValue, setRangeValue] = useState<{ startTimestamp: number | null; endTimestamp: number | null }>({ startTimestamp: normalizeToDayTimestamp('2024-05-11'), endTimestamp: normalizeToDayTimestamp('2024-05-15') })
-  const toc = t.toc.map((title, index) => ({ id: ['single', 'range', 'limits', 'api'][index], title, level: 1 }))
+  const toc = t.toc.map((title, index) => ({ id: ['single', 'range', 'inline', 'limits', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -119,6 +149,9 @@ function StarDatePickerDemoPage() {
       </StarComponentDemo>
       <StarComponentDemo id="range" title={t.range[0]} description={t.range[1]} code={rangePickerCode} data={[{ label: 'startTimestamp', value: String(rangeValue.startTimestamp) }, { label: 'endTimestamp', value: String(rangeValue.endTimestamp) }]}>
         <div style={{ width: '100%' }}><StarDatePicker mode="range" value={rangeValue} todayLabel={t.today} onChange={(next) => { if ('startTimestamp' in next) setRangeValue(next) }} /></div>
+      </StarComponentDemo>
+      <StarComponentDemo id="inline" title={t.inline[0]} description={t.inline[1]} code={inlinePickerCode} data={[{ label: 'interaction', value: "'inline'" }, { label: 'dateTimestamp', value: String(inlineValue) }]}>
+        <div style={{ width: '100%' }}><StarDatePicker interaction="inline" value={inlineValue} onChange={(next) => { if ('dateTimestamp' in next) setInlineValue(next.dateTimestamp) }} /></div>
       </StarComponentDemo>
       <StarComponentDemo id="limits" title={t.limits[0]} description={t.limits[1]} code={limitsPickerCode} data={[{ label: 'minDate', value: String(minDate) }, { label: 'maxDate', value: String(maxDate) }, { label: 'disabledDates', value: JSON.stringify([disabledDate]) }]}>
         <div style={{ width: '100%' }}><StarDatePicker defaultValue={normalizeToDayTimestamp('2024-05-15')} minDate={minDate} maxDate={maxDate} disabledDates={[disabledDate]} todayLabel={t.today} /></div>

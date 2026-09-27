@@ -1,0 +1,228 @@
+@use "./CalendarCommon.module.scss" as common;
+@use "./CalendarToolbar.module.scss" as toolbar;
+
+// 轮盘选择器（DatePicker 的行内类型）的样式。
+//
+// 配色刻意复用 CalendarToolbar 的年月下拉：两者都是「从日历里弹出来的一层」，
+// 用同一张牛皮纸底 + 同一个描边色，弹层才不会看起来像两个组件库。
+
+.date-picker-wheel {
+  // 行高与补位：窗口高度、选中框高度、行高都从这里派生，整列尺寸只有一个源头。
+  // 行高数值必须与 `WheelDatePickerPanel` 里的 `ROW_HEIGHT` 一致。
+  --date-picker-wheel-row: 36px;
+  --date-picker-wheel-spacer: 0px;
+
+  position: relative;
+  display: block;
+  // 可视行数固定为奇数（5 行）：中间一行是选中项，上下各留两行上下文。
+  // `WheelColumn` 的 `visibleCount` 与这里的 5 是同一个数，改动要一起改。
+  height: calc(var(--date-picker-wheel-row) * 5);
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid toolbar.$toolbar-panel-border;
+  border-radius: 2px;
+  background: toolbar.$toolbar-panel-bg;
+  color: toolbar.$toolbar-text;
+
+  // 上下边缘淡出：滚到边界时行是「化掉」而不是被硬切，配合无限循环看不出接缝。
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: var(--date-picker-wheel-row);
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(
+      to bottom,
+      toolbar.$toolbar-panel-bg,
+      transparent
+    );
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(
+      to top,
+      toolbar.$toolbar-panel-bg,
+      transparent
+    );
+  }
+}
+
+.date-picker-wheel--disabled {
+  opacity: 0.5;
+}
+
+.date-picker-wheel__scroller {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  // 上下补位让首尾项也能停在正中；补位高度由 JS 按行数算好传进来。
+  padding-top: var(--date-picker-wheel-spacer);
+  padding-bottom: var(--date-picker-wheel-spacer);
+  overflow-x: hidden;
+  overflow-y: auto;
+  // 吸附动画交给浏览器：JS 只管把 scrollTop 写到目标行，中间那段平滑由这里补。
+  scroll-behavior: smooth;
+  // 触摸端由指针事件接管，关掉浏览器自己的手势，免得和拖拽打架。
+  touch-action: none;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  cursor: grab;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &:focus-visible {
+    outline: 2px solid toolbar.$toolbar-accent;
+    outline-offset: -2px;
+  }
+}
+
+.date-picker-wheel__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--date-picker-wheel-row);
+  min-width: 0;
+  padding: 0 4px;
+  font-family: var(--font-pixel);
+  font-size: common.$day-font-size;
+  font-weight: 600;
+  color: common.$day-color;
+  user-select: none;
+  // 把相邻行压到选中行后面：数字越小越靠前，负值交给 transform 的层叠顺序处理。
+  transform: scale(0.94);
+  transition:
+    color 0.12s steps(2, jump-start),
+    opacity 0.12s steps(2, jump-start);
+  opacity: 0.78;
+}
+
+.date-picker-wheel__row--selected {
+  color: var(--star-raw-hex-4e342e);
+  font-weight: 700;
+  opacity: 1;
+  transform: none;
+}
+
+// 选中窗口：一条压在滚动层之上的横带，和工具栏面板的选中色同源。
+.date-picker-wheel__highlight {
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  left: 2px;
+  z-index: 1;
+  height: var(--date-picker-wheel-row);
+  background: toolbar.$toolbar-cell-selected-bg;
+  opacity: 0.34;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+// ---------------------------------------------------------------- 行内形式
+//
+// 触发器是三段「年 / 月 / 日」，视觉上按输入框处理（木框凹陷那一路），
+// 面板则与工具栏的年月下拉共用一条浮层配方：同底色、同描边、同阴影、同圆角。
+
+.date-picker-inline-wrap {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  max-width: common.$calendar-width;
+  margin: 0 auto;
+}
+
+.date-picker-inline__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid common.$grid-line;
+  border-radius: 2px;
+  background: var(--star-raw-hex-fff8eb);
+  color: var(--star-raw-hex-4e342e);
+  font-family: var(--font-pixel);
+  font-size: common.$day-font-size;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s steps(2, jump-start);
+
+  &:hover {
+    background: var(--star-raw-hex-fff3dc);
+  }
+
+  &[data-open='true'] {
+    background: var(--star-raw-hex-f4c46a);
+  }
+}
+
+.date-picker-inline__trigger-part {
+  min-width: 2.4em;
+  padding: 2px 4px;
+  text-align: center;
+  border-bottom: 2px solid toolbar.$toolbar-panel-border;
+}
+
+.date-picker-inline {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 2px solid toolbar.$toolbar-panel-border;
+  border-radius: 4px;
+  background: toolbar.$toolbar-panel-bg;
+  color: toolbar.$toolbar-text;
+  box-shadow: 2px 2px 8px toolbar.$toolbar-panel-shadow;
+}
+
+.date-picker-inline__columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.date-picker-inline__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.date-picker-inline__action {
+  min-width: 64px;
+  padding: 6px 14px;
+  border: 2px solid toolbar.$toolbar-panel-border;
+  border-radius: 2px;
+  background: transparent;
+  color: toolbar.$toolbar-text;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s steps(2, jump-start);
+
+  &:hover:not(:disabled) {
+    background: var(--star-raw-hex-f4c46a);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+

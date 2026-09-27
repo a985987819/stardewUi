@@ -251,8 +251,7 @@ describe('DatePicker', () => {
       vi.useRealTimers()
     })
 
-    it('jumps to a month picked from the year/month dropdown', () => {
-      render(<DatePicker defaultValue={normalizeToDayTimestamp('2024-05-13')} />)
+    it('jumps to a month picked from the year/month dropdown', () => {      render(<DatePicker defaultValue={normalizeToDayTimestamp('2024-05-13')} />)
 
       fireEvent.click(
         screen.getByRole('button', { name: formatMonthLabel(getMonthStartTimestamp('2024-05-01')) }),
@@ -298,6 +297,237 @@ describe('DatePicker', () => {
 
       expect(screen.queryByRole('button', { name: 'Today' })).toBeNull()
       expect(screen.queryByRole('button', { name: '回到今日' })).toBeNull()
+    })
+  })
+
+  describe('inline interaction', () => {
+    const getTrigger = () => screen.getByRole('button', { expanded: false })
+
+    function getWheelColumn(name: string) {
+      return screen.getByRole('listbox', { name })
+    }
+
+    /**
+     * 把轮盘滚到某个绝对渲染坐标。
+     *
+     * `WheelColumn` 只在滚动停下来（整数对齐）时才提交，所以这里直接把
+     * `scrollTop` 写成整行再派发 scroll，模拟一次「吸附完成」。
+     */
+    function scrollToOffset(column: HTMLElement, offset: number) {
+      Object.defineProperty(column, 'scrollTop', {
+        configurable: true,
+        writable: true,
+        value: offset * 36,
+      })
+      fireEvent.scroll(column)
+    }
+
+    it('keeps the calendar form as the default interaction', () => {
+      render(<DatePicker defaultValue={normalizeToDayTimestamp('2024-05-13')} />)
+
+      // 默认仍是月历：出现网格，不出现轮盘。
+      expect(screen.getByRole('grid')).toBeInTheDocument()
+      expect(screen.queryByRole('listbox')).toBeNull()
+    })
+
+    it('opens all three wheels from one trigger', () => {
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-05-13')}
+        />,
+      )
+
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      fireEvent.click(screen.getByRole('button', { expanded: false }))
+
+      // 年 / 月 / 日三列同时出现，各自独立滚动。
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+      expect(getWheelColumn('年')).toBeInTheDocument()
+      expect(getWheelColumn('月')).toBeInTheDocument()
+      expect(getWheelColumn('日')).toBeInTheDocument()
+
+      // 起始落点是当前值：2024 / 5月 / 13日 都停在窗口正中。
+      expect(getWheelColumn('年').children[2]).toHaveTextContent('2024')
+      expect(getWheelColumn('月').children[2]).toHaveTextContent('5月')
+      expect(getWheelColumn('日').children[2]).toHaveTextContent('13')
+    })
+
+    it('renders the trigger as three segments', () => {
+      render(
+        <DatePicker interaction="inline" defaultValue={normalizeToDayTimestamp('2024-05-13')} />,
+      )
+
+      const trigger = getTrigger()
+
+      expect(trigger).toHaveTextContent('2024')
+      expect(trigger).toHaveTextContent('05')
+      expect(trigger).toHaveTextContent('13')
+    })
+
+    it('confirms the wheel selection through onChange', () => {
+      const handleChange = vi.fn()
+
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-05-13')}
+          onChange={handleChange}
+        />,
+      )
+
+      fireEvent.click(getTrigger())
+      // 日期列的渲染坐标就是「第几天 - 1」，所以 13 日停在坐标 12；
+      // 往后滚一格到坐标 13 即 14 日，然后确认。
+      scrollToOffset(getWheelColumn('日'), 13)
+      fireEvent.click(screen.getByRole('button', { name: '确定' }))
+
+      expect(handleChange).toHaveBeenCalledWith({
+        dateTimestamp: normalizeToDayTimestamp('2024-05-14'),
+      })
+    })
+
+    it('discards the draft when cancelled', () => {
+      const handleChange = vi.fn()
+
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-05-13')}
+          onChange={handleChange}
+        />,
+      )
+
+      fireEvent.click(getTrigger())
+      // 日期列往后滚一格 → 坐标 12 → 13，草稿变成 14 日，但还没确认。
+      scrollToOffset(getWheelColumn('日'), 13)
+      fireEvent.click(screen.getByRole('button', { name: '取消' }))
+
+      expect(handleChange).not.toHaveBeenCalled()
+      expect(screen.queryByRole('dialog')).toBeNull()
+
+      // 再打开一次，仍然停在确认过的 13 日上 —— 取消是真的撤销了。
+      fireEvent.click(getTrigger())
+
+      expect(getWheelColumn('日').children[2]).toHaveTextContent('13')
+    })
+
+    it('settles on the last day of the month when the draft day overflows', () => {
+      const handleChange = vi.fn()
+
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-01-31')}
+          onChange={handleChange}
+        />,
+      )
+
+      fireEvent.click(getTrigger())
+      // 31 日 → 2 月（月份列 5 月的坐标是 4，往前滚 3 格即坐标 1）；2 月没有
+      // 31 日，要落到 29 日（2024 是闰年）。
+      scrollToOffset(getWheelColumn('月'), 1)
+
+      expect(getWheelColumn('日').children[2]).toHaveTextContent('29')
+
+      fireEvent.click(screen.getByRole('button', { name: '确定' }))
+
+      expect(handleChange).toHaveBeenCalledWith({
+        dateTimestamp: normalizeToDayTimestamp('2024-02-29'),
+      })
+    })
+
+    it('scrolls days by a full month length so it loops back to the start', () => {
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-05-31')}
+          minDate={normalizeToDayTimestamp('2024-05-01')}
+        />,
+      )
+
+      fireEvent.click(getTrigger())
+
+      const days = getWheelColumn('日')
+
+      // 31 号之后就接回 1 号：滚满一整圈之后高亮落在 1 日上。
+      // 31 日的坐标是 30，再多一格就绕回 1 日（坐标 31）。
+      scrollToOffset(days, 31)
+
+      expect(days.children[2]).toHaveTextContent('1')
+    })
+
+    it('blocks confirmation when the draft date is out of range', () => {
+      const handleChange = vi.fn()
+
+      render(
+        <DatePicker
+          interaction="inline"
+          defaultValue={normalizeToDayTimestamp('2024-05-13')}
+          minDate={normalizeToDayTimestamp('2024-05-10')}
+          maxDate={normalizeToDayTimestamp('2024-05-13')}
+          onChange={handleChange}
+        />,
+      )
+
+      fireEvent.click(getTrigger())
+      // 往后滚两格到 15 日（坐标 14）—— 超过 maxDate，确定按钮应当禁用。
+      scrollToOffset(getWheelColumn('日'), 14)
+
+      expect(screen.getByRole('button', { name: '确定' })).toBeDisabled()
+
+      // 滚回 13 日（坐标 12）就可以确认了。
+      scrollToOffset(getWheelColumn('日'), 12)
+      fireEvent.click(screen.getByRole('button', { name: '确定' }))
+
+      expect(handleChange).toHaveBeenCalledWith({
+        dateTimestamp: normalizeToDayTimestamp('2024-05-13'),
+      })
+    })
+
+    it('honours custom confirm, cancel, and column labels', () => {
+      render(<DatePicker interaction="inline" confirmLabel="OK" cancelLabel="Back" columnLabels={['Year', 'Month', 'Day']} />)
+
+      fireEvent.click(getTrigger())
+
+      expect(screen.getByRole('button', { name: 'OK' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+      expect(getWheelColumn('Year')).toBeInTheDocument()
+      expect(getWheelColumn('Month')).toBeInTheDocument()
+      expect(getWheelColumn('Day')).toBeInTheDocument()
+    })
+
+    it('keeps the trigger label in sync with a controlled value', () => {
+      const { rerender } = render(
+        <DatePicker interaction="inline" value={normalizeToDayTimestamp('2024-05-13')} />,
+      )
+
+      expect(getTrigger()).toHaveTextContent('2024')
+
+      rerender(<DatePicker interaction="inline" value={normalizeToDayTimestamp('2025-01-02')} />)
+
+      const trigger = getTrigger()
+
+      expect(trigger).toHaveTextContent('2025')
+      expect(trigger).toHaveTextContent('01')
+      expect(trigger).toHaveTextContent('02')
+    })
+
+    it('falls back to today when no value is given', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date(Date.UTC(2026, 8, 22, 10, 0)))
+
+      render(<DatePicker interaction="inline" />)
+
+      // 东八区口径下，UTC 2026-09-22T10:00 就是 9 月 22 日。
+      fireEvent.click(getTrigger())
+
+      const days = getWheelColumn('日')
+
+      expect(getWheelColumn('年').children[2]).toHaveTextContent('2026')
+      expect(getWheelColumn('月').children[2]).toHaveTextContent('9月')
+      expect(days.children[2]).toHaveTextContent('22')
     })
   })
 })

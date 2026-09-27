@@ -191,8 +191,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     usageRank: 3,
     title: { zh: '日期选择', en: 'DatePicker' },
     desc: {
-      zh: '选择播种日或规划一段采矿假期，并返回稳定的标准化时间戳。',
-      en: 'Choose a planting day or a mining vacation range with normalized timestamps.',
+      zh: '选择播种日或规划一段采矿假期，可选月历网格或三列可无限滚动的轮盘，并返回稳定的标准化时间戳。',
+      en: 'Choose a planting day or a mining vacation range with a month grid or three endlessly scrolling wheels, returning normalized timestamps.',
     },
     icon: <CalendarRange size={20} />,
     element: StarDatePickerDemoPage,
