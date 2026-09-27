@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import Switch from './Switch'
+import styles from './Switch.module.scss'
 
 describe('Switch', () => {
   it('exposes a switch role with the checked state', () => {
@@ -29,28 +30,30 @@ describe('Switch', () => {
     expect(screen.getByRole('switch', { name: 'Locked' })).toBeDisabled()
   })
 
-  it('sizes the framed track, moves the checked marker, and derives its palette', () => {
+  it('carries the size class and derives the lit-slot palette from color', () => {
     render(<Switch size="large" color="#D7992E" checked aria-label="Mine lighting" />)
 
-    const style = screen.getByRole('switch', { name: 'Mine lighting' }).style
-    expect(style.getPropertyValue('--switch-track-width')).toBe('70px')
-    expect(style.getPropertyValue('--switch-on-color')).toBe('#D7992E')
-    expect(style.getPropertyValue('--switch-fill')).toBe('#D7992E')
-    expect(style.getPropertyValue('--switch-border')).not.toBe('')
-    expect(style.getPropertyValue('--switch-thumb-translate')).toBe('30px')
+    const element = screen.getByRole('switch', { name: 'Mine lighting' })
+    expect(element).toHaveClass(styles['star-switch--large'])
+    expect(element.style.getPropertyValue('--switch-on-color')).toBe('#D7992E')
+    expect(element.style.getPropertyValue('--switch-on-edge')).not.toBe('')
+    expect(element.style.getPropertyValue('--switch-clip')).toContain('polygon')
   })
 
-  it('parks an unchecked marker at the left endpoint', () => {
-    render(<Switch size="large" aria-label="Closed gate" />)
+  it('slides the thumb to the right endpoint while checked and parks it left while unchecked', () => {
+    const { rerender } = render(<Switch size="large" checked aria-label="Mine lighting" />)
+    expect(screen.getByRole('switch', { name: 'Mine lighting' }).style.getPropertyValue('--switch-thumb-translate')).toBe('28px')
 
+    rerender(<Switch size="large" aria-label="Closed gate" />)
     expect(screen.getByRole('switch', { name: 'Closed gate' }).style.getPropertyValue('--switch-thumb-translate')).toBe('0px')
   })
 
-  it('keeps the divider rail and progress-cell marker layers decorative', () => {
+  it('keeps the slot and keyhole dot as decorative internal layers', () => {
     const { container } = render(<Switch checked aria-label="Gate latch" />)
 
-    expect(container.querySelectorAll('[class*="stardew-switch__rail"]')).toHaveLength(2)
-    expect(container.querySelector('[class*="stardew-switch__thumb"]')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector(`.${styles['star-switch__track']}`)).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector(`.${styles['star-switch__slot']}`)).toBeInTheDocument()
+    expect(container.querySelector(`.${styles['star-switch__thumb-dot']}`)).toBeInTheDocument()
   })
 
   it('honours a consumer click handler that prevents the state change', () => {

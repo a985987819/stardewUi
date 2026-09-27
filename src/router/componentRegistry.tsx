@@ -350,11 +350,11 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     routePath: 'switch',
     component: 'Switch',
     category: 'data-entry',
-    usageRank: 2,
+    usageRank: 5,
     title: { zh: '开关', en: 'Switch' },
     desc: {
-      zh: '像素药丸形状的开关，用来点亮灯、开启自动浇水或切换难度。',
-      en: 'A pixel pill switch for lamps, auto-watering, and difficulty toggles.',
+      zh: 'Checkbox 同族的木面板开关：凹槽在打开时点亮，羊皮纸滑钮以像素阶梯滑过，适合灯光与自动化设置。',
+      en: 'A wooden switch panel in the Checkbox family: the groove lights up while checked and the parchment thumb slides in stepped pixel motion.',
     },
     icon: <ToggleRight size={20} />,
     element: StarSwitchDemoPage,
@@ -483,7 +483,7 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
  * out of the public gallery, sidebar, and generated routes while their visual
  * direction is being revisited. Remove an entry here to publish it again.
  */
-export const HIDDEN_COMPONENTS = ['Avatar', 'Switch'] as const
+export const HIDDEN_COMPONENTS = ['Avatar'] as const
 
 export const COMPONENT_ROUTES: ComponentRoute[] = ALL_COMPONENT_ROUTES
   .filter(({ component }) => !(HIDDEN_COMPONENTS as readonly string[]).includes(component))

@@ -8,22 +8,22 @@ import { useI18n, type Lang } from '../i18n'
 const copy = {
   zh: {
     title: 'Switch 开关',
-    desc: '把木栅栏的暖色框架和进度格的缺角标记收进一个开关：像一枚在双横杆之间滑动的像素门闩，适合灯光、自动浇水、音效和难度设置。',
+    desc: 'Checkbox 同族的木面板开关：暖木框内嵌一条凹槽，打开时凹槽点亮为作物绿，羊皮纸滑钮带着中心锁孔点以阶梯节奏滑过凹槽；顶部高光与硬边阴影保持全库一致的像素质感，适合灯光、自动浇水、音效和难度设置。',
     toc: ['基础开关', '尺寸与配色', '禁用状态', 'API'],
     demos: [
-      ['基础开关', '用受控状态记录开关值，点击或键盘操作都会触发 onChange。'],
-      ['尺寸与配色', 'small、medium、large 对应不同密度的设置项，color 决定打开标记的颜色，并自动生成深框、投影和高光。'],
+      ['基础开关', '用受控状态记录开关值，点击或键盘操作都会触发 onChange；关闭时凹槽是浅木色，打开后整条凹槽点亮。'],
+      ['尺寸与配色', 'small、medium、large 对应不同密度的设置项，color 决定凹槽与锁孔点亮的颜色，并自动推导顶部暗边。'],
       ['禁用状态', '任务未解锁或设置不可改时，禁用态保留形状但停止响应。'],
     ],
     labels: ['谷仓灯', '自动浇水', '音效', '矿洞照明', '温室加热', '已锁定的开关'],
   },
   en: {
     title: 'Switch',
-    desc: 'A fence-warm frame with a progress-cell marker: a pixel gate latch sliding between two rails for lamps, auto-watering, sound, and difficulty settings.',
+    desc: 'A wooden switch panel in the Checkbox family: a recessed groove inside a warm frame lights up with the checked colour while a parchment thumb with a keyhole dot slides across in stepped pixel motion; the lit top edge and hard shadows keep the shared pixel feel, for lamps, auto-watering, sound, and difficulty settings.',
     toc: ['Basic Switch', 'Sizes & Colors', 'Disabled', 'API'],
     demos: [
-      ['Basic Switch', 'Keep the value in state; clicking or using the keyboard both fire onChange.'],
-      ['Sizes & Colors', 'small, medium, and large fit different settings densities; color sets the active marker and derives its frame, shadow, and highlight.'],
+      ['Basic Switch', 'Keep the value in state; clicking or using the keyboard both fire onChange. The groove is pale wood while off and lights up fully when on.'],
+      ['Sizes & Colors', 'small, medium, and large fit different settings densities; color sets the lit groove and keyhole dot, with its dark edge derived automatically.'],
       ['Disabled', 'When a quest is locked the switch keeps its shape but stops responding.'],
     ],
     labels: ['Barn lamp', 'Auto watering', 'Sound', 'Mine lighting', 'Greenhouse heat', 'Locked switch'],
@@ -42,14 +42,14 @@ const apiData = {
     { property: 'onChange', description: '状态变化回调', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'size', description: '开关尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
-    { property: 'color', description: '打开标记的颜色；深框、投影和高光从它自动推导', type: 'string', default: "'#71964A'" },
+    { property: 'color', description: '打开时凹槽与锁孔点亮的颜色；顶部暗边从它自动推导', type: 'string', default: "'#71964A'" },
   ],
   en: [
     { property: 'checked', description: 'Controlled on/off state.', type: 'boolean', default: 'false' },
     { property: 'onChange', description: 'Change callback.', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'size', description: 'Switch size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
-    { property: 'color', description: 'Active marker color; its frame, shadow, and highlight are derived from it.', type: 'string', default: "'#71964A'" },
+    { property: 'color', description: 'Colour the lit groove and keyhole dot take while checked; its dark edge is derived automatically.', type: 'string', default: "'#71964A'" },
   ],
 }
 

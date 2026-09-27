@@ -775,14 +775,14 @@ import { StarTab } from 'stardew-valley-ui'
 
 ### StarSwitch - 开关
 
-像素风开关组件。
+Checkbox 同族的木面板开关：暖木框内嵌凹槽，打开时凹槽与滑钮锁孔点点亮为 `color` 色，羊皮纸滑钮以像素阶梯节奏滑过凹槽。
 
 ```tsx
 import { StarSwitch } from 'stardew-valley-ui'
 
 <StarSwitch checked={on} onChange={setOn} />
 <StarSwitch size="small" />
-<StarSwitch size="large" color="#4ade80" />
+<StarSwitch size="large" color="#D7992E" />
 <StarSwitch disabled />
 ```
 
@@ -792,7 +792,7 @@ import { StarSwitch } from 'stardew-valley-ui'
 | onChange | `(checked: boolean) => void` | - | 变化回调 |
 | disabled | `boolean` | `false` | 是否禁用 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 开关尺寸 |
-| color | `string` | `'#4ade80'` | 开启颜色 |
+| color | `string` | `'#71964A'` | 打开时凹槽与锁孔点亮的颜色；顶部暗边从它自动推导 |
 
 ---
 
