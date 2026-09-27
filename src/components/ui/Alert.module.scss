@@ -97,6 +97,21 @@ $alert-shadow: var(--star-raw-rgba-157-65-0-0-28);
   pointer-events: none;
 }
 
+// Semantic glyph, drawn in the same accent as the stripe; sits between the
+// stripe and the text block, aligned with the title's first line.
+.star-alert__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 18px;
+  height: 18px;
+  margin: 9px 0 0 12px;
+
+  color: var(--star-alert-accent);
+}
+
 // -------------------------------------------------------------------- content
 
 .star-alert__title {

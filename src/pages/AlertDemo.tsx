@@ -24,6 +24,7 @@ const copy = {
     ghostBody: '第 40 层发现幽灵，战斗力不足请及时撤离！',
     closableTitle: '任务提示',
     closableBody: '点击 × 即可关闭这条横幅。日志里会记录这次关闭操作。',
+    dismissLabel: '关掉这条',
   },
   en: {
     title: 'Alert',
@@ -43,8 +44,9 @@ const copy = {
     ghostBody: 'A ghost was spotted on floor 40 — leave now if underpowered!',
     closableTitle: 'Quest hint',
     closableBody: 'Click the × to dismiss this banner. The action is logged to onClose.',
+    dismissLabel: 'Dismiss this',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; planted: string; plantedBody: string; storm: string; stormBody: string; full: string; fullBody: string; ghost: string; ghostBody: string; closableTitle: string; closableBody: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; planted: string; plantedBody: string; storm: string; stormBody: string; full: string; fullBody: string; ghost: string; ghostBody: string; closableTitle: string; closableBody: string; dismissLabel: string }>
 
 const apiData = {
   zh: [
@@ -68,9 +70,9 @@ const apiData = {
 const typesCode = `import { StarAlert } from 'stardew-valley-ui'
 
 <StarAlert type="info" title="Weather forecast">Rain tomorrow.</StarAlert>
-<StarAlert type="success" title="Planted">Parsnip seeds are in.</StarAlert>
+<StarAlert type="success" title="Planted" showIcon>Parsnip seeds are in.</StarAlert>
 <StarAlert type="warning" title="Backpack full">Tidy up first.</StarAlert>
-<StarAlert type="error" title="Mine danger">Leave floor 40 now!</StarAlert>`
+<StarAlert type="error" title="Mine danger" showIcon>Leave floor 40 now!</StarAlert>`
 
 const closableCode = `import { useState } from 'react'
 import { StarAlert } from 'stardew-valley-ui'
@@ -83,6 +85,7 @@ export function QuestHint() {
       type="info"
       title="Quest hint"
       closable
+      closeLabel="Dismiss this"
       onClose={() => setVisible(false)}
     >
       Click the × to dismiss.
@@ -105,9 +108,9 @@ function StarAlertDemoPage() {
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
           <StarAlert type="info" title={t.storm}>{t.stormBody}</StarAlert>
-          <StarAlert type="success" title={t.planted}>{t.plantedBody}</StarAlert>
+          <StarAlert type="success" title={t.planted} showIcon>{t.plantedBody}</StarAlert>
           <StarAlert type="warning" title={t.full}>{t.fullBody}</StarAlert>
-          <StarAlert type="error" title={t.ghost}>{t.ghostBody}</StarAlert>
+          <StarAlert type="error" title={t.ghost} showIcon>{t.ghostBody}</StarAlert>
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -116,7 +119,7 @@ function StarAlertDemoPage() {
         description={t.demos[1][1]}
         code={closableCode}
       >
-        <ClosableAlert title={t.closableTitle}>{t.closableBody}</ClosableAlert>
+        <ClosableAlert title={t.closableTitle} closeLabel={t.dismissLabel}>{t.closableBody}</ClosableAlert>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable title="Alert API" data={apiData[lang]} />
@@ -125,7 +128,7 @@ function StarAlertDemoPage() {
   )
 }
 
-function ClosableAlert({ title, children }: { title: string; children: string }) {
+function ClosableAlert({ title, closeLabel, children }: { title: string; closeLabel: string; children: string }) {
   const [visible, setVisible] = useState(true)
 
   if (!visible) return null
@@ -135,6 +138,7 @@ function ClosableAlert({ title, children }: { title: string; children: string })
       type="info"
       title={title}
       closable
+      closeLabel={closeLabel}
       onClose={() => setVisible(false)}
       style={{ width: '100%' }}
     >

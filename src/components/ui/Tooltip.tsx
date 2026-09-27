@@ -1,3 +1,4 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
   useId,
   useRef,
@@ -26,6 +27,8 @@ export interface StarTooltipProps
   mouseEnterDelay?: number
   /** Hover-out delay in ms. */
   mouseLeaveDelay?: number
+  /** Shows the pixel arrow pointing back at the trigger. */
+  arrow?: boolean
   /** Fires when hover wants to change visibility. */
   onOpenChange?: (open: boolean) => void
   /** Trigger element. */
@@ -59,6 +62,7 @@ function StarTooltip({
   defaultOpen = false,
   mouseEnterDelay = 100,
   mouseLeaveDelay = 150,
+  arrow = true,
   onOpenChange,
   children,
   className,
@@ -130,10 +134,12 @@ function StarTooltip({
                 polygon. */}
             <span className={styles['star-tooltip__plate']} aria-hidden />
             <span className={styles['star-tooltip__content']}>{title}</span>
-            <span
-              className={classNames(styles['star-tooltip__arrow'], styles[`star-tooltip__arrow--${placement}`])}
-              aria-hidden
-            />
+            {arrow ? (
+              <span
+                className={classNames(styles['star-tooltip__arrow'], styles[`star-tooltip__arrow--${placement}`])}
+                aria-hidden
+              />
+            ) : null}
           </span>
         </span>
       ) : null}

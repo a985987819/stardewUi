@@ -151,6 +151,13 @@ const COMPONENT_CATALOGUE_CATEGORY_ORDER = new Map(
   COMPONENT_CATALOGUE_CATEGORIES.map((category, index) => [category, index])
 )
 
+/**
+ * Internal batch registry (tooling marker only — never imported, no runtime
+ * footprint). `scripts/audit-batch-components.mjs` reads this comment.
+ *
+ * BATCH_2026_09_27: Badge, Alert, Skeleton, Textarea, Tooltip, Pagination, Collapse
+ */
+
 const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
   {
     routePath: 'avatar',

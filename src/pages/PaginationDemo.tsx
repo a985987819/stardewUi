@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
@@ -52,9 +53,21 @@ const apiData = {
   ],
 }
 
-const basicCode = `import { StarPagination } from 'stardew-valley-ui'
+const basicCode = `import { useState } from 'react'
+import { StarPagination } from 'stardew-valley-ui'
 
-<StarPagination total={45} pageSize={10} />`
+export function Board() {
+  const [page, setPage] = useState(1)
+  return (
+    <StarPagination
+      total={45}
+      pageSize={10}
+      current={page}
+      onChange={setPage}
+      showTotal={(total, range) => range[0] + '-' + range[1] + ' / ' + total}
+    />
+  )
+}`
 
 const ellipsisCode = `import { StarPagination } from 'stardew-valley-ui'
 
@@ -90,8 +103,7 @@ function StarPaginationDemoPage() {
         code={basicCode}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
-          <StarPagination total={45} pageSize={10} ariaLabel="公告分页 1" />
-          <span style={{ fontSize: 12, opacity: 0.75 }}>45 {t.quests} · 10 / {t.currentPage.toLowerCase()}</span>
+          <ControlledPagination pagerLabel={`${t.quests} · ${t.currentPage}`} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -118,6 +130,24 @@ function StarPaginationDemoPage() {
         <StarApiTable title="Pagination API" data={apiData[lang]} />
       </div>
     </StarComponentPage>
+  )
+}
+
+function ControlledPagination({ pagerLabel }: { pagerLabel: string }) {
+  const [page, setPage] = useState(1)
+
+  return (
+    <>
+      <StarPagination
+        total={45}
+        pageSize={10}
+        current={page}
+        onChange={setPage}
+        showTotal={(total, range) => `${range[0]}-${range[1]} / ${total}`}
+        ariaLabel={pagerLabel}
+      />
+      <span style={{ fontSize: 12, opacity: 0.75 }}>current: {page} / 5</span>
+    </>
   )
 }
 

@@ -1,3 +1,4 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import { deriveProgressPalette } from '../../utils/progressPalette'

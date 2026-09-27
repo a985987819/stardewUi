@@ -11,7 +11,7 @@ const copy = {
     desc: '木框凹陷的多行输入框，是 Input 的高个子兄弟：同款 4px 阶梯木框与羊皮纸凹槽，用来写长信、备注和任务描述；支持状态染色、字数统计与拖拽调高。',
     toc: ['基础用法', '状态与校验', '字数统计', 'API'],
     demos: [
-      ['基础用法', 'label 标注用途，rows 控制初始可见行数；右下角可以竖向拖拽调高，宽度可用 block 铺满容器。'],
+      ['基础用法', 'label 标注用途，rows 控制初始可见行数；autoSize 随内容自动长高并禁用拖拽，size 调整字号，color 可微调强调色。'],
       ['状态与校验', 'status 给木框和光标染色，message 在框下展示提示或校验文案；error 状态的提示会以 role="alert" 播报。'],
       ['字数统计', 'showCount 在右下角显示已输入字数，配合 maxLength 变为 已输入/上限；超限输入会被原生拦截。'],
     ],
@@ -21,13 +21,14 @@ const copy = {
     questMessage: '描述至少 10 个字，请再补充些细节。',
     bioLabel: '农场简介',
     bioPlaceholder: '介绍一下你的农场……',
+    bioDraft: '有机农场第四年，主种杨桃。',
   },
   en: {
     title: 'Textarea',
     desc: "A recessed multi-line field — Input's taller sibling: the same 4px stepped wooden frame and parchment groove, for letters, notes, and quest descriptions; with status tints, a character counter, and drag-to-resize.",
     toc: ['Basic Usage', 'Status & Validation', 'Character Count', 'API'],
     demos: [
-      ['Basic Usage', 'A label names the purpose and rows set the visible height; drag the bottom-right corner to grow it, or use block to fill the container.'],
+      ['Basic Usage', 'A label names the purpose and rows set the visible height; autoSize grows the field with its content and disables the grip, size adjusts the type, and color tints the accent.'],
       ['Status & Validation', 'status tints the frame and caret, and message renders hints or validation copy below; error messages announce via role="alert".'],
       ['Character Count', 'showCount displays the typed length at the bottom-right, becoming typed/limit with maxLength; typing past the limit is blocked natively.'],
     ],
@@ -37,8 +38,9 @@ const copy = {
     questMessage: 'At least 10 characters — please add more detail.',
     bioLabel: 'Farm bio',
     bioPlaceholder: 'Introduce your farm...',
+    bioDraft: 'Year four of the organic farm, mostly starfruit.',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; letterLabel: string; letterPlaceholder: string; questLabel: string; questMessage: string; bioLabel: string; bioPlaceholder: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; letterLabel: string; letterPlaceholder: string; questLabel: string; questMessage: string; bioLabel: string; bioPlaceholder: string; bioDraft: string }>
 
 const apiData = {
   zh: [
@@ -71,8 +73,9 @@ const apiData = {
 
 const basicCode = `import { StarTextarea } from 'stardew-valley-ui'
 
-<StarTextarea label="Letter to Pierre" rows={4} />
-<StarTextarea label="Notes" rows={3} block />`
+<StarTextarea label="Letter to Pierre" autoSize rows={4} block />
+<StarTextarea label="Farm bio" size="small" defaultValue="Year four." rows={2} block />
+<StarTextarea label="Quest" color="#308BE2" rows={3} block />`
 
 const statusCode = `import { StarTextarea } from 'stardew-valley-ui'
 
@@ -98,7 +101,9 @@ function StarTextareaDemoPage() {
         code={basicCode}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
-          <StarTextarea label={t.letterLabel} placeholder={t.letterPlaceholder} rows={4} block />
+          <StarTextarea label={t.letterLabel} placeholder={t.letterPlaceholder} autoSize rows={4} block />
+          <StarTextarea label={t.bioLabel} size="small" defaultValue={t.bioDraft} rows={2} block />
+          <StarTextarea label={t.questLabel} color="#308BE2" rows={3} block />
         </div>
       </StarComponentDemo>
       <StarComponentDemo

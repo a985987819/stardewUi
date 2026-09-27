@@ -989,6 +989,7 @@ import { StarTextarea } from 'stardew-valley-ui'
 | color | `string` | - | 自定义强调色，覆盖 status |
 | showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
 | block | `boolean` | `false` | 撑满容器宽度 |
+| autoSize | `boolean` | `false` | 随内容自适应高度（开启后禁用手动拉伸） |
 
 其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`onFocus`…）会透传到内部的 `<textarea>`，右下角可竖向拖拽调高。
 
@@ -1041,6 +1042,7 @@ import { StarAlert } from 'stardew-valley-ui'
 | type | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | 语义类型，决定色带与标题颜色 |
 | title | `ReactNode` | - | 加粗标题 |
 | children | `ReactNode` | - | 横幅正文 |
+| showIcon | `boolean` | `false` | 显示与色带同色的语义图标 |
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
 | onClose | `() => void` | - | 关闭后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
@@ -1069,6 +1071,7 @@ import { StarSkeleton } from 'stardew-valley-ui'
 | rows | `number` | `3` | 段落占位行数；末行自动收短到 60% |
 | title | `boolean` | `true` | 是否显示加粗标题行 |
 | avatar | `boolean` | `false` | 是否在左侧显示方形头像占位 |
+| active | `boolean` | `true` | 是否播放条纹步进动画 |
 | children | `ReactNode` | - | loading 为 `false` 时渲染的真实内容 |
 
 ---
@@ -1095,6 +1098,7 @@ import { StarTooltip } from 'stardew-valley-ui'
 | defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
 | mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒）；`0` 立即显示 |
 | mouseLeaveDelay | `number` | `150` | 移开隐藏延迟（毫秒） |
+| arrow | `boolean` | `true` | 是否显示指向触发元素的像素箭头 |
 | onOpenChange | `(open: boolean) => void` | - | 可见性将要变化时触发 |
 
 ---
@@ -1123,6 +1127,7 @@ import { StarPagination } from 'stardew-valley-ui'
 | defaultCurrent | `number` | `1` | 非受控模式的初始页码 |
 | onChange | `(page: number, pageSize: number) => void` | - | 页码变化时触发 |
 | hideOnSinglePage | `boolean` | `false` | 只有一页时是否隐藏 |
+| showTotal | `(total: number, range: [number, number]) => ReactNode` | - | 自定义总条数文案，range 为当前页起止条目 |
 
 ---
 

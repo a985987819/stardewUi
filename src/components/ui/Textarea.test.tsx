@@ -62,6 +62,15 @@ describe('Textarea', () => {
     expect(textarea.closest(`.${styles['star-textarea-wrapper']}`)).toHaveClass(styles['is-disabled'])
   })
 
+  it('grows with its content when autoSize is set', () => {
+    render(<Textarea autoSize data-testid="textarea" />)
+
+    const textarea = screen.getByTestId('textarea')
+    expect(textarea.parentElement).toHaveClass(styles['is-autosize'])
+    // The auto-height effect always writes a concrete height.
+    expect(textarea.style.height).not.toBe('')
+  })
+
   it('injects the staircase clip path as a CSS variable', () => {
     render(<Textarea data-testid="textarea" />)
 

@@ -59,6 +59,12 @@ describe('Skeleton', () => {
     expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
   })
 
+  it('freezes the stripes when active is false', () => {
+    render(<Skeleton active={false} data-testid="skeleton" />)
+
+    expect(screen.getByTestId('skeleton')).toHaveClass(styles['star-skeleton--static'])
+  })
+
   it('injects both staircase clip paths as CSS variables', () => {
     render(<Skeleton data-testid="skeleton" />)
 

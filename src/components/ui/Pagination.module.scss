@@ -120,6 +120,13 @@ $pagination-shadow: var(--star-raw-rgba-157-65-0-0-28);
   letter-spacing: 0.1em;
 }
 
+.star-pagination__total {
+  margin-left: 8px;
+
+  color: var(--star-raw-hex-9c8660);
+  font-size: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .star-pagination__page,
   .star-pagination__step {

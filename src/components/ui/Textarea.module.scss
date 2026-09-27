@@ -132,6 +132,13 @@ $textarea-hint: var(--star-raw-hex-5c4526);
   --star-textarea-font-size: 16px;
 }
 
+// Auto-height variant (`autoSize`): the JS effect owns the height, so the
+// manual grip goes away and overflowing text is never scrolled inside.
+.star-textarea.is-autosize .star-textarea__control {
+  resize: none;
+  overflow: hidden;
+}
+
 /** Focus halo: the same staircase on a box grown 3px per side. */
 .star-textarea__glow {
   position: absolute;

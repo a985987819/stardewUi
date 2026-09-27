@@ -55,6 +55,7 @@ const apiData = {
 const standaloneCode = `import { StarBadge } from 'stardew-valley-ui'
 
 <StarBadge count={7} />
+<StarBadge count={7} overflowCount={5} />
 <StarBadge count={120} />
 <StarBadge count={0} showZero />
 <StarBadge dot color="#71964A" />`
@@ -84,6 +85,7 @@ function StarBadgeDemoPage() {
       >
         <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
           <StarBadge count={7} aria-label="seven" />
+          <StarBadge count={7} overflowCount={5} aria-label="capped" />
           <StarBadge count={120} aria-label="overflow" />
           <StarBadge count={0} showZero aria-label="zero" />
           <StarBadge dot color="#71964A" aria-label="has news" />

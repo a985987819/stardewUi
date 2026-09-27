@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
@@ -18,6 +19,9 @@ const copy = {
     bottom: '下方气泡',
     left: '左侧气泡',
     right: '右侧气泡',
+    noArrow: '无箭头',
+    defaultOpenLabel: '默认展开',
+    controlled: '受控开关',
     rich: '矿洞三层有吸血鬼……带够武器再下去！',
     richStrong: '矿洞三层',
   },
@@ -34,10 +38,13 @@ const copy = {
     bottom: 'Bubble below',
     left: 'Bubble left',
     right: 'Bubble right',
+    noArrow: 'No arrow',
+    defaultOpenLabel: 'Default open',
+    controlled: 'Controlled',
     rich: 'Floor 3 has vampires... gear up before heading down!',
     richStrong: 'Mine floor 3',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; trigger: string; top: string; bottom: string; left: string; right: string; rich: string; richStrong: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; trigger: string; top: string; bottom: string; left: string; right: string; noArrow: string; defaultOpenLabel: string; controlled: string; rich: string; richStrong: string }>
 
 const apiData = {
   zh: [
@@ -62,17 +69,28 @@ const apiData = {
   ],
 }
 
-const placementCode = `import { StarTooltip } from 'stardew-valley-ui'
+const placementCode = `import { useState } from 'react'
+import { StarTooltip } from 'stardew-valley-ui'
 
 <StarTooltip title="Bubble on top"><button>Top</button></StarTooltip>
 <StarTooltip title="Bubble below" placement="bottom"><button>Bottom</button></StarTooltip>
 <StarTooltip title="Bubble left" placement="left"><button>Left</button></StarTooltip>
-<StarTooltip title="Bubble right" placement="right"><button>Right</button></StarTooltip>`
+<StarTooltip title="Bubble right" placement="right"><button>Right</button></StarTooltip>
+<StarTooltip title="No arrow" arrow={false}><button>No arrow</button></StarTooltip>
+<StarTooltip title="Bubble below" placement="bottom" defaultOpen><button>Default open</button></StarTooltip>
+
+// Controlled: the open prop owns visibility, onOpenChange mirrors it.
+const [open, setOpen] = useState(false)
+<StarTooltip title="Controlled" open={open} onOpenChange={setOpen}>
+  <button onClick={() => setOpen((v) => !v)}>Toggle</button>
+</StarTooltip>`
 
 const richCode = `import { StarTooltip } from 'stardew-valley-ui'
 
 <StarTooltip
   title={<>Mine floor 3 has vampires...<br />Gear up before heading down!</>}
+  mouseEnterDelay={150}
+  mouseLeaveDelay={400}
 >
   <button>Mine</button>
 </StarTooltip>`
@@ -105,6 +123,13 @@ function StarTooltipDemoPage() {
           <StarTooltip title={t.right} placement="right">
             <button type="button" style={triggerStyle}>Right</button>
           </StarTooltip>
+          <StarTooltip title={t.top} arrow={false}>
+            <button type="button" style={triggerStyle}>{t.noArrow}</button>
+          </StarTooltip>
+          <StarTooltip title={t.bottom} placement="bottom" defaultOpen>
+            <button type="button" style={triggerStyle}>{t.defaultOpenLabel}</button>
+          </StarTooltip>
+          <ControlledTooltip label={t.controlled} title={t.top} triggerStyle={triggerStyle} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -122,6 +147,7 @@ function StarTooltipDemoPage() {
               </>
             )}
             mouseEnterDelay={150}
+            mouseLeaveDelay={400}
           >
             <button type="button" style={triggerStyle}>{t.trigger}</button>
           </StarTooltip>
@@ -131,6 +157,22 @@ function StarTooltipDemoPage() {
         <StarApiTable title="Tooltip API" data={apiData[lang]} />
       </div>
     </StarComponentPage>
+  )
+}
+
+function ControlledTooltip({ label, title, triggerStyle }: { label: string; title: string; triggerStyle: { padding: string; cursor: 'pointer' } }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <StarTooltip title={title} open={open} onOpenChange={setOpen}>
+      <button
+        type="button"
+        style={{ ...triggerStyle, background: open ? '#d4a72c' : undefined, color: open ? '#fff3dc' : undefined }}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {label}
+      </button>
+    </StarTooltip>
   )
 }
 

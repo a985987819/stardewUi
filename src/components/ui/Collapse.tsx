@@ -1,3 +1,4 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
   useId,
   useState,

@@ -75,6 +75,12 @@ describe('Pagination', () => {
     expect(screen.getByRole('navigation')).toBeInTheDocument()
   })
 
+  it('renders the custom total copy with the visible range', () => {
+    render(<Pagination total={45} defaultCurrent={2} showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条 / 共 ${total} 条`} />)
+
+    expect(screen.getByText('第 11-20 条 / 共 45 条')).toBeInTheDocument()
+  })
+
   it('stamps the active chip with the ink modifier class', () => {
     render(<Pagination total={30} defaultCurrent={3} />)
 

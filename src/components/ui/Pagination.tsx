@@ -1,7 +1,9 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
   useState,
   type CSSProperties,
   type HTMLAttributes,
+  type ReactNode,
 } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
@@ -22,6 +24,8 @@ export interface StarPaginationProps
   onChange?: (page: number, pageSize: number) => void
   /** Renders nothing when everything fits on one page. */
   hideOnSinglePage?: boolean
+  /** Custom total copy, e.g. `(total, range) => \`共 ${total} 条\``. */
+  showTotal?: (total: number, range: [number, number]) => ReactNode
   /** Accessible name of the pager. */
   ariaLabel?: string
 }
@@ -74,6 +78,7 @@ function StarPagination({
   defaultCurrent = 1,
   onChange,
   hideOnSinglePage = false,
+  showTotal,
   ariaLabel,
   className,
   style,
@@ -144,6 +149,15 @@ function StarPagination({
       >
         <ChevronRight size={14} strokeWidth={3} aria-hidden />
       </button>
+
+      {showTotal ? (
+        <span className={styles['star-pagination__total']}>
+          {showTotal(total, [
+            (activePage - 1) * pageSize + 1,
+            Math.min(activePage * pageSize, total),
+          ])}
+        </span>
+      ) : null}
     </nav>
   )
 }

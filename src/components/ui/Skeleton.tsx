@@ -1,3 +1,4 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
@@ -12,6 +13,8 @@ export interface StarSkeletonProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   title?: boolean
   /** Shows a square avatar block on the left. */
   avatar?: boolean
+  /** Plays the stripe-marching animation; turn off for a calm placeholder. */
+  active?: boolean
   /** Real content swapped in when loading turns false. */
   children?: ReactNode
 }
@@ -42,6 +45,7 @@ function StarSkeleton({
   rows = 3,
   title = true,
   avatar = false,
+  active = true,
   children,
   className,
   style,
@@ -62,7 +66,11 @@ function StarSkeleton({
     <div
       {...rest}
       aria-busy="true"
-      className={classNames(styles['star-skeleton'], className)}
+      className={classNames(
+        styles['star-skeleton'],
+        !active && styles['star-skeleton--static'],
+        className,
+      )}
       style={{ ...cssVariables, ...style }}
     >
       {avatar ? (

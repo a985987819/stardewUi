@@ -56,7 +56,8 @@ const apiData = {
 const basicCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
 <StarSkeleton rows={3} />
-<StarSkeleton title={false} rows={2} />`
+<StarSkeleton title={false} rows={2} />
+<StarSkeleton title={false} rows={2} active={false} />`
 
 const avatarCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
@@ -94,6 +95,7 @@ function StarSkeletonDemoPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
           <StarSkeleton rows={3} />
           <StarSkeleton title={false} rows={2} />
+          <StarSkeleton title={false} rows={2} active={false} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo

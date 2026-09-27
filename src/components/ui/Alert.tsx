@@ -1,5 +1,6 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import { useState, type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react'
-import { X } from 'lucide-react'
+import { CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Alert.module.scss'
@@ -14,12 +15,22 @@ export interface StarAlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   title?: ReactNode
   /** Banner body. */
   children?: ReactNode
+  /** Shows the semantic pixel icon in front of the text. */
+  showIcon?: boolean
   /** Shows a pixel × that dismisses the banner. */
   closable?: boolean
   /** Called after the built-in close button dismisses the banner. */
   onClose?: () => void
   /** Accessible name of the built-in close button. */
   closeLabel?: string
+}
+
+/** One glyph per tint, drawn in the same accent as the stripe. */
+const ALERT_ICONS: Record<AlertType, typeof Info> = {
+  info: Info,
+  success: CircleCheck,
+  warning: TriangleAlert,
+  error: CircleX,
 }
 
 /**
@@ -42,6 +53,7 @@ function StarAlert({
   type = 'info',
   title,
   children,
+  showIcon = false,
   closable = false,
   onClose,
   closeLabel = 'Close',
@@ -50,6 +62,7 @@ function StarAlert({
   ...rest
 }: StarAlertProps) {
   const [dismissed, setDismissed] = useState(false)
+  const IconGlyph = ALERT_ICONS[type]
 
   const handleClose = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
@@ -78,6 +91,11 @@ function StarAlert({
           are separate layers sharing the same staircase polygon. */}
       <span className={styles['star-alert__plate']} aria-hidden />
       <span className={styles['star-alert__stripe']} aria-hidden />
+      {showIcon ? (
+        <span className={styles['star-alert__icon']} aria-hidden>
+          <IconGlyph size={14} strokeWidth={2.5} />
+        </span>
+      ) : null}
       <div className={styles['star-alert__body']}>
         {title ? <div className={styles['star-alert__title']}>{title}</div> : null}
         {children ? <div className={styles['star-alert__content']}>{children}</div> : null}

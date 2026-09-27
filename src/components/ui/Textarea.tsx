@@ -1,5 +1,8 @@
+// Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
   useId,
+  useEffect,
+  useRef,
   useState,
   type CSSProperties,
   type ChangeEvent,
@@ -37,6 +40,8 @@ export interface StarTextareaProps
   showCount?: boolean
   /** Stretches the field to the container width. */
   block?: boolean
+  /** Grows the field with its content; disables the manual resize grip. */
+  autoSize?: boolean
   /** Visible text rows before the field starts scrolling. */
   rows?: number
 }
@@ -70,6 +75,7 @@ function StarTextarea({
   message,
   showCount = false,
   block = false,
+  autoSize = false,
   rows = 4,
   disabled = false,
   readOnly = false,
@@ -82,10 +88,21 @@ function StarTextarea({
 }: StarTextareaProps) {
   const generatedId = useId()
   const textareaId = id ?? `star-textarea-${generatedId}`
+  const controlRef = useRef<HTMLTextAreaElement>(null)
   // The <textarea> is always controlled; `value` only decides whether React or
   // the field itself owns the text.
   const [innerValue, setInnerValue] = useState(defaultValue)
   const text = value ?? innerValue
+
+  // Auto height: collapse to the content on every text or size change. Runs
+  // after paint, which is fine here — the first frame already carries `rows`.
+  useEffect(() => {
+    if (!autoSize) return
+    const el = controlRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [text, autoSize])
 
   const commit = (next: string) => {
     if (value === undefined) setInnerValue(next)
@@ -120,7 +137,11 @@ function StarTextarea({
       ) : null}
 
       <div
-        className={classNames(styles['star-textarea'], styles[`star-textarea--${size}`])}
+        className={classNames(
+          styles['star-textarea'],
+          styles[`star-textarea--${size}`],
+          autoSize && styles['is-autosize'],
+        )}
         style={cssVariables}
       >
         {/* One `clip-path` can only cut one outline, so the halo and the frame
@@ -129,6 +150,7 @@ function StarTextarea({
         <span className={styles['star-textarea__plate']} aria-hidden />
         <textarea
           {...rest}
+          ref={controlRef}
           id={textareaId}
           className={styles['star-textarea__control']}
           value={text}

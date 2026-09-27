@@ -46,6 +46,14 @@ describe('Alert', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('renders the semantic icon only when showIcon is set', () => {
+    const { rerender, container } = render(<Alert data-testid="alert">播种季节到了。</Alert>)
+    expect(container.querySelector(`.${styles['star-alert__icon']}`)).not.toBeInTheDocument()
+
+    rerender(<Alert type="warning" showIcon data-testid="alert">播种季节到了。</Alert>)
+    expect(container.querySelector(`.${styles['star-alert__icon']}`)).toBeInTheDocument()
+  })
+
   it('dismisses the banner and fires onClose when the close button is clicked', () => {
     const onClose = vi.fn()
     const { container } = render(

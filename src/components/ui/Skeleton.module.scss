@@ -43,6 +43,12 @@ $skeleton-edge-light: var(--star-raw-hex-f4ead6);
   padding-top: 2px;
 }
 
+// Frozen variant (`active={false}`): stripes hold still, material unchanged.
+.star-skeleton--static .star-skeleton__row,
+.star-skeleton--static .star-skeleton__avatar {
+  animation: none;
+}
+
 .star-skeleton__row {
   height: 10px;
   clip-path: var(--star-skeleton-clip-row);
