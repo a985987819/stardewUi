@@ -1,0 +1,128 @@
+/**
+ * Pixel pager — square parchment chips joined like fence posts.
+ *
+ * Every chip (`__page` / `__step`) is a miniature of the Tag plate: a 2px
+ * ring painted by the chip's own background, with an inset fill layer cut by
+ * the same staircase (`--star-pagination-clip`, injected by
+ * `Pagination.tsx`). The active page is stamped dark, like ink.
+ */
+$pagination-frame-width: 2px;
+$pagination-ring: var(--star-raw-hex-a8895f);
+$pagination-surface: var(--star-raw-hex-f7efc5);
+$pagination-surface-hover: var(--star-raw-hex-f3ecd7);
+$pagination-bevel-light: var(--star-raw-hex-f4ead6);
+$pagination-text: var(--star-raw-hex-4a2c1a);
+$pagination-active-bg: var(--star-raw-hex-9d4100);
+$pagination-active-text: var(--star-raw-hex-fff3dc);
+$pagination-disabled: var(--star-raw-hex-bfae90);
+$pagination-shadow: var(--star-raw-rgba-157-65-0-0-28);
+
+.star-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: $pagination-text;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.star-pagination__page,
+.star-pagination__step {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+
+  background: $pagination-ring;
+  clip-path: var(--star-pagination-clip);
+
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  box-shadow: 1px 2px 0 $pagination-shadow;
+
+  transition: transform 90ms steps(2, jump-start);
+
+  // Inset fill layer: shares the staircase so the ring stays an even 2px.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: $pagination-frame-width;
+    background: $pagination-surface;
+    clip-path: var(--star-pagination-clip);
+
+    box-shadow: inset 0 2px 0 $pagination-bevel-light;
+  }
+
+  > * {
+    position: relative;
+  }
+
+  &:hover:not(:disabled)::before {
+    background: $pagination-surface-hover;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--star-raw-hex-d7992e);
+    outline-offset: 1px;
+  }
+}
+
+.star-pagination__page {
+  font-weight: 700;
+}
+
+.star-pagination__page.is-active {
+  cursor: default;
+
+  &::before {
+    background: $pagination-active-bg;
+    box-shadow: none;
+  }
+
+  color: $pagination-active-text;
+
+  &:hover::before {
+    background: $pagination-active-bg;
+  }
+}
+
+.star-pagination__step:disabled {
+  cursor: not-allowed;
+  box-shadow: none;
+
+  &::before {
+    background: var(--star-raw-hex-ece3cf);
+  }
+
+  color: $pagination-disabled;
+}
+
+.star-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 18px;
+  height: 26px;
+
+  color: var(--star-raw-hex-9c8660);
+  letter-spacing: 0.1em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-pagination__page,
+  .star-pagination__step {
+    transition: none !important;
+  }
+}

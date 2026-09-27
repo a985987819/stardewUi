@@ -1,0 +1,170 @@
+/**
+ * Pixel hover bubble.
+ *
+ * The bubble is a two-layer miniature of the Alert banner: `__plate` paints
+ * the 2px frame ring across the whole box, `__content` is inset by
+ * `$tooltip-frame-width` and paints the parchment fill — both cut with the
+ * same staircase (`--star-tooltip-clip`, injected by `Tooltip.tsx`).
+ *
+ * The `__arrow` is a fixed 8×8 stepped pyramid (one clip-path, defined as
+ * "pointing down" and rotated per placement). It sits in the 6px gap between
+ * bubble and trigger, overlapping the plate edge so frame and arrow read as
+ * one piece.
+ *
+ * Visibility: hover owns a JS state (with delays); keyboard focus shows the
+ * bubble through the CSS `:focus-within` rule below — but only in the
+ * uncontrolled mode (`--controlled` opts out, since a controlled `open=false`
+ * must stay hidden no matter what).
+ */
+$tooltip-frame-width: 2px;
+$tooltip-ring: var(--star-raw-hex-a8895f);
+$tooltip-surface: var(--star-raw-hex-f7efc5);
+$tooltip-bevel-dark: var(--star-raw-hex-ddc79b);
+$tooltip-bevel-light: var(--star-raw-hex-f4ead6);
+$tooltip-text: var(--star-raw-hex-4a2c1a);
+$tooltip-shadow: var(--star-raw-rgba-157-65-0-0-28);
+$tooltip-gap: 6px;
+
+.star-tooltip {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  color: $tooltip-text;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.star-tooltip__bubble {
+  position: absolute;
+  z-index: 20;
+  width: max-content;
+  max-width: 240px;
+
+  pointer-events: none;
+}
+
+// The animated wrapper: pop-in scales `transform`, so it must live on its own
+// element, apart from the bubble's translate centering above.
+.star-tooltip__inner {
+  position: relative;
+  display: block;
+  width: max-content;
+  max-width: 240px;
+
+  animation: var(--star-motion-pop-in-name) var(--star-motion-pop-in-duration)
+    cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.star-tooltip__plate {
+  position: absolute;
+  inset: 0;
+  background: $tooltip-ring;
+  clip-path: var(--star-tooltip-clip);
+
+  pointer-events: none;
+}
+
+.star-tooltip__content {
+  position: relative;
+  display: block;
+
+  margin: $tooltip-frame-width;
+  padding: 4px 8px;
+
+  background: $tooltip-surface;
+  clip-path: var(--star-tooltip-clip);
+
+  // A lighter read than the form fields: the top bevel only, so the small
+  // plate does not look over-built.
+  box-shadow: inset 0 2px 0 $tooltip-bevel-light;
+
+  line-height: 1.5;
+  text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-4);
+}
+
+.star-tooltip__arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: $tooltip-ring;
+  clip-path: var(--star-tooltip-arrow-clip);
+
+  pointer-events: none;
+}
+
+// ------------------------------------------------------------------ placements
+
+.star-tooltip__bubble--top {
+  bottom: calc(100% + $tooltip-gap);
+  left: 50%;
+
+  transform: translateX(-50%);
+}
+
+.star-tooltip__arrow--top {
+  bottom: -8px;
+  left: 50%;
+
+  margin-left: -4px;
+}
+
+.star-tooltip__bubble--bottom {
+  top: calc(100% + $tooltip-gap);
+  left: 50%;
+
+  transform: translateX(-50%);
+}
+
+.star-tooltip__arrow--bottom {
+  top: -8px;
+  left: 50%;
+
+  margin-left: -4px;
+  transform: rotate(180deg);
+}
+
+// Bubble on the left, arrow on its right edge pointing right.
+.star-tooltip__bubble--left {
+  right: calc(100% + $tooltip-gap);
+  top: 50%;
+
+  transform: translateY(-50%);
+}
+
+.star-tooltip__arrow--left {
+  right: -8px;
+  top: 50%;
+
+  margin-top: -4px;
+  transform: rotate(-90deg);
+}
+
+// Bubble on the right, arrow on its left edge pointing left.
+.star-tooltip__bubble--right {
+  left: calc(100% + $tooltip-gap);
+  top: 50%;
+
+  transform: translateY(-50%);
+}
+
+.star-tooltip__arrow--right {
+  left: -8px;
+  top: 50%;
+
+  margin-top: -4px;
+  transform: rotate(90deg);
+}
+
+// ------------------------------------------------------- keyboard reachability
+
+// Keyboard focus shows the bubble through the JS onFocus handler in
+// `Tooltip.tsx`; no CSS-only reveal is possible because the bubble is
+// conditionally rendered.
+
+// ------------------------------------------------------------------- motion
+
+@media (prefers-reduced-motion: reduce) {
+  .star-tooltip__bubble {
+    animation: none !important;
+  }
+}

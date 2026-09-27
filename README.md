@@ -126,10 +126,10 @@ export function SaveButton() {
 
 | 分类 | 导出 |
 |------|------|
-| 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading`、`StarTag` |
-| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRadio`、`StarCheckbox`、`StarSelect`、`StarRating`、`StarProgress` |
-| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
-| 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
+| 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading`、`StarTag`、`StarBadge`、`StarCollapse`、`StarSkeleton` |
+| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarTextarea`、`StarSwitch`、`StarRadio`、`StarCheckbox`、`StarSelect`、`StarRating`、`StarProgress` |
+| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter`、`StarAlert`、`StarTooltip` |
+| 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab`、`StarPagination` |
 
 完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
 
@@ -962,6 +962,196 @@ const [name, setName] = useState('')
 | clearLabel | `string` | `'Clear'` | 清空按钮的无障碍名称 |
 
 其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`name`、`onFocus`…）会透传到内部的 `<input>`。
+
+---
+
+### StarTextarea - 多行输入
+
+`StarInput` 的高个子兄弟：同款 4px 阶梯木框与羊皮纸凹槽，多行书写，支持状态染色、字数统计、竖向拖拽调高。
+
+```tsx
+import { StarTextarea } from 'stardew-valley-ui'
+
+<StarTextarea label="给皮埃尔的信" placeholder="亲爱的皮埃尔……" rows={4} block />
+
+// 校验状态与字数统计
+<StarTextarea label="任务描述" status="error" message="再补充些细节" showCount maxLength={80} />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| value / defaultValue | `string` | `''` | 受控值或初始值 |
+| onChange | `(value: string) => void` | - | 文本变化回调（只回传文本） |
+| rows | `number` | `4` | 初始可见行数 |
+| label | `ReactNode` | - | 可见标题，绑定输入框 |
+| message | `ReactNode` | - | 框下方的提示或校验文案 |
+| status | `'default' \| 'warning' \| 'error' \| 'success'` | `'default'` | 语义状态，决定边框与光标颜色 |
+| color | `string` | - | 自定义强调色，覆盖 status |
+| showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
+| block | `boolean` | `false` | 撑满容器宽度 |
+
+其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`onFocus`…）会透传到内部的 `<textarea>`，右下角可竖向拖拽调高。
+
+---
+
+### StarBadge - 徽标
+
+物品栏角落的数量角标：带 2px 阶梯角的像素小牌，独立摆放或钉在目标右上角；超过上限折叠为 N+，红点模式只标记"有新东西"。
+
+```tsx
+import { StarBadge } from 'stardew-valley-ui'
+
+<StarBadge count={7} />
+<StarBadge count={120} />          // 显示 99+
+<StarBadge dot color="#71964A" />  // 8px 方点
+
+// 包裹目标：徽标钉在其右上角
+<StarBadge count={12}>
+  <button type="button">收件箱</button>
+</StarBadge>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| count | `number` | - | 显示的数值；超过 `overflowCount` 折叠为 N+ |
+| dot | `boolean` | `false` | 红点模式：只渲染 8px 方点，不显示数字 |
+| overflowCount | `number` | `99` | 数值折叠上限 |
+| showZero | `boolean` | `false` | count 为 0 时是否显示 |
+| color | `string` | `'#E53935'` | 底色；边框色由它自动推导 |
+| children | `ReactNode` | - | 包裹目标；徽标钉在其右上角 |
+
+---
+
+### StarAlert - 警告提示
+
+钉在告示板顶端的羊皮纸横幅：左侧 4px 语义色带标明消息性质，标题加粗、正文紧随；错误横幅以 `role="alert"` 播报，色板与 Input 的 status 一致。
+
+```tsx
+import { StarAlert } from 'stardew-valley-ui'
+
+<StarAlert type="info" title="天气预报">明天有暴雨，记得提前浇水。</StarAlert>
+<StarAlert type="error" title="矿洞遇险">第 40 层发现幽灵，请及时撤离！</StarAlert>
+
+// 可关闭
+<StarAlert type="success" title="播种成功" closable onClose={log}>防风草已种下。</StarAlert>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| type | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` | 语义类型，决定色带与标题颜色 |
+| title | `ReactNode` | - | 加粗标题 |
+| children | `ReactNode` | - | 横幅正文 |
+| closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
+| onClose | `() => void` | - | 关闭后触发 |
+| closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
+
+---
+
+### StarSkeleton - 骨架屏
+
+内容就位前的像素条纹占位骨架，像矿洞里先搭好的支架：标题行、段落行和头像块以 45° 条纹填充，条纹以 `steps()` 像素步进向前跳；`loading` 变为 `false` 时支架拆掉，`children` 接管。
+
+```tsx
+import { StarSkeleton } from 'stardew-valley-ui'
+
+<StarSkeleton rows={3} />
+<StarSkeleton avatar rows={2} />
+
+// 与真实内容切换
+<StarSkeleton loading={ready} rows={2}>
+  <p>秋季收成：南瓜 ×112……</p>
+</StarSkeleton>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| loading | `boolean` | `true` | 为 `false` 时渲染 children |
+| rows | `number` | `3` | 段落占位行数；末行自动收短到 60% |
+| title | `boolean` | `true` | 是否显示加粗标题行 |
+| avatar | `boolean` | `false` | 是否在左侧显示方形头像占位 |
+| children | `ReactNode` | - | loading 为 `false` 时渲染的真实内容 |
+
+---
+
+### StarTooltip - 文字提示
+
+悬停或聚焦时浮现的像素小气泡，像 NPC 的即时指点：两层阶梯裁切的羊皮纸小牌 + 8px 像素箭头，四方向可选；键盘聚焦同样唤出。
+
+```tsx
+import { StarTooltip } from 'stardew-valley-ui'
+
+<StarTooltip title="挖矿小贴士">
+  <button type="button">矿车</button>
+</StarTooltip>
+
+<StarTooltip title="上方气泡" placement="bottom">…</StarTooltip>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| title | `ReactNode` | - | 气泡内容，支持任意 ReactNode |
+| placement | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | 气泡出现的位置 |
+| open | `boolean` | - | 受控可见性；不传则由悬停/聚焦接管 |
+| defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
+| mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒）；`0` 立即显示 |
+| mouseLeaveDelay | `number` | `150` | 移开隐藏延迟（毫秒） |
+| onOpenChange | `(open: boolean) => void` | - | 可见性将要变化时触发 |
+
+---
+
+### StarPagination - 分页
+
+翻看公告板上一页页委托的像素翻页器：方形羊皮纸页码块像栅栏柱一样排开，当前页像盖了墨章一样变深；长页码用省略号搭桥，首尾永远可见。
+
+```tsx
+import { StarPagination } from 'stardew-valley-ui'
+
+<StarPagination total={45} pageSize={10} onChange={(page) => setPage(page)} />
+
+// 长列表：第 1 页、末页、当前页 ±1，其余省略
+<StarPagination total={300} defaultCurrent={15} />
+
+// 只有一页时整个退场
+<StarPagination total={8} hideOnSinglePage />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| total | `number` | - | 总条数，翻页器据此推导总页数 |
+| pageSize | `number` | `10` | 每页条数 |
+| current | `number` | - | 受控当前页（1-based）；不传则组件自持状态 |
+| defaultCurrent | `number` | `1` | 非受控模式的初始页码 |
+| onChange | `(page: number, pageSize: number) => void` | - | 页码变化时触发 |
+| hideOnSinglePage | `boolean` | `false` | 只有一页时是否隐藏 |
+
+---
+
+### StarCollapse - 折叠面板
+
+可折叠的木牌分节，像翻开的手账逐节收纳任务说明：每节是一块 2px 阶梯框的羊皮纸木牌，像素箭头两步翻转，面板瞬开，默认多开互不影响。
+
+```tsx
+import { StarCollapse } from 'stardew-valley-ui'
+
+const seasons = [
+  { key: 'spring', label: '春季', content: '种下防风草和土豆。' },
+  { key: 'summer', label: '夏季', content: '蓝莓和辣椒是大户。', disabled: false },
+]
+
+<StarCollapse defaultActiveKeys={['spring']} items={seasons} onChange={setKeys} />
+
+// 手风琴：同时只摊开一节
+<StarCollapse accordion items={seasons} />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| items | `CollapseItem[]` | - | 分节列表；每项含 `key`、`label`、`content`、`disabled?` |
+| accordion | `boolean` | `false` | 手风琴模式：同时只展开一节 |
+| activeKeys | `string[]` | - | 受控展开键；不传则组件自持状态 |
+| defaultActiveKeys | `string[]` | `[]` | 非受控初始展开键 |
+| onChange | `(keys: string[]) => void` | - | 展开集合变化时触发 |
+| ariaLabel | `string` | - | 整个面板的无障碍名称 |
 
 ---
 

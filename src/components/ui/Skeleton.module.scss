@@ -1,0 +1,84 @@
+/**
+ * Pixel mine-support skeleton.
+ *
+ * Every placeholder block is a staircase-clipped strip filled with a 45°
+ * two-tone stripe (4px light / 4px base). Instead of a smooth shimmer, the
+ * stripes *step* forward: `background-position` advances exactly one stripe
+ * period (8px × √2 ≈ 11.314px of horizontal travel) in four discrete jumps,
+ * so the pattern hops like a pixel-game conveyor rather than gliding.
+ *
+ * Row and avatar widths live in the TSX (`--star-skeleton-clip-*` for the
+ * two staircase scales); this file only owns material and motion.
+ */
+$skeleton-base: var(--star-raw-hex-cdbda8);
+$skeleton-stripe: var(--star-raw-hex-e0d9c6);
+$skeleton-edge-dark: var(--star-raw-hex-b8a890);
+$skeleton-edge-light: var(--star-raw-hex-f4ead6);
+
+@mixin skeleton-material {
+  background: repeating-linear-gradient(
+    45deg,
+    $skeleton-stripe 0 4px,
+    $skeleton-base 4px 8px
+  );
+  box-shadow:
+    inset 0 1px 0 $skeleton-edge-light,
+    inset 0 -1px 0 $skeleton-edge-dark;
+}
+
+.star-skeleton {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  font-family: var(--font-pixel);
+}
+
+.star-skeleton__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.star-skeleton__row {
+  height: 10px;
+  clip-path: var(--star-skeleton-clip-row);
+
+  @include skeleton-material;
+  animation: star-skeleton-march 480ms steps(4, jump-none) infinite;
+}
+
+.star-skeleton__row--title {
+  height: 14px;
+}
+
+.star-skeleton__avatar {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  clip-path: var(--star-skeleton-clip-avatar);
+
+  @include skeleton-material;
+  animation: star-skeleton-march 480ms steps(4, jump-none) infinite;
+}
+
+// One full horizontal cycle of the 45° stripe pattern: 8px / cos(45°).
+@keyframes star-skeleton-march {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 11.314px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-skeleton__row,
+  .star-skeleton__avatar {
+    animation: none !important;
+  }
+}

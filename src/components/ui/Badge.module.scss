@@ -1,0 +1,65 @@
+/**
+ * Pixel counter badge.
+ *
+ * The badge is a tiny stepped plate: the fill colour comes from the `color`
+ * prop and its frame edge is derived through `deriveProgressPalette`, the same
+ * derivation Progress uses for its bevels. The staircase polygon is injected
+ * as `--star-badge-clip` by `Badge.tsx` because it is generated from the
+ * shared `pixelCorners` helper.
+ *
+ * Two placement modes come from `Badge.tsx` as modifier classes: inside a
+ * wrapper the badge pins itself half a step past the top-right corner, like an
+ * inventory stack counter; `--standalone` keeps it in the inline flow.
+ */
+
+.star-badge__wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.star-badge {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 16px;
+  height: 15px;
+  padding: 0 3px;
+
+  background: var(--star-badge-fill, var(--star-raw-hex-e53935));
+  clip-path: var(--star-badge-clip);
+  box-shadow: 1px 2px 0 var(--star-raw-rgba-157-65-0-0-28);
+
+  color: var(--star-raw-hex-f4ead6);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+// Wrap mode: pinned onto the wrapped content's top-right corner.
+.star-badge__wrapper > .star-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+
+  // Push half a step past the corner so it reads as pinned on, not inside.
+  transform: translate(38%, -38%);
+}
+
+// Standalone mode: the badge participates in the inline flow on its own.
+.star-badge--standalone {
+  position: relative;
+  transform: none;
+}
+
+.star-badge--dot {
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+}

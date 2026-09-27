@@ -1,0 +1,218 @@
+/**
+ * Pixel multi-line text field — the `Input` family's tall sibling.
+ *
+ * Two layers share one `clip-path` value (injected as `--star-textarea-clip`
+ * by `Textarea.tsx`): `__plate` paints the ring across the whole box, and the
+ * field surface is inset by `$textarea-frame-width` and painted by
+ * `__control`'s background. Because both are cut with the same staircase, the
+ * ring comes out an even 4px wide around the stepped corners.
+ *
+ * Colour tokens live on `.star-textarea-wrapper` so `is-disabled` /
+ * `is-readonly` / the `status` tints can override them; `.star-textarea` and
+ * its layers only consume them. Only `--star-textarea-clip` is set inline,
+ * because it depends on the geometry constants in `Textarea.tsx`.
+ */
+$textarea-frame-width: 4px;
+$textarea-ring-color: var(--star-raw-hex-a8895f);
+$textarea-text: var(--star-raw-hex-4a2c1a);
+$textarea-placeholder: var(--star-raw-hex-9c8660);
+$textarea-surface: var(--star-raw-hex-f7efc5);
+$textarea-bevel-dark: var(--star-raw-hex-ddc79b);
+$textarea-bevel-light: var(--star-raw-hex-f4ead6);
+$textarea-accent: var(--star-raw-hex-71964a);
+$textarea-hint: var(--star-raw-hex-5c4526);
+
+.star-textarea-wrapper {
+  --star-textarea-surface: #{$textarea-surface};
+  --star-textarea-ring: #{$textarea-ring-color};
+  --star-textarea-text: #{$textarea-text};
+  --star-textarea-accent: #{$textarea-accent};
+  --star-textarea-bevel-dark: #{$textarea-bevel-dark};
+  --star-textarea-bevel-light: #{$textarea-bevel-light};
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: inherit;
+
+  &.is-block {
+    display: flex;
+    width: 100%;
+  }
+}
+
+.star-textarea__label {
+  color: $textarea-hint;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.star-textarea__message {
+  margin: 0;
+  color: $textarea-hint;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+// --------------------------------------------------------------- status tints
+
+.star-textarea-wrapper--warning {
+  --star-textarea-accent: var(--star-raw-hex-d7992e);
+  --star-textarea-ring: var(--star-raw-hex-bb8a33);
+
+  .star-textarea__message {
+    color: var(--star-raw-hex-a9752a);
+  }
+}
+
+.star-textarea-wrapper--error {
+  --star-textarea-accent: var(--star-raw-hex-c0574f);
+  --star-textarea-ring: var(--star-raw-hex-a35149);
+
+  .star-textarea__message {
+    color: var(--star-raw-hex-a35149);
+  }
+}
+
+.star-textarea-wrapper--success {
+  --star-textarea-accent: var(--star-raw-hex-71964a);
+  --star-textarea-ring: var(--star-raw-hex-6d8a4c);
+
+  .star-textarea__message {
+    color: var(--star-raw-hex-5d7a3d);
+  }
+}
+
+// Declared last so a locked field stays muted regardless of its status.
+.star-textarea-wrapper.is-disabled {
+  --star-textarea-surface: var(--star-raw-hex-ece3cf);
+  --star-textarea-ring: var(--star-raw-hex-bfae90);
+  --star-textarea-text: var(--star-raw-hex-9b8b70);
+  --star-textarea-accent: var(--star-raw-hex-b8a890);
+
+  cursor: not-allowed;
+}
+
+// Read-only keeps the normal weight — it is still selectable content, not a
+// broken control — but flattens the surface a touch to read as "view only".
+.star-textarea-wrapper.is-readonly {
+  --star-textarea-surface: var(--star-raw-hex-f3ecd7);
+  --star-textarea-bevel-light: var(--star-raw-hex-f3ecd7);
+
+  cursor: default;
+}
+
+// ---------------------------------------------------------------------- field
+
+.star-textarea {
+  position: relative;
+  display: inline-flex;
+  width: 260px;
+  color: var(--star-textarea-text);
+  font-family: inherit;
+
+  .is-block & {
+    width: 100%;
+  }
+}
+
+.star-textarea--small {
+  --star-textarea-padding: 10px;
+  --star-textarea-font-size: 13px;
+}
+
+.star-textarea--medium {
+  --star-textarea-padding: 12px;
+  --star-textarea-font-size: 14px;
+}
+
+.star-textarea--large {
+  --star-textarea-padding: 16px;
+  --star-textarea-font-size: 16px;
+}
+
+/** Focus halo: the same staircase on a box grown 3px per side. */
+.star-textarea__glow {
+  position: absolute;
+  inset: -3px;
+  background: var(--star-textarea-accent);
+  clip-path: var(--star-textarea-clip);
+
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms steps(2, end);
+}
+
+.star-textarea__plate {
+  position: absolute;
+  inset: 0;
+  background: var(--star-textarea-ring);
+  clip-path: var(--star-textarea-clip);
+
+  pointer-events: none;
+}
+
+.star-textarea:focus-within {
+  // Focus reads as one cue: the ring picks up the accent, and the halo behind
+  // it repeats the same staircase 3px further out.
+  --star-textarea-ring: var(--star-textarea-accent);
+
+  .star-textarea__glow {
+    opacity: 1;
+  }
+}
+
+.star-textarea__control {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+
+  // The ring is painted by `__plate`, so the surface here is inset by the
+  // frame width on every side and re-cut with the same staircase. The extra
+  // bottom padding reserves room for the counter chip when `showCount` is on.
+  margin: $textarea-frame-width;
+  padding: calc(#{$textarea-frame-width} + 4px) var(--star-textarea-padding)
+    calc(#{$textarea-frame-width} + 18px);
+  border: 0;
+  outline: 0;
+  resize: vertical;
+
+  background: var(--star-textarea-surface);
+  clip-path: var(--star-textarea-clip);
+
+  // Recessed read: a dark band under the top edge, a light band above the bottom.
+  box-shadow:
+    inset 0 4px 0 0 var(--star-textarea-bevel-dark),
+    inset 0 -4px 0 0 var(--star-textarea-bevel-light);
+
+  color: inherit;
+  caret-color: var(--star-textarea-accent);
+  font: inherit;
+  font-size: var(--star-textarea-font-size);
+  line-height: 1.5;
+
+  &::placeholder {
+    color: $textarea-placeholder;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.star-textarea__count {
+  position: absolute;
+  right: calc(#{$textarea-frame-width} + 8px);
+  bottom: calc(#{$textarea-frame-width} + 4px);
+
+  color: $textarea-placeholder;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-textarea__glow {
+    transition: none !important;
+  }
+}

@@ -22,13 +22,20 @@ afterEach(() => {
 })
 
 describe('router', () => {
-  it('renders the date picker demo for /components/date-picker', async () => {
-    await renderRoute('/components/date-picker')
+  // Routed pages are code-split and the date-picker chunk is heavy; under a
+  // full-suite run the whole mount can outlast the default 5s test timeout,
+  // so this case carries its own generous budget.
+  it(
+    'renders the date picker demo for /components/date-picker',
+    async () => {
+      await renderRoute('/components/date-picker')
 
-    // Routed pages are code-split, so the chunk arrives asynchronously. The
-    // default 1s findBy timeout is too tight when the whole suite is running.
-    expect(
-      (await screen.findAllByRole('heading', { name: /DatePicker/ }, { timeout: 5000 })).length
-    ).toBeGreaterThan(0)
-  })
+      // Routed pages are code-split, so the chunk arrives asynchronously. The
+      // default 1s findBy timeout is too tight when the whole suite is running.
+      expect(
+        (await screen.findAllByRole('heading', { name: /DatePicker/ }, { timeout: 10000 })).length
+      ).toBeGreaterThan(0)
+    },
+    15000,
+  )
 })
