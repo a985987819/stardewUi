@@ -1,0 +1,259 @@
+/**
+ * Pixel dropdown select.
+ *
+ * The trigger shares `Input`'s two-layer trick: three layers share one
+ * `clip-path` value (injected as `--star-select-clip` by `Select.tsx`) —
+ * `__glow` paints the focus halo 3px outside, `__plate` paints the ring across
+ * the whole box, `__field` is inset by `$select-frame-width` and paints the
+ * parchment fill. Because all are cut with the same staircase, the ring comes
+ * out an even 4px wide around the stepped corners.
+ *
+ * The folded panel below reuses the same polygon for its own plate + surface
+ * pair, so trigger and panel keep matching stepped corners. Colour tokens live
+ * on `.star-select` so `is-open` / `--disabled` can override them; the layers
+ * only consume them.
+ */
+$select-frame-width: 4px;
+$select-ring: var(--star-raw-hex-a8895f);
+$select-text: var(--star-raw-hex-4a2c1a);
+$select-placeholder: var(--star-raw-hex-9c8660);
+$select-surface: var(--star-raw-hex-f7efc5);
+$select-bevel-dark: var(--star-raw-hex-ddc79b);
+$select-bevel-light: var(--star-raw-hex-f4ead6);
+$select-accent: var(--star-raw-hex-71964a);
+$select-panel-surface: var(--star-raw-hex-f3ecd7);
+$select-row-hover: var(--star-raw-hex-ece3cf);
+$select-selected-tint: var(--star-raw-hex-d3dfc8);
+$select-selected-ink: var(--star-raw-hex-2f5233);
+
+.star-select {
+  position: relative;
+  display: inline-flex;
+  width: 220px;
+  color: var(--select-text);
+  font-family: var(--font-pixel);
+
+  --select-ring: #{$select-ring};
+  --select-text: #{$select-text};
+  --select-accent: #{$select-accent};
+}
+
+.star-select--block {
+  width: 100%;
+}
+
+.star-select--small {
+  --select-height: 32px;
+  --select-padding: 10px;
+  --select-font-size: 13px;
+}
+
+.star-select--medium {
+  --select-height: 40px;
+  --select-padding: 12px;
+  --select-font-size: 14px;
+}
+
+.star-select--large {
+  --select-height: 48px;
+  --select-padding: 16px;
+  --select-font-size: 16px;
+}
+
+/** Focus / open halo: the same staircase on a box grown 3px per side. */
+.star-select__glow {
+  position: absolute;
+  inset: -3px;
+  background: var(--select-accent);
+  clip-path: var(--star-select-clip);
+
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms steps(2, end);
+}
+
+.star-select.is-open,
+.star-select:focus-within {
+  .star-select__glow {
+    opacity: 1;
+  }
+}
+
+.star-select__plate {
+  position: absolute;
+  inset: 0;
+  background: var(--select-ring);
+  clip-path: var(--star-select-clip);
+
+  pointer-events: none;
+}
+
+.star-select__trigger {
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin: $select-frame-width;
+  padding: 0;
+  border: 0;
+
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  // Keyboard focus reads through the halo behind the plate, which lights up
+  // via `.star-select:focus-within` — the single focus cue, matching Input.
+  &:focus-visible {
+    outline: 0;
+  }
+}
+
+.star-select__field {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 0;
+  height: var(--select-height);
+  padding: 0 var(--select-padding);
+
+  background: var(--select-surface);
+  clip-path: var(--star-select-clip);
+
+  // Recessed read: a dark band under the top edge, a light band above the bottom.
+  box-shadow:
+    inset 0 4px 0 0 var(--select-bevel-dark),
+    inset 0 -4px 0 0 var(--select-bevel-light);
+
+  font-size: var(--select-font-size);
+}
+
+.star-select__value {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.star-select__value--placeholder {
+  color: $select-placeholder;
+}
+
+.star-select__chevron {
+  flex: 0 0 auto;
+  color: $select-placeholder;
+  transition: transform 120ms steps(3, end);
+}
+
+.star-select.is-open .star-select__chevron {
+  transform: rotate(180deg);
+}
+
+// ---------------------------------------------------------------------- panel
+
+.star-select__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+
+  background: var(--select-ring);
+  clip-path: var(--star-select-clip);
+}
+
+.star-select__list {
+  margin: $select-frame-width;
+  max-height: 240px;
+  overflow-y: auto;
+
+  background: $select-panel-surface;
+  clip-path: var(--star-select-clip);
+  box-shadow:
+    inset 0 4px 0 0 var(--select-bevel-dark),
+    inset 0 -4px 0 0 var(--select-bevel-light);
+}
+
+.star-select__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px var(--select-padding);
+  border: 0;
+
+  background: transparent;
+  color: $select-text;
+  font: inherit;
+  font-size: var(--select-font-size);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: $select-row-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $select-accent;
+    outline-offset: -2px;
+  }
+
+  &--selected {
+    background: $select-selected-tint;
+    color: $select-selected-ink;
+    text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-4);
+  }
+
+  &--disabled {
+    opacity: 0.42;
+    filter: saturate(0.32) contrast(0.88);
+    cursor: not-allowed;
+  }
+}
+
+.star-select__option-label {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.star-select__option-check {
+  flex: 0 0 auto;
+  color: $select-accent;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+// ------------------------------------------------------------------- disabled
+
+.star-select--disabled {
+  --select-ring: var(--star-raw-hex-bfae90);
+  --select-text: var(--star-raw-hex-9b8b70);
+  --select-accent: var(--star-raw-hex-b8a890);
+
+  cursor: not-allowed;
+
+  .star-select__trigger {
+    cursor: not-allowed;
+  }
+
+  .star-select__field {
+    background: var(--star-raw-hex-ece3cf);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star-select__glow,
+  .star-select__chevron {
+    transition: none !important;
+  }
+}

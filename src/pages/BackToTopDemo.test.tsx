@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { act, render } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import { I18nProvider } from '../i18n'
 import StarBackToTopDemoPage from './BackToTopDemo'
 
@@ -40,7 +41,9 @@ describe('BackToTop demo page', () => {
 
     render(
       <I18nProvider>
-        <StarBackToTopDemoPage />
+        <MemoryRouter>
+          <StarBackToTopDemoPage />
+        </MemoryRouter>
       </I18nProvider>,
     )
 

@@ -1,5 +1,6 @@
 ﻿import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import { I18nProvider } from '../i18n'
 import PopupDemo from './PopupDemo'
 
@@ -9,7 +10,9 @@ describe('PopupDemo', () => {
 
     render(
       <I18nProvider>
-        <PopupDemo />
+        <MemoryRouter>
+          <PopupDemo />
+        </MemoryRouter>
       </I18nProvider>
     )
 

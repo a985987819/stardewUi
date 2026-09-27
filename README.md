@@ -126,8 +126,8 @@ export function SaveButton() {
 
 | 分类 | 导出 |
 |------|------|
-| 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading` |
-| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRating`、`StarProgress` |
+| 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading`、`StarTag` |
+| 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarSwitch`、`StarRadio`、`StarCheckbox`、`StarSelect`、`StarRating`、`StarProgress` |
 | 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab` |
 
@@ -824,6 +824,94 @@ const crops = [
 | shape | `'square' \| 'round'` | `'square'` | Card 方框或圆形印章框 |
 | radio | `boolean` | `false` | 单选模式；最多选择一项，并使用 `radiogroup` / `radio` 语义 |
 | aria-label | `string` | `'Checkbox'` | 多选框组的无障碍名称 |
+
+---
+
+### StarTag - 标签
+
+钉在告示板上的木牌小签：羊皮纸底、2px 木框与阶梯角，六种预设配色；`closable` 显示像素 ×，点击后标签自行移除并触发 `onClose`。
+
+```tsx
+import { StarTag } from 'stardew-valley-ui'
+
+// 基础用法
+<StarTag>防风草</StarTag>
+<StarTag color="green">新鲜作物</StarTag>
+<StarTag color="red">高峰定价</StarTag>
+<StarTag color="yellow">限时任务</StarTag>
+<StarTag color="blue">深海鱼</StarTag>
+<StarTag color="purple">秘境种子</StarTag>
+
+// 可关闭
+<StarTag closable onClose={removeTag}>土豆</StarTag>
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| color | `'default' \| 'green' \| 'red' \| 'yellow' \| 'blue' \| 'purple'` | `'default'` | 预设配色：更换木框、文字与关闭悬停色 |
+| closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
+| onClose | `() => void` | - | 点击关闭按钮移除标签后触发 |
+| closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
+| children | `ReactNode` | - | 标签内容 |
+
+---
+
+### StarRadio - 单选框
+
+Card 风格圆印章框的单选控件：选中时像素种子以弹跳入场，换选时旧种子摇晃缩退；重复点击已选项不会清空选择，语义与 `StarCheckbox radio` 模式一致但 API 返回单个 `string`。
+
+```tsx
+import { StarRadio } from 'stardew-valley-ui'
+
+const fences = [
+  { value: 'wood', label: '木质栅栏' },
+  { value: 'stone', label: '石质墙体' },
+  { value: 'hardwood', label: '硬木围栏', disabled: true },
+]
+
+<StarRadio options={fences} value={fence} onChange={setFence} />
+<StarRadio options={fences} direction="vertical" size="large" />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| options | `RadioOption[]` | - | 选项列表；每项可设置 `value`、`label`、`disabled` |
+| value / defaultValue | `string` | - | 受控选中值或非受控初始值 |
+| onChange | `(value: string) => void` | - | 选中项变化时返回新的 value |
+| direction | `'horizontal' \| 'vertical'` | `'horizontal'` | 选项排列方向 |
+| disabled | `boolean` | `false` | 禁用整个单选组 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 控件尺寸 |
+| aria-label | `string` | `'Radio'` | 单选组的无障碍名称 |
+
+---
+
+### StarSelect - 下拉选择
+
+与 `StarInput` 同族的木框凹陷下拉选择器：触发框共用阶梯角几何，展开折叠清单选择单项；支持禁用项、三种尺寸与块级布局，点击外部或按 Esc 收起。
+
+```tsx
+import { StarSelect } from 'stardew-valley-ui'
+
+const crops = [
+  { value: 'parsnip', label: '防风草' },
+  { value: 'potato', label: '土豆' },
+  { value: 'strawberry', label: '草莓', disabled: true },
+]
+
+<StarSelect options={crops} value={crop} onChange={setCrop} aria-label="作物" />
+<StarSelect options={crops} placeholder="选择作物" size="large" block />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| options | `SelectOption[]` | - | 选项列表；每项可设置 `value`、`label`、`disabled` |
+| value / defaultValue | `string` | - | 受控选中值或非受控初始值 |
+| onChange | `(value: string) => void` | - | 选中项变化时返回新的 value |
+| placeholder | `string` | - | 未选择时在触发框内显示的占位文案 |
+| disabled | `boolean` | `false` | 禁用整个选择器 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 触发框尺寸 |
+| block | `boolean` | `false` | 撑满容器宽度 |
+| aria-label | `string` | `'Select'` | 触发框与清单的无障碍名称 |
 
 ---
 
