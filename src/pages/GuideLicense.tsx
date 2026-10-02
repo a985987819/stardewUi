@@ -5,7 +5,7 @@ function StarGuideLicensePage() {
   return (
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
-        <span>PLEASE READ BEFORE PLANTING</span>
+        <span>播种之前，请先读完这块牌子</span>
         <StarTitle level={1} className={styles['guide-intro-title']}>版权相关</StarTitle>
         <p className={styles['guide-intro-desc']}>
           <StarTypewriter text="本项目以非商业学习与个人创作为边界。使用前请确认你的用途不涉及收费、销售、获客或为商业客户交付。" speed={60} />

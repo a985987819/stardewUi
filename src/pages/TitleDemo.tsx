@@ -19,6 +19,12 @@ const colorPresets = [
   { label: { zh: '野李紫', en: 'Wild plum' }, value: '#95649a' },
 ] as const
 
+/** Visible sample headings. The matching `code` snippets stay English so they copy straight into a project. */
+const sampleTitle = {
+  zh: { board: '丰收告示板', ledger: '森林账本', chapter: '任务章节', shadow: '去掉阴影', festival: '春季庆典' },
+  en: { board: 'Harvest board', ledger: 'Forest ledger', chapter: 'Quest chapter', shadow: 'No shadow', festival: 'Spring festival' },
+} satisfies Record<Lang, Record<string, string>>
+
 const copy = {
   zh: {
     title: '标题 Title',
@@ -70,6 +76,7 @@ const apiData = {
 function StarTitleDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
+  const sample = sampleTitle[lang]
   const [titleColor, setTitleColor] = useState('#5f8f7a')
   const toc = t.toc.map((title, index) => ({ id: ['basic', 'chinese', 'color', 'metrics', 'shadow', 'custom', 'api'][index], title, level: 1 }))
 
@@ -81,7 +88,7 @@ function StarTitleDemoPage() {
         description={t.demos[0][1]}
         code={'<StarTitle>Harvest board</StarTitle>'}
       >
-        <StarTitle>Harvest board</StarTitle>
+        <StarTitle>{sample.board}</StarTitle>
       </StarComponentDemo>
       <StarComponentDemo
         id="chinese"
@@ -135,7 +142,7 @@ function StarTitleDemoPage() {
             </div>
           </div>
           <div className={styles['title-color-demo-preview']}>
-            <StarTitle color={titleColor}>Forest ledger</StarTitle>
+            <StarTitle color={titleColor}>{sample.ledger}</StarTitle>
             <output>{titleColor}</output>
           </div>
         </div>
@@ -146,7 +153,7 @@ function StarTitleDemoPage() {
         description={t.demos[3][1]}
         code={'<StarTitle fontSize={34} letterSpacing={10}>Quest chapter</StarTitle>'}
       >
-        <StarTitle fontSize={34} letterSpacing={10}>Quest chapter</StarTitle>
+        <StarTitle fontSize={34} letterSpacing={10}>{sample.chapter}</StarTitle>
       </StarComponentDemo>
       <StarComponentDemo
         id="shadow"
@@ -154,7 +161,7 @@ function StarTitleDemoPage() {
         description={t.demos[4][1]}
         code={'<StarTitle showShadow={false}>No shadow</StarTitle>'}
       >
-        <StarTitle showShadow={false}>No shadow</StarTitle>
+        <StarTitle showShadow={false}>{sample.shadow}</StarTitle>
       </StarComponentDemo>
       <StarComponentDemo
         id="custom"
@@ -162,7 +169,7 @@ function StarTitleDemoPage() {
         description={t.demos[5][1]}
         code={'<StarTitle level={1}>Spring festival</StarTitle>'}
       >
-        <StarTitle level={1}>Spring festival</StarTitle>
+        <StarTitle level={1}>{sample.festival}</StarTitle>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable title="Title API" data={apiData[lang]} />

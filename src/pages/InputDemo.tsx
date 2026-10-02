@@ -163,7 +163,7 @@ function StarInputDemoPage() {
         title={t.demos[0][0]}
         description={t.demos[0][1]}
         code={controlledInputCode}
-        data={[{ label: 'farmName', value: farmName || '(empty)' }]}
+        data={[{ label: 'farmName', value: farmName || '（空）' }]}
       >
         <div style={stackStyle}>
           <StarInput
@@ -182,7 +182,7 @@ function StarInputDemoPage() {
         title={t.demos[1][0]}
         description={t.demos[1][1]}
         code={controlledAffixInputCode}
-        data={[{ label: 'shippingBinLabel', value: nickname || '(empty)' }]}
+        data={[{ label: 'shippingBinLabel', value: nickname || '（空）' }]}
       >
         <div style={stackStyle}>
           <StarInput

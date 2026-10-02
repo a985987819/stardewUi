@@ -116,7 +116,7 @@ function StarPixelTextDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="wrapped" title={t.demos[2][0]} description={t.demos[2][1]} code={'<StarPixelText pixelSize={7}>Farm!</StarPixelText>'}>
-        <div className={styles['wrapped']}><StarPixelText pixelSize={7} fontSize={72}>Farm!</StarPixelText></div>
+        <div className={styles['wrapped']}><StarPixelText pixelSize={7} fontSize={72}>{lang === 'zh' ? '丰收啦！' : 'Farm!'}</StarPixelText></div>
       </StarComponentDemo>
 
       <div id="api" className="component-page-api"><StarApiTable title="PixelText API" data={apiData[lang]} /></div>

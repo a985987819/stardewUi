@@ -52,7 +52,7 @@ function StarGuideAgentUsePage() {
   return (
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
-        <span>AI SKILL · STARDEW VALLEY UI</span>
+        <span>AI 技能包 · STARDEW VALLEY UI</span>
         <StarTitle level={1} className={styles['guide-intro-title']}>让 Agent 真正会用</StarTitle>
         <p className={styles['guide-intro-desc']}>
           <StarTypewriter text="这不是一段一次性的提示词，而是一份可安装、按需加载的项目知识包：让 AI 知道什么时候该用、去哪里查、哪些规则绝不能越界。" speed={60} />

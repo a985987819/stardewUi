@@ -12,7 +12,7 @@ function StarGuideDesignSystemPage() {
   return (
     <article className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
-        <span>THE TOWN NOTICEBOARD</span>
+        <span>小镇公告板</span>
         <StarTitle level={1} className={styles['guide-intro-title']}>设计规范</StarTitle>
         <p className={styles['guide-intro-desc']}>
           <StarTypewriter text="这一套组件的目标不是把每个页面都扮成游戏截图，而是用可读、可点、可复用的像素语言，让产品界面有自己的季节感。" speed={60} />

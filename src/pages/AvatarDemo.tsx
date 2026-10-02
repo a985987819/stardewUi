@@ -33,6 +33,12 @@ const copy = {
   },
 } satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; labels: string[] }>
 
+/** Live portrait names. The `code` snippets keep the English originals so they stay copy-ready. */
+const villager = {
+  zh: { abigail: '阿比盖尔', leah: '莉亚', maru: '玛鲁', sam: '山姆', robin: '罗宾', clint: '克林特' },
+  en: { abigail: 'Abigail', leah: 'Leah Stone', maru: 'Maru', sam: 'Sam', robin: 'Robin', clint: 'Clint' },
+} satisfies Record<Lang, Record<string, string>>
+
 const apiData = {
   zh: [
     { property: 'src', description: '头像图片地址；加载失败时显示后备内容', type: 'string', default: '-' },
@@ -59,26 +65,27 @@ function AvatarItem({ label, children }: { label: string; children: ReactNode })
 function StarAvatarDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
+  const v = villager[lang]
   const toc = t.toc.map((title, index) => ({ id: ['basic', 'shape', 'color', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={'<StarAvatar src="/portrait.png" alt="Abigail" />'}>
         <div className={styles['avatar-demo-row']}>
-          <AvatarItem label={t.labels[0]}><StarAvatar src={portrait} alt="Abigail" /></AvatarItem>
-          <AvatarItem label={t.labels[1]}><StarAvatar name="Leah Stone" color="#D9899A" /></AvatarItem>
+          <AvatarItem label={t.labels[0]}><StarAvatar src={portrait} alt={v.abigail} /></AvatarItem>
+          <AvatarItem label={t.labels[1]}><StarAvatar name={v.leah} color="#D9899A" /></AvatarItem>
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="shape" title={t.demos[1][0]} description={t.demos[1][1]} code={'<StarAvatar shape="circle" name="Maru" />'}>
         <div className={styles['avatar-demo-row']}>
-          <AvatarItem label={t.labels[2]}><StarAvatar name="Sam" shape="square" color="#D36C2A" /></AvatarItem>
-          <AvatarItem label={t.labels[3]}><StarAvatar src={portrait} alt="Maru" shape="circle" color="#7699B5" /></AvatarItem>
+          <AvatarItem label={t.labels[2]}><StarAvatar name={v.sam} shape="square" color="#D36C2A" /></AvatarItem>
+          <AvatarItem label={t.labels[3]}><StarAvatar src={portrait} alt={v.maru} shape="circle" color="#7699B5" /></AvatarItem>
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="color" title={t.demos[2][0]} description={t.demos[2][1]} code={'<StarAvatar size="large" color="#82B651" name="Robin" />'}>
         <div className={styles['avatar-demo-row']}>
-          <AvatarItem label={t.labels[4]}><StarAvatar size="small" color="#82B651" name="Robin" /></AvatarItem>
-          <AvatarItem label={t.labels[5]}><StarAvatar size="large" shape="circle" color="#6A7DC9" name="Clint" /></AvatarItem>
+          <AvatarItem label={t.labels[4]}><StarAvatar size="small" color="#82B651" name={v.robin} /></AvatarItem>
+          <AvatarItem label={t.labels[5]}><StarAvatar size="large" shape="circle" color="#6A7DC9" name={v.clint} /></AvatarItem>
         </div>
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="Avatar API" data={apiData[lang]} /></div>

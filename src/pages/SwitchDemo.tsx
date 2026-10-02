@@ -71,8 +71,8 @@ export function FarmSettings() {
 
   return (
     <>
-      <StarSwitch checked={barnLamp} onChange={setBarnLamp} aria-label="Barn lamp" />
-      <StarSwitch checked={autoWatering} onChange={setAutoWatering} aria-label="Auto watering" />
+      <StarSwitch checked={barnLamp} onChange={setBarnLamp} aria-label="谷仓的灯" />
+      <StarSwitch checked={autoWatering} onChange={setAutoWatering} aria-label="自动浇水" />
       <output>{JSON.stringify({ barnLamp, autoWatering })}</output>
     </>
   )

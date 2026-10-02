@@ -61,7 +61,7 @@ const copy = {
     boardEmpty: '板子上空空如也——贴一张试试。',
     postNext: '张贴下一张告示',
     starTitle: '祝尼魔任务',
-    starBody: '给 Gunther 捐 60 件展品，祝尼魔会亲自道谢。',
+    starBody: '给冈瑟捐 60 件展品，祝尼魔会亲自道谢。',
     boardClose: '撅下这张告示',
   },
   en: {

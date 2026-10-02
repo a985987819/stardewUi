@@ -142,10 +142,10 @@ function StarMessageDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo id="types" title={t.demos[1][0]} description={t.demos[1][1]}>
-        <StarNineSliceButton variant="success" onClick={() => message.success(lang === 'zh' ? '作物已出售。' : 'Crops sold.')}>Success</StarNineSliceButton>
-        <StarNineSliceButton variant="info" onClick={() => message.info(lang === 'zh' ? '旅行货车到了。' : 'Traveling cart arrived.')}>Info</StarNineSliceButton>
-        <StarNineSliceButton variant="warning" onClick={() => message.warning(lang === 'zh' ? '体力快耗尽了。' : 'Stamina is running low.')}>Warning</StarNineSliceButton>
-        <StarNineSliceButton variant="danger" onClick={() => message.error(lang === 'zh' ? '背包已满。' : 'Backpack is full.')}>Error</StarNineSliceButton>
+        <StarNineSliceButton variant="success" onClick={() => message.success(lang === 'zh' ? '作物已出售。' : 'Crops sold.')}>{lang === 'zh' ? '成功' : 'Success'}</StarNineSliceButton>
+        <StarNineSliceButton variant="info" onClick={() => message.info(lang === 'zh' ? '旅行货车到了。' : 'Traveling cart arrived.')}>{lang === 'zh' ? '信息' : 'Info'}</StarNineSliceButton>
+        <StarNineSliceButton variant="warning" onClick={() => message.warning(lang === 'zh' ? '体力快耗尽了。' : 'Stamina is running low.')}>{lang === 'zh' ? '警告' : 'Warning'}</StarNineSliceButton>
+        <StarNineSliceButton variant="danger" onClick={() => message.error(lang === 'zh' ? '背包已满。' : 'Backpack is full.')}>{lang === 'zh' ? '错误' : 'Error'}</StarNineSliceButton>
       </StarComponentDemo>
 
       <StarComponentDemo id="position" title={t.demos[2][0]} description={t.demos[2][1]}>

@@ -120,12 +120,12 @@ function StarBadgeDemoPage() {
         code={standaloneCode}
       >
         <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-          <StarBadge count={7} aria-label="seven" />
-          <StarBadge count={7} overflowCount={5} aria-label="capped" />
-          <StarBadge count={120} aria-label="overflow" />
-          <StarBadge count={0} showZero aria-label="zero" />
-          <StarBadge dot color="#71964A" aria-label="has news" />
-          <StarBadge text={t.textBadge} color="#308BE2" aria-label="event" />
+          <StarBadge count={7} aria-label="物品七件" />
+          <StarBadge count={7} overflowCount={5} aria-label="超过上限折叠为 5+" />
+          <StarBadge count={120} aria-label="数量折叠为 99+" />
+          <StarBadge count={0} showZero aria-label="数量为零也显示" />
+          <StarBadge dot color="#71964A" aria-label="有新鲜货上架" />
+          <StarBadge text={t.textBadge} color="#308BE2" aria-label="节日限定角标" />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -135,10 +135,10 @@ function StarBadgeDemoPage() {
         code={'<StarBadge count={120} overflowCount={99} />\n<StarBadge count={0} showZero />\n<StarBadge dot color="#308BE2" />'}
       >
         <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-          <StarBadge count={120} aria-label="overflow" />
-          <StarBadge count={3} color="#D7992E" aria-label="warning" />
-          <StarBadge count={2} color="#308BE2" aria-label="info" />
-          <StarBadge dot color="#71964A" aria-label="success news" />
+          <StarBadge count={120} aria-label="数量折叠为 99+" />
+          <StarBadge count={3} color="#D7992E" aria-label="三条待办警告" />
+          <StarBadge count={2} color="#308BE2" aria-label="两条新提示" />
+          <StarBadge dot color="#71964A" aria-label="有好消息" />
         </div>
       </StarComponentDemo>
       <StarComponentDemo

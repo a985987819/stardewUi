@@ -9,7 +9,7 @@ import styles from './Home.module.scss'
 
 const copy = {
   zh: {
-    eyebrow: 'PIXEL UI COMPONENT LIBRARY · REACT + TYPESCRIPT',
+    eyebrow: '像素 UI 组件库 · REACT + TYPESCRIPT',
     titleBefore: '给你的界面，',
     titleAccent: '种下一座小镇',
     description: '一套可组合、带类型提示的像素风 React 组件。把清晰的产品交互装进有泥土气息的边框里，让每一次点击都有一点收成。',
@@ -86,12 +86,12 @@ function StarHomePage() {
 
         <div className={styles['home-hero-art']} aria-hidden>
           <img src={heroImage} alt="" />
-          <span className={styles['home-art-sign']}>WELCOME!</span>
+          <span className={styles['home-art-sign']}>{lang === 'zh' ? '欢迎光临！' : 'WELCOME!'}</span>
           <span className={styles['home-art-cloud']} />
         </div>
       </section>
 
-      <section className={styles['home-highlights']} aria-label="Library highlights">
+      <section className={styles['home-highlights']} aria-label={lang === 'zh' ? '组件库亮点' : 'Library highlights'}>
         {highlights.map((highlight) => (
           <div key={highlight.label} className={styles['home-highlight']}>
             <span>{highlight.icon}</span>
@@ -103,7 +103,7 @@ function StarHomePage() {
 
       <section className={styles['home-install']}>
         <div>
-          <span className={styles['home-section-kicker']}>QUICK START</span>
+          <span className={styles['home-section-kicker']}>{lang === 'zh' ? '快速开始' : 'QUICK START'}</span>
           <h2>{text.install}</h2>
           <p>{text.installHint}</p>
         </div>
@@ -112,7 +112,7 @@ function StarHomePage() {
 
       <section className={styles['home-routes']}>
         <header>
-          <span className={styles['home-section-kicker']}>TRAIL MAP</span>
+          <span className={styles['home-section-kicker']}>{lang === 'zh' ? '推荐路线' : 'TRAIL MAP'}</span>
           <h2>{text.routesTitle}</h2>
           <p>{text.routesDescription}</p>
         </header>

@@ -65,7 +65,7 @@ export function FriendshipRating() {
 
   return (
     <>
-      <StarRating value={friendship} onChange={setFriendship} aria-label="Friendship rating" />
+      <StarRating value={friendship} onChange={setFriendship} aria-label="好感度评级" />
       <output>Friendship: {friendship} / 5</output>
     </>
   )
@@ -110,11 +110,11 @@ function StarRatingDemoPage() {
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={friendshipCode} data={[{ label: 'friendship', value: `${friendship} / 5` }]}>
-        <StarRating value={friendship} onChange={setFriendship} aria-label="Friendship rating" />
+        <StarRating value={friendship} onChange={setFriendship} aria-label="好感度评级" />
       </StarComponentDemo>
       <StarComponentDemo id="motion" title={t.demos[1][0]} description={t.demos[1][1]} code={motionCode} data={[{ label: 'rating', value: `${motionValue} / ${MOTION_MAX}` }]}>
         <div style={{ display: 'grid', gap: 18 }}>
-          <StarRating value={motionValue} count={MOTION_MAX} onChange={setMotionValue} aria-label="Motion rating" />
+          <StarRating value={motionValue} count={MOTION_MAX} onChange={setMotionValue} aria-label="动效评分" />
           <div style={{ display: 'flex', gap: 10 }}>
             <StarNineSliceButton variant="secondary" disabled={motionValue <= 0} onClick={() => setMotionValue((current) => Math.max(0, current - 1))}>{t.actions[0]}</StarNineSliceButton>
             <StarNineSliceButton variant="primary" disabled={motionValue >= MOTION_MAX} onClick={() => setMotionValue((current) => Math.min(MOTION_MAX, current + 1))}>{t.actions[1]}</StarNineSliceButton>
@@ -122,17 +122,17 @@ function StarRatingDemoPage() {
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="half" title={t.demos[2][0]} description={t.demos[2][1]} code={halfRatingCode} data={[{ label: 'score', value: `${stars} / 5` }]}>
-        <StarRating value={stars} onChange={setStars} icon="star" allowHalf color="#D7992E" aria-label="Star rating" />
+        <StarRating value={stars} onChange={setStars} icon="star" allowHalf color="#D7992E" aria-label="星级评分" />
       </StarComponentDemo>
       <StarComponentDemo id="count" title={t.demos[3][0]} description={t.demos[3][1]} code={'<StarRating count={3} defaultValue={2} />\n<StarRating count={10} defaultValue={6} />'}>
         <div style={{ display: 'grid', gap: 16 }}>
-          <StarRating count={3} defaultValue={2} aria-label="Three hearts" />
-          <StarRating count={10} defaultValue={6} aria-label="Ten hearts" />
-          <StarRating count={7} defaultValue={4} icon="star" color="#D7992E" aria-label="Seven stars" />
+          <StarRating count={3} defaultValue={2} aria-label="三颗心" />
+          <StarRating count={10} defaultValue={6} aria-label="十颗心" />
+          <StarRating count={7} defaultValue={4} icon="star" color="#D7992E" aria-label="七颗星" />
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="disabled" title={t.demos[4][0]} description={t.demos[4][1]} code={'<StarRating defaultValue={4} disabled />'}>
-        <StarRating defaultValue={4} disabled aria-label="Disabled rating" />
+        <StarRating defaultValue={4} disabled aria-label="已禁用的评分" />
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="Rating API" data={apiData[lang]} /></div>
     </StarComponentPage>
