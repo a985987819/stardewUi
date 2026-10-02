@@ -166,6 +166,7 @@
     line-height: 1.6;
   }
 
+  // 深色底 + 亮色叉号：在奶黄色的卡片标题栏里足够跳出来
   &__close {
     display: inline-flex;
     width: 30px;
@@ -173,9 +174,10 @@
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 3px solid var(--star-raw-hex-7a3514);
-    background: var(--star-raw-hex-f7d37f);
-    color: var(--star-raw-hex-5e2615);
+    border: 3px solid var(--star-raw-hex-3f2510);
+    background: var(--star-raw-hex-7a3514);
+    color: var(--star-raw-hex-ffe6a5);
+    text-shadow: 1px 1px 0 var(--star-raw-rgba-38-25-17-0-58);
     cursor: pointer;
     font-family: inherit;
     font-size: 20px;
@@ -183,11 +185,12 @@
     box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-24);
 
     &:hover {
-      background: var(--star-raw-hex-ffe6a5);
+      background: var(--star-raw-hex-9b440d);
       transform: translate(-1px, -1px);
     }
 
     &:active {
+      background: var(--star-raw-hex-5e2615);
       transform: translate(1px, 1px);
       box-shadow: none;
     }

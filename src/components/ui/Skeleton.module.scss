@@ -8,7 +8,10 @@
  * so the pattern hops like a pixel-game conveyor rather than gliding.
  *
  * Row and avatar widths live in the TSX (`--star-skeleton-clip-*` for the
- * two staircase scales); this file only owns material and motion.
+ * two staircase scales). The material colours are derived at runtime from the
+ * surrounding background (`--star-skeleton-base/stripe/edge-*`, set by
+ * `Skeleton.tsx` — hue kept, saturation toned way down); these parchment
+ * literals are only the fallback for when no painted ancestor is found.
  */
 $skeleton-base: var(--star-raw-hex-cdbda8);
 $skeleton-stripe: var(--star-raw-hex-e0d9c6);
@@ -18,12 +21,12 @@ $skeleton-edge-light: var(--star-raw-hex-f4ead6);
 @mixin skeleton-material {
   background: repeating-linear-gradient(
     45deg,
-    $skeleton-stripe 0 4px,
-    $skeleton-base 4px 8px
+    var(--star-skeleton-stripe, $skeleton-stripe) 0 4px,
+    var(--star-skeleton-base, $skeleton-base) 4px 8px
   );
   box-shadow:
-    inset 0 1px 0 $skeleton-edge-light,
-    inset 0 -1px 0 $skeleton-edge-dark;
+    inset 0 1px 0 var(--star-skeleton-edge-light, $skeleton-edge-light),
+    inset 0 -1px 0 var(--star-skeleton-edge-dark, $skeleton-edge-dark);
 }
 
 .star-skeleton {

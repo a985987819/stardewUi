@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { StarCard } from './Card'
 import StarNineSliceButton from './NineSliceButton'
@@ -79,8 +78,6 @@ const LABEL_CANCEL = '取消'
 const LABEL_ROLE = '角色'
 const TITLE_PREV = '上一页'
 const TITLE_NEXT = '下一页'
-const TITLE_PREV_DISABLED = '已是第一页'
-const TITLE_NEXT_DISABLED = '已是最后一页'
 const WAITING_TEXT = '等待标题完成...'
 function StarDialog({
   open,
@@ -396,29 +393,39 @@ function StarDialog({
 
                     {showPager ? (
                       <div className={styles['stardew-dialog__pagination']}>
-                        <StarNineSliceButton
-                          type="button"
-                          size="small"
-                          className={styles['stardew-dialog__nav-btn']}
-                          onClick={handlePrev}
-                          disabled={isFirstPage}
-                          title={isFirstPage ? TITLE_PREV_DISABLED : TITLE_PREV}
-                        >
-                          <ChevronUp size={18} />
-                        </StarNineSliceButton>
+                        {/* 首页隐藏向上（上一页）三角，尾页隐藏向下（下一页）三角：
+                            消失本身就是边界提示，比一枚灰掉的死按钮更安静 */}
+                        {!isFirstPage ? (
+                          <button
+                            type="button"
+                            className={styles['stardew-dialog__nav-tri']}
+                            title={TITLE_PREV}
+                            aria-label={TITLE_PREV}
+                            onClick={handlePrev}
+                          >
+                            <span
+                              className={classNames(styles['stardew-dialog__tri'], styles['stardew-dialog__tri--up'])}
+                              aria-hidden
+                            />
+                          </button>
+                        ) : null}
                         <span className={styles['stardew-dialog__page-indicator']}>
                           {currentPage + 1} / {totalPages}
                         </span>
-                        <StarNineSliceButton
-                          type="button"
-                          size="small"
-                          className={styles['stardew-dialog__nav-btn']}
-                          onClick={handleNext}
-                          disabled={isLastPage}
-                          title={isLastPage ? TITLE_NEXT_DISABLED : TITLE_NEXT}
-                        >
-                          <ChevronDown size={18} />
-                        </StarNineSliceButton>
+                        {!isLastPage ? (
+                          <button
+                            type="button"
+                            className={styles['stardew-dialog__nav-tri']}
+                            title={TITLE_NEXT}
+                            aria-label={TITLE_NEXT}
+                            onClick={handleNext}
+                          >
+                            <span
+                              className={classNames(styles['stardew-dialog__tri'], styles['stardew-dialog__tri--down'])}
+                              aria-hidden
+                            />
+                          </button>
+                        ) : null}
                       </div>
                     ) : null}
                   </div>

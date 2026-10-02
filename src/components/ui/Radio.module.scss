@@ -1,7 +1,7 @@
 // A Card-inspired control at field scale, deliberately matching Checkbox's
-// wooden tile: same surface, frame ring, bevels, and sizes. Radio is always a
-// round seal, and its selected mark is a crop-green seed dot instead of the
-// red check.
+// wooden tile: same surface, frame ring, bevels, size scale, and the same
+// mask-reveal / loss motion pair. Radio is always a round seal, and its
+// selected mark is a crop-green seed dot instead of the red check.
 $radio-surface: var(--star-raw-hex-ffc675);
 $radio-frame: var(--star-raw-hex-9d4100);
 $radio-inner-frame: var(--star-raw-hex-d7770f);
@@ -11,10 +11,10 @@ $radio-dot: var(--star-raw-hex-71964a);
 $radio-dot-ring: var(--star-raw-hex-2f5233);
 
 .star-radio {
-  // The dot keeps a fixed read at any size; the wooden tile scales around it
-  // exactly like Checkbox's red stamp does.
-  --radio-dot-size: 12px;
-  --radio-control-size: calc(var(--radio-dot-size) * 1.92);
+  // The mark box keeps Checkbox's exact size scale (the tile is four fifths of
+  // it), and the seed dot is half the mark box — a round read inside the seal.
+  --radio-dot-size: 23.04px;
+  --radio-control-size: calc(var(--radio-dot-size) * 0.8);
   --radio-frame-width: 1px;
   --radio-inner-width: 0.5px;
   --radio-label-size: 15px;
@@ -38,18 +38,23 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
   }
 
   &--small {
-    --radio-dot-size: 9px;
+    --radio-dot-size: 17.28px;
+    --radio-frame-width: 1px;
+    --radio-inner-width: 0.5px;
     --radio-label-size: 13px;
   }
 
   &--medium {
-    --radio-dot-size: 12px;
+    --radio-dot-size: 23.04px;
+    --radio-frame-width: 1px;
+    --radio-inner-width: 0.5px;
     --radio-label-size: 15px;
   }
 
   &--large {
-    --radio-dot-size: 15px;
+    --radio-dot-size: 28.8px;
     --radio-frame-width: 1.5px;
+    --radio-inner-width: 0.5px;
     --radio-label-size: 17px;
   }
 
@@ -145,8 +150,8 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
 
   &__dot-core {
     display: block;
-    width: var(--radio-dot-size);
-    height: var(--radio-dot-size);
+    width: calc(var(--radio-dot-size) * 0.5);
+    height: calc(var(--radio-dot-size) * 0.5);
     background: $radio-dot;
     border: 1px solid $radio-dot-ring;
     border-radius: 50%;
@@ -156,11 +161,11 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
     transform-origin: center;
   }
 
-  // The dot pops in on the shared motion token, then settles; the seal frame
-  // itself never jumps.
+  // Same left-to-right mask reveal Checkbox uses for its check: the dot starts
+  // nearly concealed, then speeds up across the finishing stretch.
   &__dot[data-motion="in"] &__dot-core {
-    animation: var(--star-motion-pop-in-name) var(--star-motion-pop-in-duration)
-      cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: var(--star-motion-mask-reveal-name)
+      var(--star-motion-mask-reveal-duration) cubic-bezier(0.72, 0, 1, 1) both;
   }
 
   // Same two-part shape as Rating's and Checkbox's loss motion, with the

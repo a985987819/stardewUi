@@ -271,9 +271,13 @@ describe('Dialog', () => {
       }
     })
 
-    it('在最后一页时下一页按钮应该被禁用', async () => {
+    it('在最后一页时下一页三角应该隐藏', async () => {
       const content = ['第一页', '第二页']
       render(<Dialog open={true} content={content} typewriter={false} />)
+
+      await waitFor(() => {
+        expect(screen.getByText('1 / 2')).toBeInTheDocument()
+      })
 
       const nextButton = screen.getAllByRole('button').find(
         btn => btn.getAttribute('title') === '下一页'
@@ -282,19 +286,24 @@ describe('Dialog', () => {
       if (nextButton) {
         fireEvent.click(nextButton)
         await waitFor(() => {
-          expect(nextButton).toBeDisabled()
+          expect(screen.queryByTitle('下一页')).not.toBeInTheDocument()
+          expect(screen.getByText('2 / 2')).toBeInTheDocument()
         })
       }
     })
 
-    it('在第一页时上一页按钮应该被禁用', async () => {
+    it('在第一页时上一页三角应该隐藏', async () => {
       render(<Dialog open={true} content={['第一页', '第二页']} typewriter={false} />)
 
       await waitFor(() => {
-        const prevButton = screen.getAllByRole('button').find(
-          btn => btn.getAttribute('title') === '已是第一页'
-        )
-        expect(prevButton).toBeDisabled()
+        expect(screen.getByText('1 / 2')).toBeInTheDocument()
+        expect(screen.queryByTitle('上一页')).not.toBeInTheDocument()
+      })
+
+      // 翻到第二页再翻回来，上一页三角重新出现
+      fireEvent.keyDown(window, { key: 'ArrowRight' })
+      await waitFor(() => {
+        expect(screen.getByTitle('上一页')).toBeInTheDocument()
       })
     })
   })

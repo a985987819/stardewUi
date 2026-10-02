@@ -199,10 +199,52 @@
     text-align: center;
   }
 
-  &__nav-btn {
-    min-width: 44px;
-    min-height: 40px;
-    padding: 0 10px;
+  // 翻页三角：正三角（朝上）= 上一页，倒三角（朝下）= 下一页。
+  // 纯提示性箭头，不再套按钮底——像星露谷对话框角落的小箭头。
+  &__nav-tri {
+    display: inline-flex;
+    width: 28px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.1s steps(2);
+
+    &:active {
+      transform: translateY(2px);
+    }
+  }
+
+  &__nav-tri:hover &__tri {
+    background: var(--star-raw-hex-9b440d);
+  }
+
+  &__tri {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: var(--star-raw-hex-7a3514);
+    transition: background 0.1s steps(2);
+
+    // 16x16 像素阶梯三角：两级 2px 台阶，和整套组件的阶梯转角呼应
+    &--up {
+      clip-path: polygon(
+        0px 16px, 16px 16px, 16px 12px, 14px 12px, 14px 8px, 12px 8px,
+        12px 4px, 10px 4px, 10px 0px, 6px 0px, 6px 4px, 4px 4px,
+        4px 8px, 2px 8px, 2px 12px, 0px 12px
+      );
+    }
+
+    &--down {
+      clip-path: polygon(
+        0px 0px, 16px 0px, 16px 4px, 14px 4px, 14px 8px, 12px 8px,
+        12px 12px, 10px 12px, 10px 16px, 6px 16px, 6px 12px, 4px 12px,
+        4px 8px, 2px 8px, 2px 4px, 0px 4px
+      );
+    }
   }
 
   &__sidebar {

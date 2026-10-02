@@ -6,16 +6,32 @@
  * staircase (`--star-collapse-clip`, injected by `Collapse.tsx`) — the Alert
  * two-layer trick at journal scale.
  *
- * Panels appear instantly with a pop-in, like a game menu unfolding; the
- * chevron is the only eased motion (a two-step flip), keeping the board
- * snappy rather than smooth.
+ * Header and panel are deliberately *different* materials: the lid is pale
+ * parchment, the unfolded body a deeper tone with a shade along its top edge
+ * and a stronger drop shadow while open, so an expanded section never blends
+ * into its own header.
+ *
+ * Panels appear with a gentle 103%-capped unfold; the chevron is the only
+ * other eased motion (a two-step flip), keeping the board snappy rather than
+ * smooth.
  */
 $collapse-frame-width: 2px;
 $collapse-ring: var(--star-raw-hex-a8895f);
 $collapse-surface: var(--star-raw-hex-f7efc5);
+// The panel is a *different* material, not a copy of the header: a cooler,
+// deeper parchment with a shade along its top edge, so an open section reads
+// as "the lid is up and you are looking inside".
+$collapse-panel-surface: var(--star-raw-hex-e6d9ba);
+$collapse-panel-tint: linear-gradient(
+  180deg,
+  var(--star-raw-rgba-157-65-0-0-08),
+  var(--star-raw-rgba-157-65-0-0-02) 26px,
+  transparent 48px
+);
 $collapse-bevel-dark: var(--star-raw-hex-ddc79b);
 $collapse-bevel-light: var(--star-raw-hex-f4ead6);
 $collapse-text: var(--star-raw-hex-4a2c1a);
+$collapse-text-panel: var(--star-raw-hex-3b2b1f);
 $collapse-text-active: var(--star-raw-hex-9d4100);
 $collapse-divider: var(--star-raw-hex-bfae90);
 $collapse-hover: var(--star-raw-hex-f3ecd7);
@@ -45,8 +61,9 @@ $collapse-shadow: var(--star-raw-rgba-157-65-0-0-28);
 }
 
 .star-collapse__item.is-open {
-  // An open section casts the same drop shadow as Alert banners.
-  filter: drop-shadow(1px 2px 0 $collapse-shadow);
+  // An open section casts the same drop shadow as Alert banners, one step
+  // stronger so the unfolded panel visually lifts off the header.
+  filter: drop-shadow(2px 3px 0 $collapse-shadow);
 }
 
 // --------------------------------------------------------------- header row
@@ -132,27 +149,54 @@ $collapse-shadow: var(--star-raw-rgba-157-65-0-0-28);
 
 // -------------------------------------------------------------------- panel
 
+// The shared pop-in overshoots to 110%, which reads as a violent zoom on a
+// full-width panel. Sections unfold at their own gentler beat instead: rise
+// from nearly rest, swell to at most 103%, then settle.
+@keyframes star-collapse-panel-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .star-collapse__panel {
   position: relative;
 
   margin: 0 $collapse-frame-width $collapse-frame-width;
   padding: 8px 12px 10px;
 
-  background: $collapse-surface;
+  background: $collapse-panel-surface;
+  // The shade under the header is what actually separates panel from lid —
+  // the two surfaces alone were too close in value to read apart.
+  background-image: $collapse-panel-tint;
   clip-path: var(--star-collapse-clip);
 
   // The divider between header and panel is a dashed pixel seam.
   border-top: 2px dashed $collapse-divider;
 
-  box-shadow: inset 0 -2px 0 $collapse-bevel-dark;
+  box-shadow:
+    inset 0 3px 0 var(--star-raw-rgba-157-65-0-0-14),
+    inset 0 -2px 0 $collapse-bevel-dark;
 
-  animation: var(--star-motion-pop-in-name) var(--star-motion-pop-in-duration)
-    cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: star-collapse-panel-in var(--star-motion-pop-in-duration) ease-out
+    both;
 }
 
 .star-collapse__panel-inner {
   font-size: 12px;
   line-height: 1.6;
+  color: $collapse-text-panel;
+  text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-35);
 }
 
 @media (prefers-reduced-motion: reduce) {
