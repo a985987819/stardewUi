@@ -106,3 +106,98 @@ describe('Alert custom icon', () => {
     expect(screen.queryByTestId('custom-icon')).not.toBeInTheDocument()
   })
 })
+
+describe('Alert modal', () => {
+  it('drops the plate into a blocking overlay outside the app tree', () => {
+    const { container } = render(<Alert modal title="矿洞封锁" data-testid="alert">今晚封闭。</Alert>)
+
+    const alert = screen.getByTestId('alert')
+    expect(alert).toHaveClass(styles['star-alert--modal'])
+    expect(alert).toHaveAttribute('role', 'alertdialog')
+    expect(alert).toHaveAttribute('aria-modal', 'true')
+    expect(container.querySelector(`.${styles['star-alert-overlay']}`)).not.toBeInTheDocument()
+    expect(document.querySelector(`.${styles['star-alert-overlay']}`)).toBeInTheDocument()
+  })
+
+  it('keeps an inline banner out of the overlay', () => {
+    const { container } = render(<Alert data-testid="alert">普通横幅。</Alert>)
+
+    expect(screen.getByTestId('alert')).not.toHaveClass(styles['star-alert--modal'])
+    expect(container.querySelector(`.${styles['star-alert-overlay']}`)).not.toBeInTheDocument()
+  })
+
+  it('ignores a backdrop click by default, and honours it when maskClosable is set', () => {
+    const onClose = vi.fn()
+    const { unmount } = render(
+      <Alert modal title="强制告示" onClose={onClose} data-testid="alert">必须读完。</Alert>,
+    )
+
+    fireEvent.click(document.querySelector(`.${styles['star-alert-overlay']}`)!)
+    expect(onClose).not.toHaveBeenCalled()
+    expect(screen.getByTestId('alert')).toBeInTheDocument()
+
+    unmount()
+
+    render(
+      <Alert modal maskClosable title="可忽略" onClose={onClose} data-testid="alert-soft">可以关。</Alert>,
+    )
+
+    fireEvent.click(document.querySelector(`.${styles['star-alert-overlay']}`)!)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('ignores Escape by default, and honours it when escClosable is set', () => {
+    const onClose = vi.fn()
+    const { unmount } = render(<Alert modal onClose={onClose} data-testid="alert" />)
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(onClose).not.toHaveBeenCalled()
+
+    unmount()
+
+    render(<Alert modal escClosable onClose={onClose} data-testid="alert-esc" />)
+
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not let a click inside the plate reach the backdrop', () => {
+    const onClose = vi.fn()
+    render(<Alert modal maskClosable title="站住" onClose={onClose} data-testid="alert">正文。</Alert>)
+
+    fireEvent.click(screen.getByText('正文。'))
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('renders footer actions inside the tinted fill', () => {
+    const ack = vi.fn()
+    render(
+      <Alert
+        modal
+        title="矿洞封锁"
+        actions={<button type="button" onClick={ack}>我知道了</button>}
+        data-testid="alert"
+      />,
+    )
+
+    // The modal plate lives in a body portal, outside the render container.
+    expect(document.querySelector(`.${styles['star-alert__actions']}`)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '我知道了' }))
+    expect(ack).toHaveBeenCalledTimes(1)
+  })
+
+  it('locks page scroll while the modal alert is up and restores it after', () => {
+    const { unmount } = render(<Alert modal title="封锁" data-testid="alert" />)
+
+    expect(document.body.style.overflow).toBe('hidden')
+
+    unmount()
+    expect(document.body.style.overflow).not.toBe('hidden')
+  })
+
+  it('uses modalLabel as the accessible name of the alertdialog', () => {
+    render(<Alert modal modalLabel="矿洞封锁通知" data-testid="alert" />)
+
+    expect(screen.getByRole('alertdialog', { name: '矿洞封锁通知' })).toBeInTheDocument()
+  })
+})

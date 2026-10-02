@@ -1,32 +1,37 @@
 /**
- * Pixel notice-board banner.
+ * Pixel notice-board banner, tinted like Message.
  *
  * Two layers share one `clip-path` value (injected as `--star-alert-clip` by
- * `Alert.tsx`): `__plate` paints the ring across the whole box, `__body`'s
- * wrapper is inset by `$alert-frame-width` and paints the parchment fill. The
- * coloured `__stripe` sits on the left edge as the semantic marker.
+ * `Alert.tsx`): `__plate` paints the ring across the whole box, `__body` is
+ * inset by `$alert-frame-width` and paints the tinted fill. Each type recolours
+ * the whole banner — ring, fill, icon, title ink — with the exact palette
+ * Message uses, so a toast and a banner of the same kind are unmistakably
+ * siblings.
  *
- * The four type modifiers only swap two ink tokens — `--star-alert-accent`
- * (stripe, title, close hover) and `--star-alert-ink` (title text) — matching
- * the Input status palette so form validation and banners always agree.
+ * `--modal` lifts the same plate into a blocking overlay (see
+ * `.star-alert-overlay`): dimmed pixel backdrop, page scroll locked, and no
+ * dismissal path except the ones the caller allows.
+ *
+ * Note: never clip the semantic stripe separately. A stepped rect clip insets
+ * a full corner-cut per side, which degenerates to nothing on a 4px-wide
+ * stripe — the stripe used to vanish this way. The semantic colour now lives
+ * in the ring itself, and the icon box separator replaces the stripe.
  */
-$alert-frame-width: 2px;
-$alert-ring: var(--star-raw-hex-9d4100);
-$alert-surface: var(--star-raw-hex-f7efc5);
-$alert-bevel-dark: var(--star-raw-hex-ddc79b);
-$alert-bevel-light: var(--star-raw-hex-f4ead6);
+$alert-frame-width: 3px;
 $alert-text: var(--star-raw-hex-4a2c1a);
 $alert-shadow: var(--star-raw-rgba-157-65-0-0-28);
 
 .star-alert {
-  --star-alert-accent: var(--star-raw-hex-308be2);
-  --star-alert-ink: var(--star-raw-hex-2e4057);
+  // Message's info palette by default.
+  --star-alert-fill: #c2ece6;
+  --star-alert-border: #26746f;
+  --star-alert-ink: #1d5855;
 
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
-  color: $alert-text;
+  color: var(--star-alert-ink);
   font-family: var(--font-pixel);
   font-size: 13px;
   line-height: 1.5;
@@ -36,100 +41,180 @@ $alert-shadow: var(--star-raw-rgba-157-65-0-0-28);
 }
 
 .star-alert--info {
-  --star-alert-accent: var(--star-raw-hex-308be2);
-  --star-alert-ink: var(--star-raw-hex-2e4057);
+  --star-alert-fill: #c2ece6;
+  --star-alert-border: #26746f;
+  --star-alert-ink: #1d5855;
 }
 
 .star-alert--success {
-  --star-alert-accent: var(--star-raw-hex-71964a);
-  --star-alert-ink: var(--star-raw-hex-2f5233);
+  --star-alert-fill: #e0f0cf;
+  --star-alert-border: #2f6a38;
+  --star-alert-ink: #285630;
 }
 
 .star-alert--warning {
-  --star-alert-accent: var(--star-raw-hex-d7992e);
-  --star-alert-ink: var(--star-raw-hex-6a350b);
+  --star-alert-fill: #fff0bf;
+  --star-alert-border: #8a5a16;
+  --star-alert-ink: #68400c;
 }
 
 .star-alert--error {
-  --star-alert-accent: var(--star-raw-hex-c0574f);
-  --star-alert-ink: var(--star-raw-hex-562c2b);
+  --star-alert-fill: #ffd8d2;
+  --star-alert-border: #a13e35;
+  --star-alert-ink: #742a25;
 }
 
 // --------------------------------------------------------------- frame layers
 
+// The ring, recoloured per type like Message's border.
 .star-alert__plate {
   position: absolute;
   inset: 0;
-  background: $alert-ring;
+  background: var(--star-alert-border);
   clip-path: var(--star-alert-clip);
 
   pointer-events: none;
 }
 
-// The parchment fill: painted by an inset layer so the ring stays an even 2px.
+// The tinted fill: painted by an inset layer so the ring stays an even 3px.
 .star-alert__body {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: 1 1 auto;
   min-width: 0;
 
   margin: $alert-frame-width;
-  margin-left: 0;
-  padding: 8px 12px 8px 14px;
+  padding: 9px 12px;
 
-  background: $alert-surface;
+  background: var(--star-alert-fill);
   clip-path: var(--star-alert-clip);
   box-shadow:
-    inset 0 2px 0 $alert-bevel-light,
-    inset 0 -2px 0 $alert-bevel-dark,
+    inset 0 2px 0 var(--star-raw-rgba-255-255-255-0-38),
+    inset 0 -2px 0 var(--star-raw-rgba-0-0-0-0-08),
     1px 2px 0 $alert-shadow;
 }
 
-// Semantic side stripe, drawn over the ring on the left edge.
-.star-alert__stripe {
-  position: absolute;
-  top: $alert-frame-width;
-  bottom: $alert-frame-width;
-  left: $alert-frame-width;
-  width: 4px;
-  background: var(--star-alert-accent);
-  clip-path: var(--star-alert-clip);
+// Semantic glyph in its own slot, separated from the text by an accent seam —
+// the same icon-box read as Message's.
+.star-alert__icon-box {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  align-self: stretch;
 
-  pointer-events: none;
+  padding-right: 10px;
+  border-right: 3px solid
+    color-mix(in srgb, var(--star-alert-border) 32%, transparent);
 }
 
-// Semantic glyph, drawn in the same accent as the stripe; sits between the
-// stripe and the text block, aligned with the title's first line.
 .star-alert__icon {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
 
-  width: 18px;
-  height: 18px;
-  margin: 9px 0 0 12px;
+  width: 22px;
+  height: 22px;
 
-  color: var(--star-alert-accent);
+  color: var(--star-alert-border);
 }
 
 // -------------------------------------------------------------------- content
+
+.star-alert__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 
 .star-alert__title {
   color: var(--star-alert-ink);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-4);
+  text-shadow: 1px 1px 0 var(--star-raw-rgba-255-255-255-0-5);
 }
 
 .star-alert__content {
   margin-top: 2px;
   font-size: 12px;
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
 .star-alert__title + .star-alert__content {
   margin-top: 4px;
+}
+
+// Footer actions (acknowledge buttons): right-aligned under the copy, inside
+// the tinted fill so a modal alert reads as one plate.
+.star-alert__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+// ----------------------------------------------------------- modal (alertdialog)
+
+// A forced alert: the page dims, the plate steps forward, and nothing behind
+// the alert takes a click until an action (or an opted-in Escape / backdrop
+// click) dismisses it.
+.star-alert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  background:
+    linear-gradient(135deg, var(--star-raw-rgba-255-236-184-0-06) 25%, transparent 25%) 0 0 / 8px 8px,
+    var(--star-raw-rgba-43-24-10-0-84);
+
+  animation: star-alert-overlay-in 140ms linear both;
+}
+
+.star-alert-overlay--clickable {
+  cursor: pointer;
+}
+
+.star-alert-overlay__panel {
+  width: min(560px, 100%);
+  cursor: default;
+
+  filter: drop-shadow(4px 4px 0 var(--star-raw-rgba-0-0-0-0-28));
+}
+
+// The modal plate grows a little more presence than an inline banner: a wider
+// inset, larger copy, and no hover/focus affordances from the page behind.
+.star-alert--modal {
+  .star-alert__body {
+    padding: 14px 16px;
+  }
+
+  .star-alert__title {
+    font-size: 15px;
+  }
+
+  .star-alert__content {
+    margin-top: 6px;
+    font-size: 13px;
+    opacity: 1;
+  }
+}
+
+@keyframes star-alert-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .star-alert__close {
@@ -137,37 +222,36 @@ $alert-shadow: var(--star-raw-rgba-157-65-0-0-28);
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
 
-  width: 16px;
-  height: 16px;
-  margin: 8px 8px 0 0;
+  width: 20px;
+  height: 20px;
   padding: 0;
-  border: 0;
+  border: 2px solid transparent;
 
-  background: $alert-bevel-dark;
-  color: $alert-text;
+  background: transparent;
+  color: var(--star-alert-ink);
   cursor: pointer;
 
   transition: transform 90ms steps(2, jump-start);
 
   &:hover {
-    background: var(--star-alert-accent);
-    color: $alert-bevel-light;
+    border-color: var(--star-alert-border);
+    background: var(--star-raw-rgba-0-0-0-0-08);
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: translate(1px, 1px);
   }
 
   &:focus-visible {
-    outline: 1px solid var(--star-alert-accent);
+    outline: 1px solid var(--star-alert-border);
     outline-offset: 1px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .star-alert {
+  .star-alert,
+  .star-alert-overlay {
     animation: none !important;
   }
 
