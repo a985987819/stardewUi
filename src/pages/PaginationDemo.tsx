@@ -2,8 +2,9 @@ import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarPagination } from '../components/ui'
+import { StarCheckbox, StarDisplayFrame, StarPagination, StarTitle } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
+import styles from './PaginationDemo.module.scss'
 
 const QUEST_POOL: Record<Lang, string[]> = {
   zh: [
@@ -46,11 +47,11 @@ const copy = {
       ['长列表省略', '页数超过 7 时自动折叠：始终保留第 1 页和最后一页，当前页前后各留一个邻居，其余用省略号占位。'],
       ['单页隐藏', 'hideOnSinglePage 让只有一页时整个翻页器退场，避免孤零零一块木牌挂在页脚。'],
       ['每页条数', 'showSizeChanger 在页码旁立起一个木框下拉，pageSizeOptions 决定档位；换档时当前页会重锚到「原来那条数据」所在的新页——停在末页第 9 页第 41 条，换成每页 20 条后落在第 3 页。'],
-      ['委托板', '拖动滑块调委托总量、点按钮切每页条数，看页码条与省略号实时变形；当前页的委托就贴在翻页器下面。'],
+      ['委托板', '委托贴在板子上、页码在板子下方：顶部悬浮的标题压住板沿，每条委托一块展示框，任务名后面用点线牵到最右侧的勾选框，勾一下就算接下了这条活；拖滑块调总量、点按钮切每页条数，页码条与省略号实时变形。'],
     ],
     quests: '条委托',
     currentPage: '当前页',
-    questBoard: '委托板',
+    questBoard: '【委托板】',
     questTotal: '委托总量',
     questPerPage: '每页条数',
     sizeLog: '最近一次切换',
@@ -64,11 +65,11 @@ const copy = {
       ['Long-Run Ellipsis', 'Past 7 pages the run folds up: page 1 and the last page always stay, one neighbour on each side of the active page, and ellipses hold the gaps.'],
       ['Hide on Single Page', 'hideOnSinglePage dismisses the whole pager when everything fits on one page, so no lonely wooden board hangs at the footer.'],
       ['Page Size', 'showSizeChanger raises a wooden select beside the chips, and pageSizeOptions sets the gears; switching re-anchors the page onto the item you were looking at — parked on the last page at item 41 of 5-per-page, a jump to 20 lands you on page 3.'],
-      ['Quest Board', 'Drag the slider to change the quest total and tap to switch the page size — watch the chips and ellipses reshape live; the active page\'s quests pin right below the pager.'],
+      ['Quest Board', 'Quests pin onto the board with the pager below it: a floating title overlaps the board\'s top edge, every quest gets its own framed row, a dot leader carries the task name out to the tick box on the right, and ticking one takes the job. Drag the slider for the total and tap for the page size — the chips reshape live.'],
     ],
     quests: 'quests',
     currentPage: 'Current page',
-    questBoard: 'Quest Board',
+    questBoard: '【QUEST BOARD】',
     questTotal: 'Quest total',
     questPerPage: 'Per page',
     sizeLog: 'Last change',
@@ -152,18 +153,36 @@ const sizeCode = `import { StarPagination } from 'stardew-valley-ui'
 />`
 
 const boardCode = `import { useState } from 'react'
-import { StarPagination } from 'stardew-valley-ui'
+import { StarCheckbox, StarDisplayFrame, StarPagination, StarTitle } from 'stardew-valley-ui'
 
 export function QuestBoard() {
   const [total, setTotal] = useState(45)
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
-  // Slice the pinned quests for the active page.
+  const [done, setDone] = useState({})
+  const quests = ... // slice the active page
+  const range = [(page - 1) * pageSize + 1, Math.min(page * pageSize, total)]
+
   return (
     <>
+      {/* Board title floats over the top edge, then one framed row per quest */}
+      <StarTitle level={3} fontSize={34}>【委托板】</StarTitle>
+      {quests.map((quest, index) => (
+        <StarDisplayFrame key={index}>
+          <span>{quest}</span>
+          <i className="dot-leader" />
+          <StarCheckbox
+            size="small"
+            options={[{ value: String(index), label: '' }]}
+            value={done[index] ? [String(index)] : []}
+            onChange={() => setDone(...)}
+          />
+        </StarDisplayFrame>
+      ))}
       <input type="range" min={5} max={300} value={total} onChange={...} />
+      {/* The pager stays bare; its numbers live on their own line */}
       <StarPagination total={total} pageSize={pageSize} current={page} onChange={setPage} />
-      {quests.slice((page - 1) * pageSize, page * pageSize).map(...) }
+      <span>{range[0]}-{range[1]} / {total} · current: {page} / {Math.ceil(total / pageSize)}</span>
     </>
   )
 }`
@@ -219,7 +238,12 @@ function StarPaginationDemoPage() {
         description={t.demos[4][1]}
         code={boardCode}
       >
-        <QuestBoard pool={QUEST_POOL[lang]} totalLabel={t.questTotal} perPageLabel={t.questPerPage} />
+        <QuestBoard
+          pool={QUEST_POOL[lang]}
+          totalLabel={t.questTotal}
+          perPageLabel={t.questPerPage}
+          boardTitle={t.questBoard}
+        />
       </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable title="Pagination API" data={apiData[lang]} />
@@ -228,40 +252,97 @@ function StarPaginationDemoPage() {
   )
 }
 
+/**
+ * The pager's own numbers, kept on one line *outside* the nav: the visible
+ * range and the current page are readouts, not controls, so they never mix
+ * into the chip run.
+ */
+function PagerMeta({
+  range,
+  total,
+  current,
+  totalPages,
+}: {
+  range: [number, number]
+  total: number
+  current: number
+  totalPages: number
+}) {
+  return (
+    <span className={styles['pager-meta']}>
+      <span>
+        {range[0]}-{range[1]} / {total}
+      </span>
+      <span className={styles['pager-meta__sep']} aria-hidden>
+        ·
+      </span>
+      <span>
+        current: {current} / {totalPages}
+      </span>
+    </span>
+  )
+}
+
 function ControlledPagination({ pagerLabel }: { pagerLabel: string }) {
   const [page, setPage] = useState(1)
+  const total = 45
+  const pageSize = 10
+  const totalPages = Math.ceil(total / pageSize)
 
   return (
-    <>
+    <div className={styles['pager-stack']}>
       <StarPagination
-        total={45}
-        pageSize={10}
+        total={total}
+        pageSize={pageSize}
         current={page}
         onChange={setPage}
-        showTotal={(total, range) => `${range[0]}-${range[1]} / ${total}`}
         ariaLabel={pagerLabel}
       />
-      <span style={{ fontSize: 12, opacity: 0.75 }}>current: {page} / 5</span>
-    </>
+      <PagerMeta
+        range={[(page - 1) * pageSize + 1, Math.min(page * pageSize, total)]}
+        total={total}
+        current={page}
+        totalPages={totalPages}
+      />
+    </div>
   )
 }
 
 function SizeChangerPager({ logLabel }: { logLabel: string }) {
   const [log, setLog] = useState('')
+  const [page, setPage] = useState(9)
+  const [pageSize, setPageSize] = useState(5)
+  const total = 45
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', width: '100%' }}>
+    <div className={styles['pager-stack']}>
       <StarPagination
-        total={45}
+        total={total}
         defaultCurrent={9}
         defaultPageSize={5}
         showSizeChanger
         pageSizeOptions={[5, 10, 20]}
-        onShowSizeChange={(page, size) => setLog(`onShowSizeChange(${page}, ${size})`)}
+        onChange={(nextPage, nextSize) => {
+          setPage(nextPage)
+          setPageSize(nextSize)
+        }}
+        onShowSizeChange={(nextPage, nextSize) => {
+          setPage(nextPage)
+          setPageSize(nextSize)
+          setLog(`onShowSizeChange(${nextPage}, ${nextSize})`)
+        }}
         ariaLabel="公告分页 4"
       />
+      <PagerMeta
+        range={[(page - 1) * pageSize + 1, Math.min(page * pageSize, total)]}
+        total={total}
+        current={page}
+        totalPages={Math.max(1, Math.ceil(total / pageSize))}
+      />
       {log ? (
-        <span style={{ fontSize: 12, opacity: 0.75 }}>{logLabel}: <code>{log}</code></span>
+        <span style={{ fontSize: 12, opacity: 0.75 }}>
+          {logLabel}: <code>{log}</code>
+        </span>
       ) : null}
     </div>
   )
@@ -269,10 +350,23 @@ function SizeChangerPager({ logLabel }: { logLabel: string }) {
 
 export default StarPaginationDemoPage
 
-function QuestBoard({ pool, totalLabel, perPageLabel }: { pool: string[]; totalLabel: string; perPageLabel: string }) {
+function QuestBoard({
+  pool,
+  totalLabel,
+  perPageLabel,
+  boardTitle,
+}: {
+  pool: string[]
+  totalLabel: string
+  perPageLabel: string
+  boardTitle: string
+}) {
   const [total, setTotal] = useState(45)
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
+  // Which pinned quests are ticked off, keyed by page + row so flipping pages
+  // never inherits another page's ticks.
+  const [done, setDone] = useState<Record<string, boolean>>({})
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const activePage = Math.min(page, totalPages)
@@ -280,10 +374,43 @@ function QuestBoard({ pool, totalLabel, perPageLabel }: { pool: string[]; totalL
     .slice((activePage - 1) * pageSize, activePage * pageSize)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
-      <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-          <span style={{ opacity: 0.75 }}>{totalLabel}</span>
+    <div className={styles['board']}>
+      {/* Board content first: the title floats over the top edge of the list. */}
+      <div className={styles['board__title-wrap']}>
+        <StarTitle level={3} fontSize={34} className={styles['board__title']}>
+          {boardTitle}
+        </StarTitle>
+      </div>
+
+      <div className={styles['board__list']}>
+        {visible.map((quest, index) => {
+          const key = `${activePage}-${index}`
+
+          return (
+            <StarDisplayFrame key={key} className={styles['board__row']}>
+              <div className={styles['board__row-inner']}>
+                <span className={styles['board__quest']}>{quest}</span>
+                <span className={styles['board__leader']} aria-hidden />
+                <StarCheckbox
+                  className={styles['board__check']}
+                  size="small"
+                  aria-label={quest}
+                  options={[{ value: key, label: '' }]}
+                  value={done[key] ? [key] : []}
+                  onChange={(next) => {
+                    const ticked = next.includes(key)
+                    setDone((current) => ({ ...current, [key]: ticked }))
+                  }}
+                />
+              </div>
+            </StarDisplayFrame>
+          )
+        })}
+      </div>
+
+      <div className={styles['board__controls']}>
+        <label className={styles['board__control-group']} style={{ cursor: 'pointer' }}>
+          <span className={styles['board__control-label']}>{totalLabel}</span>
           <input
             type="range"
             min={5}
@@ -297,23 +424,16 @@ function QuestBoard({ pool, totalLabel, perPageLabel }: { pool: string[]; totalL
           />
           <code>{total}</code>
         </label>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ opacity: 0.75 }}>{perPageLabel}</span>
+        <span className={styles['board__control-group']}>
+          <span className={styles['board__control-label']}>{perPageLabel}</span>
           {[5, 10, 20].map((size) => (
             <button
               key={size}
               type="button"
+              className={`${styles['board__size-button']}${pageSize === size ? ` ${styles['board__size-button--active']}` : ''}`}
               onClick={() => {
                 setPageSize(size)
                 setPage(1)
-              }}
-              style={{
-                padding: '3px 10px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font-pixel)',
-                fontSize: 12,
-                background: pageSize === size ? '#d4a72c' : undefined,
-                color: pageSize === size ? '#fff3dc' : undefined,
               }}
             >
               {size}
@@ -321,30 +441,23 @@ function QuestBoard({ pool, totalLabel, perPageLabel }: { pool: string[]; totalL
           ))}
         </span>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+
+      <div className={styles['pager-stack']}>
         <StarPagination
           total={total}
           pageSize={pageSize}
           current={activePage}
           onChange={setPage}
-          showTotal={(questTotal, range) => `${range[0]}-${range[1]} / ${questTotal}`}
         />
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
-        {visible.map((quest, index) => (
-          <span
-            key={`${activePage}-${index}`}
-            style={{
-              padding: '4px 10px',
-              border: '2px solid #b5895a',
-              background: '#fff3dc',
-              color: '#4a2c1a',
-              fontSize: 12,
-            }}
-          >
-            {quest}
-          </span>
-        ))}
+        <PagerMeta
+          range={[
+            (activePage - 1) * pageSize + 1,
+            Math.min(activePage * pageSize, total),
+          ]}
+          total={total}
+          current={activePage}
+          totalPages={totalPages}
+        />
       </div>
     </div>
   )

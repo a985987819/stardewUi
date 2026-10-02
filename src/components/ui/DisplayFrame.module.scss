@@ -61,6 +61,8 @@ $frame-color-surface: var(--star-raw-hex-fed384);
   }
 
   // 唯一参与布局的一层：宽高都由内容决定，所以框是自适应的。
+  // 内容内边距可由调用方通过 `--display-frame-surface-padding` 覆盖（列成
+  // 任务行这类紧凑场景不需要 10/12 的宽松留白），不改动时保持原值。
   &__surface {
     position: relative;
     z-index: 1;
@@ -68,6 +70,6 @@ $frame-color-surface: var(--star-raw-hex-fed384);
     clip-path: var(--display-frame-clip);
     background: $frame-color-surface;
     color: var(--star-raw-hex-000);
-    padding: 10px 12px;
+    padding: var(--display-frame-surface-padding, 10px 12px);
   }
 }

@@ -1,0 +1,134 @@
+// Pagination demo layout: the pager's own stats line, and the quest board that
+// pins framed quest rows under a floating board title.
+
+.pager-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+// `1-10 / 45` and `current: 1 / 5` share one quiet line, deliberately kept out
+// of the pager itself so the chips stay the only thing in the nav.
+.pager-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--star-raw-hex-7a4c24);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.pager-meta__sep {
+  color: var(--star-raw-hex-ba7f53);
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+// The board title floats over the top edge of the list, centred — a sign hung
+// above the notice board rather than another row inside it.
+.board__title-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -14px;
+}
+
+.board__title {
+  filter: drop-shadow(0 4px 0 var(--star-raw-rgba-48-28-14-0-24));
+  pointer-events: none;
+}
+
+.board__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 18px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.board__row {
+  width: 100%;
+  // Compact rows: the frame only needs its bands, not the roomy default inset.
+  --display-frame-surface-padding: 5px 10px;
+}
+
+.board__row-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.board__quest {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: var(--star-raw-hex-3f2510);
+}
+
+// The dot leader runs from the task name out to the check box on the right.
+.board__leader {
+  flex: 1 1 auto;
+  min-width: 16px;
+  height: 3px;
+  margin: 0 4px;
+
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--star-raw-hex-a8895f) 0 3px,
+    transparent 3px 8px
+  );
+}
+
+.board__check {
+  flex: 0 0 auto;
+}
+
+.board__controls {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.board__control-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.board__control-label {
+  opacity: 0.75;
+}
+
+.board__size-button {
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.board__size-button--active {
+  background: var(--star-raw-hex-d4a72c);
+  color: var(--star-raw-hex-fff3dc);
+}

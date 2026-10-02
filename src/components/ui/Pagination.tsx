@@ -150,12 +150,12 @@ function StarPagination({
     >
       <button
         type="button"
-        className={styles['star-pagination__step']}
+        className={classNames(styles['star-pagination__step'], styles['star-pagination__step--prev'])}
         aria-label="Previous page"
         disabled={activePage <= 1}
         onClick={() => goTo(activePage - 1)}
       >
-        <ChevronLeft size={14} strokeWidth={3} aria-hidden />
+        <ChevronLeft size={15} strokeWidth={3} aria-hidden />
       </button>
 
       {buildChunks(activePage, totalPages).map((chunk) =>
@@ -182,12 +182,12 @@ function StarPagination({
 
       <button
         type="button"
-        className={styles['star-pagination__step']}
+        className={classNames(styles['star-pagination__step'], styles['star-pagination__step--next'])}
         aria-label="Next page"
         disabled={activePage >= totalPages}
         onClick={() => goTo(activePage + 1)}
       >
-        <ChevronRight size={14} strokeWidth={3} aria-hidden />
+        <ChevronRight size={15} strokeWidth={3} aria-hidden />
       </button>
 
       {showSizeChanger ? (
