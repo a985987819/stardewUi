@@ -70,10 +70,10 @@ describe('Radio', () => {
     expect(container.firstElementChild).toHaveClass(styles['star-radio--large'])
   })
 
-  it('keeps the dot mounted across a state change so enter and exit motions can play', async () => {
+  it('keeps the check mounted across a state change so enter and exit motions can play', async () => {
     const { container } = render(<Radio options={options} />)
 
-    expect(container.querySelector(`.${styles['star-radio__dot']}`)).toBeInTheDocument()
+    expect(container.querySelector(`.${styles['star-radio__mark']}`)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('radio', { name: '木质栅栏' }))
 
     await vi.waitFor(() => expect(container.querySelector('[data-motion="in"]')).toBeInTheDocument())

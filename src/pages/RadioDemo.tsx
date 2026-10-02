@@ -8,7 +8,7 @@ import { useI18n, type Lang } from '../i18n'
 const copy = {
   zh: {
     title: '单选框 Radio',
-    desc: 'Card 风格圆框承托像素种子的单选控件：一次只选一个，选中时种子以弹跳入场，换选时旧种子像评分图标一样摇晃缩退；重复点击已选项不会清空选择。',
+    desc: '与 StarCheckbox 同款方形木牌的单选控件：选中时红色 ✔ 揭幕入场，换选时旧对勾先摇晃再缩退；一次只能定一件事，重复点击已选项不会清空选择。',
     toc: ['基础用法', '纵向与禁用项', '尺寸', 'API'],
     demos: [
       ['基础用法', '受控使用：value 与 onChange 组成一个标准单选组，适合选作物、选工具、选难度这类一次只能定一件事的场景。'],
@@ -17,11 +17,11 @@ const copy = {
     ],
     fences: ['木质栅栏', '石质墙体', '硬木围栏'],
     seasons: ['春季', '夏季', '秋季（已过）', '冬季'],
-    sizes: ['小号圆框', '中号圆框', '大号圆框'],
+    sizes: ['小号方框', '中号方框', '大号方框'],
   },
   en: {
     title: 'Radio',
-    desc: 'A Card-framed single-choice control carrying a pixel seed dot: one choice at a time, the dot pops in on selection and leaves with the Rating shake-and-shrink motion, and re-clicking the selected option never empties the group.',
+    desc: 'A single-choice control on the same square wooden tile as StarCheckbox: the selected option reveals a red ✔ with the shared mask reveal and leaves with the shake-and-shrink motion, and re-clicking the selected option never empties the group.',
     toc: ['Basic Usage', 'Vertical & Disabled', 'Sizes', 'API'],
     demos: [
       ['Basic Usage', 'Controlled usage: value and onChange form a standard radio group for picking one crop, tool, or difficulty.'],
@@ -30,7 +30,7 @@ const copy = {
     ],
     fences: ['Wood fence', 'Stone wall', 'Hardwood fence'],
     seasons: ['Spring', 'Summer', 'Fall (over)', 'Winter'],
-    sizes: ['Small seal', 'Medium seal', 'Large seal'],
+    sizes: ['Small square', 'Medium square', 'Large square'],
   },
 } satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; fences: string[]; seasons: string[]; sizes: string[] }>
 

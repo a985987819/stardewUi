@@ -864,7 +864,7 @@ import { StarTag } from 'stardew-valley-ui'
 
 ### StarRadio - 单选框
 
-Card 风格圆印章框的单选控件：选中时像素种子以弹跳入场，换选时旧种子摇晃缩退；重复点击已选项不会清空选择，语义与 `StarCheckbox radio` 模式一致但 API 返回单个 `string`。
+与 `StarCheckbox` 同款方形木牌与红色 ✔ 的单选控件：选中时对勾揭幕入场，换选时旧对勾摇晃缩退；重复点击已选项不会清空选择，语义与 `StarCheckbox radio` 模式一致但 API 返回单个 `string`。
 
 ```tsx
 import { StarRadio } from 'stardew-valley-ui'

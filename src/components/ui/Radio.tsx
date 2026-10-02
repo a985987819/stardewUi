@@ -34,24 +34,25 @@ export interface StarRadioProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   direction?: RadioDirection
   /** Disables every option while preserving selection. */
   disabled?: boolean
-  /** Scale of the Card-inspired seal frame. */
+  /** Scale of the Card-inspired checkbox frame. */
   size?: RadioSize
   /** Accessible name of the group. */
   'aria-label'?: string
 }
 
-const DOT_IN_DURATION_MS = 360
+const MARK_IN_DURATION_MS = 360
 /**
  * Mirrors Checkbox's exit timing: a quick shake-and-shrink so a re-selection
- * never feels held back by the old dot.
+ * never feels held back by the old check.
  */
-const DOT_OUT_DURATION_MS = 150
+const MARK_OUT_DURATION_MS = 150
 
 /**
- * Keeps a pixel dot in the DOM while it leaves, so removal can reuse the
- * Rating/Checkbox loss rhythm instead of disappearing abruptly.
+ * Keeps the red check in the DOM while it leaves, so removal can reuse the
+ * Rating/Checkbox loss rhythm instead of disappearing abruptly. This is the
+ * same mark Checkbox renders — Radio shares its square tile and red check.
  */
-function RadioDot({ selected }: { selected: boolean }) {
+function RadioMark({ selected }: { selected: boolean }) {
   const previousSelected = useRef(selected)
   const [visible, setVisible] = useState(selected)
   const [motion, setMotion] = useState<'in' | 'out' | null>(null)
@@ -68,7 +69,7 @@ function RadioDot({ selected }: { selected: boolean }) {
         setVisible(true)
         setMotion('in')
       }, 0)
-      const timer = window.setTimeout(() => setMotion(null), DOT_IN_DURATION_MS)
+      const timer = window.setTimeout(() => setMotion(null), MARK_IN_DURATION_MS)
       return () => {
         window.clearTimeout(showTimer)
         window.clearTimeout(timer)
@@ -79,7 +80,7 @@ function RadioDot({ selected }: { selected: boolean }) {
     const timer = window.setTimeout(() => {
       setMotion(null)
       setVisible(false)
-    }, DOT_OUT_DURATION_MS)
+    }, MARK_OUT_DURATION_MS)
     return () => {
       window.clearTimeout(hideMotionTimer)
       window.clearTimeout(timer)
@@ -87,17 +88,18 @@ function RadioDot({ selected }: { selected: boolean }) {
   }, [selected])
 
   return (
-    <span className={styles['star-radio__dot']} data-motion={motion ?? undefined} aria-hidden>
-      {visible ? <span className={styles['star-radio__dot-core']} /> : null}
+    <span className={styles['star-radio__mark']} data-motion={motion ?? undefined} aria-hidden>
+      {visible ? <span className={styles['star-radio__mark-glyph']}>✔</span> : null}
     </span>
   )
 }
 
 /**
- * A single-choice radio group with compact Card-material seal frames. The
- * selected option reveals a pixel seed dot with the shared pop-in motion;
- * losing it follows Rating's shake, enlarge, shrink, and fade sequence.
- * Selection is sticky — clicking the selected option never empties the group.
+ * A single-choice radio group sharing Checkbox's square Card-material tile and
+ * red check, so the two controls read as one material. The selected option
+ * reveals its check with the shared mask reveal; losing it follows Rating's
+ * shake, enlarge, shrink, and fade sequence. Selection is sticky — clicking the
+ * selected option never empties the group.
  */
 function StarRadio({
   options,
@@ -161,7 +163,7 @@ function StarRadio({
             <span className={styles['star-radio__control']} aria-hidden>
               <span className={styles['star-radio__surface']} />
               <span className={styles['star-radio__frame']} />
-              <RadioDot selected={selected} />
+              <RadioMark selected={selected} />
             </span>
             <span className={styles['star-radio__label']}>{option.label}</span>
           </button>

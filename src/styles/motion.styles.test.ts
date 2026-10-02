@@ -7,6 +7,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 
 const motion = read('src/styles/motion.scss')
 const checkbox = read('src/components/ui/Checkbox.module.scss')
+const radio = read('src/components/ui/Radio.module.scss')
 const progress = read('src/components/ui/Progress.module.scss')
 const rating = read('src/components/ui/Rating.module.scss')
 const appEntry = read('src/main.tsx')
@@ -21,9 +22,12 @@ describe('shared component motion', () => {
     expect(motion).toContain('--star-motion-loss-duration: 270ms')
   })
 
-  it('makes Checkbox, Progress, and Rating consume shared animation names', () => {
+  it('makes Checkbox, Radio, Progress, and Rating consume shared animation names', () => {
     expect(checkbox).toContain('var(--star-motion-mask-reveal-name)')
     expect(checkbox).toContain('var(--star-motion-loss-shake-name)')
+    expect(radio).toContain('var(--star-motion-mask-reveal-name)')
+    expect(radio).toContain('var(--star-motion-loss-shake-name)')
+    expect(radio).toContain('var(--star-motion-loss-shrink-name)')
     expect(progress).toContain('var(--star-motion-pop-in-name)')
     expect(rating).toContain('var(--star-motion-pop-in-name)')
     expect(rating).toContain('var(--star-motion-loss-shrink-name)')

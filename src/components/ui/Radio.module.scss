@@ -1,26 +1,25 @@
-// A Card-inspired control at field scale, deliberately matching Checkbox's
-// wooden tile: same surface, frame ring, bevels, size scale, and the same
-// mask-reveal / loss motion pair. Radio is always a round seal, and its
-// selected mark is a crop-green seed dot instead of the red check.
+// A Card-inspired control at field scale, deliberately identical to Checkbox:
+// same wooden tile, frame ring, bevels, size scale, and mask-reveal / loss
+// motion pair. Radio keeps Checkbox's square tile and red check so the two
+// controls read as one material — only the selection semantics differ (one
+// value at a time, and the group never empties).
 $radio-surface: var(--star-raw-hex-ffc675);
 $radio-frame: var(--star-raw-hex-9d4100);
 $radio-inner-frame: var(--star-raw-hex-d7770f);
 $radio-highlight: var(--star-raw-hex-ffe0b2);
 $radio-shadow: var(--star-raw-hex-6a350b);
-$radio-dot: var(--star-raw-hex-71964a);
-$radio-dot-ring: var(--star-raw-hex-2f5233);
+$radio-check: var(--star-raw-hex-e53935);
 
 .star-radio {
-  // The mark box keeps Checkbox's exact size scale (the tile is four fifths of
-  // it), and the seed dot is half the mark box — a round read inside the seal.
-  --radio-dot-size: 23.04px;
-  --radio-control-size: calc(var(--radio-dot-size) * 0.8);
+  // Mirrors Checkbox's scale exactly: the red check keeps its established size
+  // and the wooden tile is four fifths of it, so the mark still reads as a
+  // floating stamp above the tile.
+  --radio-check-size: 23.04px;
+  --radio-control-size: calc(var(--radio-check-size) * 0.8);
+  --radio-loss-duration: 150ms;
   --radio-frame-width: 1px;
   --radio-inner-width: 0.5px;
   --radio-label-size: 15px;
-  // Mirrors Checkbox: the JS unmount timer and the CSS loss animation must
-  // share one duration, or the dot disappears mid-shake.
-  --radio-loss-duration: 150ms;
 
   display: inline-flex;
   align-items: center;
@@ -38,21 +37,21 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
   }
 
   &--small {
-    --radio-dot-size: 17.28px;
+    --radio-check-size: 17.28px;
     --radio-frame-width: 1px;
     --radio-inner-width: 0.5px;
     --radio-label-size: 13px;
   }
 
   &--medium {
-    --radio-dot-size: 23.04px;
+    --radio-check-size: 23.04px;
     --radio-frame-width: 1px;
     --radio-inner-width: 0.5px;
     --radio-label-size: 15px;
   }
 
   &--large {
-    --radio-dot-size: 28.8px;
+    --radio-check-size: 28.8px;
     --radio-frame-width: 1.5px;
     --radio-inner-width: 0.5px;
     --radio-label-size: 17px;
@@ -85,7 +84,7 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
     }
 
     &:focus-visible {
-      outline: 2px solid $radio-dot;
+      outline: 2px solid $radio-check;
       outline-offset: 4px;
     }
 
@@ -93,6 +92,8 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
       cursor: not-allowed;
     }
 
+    // A locked choice should look washed out as a whole: the label, tiny wooden
+    // tile, and any retained check all share the same muted disabled state.
     &--disabled {
       opacity: 0.42;
       filter: saturate(0.32) contrast(0.88);
@@ -105,10 +106,13 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
     flex: 0 0 var(--radio-control-size);
     width: var(--radio-control-size);
     height: var(--radio-control-size);
+    // The check is deliberately allowed past this compact Card-like frame so it
+    // reads as a floating red stamp rather than a glyph trapped in a box —
+    // check out Checkbox for the identical arrangement.
     overflow: visible;
     background: $radio-surface;
     border: var(--radio-frame-width) solid $radio-frame;
-    border-radius: 50%;
+    border-radius: 4px;
     box-shadow:
       2px 3px 0 $radio-shadow,
       inset 0 1px 0 $radio-highlight;
@@ -116,10 +120,9 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
 
   &__surface,
   &__frame,
-  &__dot {
+  &__mark {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
   }
 
   &__surface {
@@ -136,46 +139,53 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
   &__frame {
     z-index: 1;
     border: var(--radio-inner-width) solid $radio-inner-frame;
+    border-radius: 1px;
     box-shadow:
       inset 0 2px 0 $radio-highlight,
       inset -2px -2px 0 var(--star-raw-rgba-157-65-0-0-32);
   }
 
-  &__dot {
+  &__mark {
+    // The expanded mark box gives both its mask and its exit shake room to
+    // float. Its paired horizontal insets shift the full check 5px left
+    // without competing with the exit animation's transform.
+    inset: calc(var(--radio-check-size) * -0.3)
+      calc(var(--radio-check-size) * -0.48 + 3px) 0
+      calc(var(--radio-check-size) * -0.14 - 3px);
     z-index: 2;
     display: grid;
     place-items: center;
     pointer-events: none;
+    color: $radio-check;
+    font-family: var(--font-pixel);
+    font-size: var(--radio-check-size);
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 1px 2px 0 var(--star-raw-rgba-157-65-0-0-38);
   }
 
-  &__dot-core {
+  &__mark-glyph {
     display: block;
-    width: calc(var(--radio-dot-size) * 0.5);
-    height: calc(var(--radio-dot-size) * 0.5);
-    background: $radio-dot;
-    border: 1px solid $radio-dot-ring;
-    border-radius: 50%;
-    box-shadow:
-      inset 0 1px 0 var(--star-raw-hex-aebc97),
-      1px 2px 0 var(--star-raw-rgba-157-65-0-0-32);
     transform-origin: center;
+    filter: drop-shadow(0 5px 0 var(--star-raw-rgba-157-65-0-0-32));
   }
 
-  // Same left-to-right mask reveal Checkbox uses for its check: the dot starts
-  // nearly concealed, then speeds up across the finishing stretch.
-  &__dot[data-motion="in"] &__dot-core {
+  // The check begins nearly concealed, then speeds up across the last stretch:
+  // the same literal left-to-right masking reveal Checkbox uses.
+  &__mark[data-motion="in"] &__mark-glyph {
     animation: var(--star-motion-mask-reveal-name)
       var(--star-motion-mask-reveal-duration) cubic-bezier(0.72, 0, 1, 1) both;
   }
 
-  // Same two-part shape as Rating's and Checkbox's loss motion, with the
-  // brisker Checkbox duration: shake first, then shrink and fade the dot.
-  &__dot[data-motion="out"] {
+  // Same two-part shape as Rating's loss motion, but with Checkbox's brisker
+  // duration: shake first, then enlarge, shrink and fade the painted check.
+  // The control tile itself never jumps.
+  &__mark[data-motion="out"] {
     animation: var(--star-motion-loss-shake-name) var(--radio-loss-duration)
       ease-in-out both;
   }
 
-  &__dot[data-motion="out"] &__dot-core {
+  &__mark[data-motion="out"] &__mark-glyph {
     animation: var(--star-motion-loss-shrink-name) var(--radio-loss-duration)
       cubic-bezier(0.4, 0, 0.7, 0.2) both;
   }
@@ -193,8 +203,8 @@ $radio-dot-ring: var(--star-raw-hex-2f5233);
 
 @media (prefers-reduced-motion: reduce) {
   .star-radio__option,
-  .star-radio__dot[data-motion],
-  .star-radio__dot[data-motion] .star-radio__dot-core {
+  .star-radio__mark[data-motion],
+  .star-radio__mark[data-motion] .star-radio__mark-glyph {
     animation: none !important;
     transition: none !important;
   }

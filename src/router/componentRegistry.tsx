@@ -476,8 +476,8 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     usageRank: 6,
     title: { zh: '单选框', en: 'Radio' },
     desc: {
-      zh: 'Card 风格圆框承托像素圆点的单选控件，一次只选一个，支持禁用项与尺寸。',
-      en: 'A Card-framed single-choice control with a pixel dot; one choice at a time, with disabled options and sizes.',
+      zh: '与 Checkbox 同款方形木牌与红色对勾的单选控件，一次只选一个，支持禁用项与尺寸。',
+      en: 'A Card-framed single-choice control on Checkbox\u2019s square tile and red check; one choice at a time, with disabled options and sizes.',
     },
     icon: <CircleDot size={20} />,
     element: StarRadioDemoPage,
