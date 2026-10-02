@@ -1,127 +1,94 @@
-.popup-demo {
-  &-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 40px;
-    padding-right: 320px;
-  }
+// Placement dial: the demo's main surface for the placement API. Each satellite
+// sits on a circle and its bubble flies out to the side facing away from the
+// centre, so hovering around the ring shows every side at a glance.
 
-  &-placement-btn {
-    min-width: 112px;
-  }
+.popup-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 
-  &-placement-map {
-    display: grid;
-    position: relative;
-    z-index: 8;
+.popup-demo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.popup-demo-dial {
+  position: relative;
+  width: min(480px, 100%);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: 0 0 24px;
+}
+
+// The dashed pixel ring the satellites hang off — purely decorative.
+.popup-demo-dial__ring {
+  position: absolute;
+  inset: 18%;
+  border: 3px dashed var(--star-raw-hex-cdbda8);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.popup-demo-dial__core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 34%;
+  aspect-ratio: 1;
+  padding: 10px;
+  border: 3px solid var(--star-raw-hex-9d4100);
+  border-radius: 50%;
+  background: var(--star-raw-hex-f7efc5);
+  box-shadow:
+    2px 3px 0 var(--star-raw-rgba-157-65-0-0-28),
+    inset 0 2px 0 var(--star-raw-hex-f4ead6);
+  color: var(--star-raw-hex-4a2c1a);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+// One satellite: an absolutely positioned anchor on the ring. The button keeps
+// its natural size; only the wrapper is placed.
+.popup-demo-dial__item {
+  position: absolute;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+}
+
+.popup-demo-dial__hint {
+  margin: 0;
+  color: var(--star-raw-hex-7a4c24);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+// The playground under the dial is deliberately roomy: bubbles are positioned
+// absolutely and need somewhere to fly.
+.popup-demo-playground {
+  padding: 48px 24px;
+}
+
+@media (max-width: 640px) {
+  .popup-demo-dial {
     width: 100%;
-    grid-template-columns: 160px minmax(280px, 1fr) 160px;
-    grid-template-rows: auto minmax(260px, 1fr) auto;
-    align-items: center;
-    justify-items: center;
-    gap: 18px 32px;
-    padding: 20px 0 280px;
   }
 
-  &-placement-row,
-  &-placement-column {
-    display: flex;
-    gap: 12px;
-  }
-
-  &-placement-row {
-    &--top {
-      grid-column: 2;
-      grid-row: 1;
-    }
-
-    &--bottom {
-      grid-column: 2;
-      grid-row: 3;
-    }
-  }
-
-  &-placement-column {
-    flex-direction: column;
-
-    &--left {
-      grid-column: 1;
-      grid-row: 2;
-      justify-self: start;
-    }
-
-    &--right {
-      grid-column: 3;
-      grid-row: 2;
-      justify-self: end;
-    }
-  }
-
-  &-playground {
-    display: flex;
-    width: 100%;
-    min-height: 280px;
-    grid-column: 2;
-    grid-row: 2;
-    align-items: center;
-    justify-content: center;
-    padding: 48px 24px;
-  }
-
-  @media (max-width: 900px) {
-    &-placement-map {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto auto auto auto;
-      gap: 16px;
-      padding-bottom: 220px;
-    }
-
-    &-placement-row--top,
-    &-placement-column--left,
-    &-playground,
-    &-placement-column--right,
-    &-placement-row--bottom {
-      grid-column: 1;
-      justify-self: center;
-    }
-
-    &-placement-row--top {
-      grid-row: 1;
-    }
-
-    &-placement-column--left {
-      grid-row: 2;
-    }
-
-    &-playground {
-      min-height: 220px;
-      grid-row: 3;
-    }
-
-    &-placement-column--right {
-      grid-row: 4;
-    }
-
-    &-placement-row--bottom {
-      grid-row: 5;
-    }
-
-    &-placement-column {
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 560px) {
-    &-placement-row {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    &-placement-btn {
-      min-width: 100px;
-    }
+  .popup-demo-dial__core {
+    font-size: 11px;
   }
 }

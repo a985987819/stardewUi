@@ -11,25 +11,61 @@
   &__bubble-wrap {
     position: absolute;
     z-index: 60;
-  }
-
-  &__bubble {
-    min-width: 244px;
-    max-width: 324px;
     color: var(--wood-panel-text, var(--star-raw-hex-3f2510));
     filter: drop-shadow(4px 4px 0 var(--star-raw-rgba-63-37-16-0-24));
   }
 
   /**
-   * Content box of the canvas panel. It lines up with the drawn surface, so the
-   * sections below run edge to edge exactly like the card header/body/footer.
-   * The clip keeps their square corners tucked inside the gap frame the canvas
-   * drew (`createInsetSteppedRectClipPath` in `Popup.tsx`).
+   * The panel: dark border ring painted by the panel background, lit bevel
+   * ring one step inside, then the surface. Every layer is clipped by the
+   * same staircase-corner polygon (2 steps × 4px, set from `Popup.tsx`), so
+   * the corners read as pixel steps and content can never poke out.
+   */
+  &__panel {
+    position: relative;
+    z-index: 1;
+    min-width: 244px;
+    max-width: 324px;
+    padding: 8px; /* 4px border + 4px bevel */
+    background: var(--wood-panel-border, var(--star-raw-hex-6a350b));
+  }
+
+  &__bevel {
+    position: absolute;
+    z-index: 0;
+    inset: 4px;
+    display: block;
+    background: var(--wood-panel-frame, var(--star-raw-hex-ca6f1c));
+  }
+
+  /**
+   * In-flow surface: carries the content and its own stepped clip, so the
+   * header/body/footer backgrounds tuck inside the bevel ring exactly.
    */
   &__surface {
+    position: relative;
+    z-index: 1;
     min-width: 204px;
+    display: flex;
+    flex-direction: column;
+    background: var(--wood-panel-surface, var(--star-raw-hex-f4ead6));
     color: var(--wood-panel-text, var(--star-raw-hex-3f2510));
-    clip-path: var(--wood-panel-surface-clip-path);
+  }
+
+  /**
+   * Pixel triangle arrow pointing back at the trigger. Solid border colour so
+   * it merges with the frame ring instead of floating beside it.
+   */
+  &__arrow-host {
+    position: absolute;
+    z-index: 0;
+  }
+
+  &__arrow {
+    position: absolute;
+    inset: 0;
+    display: block;
+    background: var(--wood-panel-border, var(--star-raw-hex-6a350b));
   }
 
   &__header,

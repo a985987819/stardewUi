@@ -20,7 +20,6 @@ import {
   Inbox,
   LayoutList,
   LoaderCircle,
-  MessageCircle,
   MessageSquare,
   MessageSquareMore,
   MousePointer,
@@ -66,7 +65,6 @@ import {
   StarTagDemoPage,
   StarTextareaDemoPage,
   StarTitleDemoPage,
-  StarTooltipDemoPage,
   StarTypewriterDemoPage,
 } from './lazyPages'
 
@@ -155,7 +153,7 @@ const COMPONENT_CATALOGUE_CATEGORY_ORDER = new Map(
  * Internal batch registry (tooling marker only — never imported, no runtime
  * footprint). `scripts/audit-batch-components.mjs` reads this comment.
  *
- * BATCH_2026_09_27: Badge, Alert, Skeleton, Textarea, Tooltip, Pagination, Collapse
+ * BATCH_2026_09_27: Badge, Alert, Skeleton, Textarea, Pagination, Collapse
  */
 
 const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
@@ -548,19 +546,6 @@ const ALL_COMPONENT_ROUTES: ComponentRoute[] = [
     },
     icon: <Bone size={20} />,
     element: StarSkeletonDemoPage,
-  },
-  {
-    routePath: 'tooltip',
-    component: 'Tooltip',
-    category: 'feedback',
-    usageRank: 9,
-    title: { zh: '文字提示', en: 'Tooltip' },
-    desc: {
-      zh: '悬停或聚焦时浮现的像素小气泡，像 NPC 的即时指点。',
-      en: 'A pixel bubble that floats in on hover or focus, like an NPC pointing the way.',
-    },
-    icon: <MessageCircle size={20} />,
-    element: StarTooltipDemoPage,
   },
   {
     routePath: 'pagination',

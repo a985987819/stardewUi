@@ -128,7 +128,7 @@ export function SaveButton() {
 |------|------|
 | 容器与展示 | `StarCard`、`StarTitle`、`StarPixelText`、`StarDisplayFrame`、`StarDivider`、`StarAvatar`、`StarEmptyState`、`StarLoading`、`StarTag`、`StarBadge`、`StarCollapse`、`StarSkeleton` |
 | 表单与操作 | `StarNineSliceButton`、`StarInput`、`StarTextarea`、`StarSwitch`、`StarRadio`、`StarCheckbox`、`StarSelect`、`StarRating`、`StarProgress` |
-| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter`、`StarAlert`、`StarTooltip` |
+| 反馈与浮层 | `StarDialog`、`StarDrawer`、`StarPopup`、`message`、`StarTypewriter`、`StarAlert` |
 | 日期与导航 | `StarCalendar`、`StarDatePicker`、`StarTab`、`StarPagination` |
 
 完整 Props 类型可从根入口以 `import type` 方式导入；组件均支持 `className`，大部分容器类组件也支持原生 `style` 与相应 DOM 属性。
@@ -634,7 +634,7 @@ import { StarLoading } from 'stardew-valley-ui'
 
 ### StarPopup - 弹窗
 
-气泡弹窗组件，支持多种位置和触发方式。
+气泡弹窗组件，支持多种位置和触发方式。它同时覆盖了「悬停提示」场景：纯文本气泡自带 `role="tooltip"`，带 `actions` 时自动变为 `role="dialog"`；键盘聚焦唤出、Esc 收起，因此库内不再单列 Tooltip 组件。
 
 ```tsx
 import { StarPopup } from 'stardew-valley-ui'
@@ -679,8 +679,14 @@ import { StarPopup } from 'stardew-valley-ui'
 | trigger | `'hover' \| 'click'` | `'hover'` | 触发方式 |
 | title | `ReactNode` | - | 弹窗标题 |
 | content | `ReactNode` | - | 弹窗内容 |
-| actions | `PopupAction[]` | - | 操作按钮 |
+| actions | `PopupAction[]` | - | 操作按钮；存在时 role 自动为 `dialog` |
 | offset | `number` | `12` | 偏移距离 |
+| arrow | `boolean` | `true` | 是否显示指回触发元素的像素箭头 |
+| color | `string` | - | 底色；边框、内芯与奶油墨色由它推导 |
+| role | `'tooltip' \| 'dialog' \| 'none'` | 自动 | 气泡的无障碍角色，默认按有无 actions 推导 |
+| defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
+| mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒） |
+| mouseLeaveDelay | `number` | `120` | 移开隐藏延迟（毫秒） |
 
 ---
 
@@ -1090,25 +1096,7 @@ import { StarSkeleton } from 'stardew-valley-ui'
 
 ---
 
-### StarTooltip - 文字提示
-
-悬停或聚焦时浮现的像素小气泡，像 NPC 的即时指点：两层阶梯裁切的羊皮纸小牌 + 8px 像素箭头，四方向可选；键盘聚焦同样唤出。
-
-```tsx
-import { StarTooltip } from 'stardew-valley-ui'
-
-<StarTooltip title="挖矿小贴士">
-  <button type="button">矿车</button>
-</StarTooltip>
-
-<StarTooltip title="上方气泡" placement="bottom">…</StarTooltip>
-
-// 彩色气泡
-<StarTooltip title="季节作物" color="#71964A" placement="bottom">…</StarTooltip>
-```
-
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
+------|------|--------|------|
 | title | `ReactNode` | - | 气泡内容，支持任意 ReactNode |
 | placement | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | 气泡出现的位置 |
 | open | `boolean` | - | 受控可见性；不传则由悬停/聚焦接管 |

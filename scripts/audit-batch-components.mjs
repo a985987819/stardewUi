@@ -53,7 +53,6 @@ const COMMON_API_BY_COMPONENT = {
   Alert: ['type', 'title', 'children', 'closable', 'onClose', 'showIcon', 'icon'],
   Skeleton: ['loading', 'title', 'rows', 'avatar', 'avatarShape', 'active', 'children'],
   Textarea: ['value', 'defaultValue', 'onChange', 'label', 'message', 'status', 'rows', 'showCount', 'block', 'autoSize', 'allowClear', 'clearLabel', 'onPressEnter'],
-  Tooltip: ['title', 'placement', 'open', 'defaultOpen', 'mouseEnterDelay', 'mouseLeaveDelay', 'onOpenChange', 'arrow', 'color'],
   Pagination: ['total', 'pageSize', 'current', 'defaultCurrent', 'defaultPageSize', 'onChange', 'showSizeChanger', 'pageSizeOptions', 'onShowSizeChange', 'hideOnSinglePage', 'showTotal'],
   Collapse: ['items', 'accordion', 'expandIconPosition', 'activeKeys', 'defaultActiveKeys', 'onChange'],
 }
