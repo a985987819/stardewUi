@@ -2,7 +2,7 @@ import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarCollapse } from '../components/ui'
+import { StarCollapse, StarNineSliceButton } from '../components/ui'
 import type { CollapseItem } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 
@@ -226,17 +226,16 @@ function ControlledCollapse({
   foldAllLabel: string
 }) {
   const [keys, setKeys] = useState<string[]>([])
-  const boardButtonStyle = { padding: '4px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
       <div style={{ display: 'flex', gap: 10 }}>
-        <button type="button" style={boardButtonStyle} onClick={() => setKeys(items.map((item) => item.key))}>
+        <StarNineSliceButton type="button" size="small" variant="primary" onClick={() => setKeys(items.map((item) => item.key))}>
           {spreadAllLabel}
-        </button>
-        <button type="button" style={boardButtonStyle} onClick={() => setKeys([])}>
+        </StarNineSliceButton>
+        <StarNineSliceButton type="button" size="small" onClick={() => setKeys([])}>
           {foldAllLabel}
-        </button>
+        </StarNineSliceButton>
       </div>
       <StarCollapse items={items} activeKeys={keys} onChange={setKeys} ariaLabel={ariaLabel} />
       <span style={{ fontSize: 12, opacity: 0.75 }}>

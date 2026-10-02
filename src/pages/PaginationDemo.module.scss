@@ -120,15 +120,3 @@
 .board__control-label {
   opacity: 0.75;
 }
-
-.board__size-button {
-  padding: 3px 10px;
-  cursor: pointer;
-  font-family: var(--font-pixel);
-  font-size: 12px;
-}
-
-.board__size-button--active {
-  background: var(--star-raw-hex-d4a72c);
-  color: var(--star-raw-hex-fff3dc);
-}

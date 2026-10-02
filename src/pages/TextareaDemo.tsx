@@ -2,7 +2,7 @@ import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarTextarea } from '../components/ui'
+import { StarNineSliceButton, StarTextarea } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 
 const copy = {
@@ -130,7 +130,7 @@ const countCode = `import { StarTextarea } from 'stardew-valley-ui'
 <StarTextarea label="Farm bio" showCount maxLength={80} />`
 
 const giftCode = `import { useState } from 'react'
-import { StarTextarea } from 'stardew-valley-ui'
+import { StarNineSliceButton, StarTextarea } from 'stardew-valley-ui'
 
 export function GiftNote() {
   const [text, setText] = useState('')
@@ -149,7 +149,7 @@ export function GiftNote() {
         status={status}
         message={message}
       />
-      <button disabled={status !== 'success'} onClick={pack}>Wrap the gift</button>
+      <StarNineSliceButton size="small" disabled={status !== 'success'} onClick={pack}>Wrap the gift</StarNineSliceButton>
     </>
   )
 }`
@@ -291,8 +291,6 @@ const noteChipStyle = {
   alignItems: 'center',
 } as const
 
-const noteButtonStyle = { padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
-
 function StickyNotes({
   label,
   placeholder,
@@ -337,7 +335,7 @@ function StickyNotes({
       />
       <span style={{ fontSize: 12, opacity: 0.75 }}>{hint}</span>
       <div style={{ display: 'flex', gap: 10 }}>
-        <button type="button" style={noteButtonStyle} onClick={pin}>{pinLabel}</button>
+        <StarNineSliceButton type="button" size="small" variant="primary" onClick={pin}>{pinLabel}</StarNineSliceButton>
       </div>
       {notes.length === 0 ? (
         <p style={{ margin: 0, fontSize: 12, opacity: 0.7 }}>{emptyLabel}</p>
@@ -350,7 +348,25 @@ function StickyNotes({
                 type="button"
                 aria-label={`${removeLabel}: ${note}`}
                 onClick={() => setNotes((current) => current.filter((_, i) => i !== index))}
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, fontSize: 12, color: 'inherit', fontFamily: 'inherit' }}
+                style={{
+                  // Mirrors Tag's closable button: a small filled square instead
+                  // of a floating glyph, so the remove affordance actually reads
+                  // as a control inside the chip.
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 16,
+                  height: 16,
+                  padding: 0,
+                  border: 0,
+                  borderRadius: 2,
+                  background: '#b5895a',
+                  color: '#fff3dc',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  fontSize: 12,
+                  lineHeight: 1,
+                }}
               >
                 ×
               </button>
@@ -406,25 +422,26 @@ function GiftNote({
         }}
       />
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-        <button
+        <StarNineSliceButton
           type="button"
+          size="small"
+          variant="primary"
           disabled={status !== 'success'}
           onClick={() => setPacked(true)}
-          style={{ padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 }}
         >
           {packLabel}
-        </button>
+        </StarNineSliceButton>
         {text ? (
-          <button
+          <StarNineSliceButton
             type="button"
+            size="small"
             onClick={() => {
               setText('')
               setPacked(false)
             }}
-            style={{ padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 }}
           >
             {againLabel}
-          </button>
+          </StarNineSliceButton>
         ) : null}
         {packed ? <span style={{ fontSize: 12, color: '#557d3c' }}>{packedLabel}</span> : null}
       </div>

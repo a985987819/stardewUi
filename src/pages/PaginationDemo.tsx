@@ -2,7 +2,7 @@ import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarCheckbox, StarDisplayFrame, StarPagination, StarTitle } from '../components/ui'
+import { StarCheckbox, StarDisplayFrame, StarNineSliceButton, StarPagination, StarTitle } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 import styles from './PaginationDemo.module.scss'
 
@@ -427,17 +427,19 @@ function QuestBoard({
         <span className={styles['board__control-group']}>
           <span className={styles['board__control-label']}>{perPageLabel}</span>
           {[5, 10, 20].map((size) => (
-            <button
+            <StarNineSliceButton
               key={size}
               type="button"
-              className={`${styles['board__size-button']}${pageSize === size ? ` ${styles['board__size-button--active']}` : ''}`}
+              size="small"
+              variant={pageSize === size ? 'primary' : 'default'}
+              aria-pressed={pageSize === size}
               onClick={() => {
                 setPageSize(size)
                 setPage(1)
               }}
             >
               {size}
-            </button>
+            </StarNineSliceButton>
           ))}
         </span>
       </div>

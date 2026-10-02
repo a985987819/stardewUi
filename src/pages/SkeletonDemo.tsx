@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarSkeleton } from '../components/ui'
+import { StarNineSliceButton, StarSkeleton } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 
 const copy = {
@@ -91,13 +91,13 @@ const avatarCode = `import { StarSkeleton } from 'stardew-valley-ui'
 <StarSkeleton avatar avatarShape="circle" rows={2} />`
 
 const toggleCode = `import { useState } from 'react'
-import { StarSkeleton } from 'stardew-valley-ui'
+import { StarNineSliceButton, StarSkeleton } from 'stardew-valley-ui'
 
 export function HarvestReport() {
   const [loading, setLoading] = useState(true)
   return (
     <>
-      <button onClick={() => setLoading((v) => !v)}>Reload</button>
+      <StarNineSliceButton size="small" onClick={() => setLoading((v) => !v)}>Reload</StarNineSliceButton>
       <StarSkeleton loading={loading} rows={2}>
         <h4>Fall harvest</h4>
         <p>Pumpkin ×112, cranberry ×340...</p>
@@ -107,14 +107,14 @@ export function HarvestReport() {
 }`
 
 const mineCode = `import { useState } from 'react'
-import { StarSkeleton } from 'stardew-valley-ui'
+import { StarNineSliceButton, StarSkeleton } from 'stardew-valley-ui'
 
 export function MineElevator() {
   const [loading, setLoading] = useState(false)
   // While the elevator falls, the striped supports hold the page up.
   return (
     <>
-      <button onClick={descend} disabled={loading}>Descend</button>
+      <StarNineSliceButton size="small" onClick={descend} disabled={loading}>Descend</StarNineSliceButton>
       <StarSkeleton loading={loading} avatar rows={2}>
         <h4>Arrived at floor {floor}</h4>
         <p>{find}</p>
@@ -190,13 +190,9 @@ function LoadingToggle({ title, body, toggleLabel, loadedLabel }: { title: strin
   return (
     <>
       <div style={{ marginBottom: 12 }}>
-        <button
-          type="button"
-          onClick={() => setLoading((value) => !value)}
-          style={{ padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 }}
-        >
+        <StarNineSliceButton type="button" size="small" onClick={() => setLoading((value) => !value)}>
           {loading ? toggleLabel : loadedLabel}
-        </button>
+        </StarNineSliceButton>
       </div>
       <StarSkeleton loading={loading} rows={2}>
         <div style={{ fontFamily: 'var(--font-pixel)', color: '#4a2c1a' }}>
@@ -229,14 +225,9 @@ function MineElevator({ descendLabel, descendingLabel, floorLabel, emptyLabel, f
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <button
-          type="button"
-          onClick={descend}
-          disabled={loading}
-          style={{ padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 }}
-        >
+        <StarNineSliceButton type="button" size="small" variant="primary" onClick={descend} disabled={loading}>
           {loading ? descendingLabel : descendLabel}
-        </button>
+        </StarNineSliceButton>
         {visit && !loading ? <span style={{ fontSize: 12, opacity: 0.75 }}>{floorLabel}: {visit.floor}</span> : null}
       </div>
       {visit ? (

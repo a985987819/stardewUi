@@ -2,7 +2,7 @@ import { useState } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarBadge, StarDisplayFrame } from '../components/ui'
+import { StarBadge, StarDisplayFrame, StarNineSliceButton } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 
 const copy = {
@@ -84,12 +84,12 @@ const standaloneCode = `import { StarBadge } from 'stardew-valley-ui'
 <StarBadge dot color="#71964A" />
 <StarBadge text="EVENT" color="#308BE2" />`
 
-const wrapCode = `import { StarBadge } from 'stardew-valley-ui'
+const wrapCode = `import { StarBadge, StarNineSliceButton } from 'stardew-valley-ui'
 
 export function MailboxButton() {
   return (
     <StarBadge count={12}>
-      <button type="button">Inbox</button>
+      <StarNineSliceButton size="small">Inbox</StarNineSliceButton>
     </StarBadge>
   )
 }`
@@ -150,10 +150,10 @@ function StarBadgeDemoPage() {
       >
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
           <StarBadge count={12}>
-            <button type="button" style={{ padding: '6px 12px', cursor: 'pointer' }}>{t.inbox}</button>
+            <StarNineSliceButton size="small">{t.inbox}</StarNineSliceButton>
           </StarBadge>
           <StarBadge dot>
-            <button type="button" style={{ padding: '6px 12px', cursor: 'pointer' }}>{t.backpack}</button>
+            <StarNineSliceButton size="small">{t.backpack}</StarNineSliceButton>
           </StarBadge>
           <StarBadge count={5}>
             <StarDisplayFrame>312</StarDisplayFrame>
@@ -185,8 +185,6 @@ function StarBadgeDemoPage() {
 
 export default StarBadgeDemoPage
 
-const demoButtonStyle = { padding: '5px 12px', cursor: 'pointer', fontFamily: 'var(--font-pixel)', fontSize: 12 } as const
-
 function HarvestGame({
   crop,
   waterLabel,
@@ -213,10 +211,10 @@ function HarvestGame({
         <StarDisplayFrame>{crop}</StarDisplayFrame>
       </StarBadge>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button type="button" style={demoButtonStyle} onClick={() => setCount((value) => value + 5)}>{waterLabel}</button>
-        <button type="button" style={demoButtonStyle} onClick={() => setCount((value) => Math.max(0, value - 1))}>{pickLabel}</button>
-        <button type="button" style={demoButtonStyle} onClick={() => setCount(0)}>{collectLabel}</button>
-        <button type="button" style={demoButtonStyle} onClick={() => setCount(24)}>{restockLabel}</button>
+        <StarNineSliceButton size="small" variant="success" onClick={() => setCount((value) => value + 5)}>{waterLabel}</StarNineSliceButton>
+        <StarNineSliceButton size="small" onClick={() => setCount((value) => Math.max(0, value - 1))}>{pickLabel}</StarNineSliceButton>
+        <StarNineSliceButton size="small" variant="warning" onClick={() => setCount(0)}>{collectLabel}</StarNineSliceButton>
+        <StarNineSliceButton size="small" onClick={() => setCount(24)}>{restockLabel}</StarNineSliceButton>
       </div>
       <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
         <input type="checkbox" checked={showZero} onChange={(event) => setShowZero(event.target.checked)} />
