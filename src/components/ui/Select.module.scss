@@ -1,14 +1,19 @@
 /**
  * Pixel dropdown select.
  *
- * The trigger shares `Input`'s two-layer trick: three layers share one
+ * The trigger shares `Input`'s two-layer trick: four layers share one
  * `clip-path` value (injected as `--star-select-clip` by `Select.tsx`) —
- * `__glow` paints the focus halo 3px outside, `__plate` paints the ring across
- * the whole box, `__field` is inset by `$select-frame-width` and paints the
- * parchment fill. Because all are cut with the same staircase, the ring comes
- * out an even 4px wide around the stepped corners.
+ * `__hover` paints the warm hover outline 3px outside, `__glow` paints the
+ * focus halo on the same geometry, `__plate` paints the ring across the whole
+ * box, `__field` is inset by `$select-frame-width` and paints the parchment
+ * fill. Because all are cut with the same staircase, the ring comes out an even
+ * 4px wide around the stepped corners.
  *
- * The folded panel below reuses the same polygon for its own plate + surface
+ * The chevron lives in `__chevron-badge` — a small raised key clipped with its
+ * own, smaller staircase (`--star-select-chevron-clip`) that keeps the arrow
+ * legible against the pale fill.
+ *
+ * The folded panel below reuses the main polygon for its own plate + surface
  * pair, so trigger and panel keep matching stepped corners. Colour tokens live
  * on `.star-select` so `is-open` / `--disabled` can override them; the layers
  * only consume them.
@@ -25,6 +30,9 @@ $select-panel-surface: var(--star-raw-hex-f3ecd7);
 $select-row-hover: var(--star-raw-hex-ece3cf);
 $select-selected-tint: var(--star-raw-hex-d3dfc8);
 $select-selected-ink: var(--star-raw-hex-2f5233);
+$select-chevron-face: var(--star-raw-hex-a8895f);
+$select-chevron-ink: var(--star-raw-hex-f4ead6);
+$select-hover-glow: var(--star-raw-hex-f4c46a);
 
 .star-select {
   position: relative;
@@ -34,8 +42,14 @@ $select-selected-ink: var(--star-raw-hex-2f5233);
   font-family: var(--font-pixel);
 
   --select-ring: #{$select-ring};
+  // Declared here (it was consumed by `__field` but never defined, so the fill
+  // was transparent and the brown plate showed straight through the trigger).
+  --select-surface: #{$select-surface};
   --select-text: #{$select-text};
   --select-accent: #{$select-accent};
+  --select-chevron-face: #{$select-chevron-face};
+  --select-chevron-ink: #{$select-chevron-ink};
+  --select-hover-glow: #{$select-hover-glow};
 }
 
 .star-select--block {
@@ -46,18 +60,36 @@ $select-selected-ink: var(--star-raw-hex-2f5233);
   --select-height: 32px;
   --select-padding: 10px;
   --select-font-size: 13px;
+  --select-chevron-box: 20px;
+  --select-chevron-pad: 3px;
 }
 
 .star-select--medium {
   --select-height: 40px;
   --select-padding: 12px;
   --select-font-size: 14px;
+  --select-chevron-box: 24px;
+  --select-chevron-pad: 4px;
 }
 
 .star-select--large {
   --select-height: 48px;
   --select-padding: 16px;
   --select-font-size: 16px;
+  --select-chevron-box: 28px;
+  --select-chevron-pad: 5px;
+}
+
+/** Hover outline: the same staircase, warmed to a highlight, one step before focus. */
+.star-select__hover {
+  position: absolute;
+  inset: -3px;
+  background: var(--select-hover-glow);
+  clip-path: var(--star-select-clip);
+
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 90ms steps(2, end);
 }
 
 /** Focus / open halo: the same staircase on a box grown 3px per side. */
@@ -72,10 +104,24 @@ $select-selected-ink: var(--star-raw-hex-2f5233);
   transition: opacity 90ms steps(2, end);
 }
 
+// The focus halo is painted after the hover outline and shares its geometry, so
+// a trigger that is both hovered and open shows the accent ring, not the warm one.
 .star-select.is-open,
 .star-select:focus-within {
   .star-select__glow {
     opacity: 1;
+  }
+}
+
+// Hover lights the warm outline and flips the chevron key to accent, so the
+// whole control reads as openable before focus lands on it.
+.star-select:hover:not(.star-select--disabled) {
+  .star-select__hover {
+    opacity: 0.78;
+  }
+
+  .star-select__chevron-badge {
+    background: var(--select-accent);
   }
 }
 
@@ -144,14 +190,48 @@ $select-selected-ink: var(--star-raw-hex-2f5233);
   color: $select-placeholder;
 }
 
-.star-select__chevron {
+/**
+ * Chevron key: a small raised, stepped chip holding the arrow. The muted arrow
+ * that used to sit straight on the fill all but vanished, so the affordance is
+ * now a light arrow on a distinctly darker key — echoing the frame's own wood
+ * tone and clipped with the same (smaller) staircase.
+ */
+.star-select__chevron-badge {
+  display: grid;
   flex: 0 0 auto;
-  color: $select-placeholder;
+  place-items: center;
+
+  box-sizing: border-box;
+  width: var(--select-chevron-box);
+  height: var(--select-chevron-box);
+  padding: var(--select-chevron-pad);
+
+  background: var(--select-chevron-face);
+  color: var(--select-chevron-ink);
+  clip-path: var(--star-select-chevron-clip);
+
+  // Raised read, the inverse of the recessed field: light band on top, dark below.
+  box-shadow:
+    inset 0 2px 0 0 var(--star-raw-rgba-255-255-255-0-32),
+    inset 0 -2px 0 0 var(--star-raw-rgba-0-0-0-0-28);
+
+  transition:
+    background 90ms steps(2, end),
+    color 90ms steps(2, end);
+}
+
+.star-select__chevron {
+  width: 100%;
+  height: 100%;
   transition: transform 120ms steps(3, end);
 }
 
 .star-select.is-open .star-select__chevron {
   transform: rotate(180deg);
+}
+
+.star-select.is-open .star-select__chevron-badge {
+  background: var(--select-accent);
 }
 
 // ---------------------------------------------------------------------- panel
@@ -237,23 +317,24 @@ $select-selected-ink: var(--star-raw-hex-2f5233);
 
 .star-select--disabled {
   --select-ring: var(--star-raw-hex-bfae90);
+  --select-surface: var(--star-raw-hex-ece3cf);
   --select-text: var(--star-raw-hex-9b8b70);
   --select-accent: var(--star-raw-hex-b8a890);
+  --select-chevron-face: var(--star-raw-hex-cdbda8);
+  --select-chevron-ink: var(--star-raw-hex-ece3cf);
 
   cursor: not-allowed;
 
   .star-select__trigger {
     cursor: not-allowed;
   }
-
-  .star-select__field {
-    background: var(--star-raw-hex-ece3cf);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .star-select__hover,
   .star-select__glow,
-  .star-select__chevron {
+  .star-select__chevron,
+  .star-select__chevron-badge {
     transition: none !important;
   }
 }

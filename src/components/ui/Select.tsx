@@ -47,8 +47,22 @@ const SELECT_CORNER_STEP = 4
 
 const SELECT_CLIP_PATH = createSteppedRectClipPath(SELECT_CORNER_STEPS, SELECT_CORNER_STEP)
 
+/**
+ * Chevron chip geometry: the same staircase language as the field, scaled down
+ * to the 24px key that holds the arrow (2 levels × 2px = a 4px span, against
+ * the field's 8px).
+ */
+const SELECT_CHEVRON_CORNER_STEPS = 2
+const SELECT_CHEVRON_CORNER_STEP = 2
+
+const SELECT_CHEVRON_CLIP_PATH = createSteppedRectClipPath(
+  SELECT_CHEVRON_CORNER_STEPS,
+  SELECT_CHEVRON_CORNER_STEP,
+)
+
 type SelectCssVariables = CSSProperties & {
   '--star-select-clip': string
+  '--star-select-chevron-clip': string
 }
 
 /**
@@ -114,6 +128,7 @@ function StarSelect({
 
   const cssVariables: SelectCssVariables = {
     '--star-select-clip': SELECT_CLIP_PATH,
+    '--star-select-chevron-clip': SELECT_CHEVRON_CLIP_PATH,
   }
 
   return (
@@ -130,8 +145,11 @@ function StarSelect({
       )}
       style={{ ...cssVariables, ...style }}
     >
-      {/* One `clip-path` can only cut one outline, so the halo, ring, and fill
-          are separate absolutely positioned layers sharing the same polygon. */}
+      {/* One `clip-path` can only cut one outline, so the hover highlight,
+          focus halo, ring, and fill are separate absolutely positioned layers
+          sharing the same polygon. The hover layer sits underneath the focus
+          halo so the two never fight when a trigger is both hovered and open. */}
+      <span className={styles['star-select__hover']} aria-hidden />
       <span className={styles['star-select__glow']} aria-hidden />
       <span className={styles['star-select__plate']} aria-hidden />
       <button
@@ -152,12 +170,14 @@ function StarSelect({
           >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
-          <ChevronDown
-            className={styles['star-select__chevron']}
-            size={14}
-            strokeWidth={2.6}
-            aria-hidden
-          />
+          <span className={styles['star-select__chevron-badge']} aria-hidden>
+            <ChevronDown
+              className={styles['star-select__chevron']}
+              size={16}
+              strokeWidth={3}
+              aria-hidden
+            />
+          </span>
         </span>
       </button>
 
