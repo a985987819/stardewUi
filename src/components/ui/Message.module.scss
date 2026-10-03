@@ -2,9 +2,15 @@
   pointer-events: auto;
   opacity: 0;
   transform: translateY(-20px);
+  // The toast drops in over 20px. Its own step count is 7, not the 5 that
+  // `--star-motion-float-ease` carries, because 20px / 7 = 2.9px per step and
+  // 20px / 5 = 4px per step — the shared grid is ~3px, so the count scales
+  // with the distance travelled while the pixel size stays constant. Spelled
+  // out here rather than taken from the token precisely because it is
+  // geometry; BackToTop's 14px / 5 does match the token.
   transition:
-    opacity 0.2s steps(3),
-    transform 0.2s steps(3);
+    opacity var(--star-motion-float-duration) steps(7, jump-none),
+    transform var(--star-motion-float-duration) steps(7, jump-none);
   font-family: var(--font-pixel, "Stardew", monospace);
   font-size: 14px;
 
@@ -161,8 +167,8 @@
     font-size: 18px;
     line-height: 1;
     transition:
-      background 0.1s steps(2),
-      transform 0.1s steps(2);
+      background var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+      transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
     &:hover {
       background: var(--star-raw-rgba-47-52-64-0-08);
@@ -188,8 +194,8 @@
     line-height: 1;
     text-shadow: 1px 1px 0 var(--star-raw-rgba-0-0-0-0-18);
     transition:
-      transform 0.1s steps(2),
-      filter 0.1s steps(2);
+      transform var(--star-motion-press-duration) var(--star-motion-press-ease),
+      filter var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
     &:hover {
       filter: brightness(1.08);

@@ -73,7 +73,7 @@ $radio-check: var(--star-raw-hex-e53935);
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: transform 90ms steps(2, jump-start);
+    transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
     &:hover:not(:disabled) {
       transform: translateY(-1px);

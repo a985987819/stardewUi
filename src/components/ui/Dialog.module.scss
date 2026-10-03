@@ -247,7 +247,7 @@
     border: 0;
     background: transparent;
     cursor: pointer;
-    transition: transform 0.1s steps(2);
+    transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
     &:active {
       transform: translateY(2px);
@@ -263,7 +263,7 @@
     width: 16px;
     height: 16px;
     background: var(--star-raw-hex-7a3514);
-    transition: background 0.1s steps(2);
+    transition: background var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
     // 16x16 像素阶梯三角：两级 2px 台阶，和整套组件的阶梯转角呼应
     &--up {

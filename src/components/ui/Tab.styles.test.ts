@@ -32,7 +32,13 @@ describe('tab external navigation styles', () => {
   })
 
   it('animates external tab travel and lets bottom tabs paint over their panel seam', () => {
-    expect(tab).toMatch(/\.star-tab__item\s*\{[\s\S]*?transform 0\.18s steps\(3, jump-start\)/)
+    // The 4px tuck of the selected sign must stay animated rather than
+    // teleporting. It reads the shared press token now, so this asserts the
+    // token instead of the literal `0.18s steps(3, ...)` it used to pin — the
+    // point of the guard is that the travel is animated, not which number.
+    expect(tab).toMatch(
+      /\.star-tab__item\s*\{[\s\S]*?transform var\(--star-motion-press-duration\) var\(--star-motion-press-ease\)/,
+    )
     expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav-wrapper\s*\{[^}]*z-index:\s*3/s)
     expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav\s*\{[^}]*padding-bottom:\s*4px/s)
   })

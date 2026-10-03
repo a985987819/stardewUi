@@ -3,16 +3,28 @@
 // Components refer to the names through CSS variables because CSS Modules would
 // otherwise scope an animation identifier independently in every module.
 //
-// Three tiers live here:
+// Four tiers live here:
 //
 //   1. --star-motion-*-name/-duration  — reusable *keyframes* (discrete events:
 //      a star being earned, a check appearing).
-//   2. --star-motion-duration-*         — durations for state *transitions*.
-//   3. --star-motion-ease-*             — the shared easing vocabulary.
+//   2. --star-motion-press-*            — durations/easings for *interactions*,
+//      named by what the user is doing rather than by a number.
+//   3. --star-motion-duration-*         — raw durations, for state transitions
+//      that have no interaction semantics of their own.
+//   4. --star-motion-ease-*             — the shared easing vocabulary.
+//
+// Tier 2 exists because tier 3 and 4 alone could not keep the library
+// consistent. The audit that prompted it found 56 of 75 motion declarations
+// carrying a hardcoded duration, and the same interaction — "the user pressed
+// a button" — had four different values: 90ms in Checkbox/Radio/Tag/Pagination,
+// 100ms in Rating and Card, 120ms in CalendarToolbar/WheelPicker, 250ms in Tab.
+// Two buttons side by side in the demo pages therefore answered the same press
+// at different speeds. Tokens that only say "fast" or "base" cannot prevent
+// that, because picking between them is still a per-component decision.
 //
 // Anything that only needs "this transition must match that transition" — a
 // timer in TS flipping `data-state` from `opening` to `open`, say — should read
-// a duration from tier 2 so the JS deadline and the CSS animation can never
+// a duration from tier 3 so the JS deadline and the CSS animation can never
 // drift apart. For Drawer and Dialog that source is
 // `components/ui/overlayMotion.ts`, which injects the numbers as custom
 // properties on the overlay root; the `--star-motion-duration-overlay-*` pair
@@ -30,7 +42,63 @@
   // same exit sequence, so its red check now leaves at the matching tempo.
   --star-motion-loss-duration: 270ms;
 
-  // ---- transition durations -------------------------------------------------
+  // ---- interaction semantics (tier 2) ---------------------------------------
+  // Named by what the user is doing, so that "the same press" cannot be spelled
+  // three different ways in three components. Each row below replaced a set of
+  // literals that had drifted apart; the comment records what it replaced.
+
+  // A control being pressed: the pixel-art body hops 1-2px toward the viewer.
+  // 90ms across Checkbox / Radio / Tag / Pagination / Alert / Input / Select /
+  // Textarea, and 100ms in Rating + Card + Dialog's arrows, 120ms in
+  // CalendarToolbar + WheelPicker. All are the same gesture.
+  //
+  // `jump-start` rather than the default `end` is the point: the hop must begin
+  // on the frame the finger lands. With `end` the 1px offset only appears in
+  // the last 45ms, which reads as lag on something the user is actively
+  // holding down.
+  --star-motion-press-duration: 90ms;
+  --star-motion-press-ease: steps(2, jump-start);
+
+  // A control's *colour* responding — hover tint, focus ring, selected fill.
+  // This is a tint, not a move, so it interpolates continuously: no `steps`,
+  // because stepping a colour ramp is what produced the 3-step "strobe" look.
+  // 120ms reads as immediate without feeling like a cut.
+  --star-motion-tint-duration: 120ms;
+  --star-motion-tint-ease: steps(2, jump-none);
+
+  // Press feedback for controls that must be legible at a glance while being
+  // held — the 2px hop reads on a checkbox but not on a 32px text input, where
+  // the same gesture is carried by the focus ring instead.
+  --star-motion-press-ring-duration: 90ms;
+  --star-motion-press-ring-ease: steps(2, end);
+
+  // A 14px chevron flipping 180° (Collapse's header, Select's dropdown arrow).
+  // Two steps, not three: measured on the rendered icon, steps(2) moves the tip
+  // 7px — half the icon, which reads as a deliberate two-frame flip. Select was
+  // on steps(3) while Collapse was on steps(2), so the same gesture answered
+  // differently in two components. `jump-none` holds the starting angle for the
+  // first half, because a chevron rotating *through* the middle looks like a
+  // glitch: its two arms cross at 90°.
+  --star-motion-flip-duration: 120ms;
+  --star-motion-flip-ease: steps(2, jump-none);
+
+  // A floating element arriving or leaving: BackToTop's plane rising 14px, a
+  // Message dropping in from -20px. Both are "something travelled", so both
+  // step in whole pixels rather than easing.
+  //
+  // The step *count* is geometry, not taste, and the library's own precedent is
+  // Switch: `--switch-travel-steps` = travel / 2px. Measured on what was
+  // actually there, BackToTop's 14px over steps(5) is 2.8px per step — right on
+  // the pixel grid, which is why it looked correct. Message's 20px over
+  // steps(3) was 6.7px per step, over twice as coarse, so the same gesture
+  // crawled in visibly coarser jumps depending on which component ran it.
+  //
+  // 3px per step is the shared grid. Message therefore needs 7 steps for its
+  // 20px, and both files now say so via a token rather than each guessing.
+  --star-motion-float-duration: 200ms;
+  --star-motion-float-ease: steps(5, jump-none);
+
+  // ---- transition durations (tier 3) ---------------------------------------
   // Tiny control feedback: hover tints, pressed offsets, checked colour swaps.
   --star-motion-duration-micro: 90ms;
   --star-motion-duration-fast: 140ms;

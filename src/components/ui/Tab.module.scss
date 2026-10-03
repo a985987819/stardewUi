@@ -117,8 +117,8 @@ $tab-step-span: 6px;
     // `jump-start` matters here. The default `end` position holds the starting
     // colour for the first half of the duration, which reads as a delayed hover.
     transition:
-      background 0.12s steps(2, jump-start),
-      color 0.12s steps(2, jump-start);
+      background var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+      color var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
     &:hover:not(&--disabled):not(&--active) {
       background: $tab-bg-hover;
@@ -246,10 +246,12 @@ $tab-step-span: 6px;
       box-shadow: inset 0 2px 0 $tab-border-light;
       // The selected sign physically tucks into the frame. Animate that small
       // journey in stepped pixels instead of letting it teleport between rows.
+      // The 4px settle is a press-sized hop, so it takes the press timing; the
+      // colours are a tint and take the tint timing.
       transition:
-        background 0.12s steps(2, jump-start),
-        color 0.12s steps(2, jump-start),
-        transform 0.18s steps(3, jump-start);
+        background var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+        color var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+        transform var(--star-motion-press-duration) var(--star-motion-press-ease);
     }
 
     .star-tab__item--active {

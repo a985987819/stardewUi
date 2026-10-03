@@ -144,7 +144,7 @@ $input-hint: var(--star-raw-hex-5c4526);
 
   pointer-events: none;
   opacity: 0;
-  transition: opacity 90ms steps(2, end);
+  transition: opacity var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 }
 
 .star-input__plate {

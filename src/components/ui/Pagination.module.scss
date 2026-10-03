@@ -56,7 +56,7 @@ $pagination-step-ink: var(--star-raw-hex-6a350b);
 
   box-shadow: 1px 2px 0 $pagination-shadow;
 
-  transition: transform 90ms steps(2, jump-start);
+  transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
   // Inset fill layer: shares the staircase so the ring stays an even 2px.
   &::before {

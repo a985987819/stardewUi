@@ -44,7 +44,7 @@ $toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
   background: transparent;
   font-family: var(--font-pixel);
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
   &:hover {
     border-color: $toolbar-panel-border;
@@ -137,7 +137,7 @@ $toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
   font-family: var(--font-pixel);
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
   &:hover {
     border-color: $toolbar-panel-border;

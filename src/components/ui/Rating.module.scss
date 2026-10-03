@@ -29,7 +29,7 @@
     background: transparent;
     color: var(--star-rating-empty-color);
     cursor: pointer;
-    transition: transform 0.1s steps(2, jump-start);
+    transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);

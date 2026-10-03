@@ -104,7 +104,11 @@ $collapse-shadow: var(--star-raw-rgba-157-65-0-0-28);
   flex: 0 0 auto;
   color: $collapse-text-active;
 
-  transition: transform 120ms steps(2, jump-none);
+  // 180° flip. `jump-none` holds the starting angle for the first half so the
+  // icon sits still, then snaps — a chevron mid-rotation reads as a glitch
+  // because its two arms cross. Shared with Select's chevron, which is the same
+  // gesture and had been given a different step count.
+  transition: transform var(--star-motion-flip-duration) var(--star-motion-flip-ease);
 }
 
 .star-collapse__item.is-open .star-collapse__chevron {

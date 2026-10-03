@@ -105,8 +105,8 @@
   // 把相邻行压到选中行后面：数字越小越靠前，负值交给 transform 的层叠顺序处理。
   transform: scale(0.94);
   transition:
-    color 0.12s steps(2, jump-start),
-    opacity 0.12s steps(2, jump-start);
+    color var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+    opacity var(--star-motion-tint-duration) var(--star-motion-tint-ease);
   opacity: 0.78;
 }
 
@@ -160,7 +160,7 @@
   font-size: common.$day-font-size;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
   &:hover {
     background: var(--star-raw-hex-fff3dc);
@@ -214,7 +214,7 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
   &:hover:not(:disabled) {
     background: var(--star-raw-hex-f4c46a);

@@ -11,9 +11,13 @@
   // `jump-start` so the hover lift and the press sink respond on the first
   // frame; the default `end` position holds the start pose for half the
   // duration, which reads as lag.
+  //
+  // The lift and the text colour used to run at 80ms and 120ms respectively —
+  // the same button's two halves answering at different speeds, which is
+  // exactly what the shared press/tint pair exists to prevent.
   transition:
-    transform 0.08s steps(2, jump-start),
-    color 0.12s ease;
+    transform var(--star-motion-press-duration) var(--star-motion-press-ease),
+    color var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 
   &__bg {
     position: absolute;

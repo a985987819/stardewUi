@@ -232,7 +232,7 @@ $alert-shadow: var(--star-raw-rgba-157-65-0-0-28);
   color: var(--star-alert-ink);
   cursor: pointer;
 
-  transition: transform 90ms steps(2, jump-start);
+  transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
 
   &:hover {
     border-color: var(--star-alert-border);

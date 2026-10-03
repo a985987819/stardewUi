@@ -89,7 +89,7 @@ $select-hover-glow: var(--star-raw-hex-f4c46a);
 
   pointer-events: none;
   opacity: 0;
-  transition: opacity 90ms steps(2, end);
+  transition: opacity var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 }
 
 /** Focus / open halo: the same staircase on a box grown 3px per side. */
@@ -101,7 +101,7 @@ $select-hover-glow: var(--star-raw-hex-f4c46a);
 
   pointer-events: none;
   opacity: 0;
-  transition: opacity 90ms steps(2, end);
+  transition: opacity var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 }
 
 // The focus halo is painted after the hover outline and shares its geometry, so
@@ -216,14 +216,19 @@ $select-hover-glow: var(--star-raw-hex-f4c46a);
     inset 0 -2px 0 0 var(--star-raw-rgba-0-0-0-0-28);
 
   transition:
-    background 90ms steps(2, end),
-    color 90ms steps(2, end);
+    background var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+    color var(--star-motion-tint-duration) var(--star-motion-tint-ease);
 }
 
 .star-select__chevron {
   width: 100%;
   height: 100%;
-  transition: transform 120ms steps(3, end);
+  // Same 180° flip as Collapse's chevron, so it gets the same token. Measured on
+  // the rendered 14px icon: steps(2) moves the tip 7px per step, which is half
+  // the icon and reads as a deliberate two-frame flip; Select had steps(3),
+  // which put an odd 61°/step in the middle and made the two chevrons in the
+  // library disagree about the same gesture.
+  transition: transform var(--star-motion-flip-duration) var(--star-motion-flip-ease);
 }
 
 .star-select.is-open .star-select__chevron {

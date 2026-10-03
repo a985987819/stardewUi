@@ -38,10 +38,11 @@ $flight-ease: cubic-bezier(0.4, 0, 0.7, 0.2);
   transform: translateY(14px);
   pointer-events: none;
   // `steps()` rather than an ease: the plane should teleport in whole pixels,
-  // like every other transition in the kit.
+  // like every other transition in the kit. 14px over 5 steps is 2.8px per
+  // step, which lands on the shared 3px grid in motion.scss.
   transition:
-    opacity 0.2s steps(5),
-    transform 0.2s steps(5);
+    opacity var(--star-motion-float-duration) var(--star-motion-float-ease),
+    transform var(--star-motion-float-duration) var(--star-motion-float-ease);
 
   &--visible {
     opacity: 1;
@@ -67,7 +68,7 @@ $flight-ease: cubic-bezier(0.4, 0, 0.7, 0.2);
     // One level deeper than the root on purpose: the root owns the show/hide
     // transform, this owns the hover/press nudge, so neither can overwrite the
     // other halfway through an animation.
-    transition: transform 0.12s steps(2);
+    transition: transform var(--star-motion-press-duration) var(--star-motion-press-ease);
   }
 
   &__plane {
