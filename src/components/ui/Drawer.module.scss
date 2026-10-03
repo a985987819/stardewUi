@@ -4,12 +4,36 @@
 // the only reason was that each had its own literals. The numbers are injected
 // by `overlayMotion.ts` because a JS timer has to hit the same deadline the
 // animation does; the comment there explains why that coupling is unavoidable.
+//
+// The page behind transitions per direction, on the `--star-motion-duration-
+// overlay-*` pair from `styles/motion.scss`. It used to transition on the
+// portal's own enter duration in both directions, so on close the background
+// took 240ms with a springy curve to come back while the panel had already left
+// at 170ms — the farm behind was still visibly settling for ~70ms after the
+// drawer was gone. Measured, not inferred: the scale read 0.965 for the whole
+// exit and only reached 1.0 after unmount.
+//
+// The durations come from `:root` rather than from the portal's injected
+// variables on purpose. The portal is a child of `document.body` and so is
+// `[data-star-app]`, making them siblings; a custom property does not inherit
+// sideways, and the undefined `var()` took the whole declaration down with it.
 :global([data-star-app='true']) {
   transform-origin: center center;
   transition:
-    opacity var(--star-motion-duration-base) ease-out,
-    filter var(--star-motion-duration-base) ease-out,
-    transform var(--stardew-overlay-enter) var(--star-motion-ease-spring);
+    opacity var(--star-motion-duration-overlay-out) var(--star-motion-ease-overlay-veil),
+    transform var(--star-motion-duration-overlay-out) var(--star-motion-ease-overlay-veil);
+}
+
+:global([data-star-app='true'].stardew-drawer-page-focused) {
+  opacity: 0.82;
+  transform: scale(0.965);
+  will-change: opacity, transform;
+  // Entering is the reverse relationship: the page steps back over the same
+  // window the panel takes to arrive, so the two settle together instead of
+  // the page still moving after the panel has landed.
+  transition:
+    opacity var(--star-motion-duration-overlay-in) var(--star-motion-ease-overlay-veil),
+    transform var(--star-motion-duration-overlay-in) var(--star-motion-ease-overlay-veil);
 }
 
 // `will-change` belongs on the state that animates, never on the resting state of
@@ -19,12 +43,6 @@
 // StarBackToTop plane showed it — resting at the bottom of the page it read
 // `top: 909` (correct), but at the top of the page it read `top: 4706` on a 1005px
 // viewport, i.e. far outside the screen.
-:global([data-star-app='true'].stardew-drawer-page-focused) {
-  opacity: 0.82;
-  transform: scale(0.965);
-  will-change: opacity, transform;
-}
-
 .stardew-drawer-layer {
   position: fixed;
   inset: 0;
@@ -45,7 +63,6 @@
   overflow: hidden;
   pointer-events: auto;
   transform: translate3d(0, 0, 0);
-  will-change: transform, opacity;
 
   &--right,
   &--left {
@@ -80,11 +97,20 @@
   &[data-state='opening'],
   &[data-state='closing'] {
     animation-fill-mode: both;
+    // Only while the panel is actually travelling. A permanent `will-change`
+    // keeps a compositing layer alive for the whole time the drawer is open,
+    // which on a 420px panel is real memory for no benefit once it has settled.
+    will-change: transform, opacity;
   }
 
   &[data-state='opening'] {
     animation-duration: var(--stardew-overlay-enter);
-    animation-timing-function: var(--star-motion-ease-spring);
+    // Not the old `cubic-bezier(0.16, 0.85, 0.3, 1.15)`. That curve is tuned for a dialog
+    // up from nothing, and on a 444px slide its overshoot measured 16px of
+    // visible bounce past the resting position — the panel edge shot past the
+    // edge of the screen and sprang back. `overlay-in` overshoots 1.5px on the
+    // same travel: still reads as weight, no longer reads as rubber.
+    animation-timing-function: var(--star-motion-ease-overlay-in);
   }
 
   // The close delay lives here rather than in JS so the hold is a property of
@@ -95,7 +121,10 @@
   &[data-state='closing'] {
     animation-delay: var(--stardew-overlay-exit-delay);
     animation-duration: var(--stardew-overlay-exit);
-    animation-timing-function: var(--star-motion-ease-exit);
+    // Moves on the first frame. The old exit curve started at literally
+    // zero velocity, which stacked with the close hold to freeze the panel for
+    // ~75ms and then throw it 265px in the last 60ms.
+    animation-timing-function: var(--star-motion-ease-overlay-out);
   }
 
   // Reopening during the close hold: the panel is mid-exit, and the entrance
@@ -114,7 +143,7 @@
     animation-name: stardew-drawer-settle-in;
     animation-delay: 0s;
     animation-duration: var(--star-motion-duration-fast);
-    animation-timing-function: var(--star-motion-ease-enter);
+    animation-timing-function: var(--star-motion-ease-overlay-veil);
   }
 
   &--right[data-state='opening'] {
@@ -156,8 +185,10 @@
       linear-gradient(135deg, var(--star-raw-rgba-255-236-184-0-06) 25%, transparent 25%) 0 0 / 8px 8px,
       var(--star-raw-rgba-38-25-17-0-58);
     opacity: 0;
+    // Opacity has no arrival to overshoot past, so it gets the plain decelerate
+    // rather than the panel's `overlay-in`/`overlay-out` pair.
     transition:
-      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-enter),
+      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-overlay-veil),
       visibility 0s linear var(--stardew-overlay-mask-enter);
     will-change: opacity;
   }
@@ -170,7 +201,7 @@
   .stardew-drawer-layer[data-state='open'] &__mask {
     opacity: 1;
     transition:
-      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-enter),
+      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-overlay-veil),
       visibility 0s linear 0s;
   }
 
@@ -181,7 +212,7 @@
   .stardew-drawer-layer[data-state='closing'] &__mask {
     opacity: 0;
     transition:
-      opacity var(--stardew-overlay-mask-exit) var(--star-motion-ease-exit),
+      opacity var(--stardew-overlay-mask-exit) var(--star-motion-ease-overlay-veil),
       visibility 0s linear var(--stardew-overlay-mask-exit);
   }
 
@@ -335,13 +366,21 @@
 // Exits fade as well as travel. A drawer that only slides off leaves a hard
 // edge hanging on screen for the last third of its travel; the fade lets it
 // dissolve into the farm behind it instead.
+//
+// The hold before the fade is 20%, not 40%. The old 40% stop was tuned against
+// zero-initial-velocity exit curve, which is slow off the line — so it needed
+// opaque stretch to avoid the panel looking like it was fading while barely
+// moving. `overlay-out` is already moving briskly at 20%, so a 40% hold would
+// have stacked a second stall on top of the close delay. At 20% the panel is
+// ~70px into a 444px travel when it starts to dissolve, which reads as one
+// continuous gesture instead of "slide, pause, fade".
 @keyframes stardew-drawer-exit-right {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 
-  40% {
+  20% {
     opacity: 1;
   }
 
@@ -357,7 +396,7 @@
     transform: translate3d(0, 0, 0);
   }
 
-  40% {
+  20% {
     opacity: 1;
   }
 
@@ -373,7 +412,7 @@
     transform: translate3d(0, 0, 0);
   }
 
-  40% {
+  20% {
     opacity: 1;
   }
 
@@ -389,7 +428,7 @@
     transform: translate3d(0, 0, 0);
   }
 
-  40% {
+  20% {
     opacity: 1;
   }
 

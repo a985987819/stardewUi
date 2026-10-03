@@ -13,7 +13,11 @@
 // Anything that only needs "this transition must match that transition" — a
 // timer in TS flipping `data-state` from `opening` to `open`, say — should read
 // a duration from tier 2 so the JS deadline and the CSS animation can never
-// drift apart. See DRAWER_TRANSITION_MS in Drawer.tsx.
+// drift apart. For Drawer and Dialog that source is
+// `components/ui/overlayMotion.ts`, which injects the numbers as custom
+// properties on the overlay root; the `--star-motion-duration-overlay-*` pair
+// below exists only so the *page behind* (a different element, outside the
+// portal) can match them without a JS timer of its own.
 :root {
   --star-motion-mask-reveal-name: star-motion-mask-reveal;
   --star-motion-pop-in-name: star-motion-pop-in;
@@ -33,26 +37,62 @@
   --star-motion-duration-base: 200ms;
   --star-motion-duration-slow: 260ms;
 
-  // Overlay lifecycles. Drawer and Dialog both read these; keep the pair in sync
-  // with DRAWER_TRANSITION_MS / DIALOG_TRANSITION_MS.
+  // ---- overlay lifecycles ---------------------------------------------------
+  // These four are the *page-behind* timings, i.e. how long the application
+  // itself takes to step back and to return. They are duplicated in
+  // `components/ui/overlayMotion.ts`, which is the source of truth and which
+  // also injects them onto the overlay portal.
+  //
+  // They must ALSO be declared here, and that duplication is not redundancy —
+  // it is the only way they reach the page at all. The overlay renders into a
+  // portal on `document.body`, so `[data-star-app]` is the portal's *sibling*,
+  // not its ancestor. A custom property set on the portal root does not
+  // inherit to a sibling, and an undefined `var()` does not degrade to the
+  // fallback silently: it invalidates the entire declaration at
+  // computed-value time, so the page behind's `transition` collapsed to `all 0s`
+  // and the focus effect snapped instead of animating. Verified in a real
+  // browser — `getComputedStyle(appRoot).transition` read `all 0s` and
+  // `getPropertyValue('--stardew-overlay-out-enter')` read empty.
+  //
+  // `overlayMotion.test.ts` asserts the two files agree, so this cannot drift.
   --star-motion-duration-overlay-in: 240ms;
-  --star-motion-duration-overlay-out: 180ms;
-
-  // The backdrop needs to finish fading before the panel starts leaving, or the
-  // scrim visibly outlives the thing it is dimming.
-  --star-motion-delay-overlay-out: 30ms;
+  --star-motion-duration-overlay-out: 194ms;
 
   // ---- easing ---------------------------------------------------------------
-  // Departing: quick out of the gate, long settle. Overshoot on the way in is
-  // reserved for things that physically pop (a dialog bursting open).
-  --star-motion-ease-exit: cubic-bezier(0.32, 0, 0.67, 0);
-  --star-motion-ease-enter: cubic-bezier(0.16, 0.84, 0.28, 1);
-  // The house entrance curve: accelerates hard, then eases back with a slight
-  // overshoot. Used by Drawer/Dialog pop and by any control that should feel
-  // sprung rather than linear.
-  --star-motion-ease-spring: cubic-bezier(0.16, 0.85, 0.3, 1.15);
-  // Standard in-out for anything that moves but should not bounce.
+  // Standard in-out for anything that moves but should not bounce. The general
+  // purpose curve; the overlay-specific ones below are deliberately NOT aliases
+  // of it, because a panel that travels a long distance needs different
+  // velocities from a hover tint.
   --star-motion-ease-standard: cubic-bezier(0.32, 0.72, 0.28, 1);
+
+  // ---- overlay panel curves -------------------------------------------------
+  // These two are a matched pair for a panel that *travels* — a drawer sliding
+  // in from the edge, a dialog scaling up from nothing. They were tuned against
+  // measured pixel positions on a 444px travel, not picked by eye, because the
+  // previous pair was wrong in ways only numbers expose:
+  //
+  //   The old exit was `cubic-bezier(0.32, 0, 0.67, 0)`, whose initial velocity
+  //   is literally zero. Combined with the 40ms close hold that meant the panel
+  //   sat frozen for ~75ms after the click and then covered 265px in the last
+  //   60ms — a lurch, not an exit. Starting from rest is right for a *fade*,
+  //   which is why the curve was never obviously wrong; it is wrong for
+  //   something that has to travel.
+  //
+  //   The old enter was `cubic-bezier(0.16, 0.85, 0.3, 1.15)`, tuned for a
+  //   dialog scaling from 0. Reused on a 444px slide its 1.15 overshoot became
+  //   **16px of visible bounce** past the resting position — the panel edge
+  //   overshot, sprang back, and the whole thing read as rubbery rather than
+  //   weighted. On the dialog it was worse: the keyframes already overshoot to
+  //   1.05, so the two compounded to a measured peak of scale 1.089.
+  //
+  // So: `in` overshoots by 1.5px (a hint of weight, sub-pixel at 1x on a
+  // 420px-wide panel) and `out` starts at 1.25x average speed and accelerates
+  // to 2.6x. Nothing waits, nothing lunges.
+  --star-motion-ease-overlay-in: cubic-bezier(0.2, 0.55, 0.25, 1.05);
+  --star-motion-ease-overlay-out: cubic-bezier(0.2, 0.25, 0.75, 0.35);
+  // Scrim and page-behind: a plain decelerate with no overshoot. Opacity and
+  // scale have no "arrival" to overshoot past, so `in`/`out` would be wrong.
+  --star-motion-ease-overlay-veil: cubic-bezier(0.25, 0.35, 0.4, 1);
 }
 
 // Checkbox entrance: a literal left-to-right mask which holds back most of the

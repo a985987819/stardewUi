@@ -2,12 +2,22 @@
 // gently steps back. This mirrors Drawer without coupling the two components'
 // lifecycle classes: either overlay can be open independently. Durations come
 // from `overlayMotion.ts` so the two overlays are indistinguishable in motion.
+//
+// The page behind transitions per-direction, on the `--star-motion-duration-
+// overlay-*` pair from `styles/motion.scss`. It used to run the portal's enter
+// duration in both directions, so on close the background took 240ms with a
+// springy curve to return while the dialog had already shrunk away at 170ms —
+// the farm behind was still settling after the dialog was gone.
+//
+// The durations come from `:root` rather than from the portal's injected
+// variables: the portal is a child of `document.body` and so is
+// `[data-star-app]`, so a custom property set on the portal does not reach it.
 :global([data-star-app='true']) {
   transform-origin: center center;
   transition:
-    opacity var(--star-motion-duration-base) ease-out,
-    filter var(--star-motion-duration-base) ease-out,
-    transform var(--stardew-overlay-enter) var(--star-motion-ease-spring);
+    opacity var(--star-motion-duration-overlay-out) var(--star-motion-ease-overlay-veil),
+    filter var(--star-motion-duration-overlay-out) var(--star-motion-ease-overlay-veil),
+    transform var(--star-motion-duration-overlay-out) var(--star-motion-ease-overlay-veil);
 }
 
 :global([data-star-app='true'].stardew-dialog-page-focused) {
@@ -15,6 +25,10 @@
   opacity: 0.82;
   transform: scale(0.965);
   will-change: filter, opacity, transform;
+  transition:
+    opacity var(--star-motion-duration-overlay-in) var(--star-motion-ease-overlay-veil),
+    filter var(--star-motion-duration-overlay-in) var(--star-motion-ease-overlay-veil),
+    transform var(--star-motion-duration-overlay-in) var(--star-motion-ease-overlay-veil);
 }
 
 .stardew-dialog-overlay {
@@ -50,7 +64,7 @@
     content: '';
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-enter);
+    transition: opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-overlay-veil);
   }
 
   &[data-state='opening'],
@@ -67,7 +81,7 @@
   &[data-state='closing'] {
     &::before {
       opacity: 0;
-      transition: opacity var(--stardew-overlay-mask-exit) var(--star-motion-ease-exit);
+      transition: opacity var(--stardew-overlay-mask-exit) var(--star-motion-ease-overlay-veil);
     }
   }
 
@@ -114,7 +128,11 @@
   &[data-state='opening'] {
     animation-name: stardew-dialog-enter;
     animation-duration: var(--stardew-overlay-enter);
-    animation-timing-function: var(--star-motion-ease-spring);
+    // The overshoot lives in the keyframes (1.05 at 72%), so the curve must not
+    // add a second one. The old spring curve also overshoots 1.037, and
+    // the two compound: measured peak scale was **1.089**, an 8.9% pop on a
+    // 760px dialog. `overlay-in` peaks at 1.054 — the keyframe's intent, once.
+    animation-timing-function: var(--star-motion-ease-overlay-in);
   }
 
   // Same close hold as Drawer, for the same reason: the dismissal should read as
@@ -124,7 +142,10 @@
     animation-name: stardew-dialog-exit;
     animation-delay: var(--stardew-overlay-exit-delay);
     animation-duration: var(--stardew-overlay-exit);
-    animation-timing-function: var(--star-motion-ease-exit);
+    // Moves on the first frame, same as the drawer. Scaling to zero is a
+    // travel, not a fade, so the zero-initial-velocity exit curve is wrong here
+    // for the same reason it was wrong on the panel.
+    animation-timing-function: var(--star-motion-ease-overlay-out);
   }
 
   &--bottom {

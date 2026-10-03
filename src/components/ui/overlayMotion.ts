@@ -26,13 +26,22 @@ export const OVERLAY_ENTER_MS = 240
 /** Panel leaving: 170ms. Roughly 1/1.4 of the enter time — departure should never outlast arrival. */
 export const OVERLAY_EXIT_MS = 170
 /**
- * Hold before the panel starts leaving. A one-frame hold lets the press that
- * dismissed the overlay register visually before the panel starts moving, which
- * is what stops a close from reading as an input glitch. It also gives the
- * focus-effect class on the app root time to start releasing, so the page
- * behind and the panel in front do not both move on the same millisecond.
+ * Hold before the panel starts leaving.
+ *
+ * It was 40ms, and that number was doing two contradictory jobs. It was meant to
+ * let the press that dismissed the overlay register visually — but it was
+ * stacked on top of an exit curve whose initial velocity is *zero*
+ * (`cubic-bezier(0.32, 0, 0.67, 0)`, which is correct for a fade and wrong for
+ * travel). Measured in a real browser, the two together meant the panel sat
+ * frozen for ~75ms after the click and then covered 265px in the final 60ms.
+ * The hold was doing the opposite of its purpose: it read as lag, then a lurch.
+ *
+ * The curve is now `--star-motion-ease-overlay-out`, which moves on frame one,
+ * so the hold is the only thing between the click and the first pixel of
+ * movement. 24ms is about 1.5 frames at 60Hz — enough to register as a
+ * deliberate beat, short enough that the panel never appears to stall.
  */
-export const OVERLAY_EXIT_DELAY_MS = 40
+export const OVERLAY_EXIT_DELAY_MS = 24
 /** Scrim fade: shorter than the panel so the backdrop is never the last thing standing. */
 export const MASK_EXIT_MS = 150
 /** Scrim fade-in. Deliberately a touch slower than the panel: the dimming should trail the arrival. */
@@ -60,6 +69,13 @@ export interface OverlayMotionCssVariables {
 /**
  * The custom properties to spread onto an overlay's root element. Shared by
  * Drawer and Dialog so the two lifecycles cannot drift apart.
+ *
+ * Only the *portal's own* timings live here. The page behind gets its durations
+ * from `--star-motion-duration-overlay-{in,out}` in `styles/motion.scss` instead,
+ * because the portal is mounted on `document.body` and `[data-star-app]` is its
+ * sibling — a custom property set here does not inherit across, and the
+ * resulting undefined `var()` silently collapsed the page's `transition` to
+ * `all 0s`. The two are kept in step by a test.
  *
  * Typed as the crossed `OverlayMotionStyle` rather than a bare interface:
  * React's `CSSProperties` has no index signature for `--*` names, so passing a
