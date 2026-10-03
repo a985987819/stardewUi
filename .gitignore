@@ -43,3 +43,7 @@ pnpm-lock.yaml
 
 # OpenMemory - IDE/Assistant specific rules
 CLAUDE.md
+
+# Local build-verification output (see CLAUDE.md: the sandbox safe-delete hook
+# blocks the normal dist/ wipe, so builds go to dist-verify/ instead).
+dist-verify
