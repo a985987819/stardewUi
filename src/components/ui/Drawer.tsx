@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { createPortal } from 'react-dom'
 import { classNames } from '../../utils/classNames'
 import StarCard from './Card'
+import { OVERLAY_ENTER_TOTAL_MS, OVERLAY_EXIT_TOTAL_MS, overlayMotionStyle } from './overlayMotion'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './Drawer.module.scss'
 
 export type DrawerPlacement = 'top' | 'right' | 'bottom' | 'left'
@@ -25,11 +27,14 @@ export interface StarDrawerProps {
   focusEffect?: boolean
   /** Whether clicking the backdrop requests a close. */
   maskClosable?: boolean
+  /** Accessible name for the close button. */
+  closeLabel?: string
+  /** Accessible name for the panel when no string `title` is supplied. */
+  ariaLabel?: string
   /** Called when the close button, backdrop, or Escape key requests closing. */
   onClose?: () => void
 }
 
-const DRAWER_TRANSITION_MS = 200
 const PAGE_FOCUS_CLASS = 'stardew-drawer-page-focused'
 const focusedAppRoots = new Map<HTMLElement, number>()
 type DrawerMotionState = 'closed' | 'opening' | 'open' | 'closing'
@@ -67,39 +72,57 @@ function StarDrawer({
   maskStyle,
   focusEffect = true,
   maskClosable = true,
+  closeLabel,
+  ariaLabel,
   onClose,
 }: StarDrawerProps) {
   const [rendered, setRendered] = useState(open)
   const renderedRef = useRef(open)
   const [motionState, setMotionState] = useState<DrawerMotionState>(open ? 'opening' : 'closed')
   const [activePlacement, setActivePlacement] = useState<DrawerPlacement>(placement)
+  // True only when an open request arrives while the exit is still playing. The
+  // entrance keyframe starts a full viewport away, so replaying it from
+  // mid-exit would fling the drawer off-screen and drag it back; instead the
+  // stylesheet gets `data-skip-enter` and just restores the opacity.
+  const [skipEnter, setSkipEnter] = useState(false)
 
   useEffect(() => {
     let enterTimer: ReturnType<typeof setTimeout> | null = null
     let exitTimer: ReturnType<typeof setTimeout> | null = null
     let frameId: number | null = null
+    let holdTimer: ReturnType<typeof setTimeout> | null = null
 
     if (open) {
+      const interruptedClose = renderedRef.current
       frameId = window.requestAnimationFrame(() => {
         setActivePlacement(placement)
         renderedRef.current = true
         setRendered(true)
+        setSkipEnter(interruptedClose)
         setMotionState('opening')
-        enterTimer = setTimeout(() => setMotionState('open'), DRAWER_TRANSITION_MS)
+        // Clear the flag on the next frame. The stylesheet matches it only while
+        // `data-state="opening"`, so leaving it set is harmless — but clearing it
+        // keeps the DOM honest for anyone inspecting the drawer.
+        if (interruptedClose) {
+          holdTimer = setTimeout(() => setSkipEnter(false), OVERLAY_ENTER_TOTAL_MS + 50)
+        }
+        enterTimer = setTimeout(() => setMotionState('open'), OVERLAY_ENTER_TOTAL_MS)
       })
     } else if (renderedRef.current) {
       frameId = window.requestAnimationFrame(() => setMotionState('closing'))
       exitTimer = setTimeout(() => {
         setMotionState('closed')
         renderedRef.current = false
+        setSkipEnter(false)
         setRendered(false)
-      }, DRAWER_TRANSITION_MS)
+      }, OVERLAY_EXIT_TOTAL_MS)
     }
 
     return () => {
       if (frameId !== null) window.cancelAnimationFrame(frameId)
       if (enterTimer !== null) clearTimeout(enterTimer)
       if (exitTimer !== null) clearTimeout(exitTimer)
+      if (holdTimer !== null) clearTimeout(holdTimer)
     }
   }, [open, placement])
 
@@ -124,6 +147,14 @@ function StarDrawer({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [onClose, open])
 
+  // The close button and the panel's own accessible name were English-only
+  // literals until now, so a Chinese-speaking screen-reader user got an English
+  // button in an otherwise Chinese drawer. Resolved before the `rendered` early
+  // return so the hook order stays stable across a close/open cycle.
+  const copy = useComponentCopy()
+  const resolvedCloseLabel = closeLabel ?? copy.t('ui.drawer.close')
+  const resolvedAriaLabel = ariaLabel ?? (typeof title === 'string' ? title : copy.t('ui.dialog.drawer'))
+
   if (!rendered || typeof document === 'undefined') return null
 
   const handleMaskClick = () => {
@@ -131,7 +162,11 @@ function StarDrawer({
   }
 
   return createPortal(
-    <div className={styles['stardew-drawer-layer']} data-state={motionState}>
+    <div
+      className={styles['stardew-drawer-layer']}
+      data-state={motionState}
+      style={overlayMotionStyle}
+    >
       <div
         aria-hidden
         className={classNames(styles['stardew-drawer__mask'], maskClosable && styles['stardew-drawer__mask--clickable'])}
@@ -146,9 +181,10 @@ function StarDrawer({
         )}
         data-state={motionState}
         data-placement={activePlacement}
+        data-skip-enter={skipEnter ? 'true' : undefined}
         role="dialog"
         aria-modal="true"
-        aria-label={typeof title === 'string' ? title : 'Drawer'}
+        aria-label={resolvedAriaLabel}
       >
         <StarCard
           className={styles['stardew-drawer__shell']}
@@ -156,7 +192,7 @@ function StarDrawer({
           showTitle={Boolean(title)}
           headerExtra={
             title && onClose ? (
-              <button type="button" className={styles['stardew-drawer__close']} aria-label="Close drawer" onClick={onClose}>
+              <button type="button" className={styles['stardew-drawer__close']} aria-label={resolvedCloseLabel} onClick={onClose}>
                 ×
               </button>
             ) : undefined
@@ -167,7 +203,7 @@ function StarDrawer({
             <button
               type="button"
               className={classNames(styles['stardew-drawer__close'], styles['stardew-drawer__close--floating'])}
-              aria-label="Close drawer"
+              aria-label={resolvedCloseLabel}
               onClick={onClose}
             >
               ×

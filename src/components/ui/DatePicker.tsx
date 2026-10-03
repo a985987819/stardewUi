@@ -12,8 +12,14 @@ import {
 import { classNames } from '../../utils/classNames'
 import CalendarGrid from './CalendarGrid'
 import CalendarToolbar from './CalendarToolbar'
-import { formatMonthLabel } from './calendarLabels'
+import {
+  formatMonthLabel,
+  formatUnitSuffixes,
+  toIntlLocale,
+  type CalendarLocale,
+} from './calendarLabels'
 import WheelDatePickerPanel from './WheelDatePickerPanel'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './DatePicker.module.scss'
 
 type DatePickerMode = 'single' | 'range'
@@ -61,13 +67,14 @@ export interface StarDatePickerProps {
   cancelLabel?: string
   /** `inline` 形式下三列的无障碍名称，依次为年、月、日 */
   columnLabels?: [string, string, string]
+  /**
+   * BCP 47 locale for month names, the weekday header, and the inline trigger.
+   * Defaults to the host app's language, then `zh-CN`.
+   */
+  locale?: CalendarLocale
   className?: string
 }
 
-const DEFAULT_TODAY_LABEL = '回到今日'
-const DEFAULT_CONFIRM_LABEL = '确定'
-const DEFAULT_CANCEL_LABEL = '取消'
-const DEFAULT_COLUMN_LABELS: [string, string, string] = ['年', '月', '日']
 
 function formatDayLabel(dayTimestamp: number) {
   const date = new Date(dayTimestamp)
@@ -185,14 +192,28 @@ function DatePicker({
   maxDate,
   disabledDates = [],
   showOutsideDays = true,
-  todayLabel = DEFAULT_TODAY_LABEL,
+  todayLabel,
   showToday = true,
   todayOffsetMinutes,
-  confirmLabel = DEFAULT_CONFIRM_LABEL,
-  cancelLabel = DEFAULT_CANCEL_LABEL,
-  columnLabels = DEFAULT_COLUMN_LABELS,
+  confirmLabel,
+  cancelLabel,
+  columnLabels,
+  locale,
   className,
 }: StarDatePickerProps) {
+  // Explicit prop, then the host app's language, then the historical `zh-CN`.
+  const copy = useComponentCopy()
+  const resolvedLocale = locale ?? toIntlLocale(copy.lang)
+  const unitSuffixes = formatUnitSuffixes(resolvedLocale)
+  const resolvedTodayLabel = todayLabel ?? copy.t('ui.datePicker.today')
+  const resolvedConfirmLabel = confirmLabel ?? copy.t('ui.datePicker.confirm')
+  const resolvedCancelLabel = cancelLabel ?? copy.t('ui.datePicker.cancel')
+  const resolvedColumnLabels: [string, string, string] = columnLabels ?? [
+    unitSuffixes.year || copy.t('ui.datePicker.yearSuffix'),
+    unitSuffixes.month || copy.t('ui.datePicker.monthSuffix'),
+    unitSuffixes.day || copy.t('ui.datePicker.daySuffix'),
+  ]
+
   const isControlled = value !== undefined
   const [internalMonth, setInternalMonth] = useState(() =>
     getInitialMonth(mode, value, defaultValue),
@@ -549,9 +570,9 @@ function DatePicker({
             minDate={normalizedMinDate}
             maxDate={normalizedMaxDate}
             disabledDates={inlineDisabledDateSet}
-            confirmLabel={confirmLabel}
-            cancelLabel={cancelLabel}
-            columnLabels={columnLabels}
+            confirmLabel={resolvedConfirmLabel}
+            cancelLabel={resolvedCancelLabel}
+            columnLabels={resolvedColumnLabels}
             onDraftChange={handleInlineDraftChange}
             onConfirm={handleInlineConfirm}
             onCancel={closeInline}
@@ -566,15 +587,17 @@ function DatePicker({
       <CalendarToolbar
         monthTimestamp={monthTimestamp}
         todayTimestamp={todayTimestamp}
-        todayLabel={todayLabel}
+        todayLabel={resolvedTodayLabel}
         showToday={showToday}
+        locale={resolvedLocale}
         onSelectMonth={changeMonth}
       />
 
       <CalendarGrid
-        monthLabel={formatMonthLabel(monthTimestamp)}
+        monthLabel={formatMonthLabel(monthTimestamp, resolvedLocale)}
         cells={cells}
         showOutsideDays={showOutsideDays}
+        locale={resolvedLocale}
         onSelectDay={handleSelectDay}
         isDisabled={isDisabled}
         getCellStateClassName={getCellStateClassName}

@@ -8,6 +8,7 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './Pagination.module.scss'
 
 export interface StarPaginationProps
@@ -96,6 +97,10 @@ function StarPagination({
   style,
   ...rest
 }: StarPaginationProps) {
+  // The nav and the page-size select previously fell back to English-only
+  // literals, so a Chinese screen-reader user heard an English landmark.
+  const copy = useComponentCopy()
+
   // Board counts are finite and non-negative: NaN or negative totals collapse
   // to an empty board instead of leaking NaN into the page chips.
   const safeTotal = Number.isFinite(total) ? Math.max(0, total) : 0
@@ -144,7 +149,7 @@ function StarPagination({
   return (
     <nav
       {...rest}
-      aria-label={ariaLabel ?? 'Pagination'}
+      aria-label={ariaLabel ?? copy.t('ui.pagination.label')}
       className={classNames(styles['star-pagination'], className)}
       style={{ ...cssVariables, ...style }}
     >
@@ -195,7 +200,7 @@ function StarPagination({
           <select
             className={styles['star-pagination__size']}
             value={activeSize}
-            aria-label={`${ariaLabel ?? 'Pagination'} page size`}
+            aria-label={ariaLabel ? `${ariaLabel} ${copy.t('ui.pagination.pageSize')}` : copy.t('ui.pagination.pageSize')}
             onChange={(event) => changeSize(Number(event.target.value))}
           >
             {sizeChoices.map((option) => (

@@ -10,6 +10,8 @@ import {
 import { classNames } from '../../utils/classNames'
 import CalendarGrid from './CalendarGrid'
 import CalendarToolbar from './CalendarToolbar'
+import { DEFAULT_CALENDAR_LOCALE, toIntlLocale, type CalendarLocale } from './calendarLabels'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './Calendar.module.scss'
 
 export interface CalendarItem {
@@ -37,11 +39,15 @@ export interface StarCalendarProps {
   showToday?: boolean
   /** 计算「今日」所用的时区偏移（分钟），默认 480 即东八区 */
   todayOffsetMinutes?: number
+  /**
+   * BCP 47 locale for month names, the weekday header, and the year heading.
+   * Defaults to the host app's language, then `zh-CN`.
+   */
+  locale?: CalendarLocale
   className?: string
 }
 
 const DEFAULT_MAX_VISIBLE_MARKERS = 3
-const DEFAULT_TODAY_LABEL = '回到今日'
 
 function getInitialMonth(value?: number, defaultValue?: number) {
   if (value !== undefined) {
@@ -99,9 +105,10 @@ function Calendar({
   maxVisibleMarkers = DEFAULT_MAX_VISIBLE_MARKERS,
   iconMap,
   showOutsideDays = true,
-  todayLabel = DEFAULT_TODAY_LABEL,
+  todayLabel,
   showToday = true,
   todayOffsetMinutes,
+  locale,
   className,
 }: StarCalendarProps) {
   const [internalMonth, setInternalMonth] = useState(() => getInitialMonth(value, defaultValue))
@@ -109,6 +116,12 @@ function Calendar({
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
   const isControlled = value !== undefined
   const monthTimestamp = isControlled ? getMonthStartTimestamp(value) : internalMonth
+
+  // An explicit `locale` prop wins; otherwise the host app's language decides,
+  // and a standalone consumer with neither gets the historical `zh-CN`.
+  const copy = useComponentCopy()
+  const resolvedLocale = locale ?? (copy.lang ? toIntlLocale(copy.lang) : DEFAULT_CALENDAR_LOCALE)
+  const resolvedTodayLabel = todayLabel ?? copy.t('ui.datePicker.today')
   // 「今日」按东八区算，与「回到今日」落点保持同一个口径：格子高亮和按钮跳转
   // 都读这一个值，所以跨时区访问时不会出现「按钮跳过去但没高亮」。
   const todayTimestamp = getTodayTimestamp(todayOffsetMinutes)
@@ -182,14 +195,16 @@ function Calendar({
       <CalendarToolbar
         monthTimestamp={monthTimestamp}
         todayTimestamp={todayTimestamp}
-        todayLabel={todayLabel}
+        todayLabel={resolvedTodayLabel}
         showToday={showToday}
+        locale={resolvedLocale}
         onSelectMonth={changeMonth}
       />
 
       <CalendarGrid
         cells={cells}
         showOutsideDays={showOutsideDays}
+        locale={resolvedLocale}
         onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}
         renderCellContent={renderCellContent}
         getCellButtonProps={(cell) => ({

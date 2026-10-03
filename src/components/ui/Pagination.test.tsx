@@ -118,7 +118,7 @@ describe('Pagination size changer', () => {
     expect(screen.getByRole('button', { name: 'Page 9' })).toHaveAttribute('aria-current', 'page')
 
     // First visible item was 41; at 20 per page that re-anchors to page 3 of 3.
-    fireEvent.change(screen.getByRole('combobox', { name: 'Pagination page size' }), {
+    fireEvent.change(screen.getByRole('combobox', { name: '每页条数' }), {
       target: { value: '20' },
     })
     expect(onShowSizeChange).toHaveBeenCalledWith(3, 20)
@@ -132,7 +132,7 @@ describe('Pagination size changer', () => {
       <Pagination total={45} pageSize={10} current={2} showSizeChanger pageSizeOptions={[5, 10]} onChange={onChange} />,
     )
 
-    fireEvent.change(screen.getByRole('combobox', { name: 'Pagination page size' }), {
+    fireEvent.change(screen.getByRole('combobox', { name: '每页条数' }), {
       target: { value: '5' },
     })
 
@@ -145,7 +145,7 @@ describe('Pagination size changer', () => {
   it('joins the active size into the options when it is missing', () => {
     render(<Pagination total={45} pageSize={7} showSizeChanger />)
 
-    const combo = screen.getByRole('combobox', { name: 'Pagination page size' })
+    const combo = screen.getByRole('combobox', { name: '每页条数' })
     expect(combo).toHaveValue('7')
   })
 })

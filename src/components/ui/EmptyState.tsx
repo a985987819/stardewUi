@@ -1,6 +1,7 @@
 ﻿import { type HTMLAttributes, type ReactNode } from 'react'
 import defaultEmptyStateImage from '../../assets/noData.png'
 import { classNames } from '../../utils/classNames'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './EmptyState.module.scss'
 
 export type EmptyStateDirection = 'horizontal' | 'vertical'
@@ -15,19 +16,25 @@ export interface StarEmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>
 }
 
 const DEFAULT_IMAGE_SRC = defaultEmptyStateImage
-const DEFAULT_IMAGE_ALT = '暂无数据'
 const DEFAULT_MESSAGE = '没有更多数据了'
 
 function StarEmptyState({
   imageSrc = DEFAULT_IMAGE_SRC,
-  imageAlt = DEFAULT_IMAGE_ALT,
-  message = DEFAULT_MESSAGE,
+  imageAlt,
+  message,
   showImage = true,
   showMessage = true,
   direction = 'vertical',
   className,
   ...rest
 }: StarEmptyStateProps) {
+  // Defaults come from the host app's language when it provides one. The
+  // constants above stay exported as the documented Chinese fallbacks so a
+  // consumer reading `EMPTY_STATE_DEFAULT_MESSAGE` gets a stable value.
+  const copy = useComponentCopy()
+  const resolvedAlt = imageAlt ?? copy.t('ui.emptyState.imageAlt')
+  const resolvedMessage = message ?? copy.t('ui.emptyState.message')
+
   return (
     <div
       {...rest}
@@ -35,10 +42,10 @@ function StarEmptyState({
     >
       {showImage ? (
         <div className={styles['stardew-empty-state__image-wrap']}>
-          <img src={imageSrc} alt={imageAlt} className={styles['stardew-empty-state__image']} />
+          <img src={imageSrc} alt={resolvedAlt} className={styles['stardew-empty-state__image']} />
         </div>
       ) : null}
-      {showMessage ? <div className={styles['stardew-empty-state__message']}>{message}</div> : null}
+      {showMessage ? <div className={styles['stardew-empty-state__message']}>{resolvedMessage}</div> : null}
     </div>
   )
 }

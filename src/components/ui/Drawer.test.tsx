@@ -1,10 +1,15 @@
 import '@testing-library/jest-dom/vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { I18nProvider } from '../../i18n'
 import Drawer from './Drawer'
+import { OVERLAY_ENTER_TOTAL_MS } from './overlayMotion'
 import styles from './Drawer.module.scss'
 
-const DRAWER_TRANSITION_MS = 200
+// Imported rather than retyped: the test's job is to confirm the component's
+// timer matches the shared duration, not to assert a magic number that would
+// drift from the stylesheet.
+const DRAWER_ENTER_MS = OVERLAY_ENTER_TOTAL_MS
 
 describe('Drawer', () => {
   afterEach(() => {
@@ -39,7 +44,7 @@ describe('Drawer', () => {
       expect(drawer).toHaveAttribute('data-state', 'opening')
 
       await act(async () => {
-        vi.advanceTimersByTime(DRAWER_TRANSITION_MS)
+        vi.advanceTimersByTime(DRAWER_ENTER_MS)
       })
 
       expect(drawer).toHaveAttribute('data-state', 'open')
@@ -140,11 +145,35 @@ describe('Drawer', () => {
 
     await waitFor(() => expect(screen.getByText('内容')).toBeInTheDocument())
 
-    fireEvent.click(screen.getByRole('button', { name: 'Close drawer' }))
+    fireEvent.click(screen.getByRole('button', { name: '关闭抽屉' }))
     fireEvent.click(document.querySelector(`.${styles['stardew-drawer__mask']}`) as Element)
     fireEvent.keyDown(window, { key: 'Escape' })
 
     expect(onClose).toHaveBeenCalledTimes(3)
+  })
+
+  it('names the close button in the host app language rather than an English literal', async () => {
+    // The label used to be the hardcoded string "Close drawer", so a Chinese
+    // screen-reader user got an English button in an otherwise Chinese drawer.
+    render(
+      <I18nProvider>
+        <Drawer open title="设置" onClose={() => {}}>内容</Drawer>
+      </I18nProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByText('内容')).toBeInTheDocument())
+
+    expect(screen.getByRole('button', { name: '关闭抽屉' })).toBeInTheDocument()
+  })
+
+  it('lets a caller override the close label outright', async () => {
+    render(
+      <Drawer open title="设置" closeLabel="Close bag" onClose={() => {}}>内容</Drawer>,
+    )
+
+    await waitFor(() => expect(screen.getByText('内容')).toBeInTheDocument())
+
+    expect(screen.getByRole('button', { name: 'Close bag' })).toBeInTheDocument()
   })
 
   it('does not close from the mask when maskClosable is false', async () => {

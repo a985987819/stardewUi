@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import StarLoading from '../ui/Loading'
 import StarProgress from '../ui/Progress'
+import { useI18n } from '../../i18n'
 import { resolveAssetPath } from '../../utils/githubPages'
 import styles from './StartupLoader.module.scss'
 
@@ -30,6 +31,9 @@ const preloadImage = (src: string) =>
   })
 
 function StarStartupLoader({ onComplete }: StartupLoaderProps) {
+  // The loader is the first thing a visitor sees, so its copy has to switch with
+  // the app language rather than flashing Chinese before React hydrates the rest.
+  const { t } = useI18n()
   const [loaded, setLoaded] = useState(0)
   const resources = useMemo(() => [...LOCAL_ASSET_URLS, ...PUBLIC_ASSET_URLS], [])
   const total = resources.length + 1
@@ -66,14 +70,14 @@ function StarStartupLoader({ onComplete }: StartupLoaderProps) {
       <section className={styles['startup-loader__identity']}>
         <span className={styles['startup-loader__season']}>SPRING · YEAR 1</span>
         <h1>StardewValley UI</h1>
-        <p>正在整理工具箱与农场素材…</p>
+        <p>{t('ui.loading.startup')}</p>
       </section>
       <div className={styles['startup-loader__garden']}>
         <StarLoading active size={176} speed={260} text="" aria-hidden />
       </div>
       <section className={styles['startup-loader__progress']} aria-live="polite" aria-label={`Loading ${progress}%`}>
         <div className={styles['startup-loader__progress-heading']}>
-          <span>晨间准备</span>
+          <span>{t('ui.loading.startupPhase')}</span>
           <span>{progress}%</span>
         </div>
         <StarProgress
@@ -82,9 +86,9 @@ function StarStartupLoader({ onComplete }: StartupLoaderProps) {
           max={total}
           segmentSize={1}
           color="#71964A"
-          aria-label={`正在加载 ${loaded} / ${total} 项资源`}
+          aria-label={t('ui.loading.progress', { loaded, total })}
         />
-        <p>{loaded} / {total} 件素材已归位</p>
+        <p>{loaded} / {total} {t('ui.loading.startupDone')}</p>
       </section>
     </main>
   )

@@ -1,20 +1,24 @@
-import { useCallback, type ReactNode } from 'react'
+import { useCallback, useMemo, type ReactNode } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { dictionaries } from './dictionaries'
-import { I18nContext } from './context'
+import { dictionaries, interpolate } from './dictionaries'
+import { I18nContext, type I18nContextValue } from './context'
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useLocalStorage<'zh' | 'en'>('star-ui-lang', 'zh')
 
   const t = useCallback(
-    (key: string) => {
+    // An unknown key falls through to the key itself rather than throwing, so a
+    // typo degrades to visible-but-inert text instead of taking down the page.
+    (key: string, values?: Record<string, string | number>) => {
       const dict = dictionaries[lang]
-      return dict[key] ?? key
+      return interpolate(dict[key] ?? key, values)
     },
     [lang]
   )
 
-  return <I18nContext.Provider value={{ lang, setLang, t }}>{children}</I18nContext.Provider>
+  const value = useMemo<I18nContextValue>(() => ({ lang, setLang, t }), [lang, setLang, t])
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
 export default I18nProvider

@@ -216,7 +216,7 @@ describe('Calendar', () => {
       />,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+    fireEvent.click(screen.getByRole('button', { name: '下个月' }))
 
     expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2024-06-01'))
   })
@@ -270,12 +270,12 @@ describe('Calendar', () => {
       // 2024 落在 2016-2027 这一页。
       expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Next years' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '下一个年份段' }))
 
       expect(within(panel).queryByRole('button', { name: '2016年' })).toBeNull()
       expect(within(panel).getByRole('button', { name: '2028年' })).toBeInTheDocument()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Previous years' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '上一个年份段' }))
 
       expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
     })
@@ -285,7 +285,7 @@ describe('Calendar', () => {
 
       const panel = openMonthPanel()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Next year' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '下一年' }))
 
       expect(within(panel).getByRole('button', { name: '2025年' })).toBeInTheDocument()
       expect(within(panel).getByRole('button', { name: '2025年5月' })).toBeInTheDocument()

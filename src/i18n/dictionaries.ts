@@ -1,22 +1,26 @@
 export type Lang = 'zh' | 'en'
 
+/**
+ * Shared UI copy. Two families live here:
+ *
+ *   nav.* / guide.* / components.*  — documentation chrome
+ *   ui.*                             — strings the *components themselves* show
+ *
+ * The `ui.*` family exists because `src/components/ui` had no access to the
+ * language at all: Dialog's default footer read 确认/取消 in English, and its
+ * pager buttons announced 上一页 to a screen reader in English. Components now
+ * take an optional label prop per string and fall back to these keys, so the
+ * library is bilingual out of the box without forcing consumers to pass labels.
+ *
+ * Every key here is reachable: `dictionaries.test.ts` fails on a key that is
+ * unused, which is how the previous 22 dead keys accumulated and rotted.
+ */
 export const zhDict: Record<string, string> = {
   'nav.guide': '指南',
   'nav.components': '组件',
   'nav.api': 'API',
   'nav.backToTop': '回到顶部',
   'header.github': '查看 GitHub',
-  'home.badge': '像素农场 UI Kit',
-  'home.desc':
-    '一套带着星露谷泥土香气的 React 组件库。按钮像工具箱里的铜锤，卡片像镇长公告栏，日历会提醒你别错过花舞节。',
-  'home.start': '开始逛农场',
-  'home.github': '查看 GitHub',
-  'home.feature1.title': '把组件种进田里',
-  'home.feature1.desc': '按钮、卡片、日历、弹窗和消息组件都带着像素边框，适合搭建有游戏感的活动页、文档站和互动界面。',
-  'home.feature2.title': '先试玩，再接入',
-  'home.feature2.desc': '每个组件都有演示田块、用例说明和 API 表格，像翻农场手册一样快速找到合适的用法。',
-  'home.feature3.title': '界面也能有季节',
-  'home.feature3.desc': '春天播种、夏天冒险、秋天收获、冬天整理背包，让普通 UI 也有明确的情绪和记忆点。',
   'guide.install': '安装',
   'guide.installDesc': '把工具包放进背包，任选一种包管理器安装：',
   'guide.usage': '使用',
@@ -31,19 +35,6 @@ export const zhDict: Record<string, string> = {
   'guide.feature5': '适合文档站、活动页、小游戏周边界面和有风格诉求的产品',
   'components.title': '组件',
   'components.desc': '挑一块田开始试种：每个组件页都包含介绍、游戏化用例、代码示例和 API 参考。',
-  'sidebar.guide': '指南',
-  'sidebar.components': '组件',
-  'sidebar.button': '按钮',
-  'sidebar.calendar': '日历',
-  'sidebar.datePicker': '日期选择',
-  'sidebar.card': '卡片',
-  'sidebar.dialog': '对话框',
-  'sidebar.popup': '弹窗',
-  'sidebar.typewriter': '打字机',
-  'sidebar.loading': '加载',
-  'sidebar.message': '消息',
-  'sidebar.emptyState': '空状态',
-  'sidebar.tab': '选项卡',
   'demo.showCode': '显示代码',
   'demo.hideCode': '隐藏代码',
   'demo.copyReady': 'React 应用示例',
@@ -55,14 +46,45 @@ export const zhDict: Record<string, string> = {
   'api.description': '说明',
   'api.type': '类型',
   'api.default': '默认值',
-  'api.required': '必填',
-  'lang.zh': '中文',
-  'lang.en': 'English',
   'toc.title': '目录',
   'search.placeholder': '搜索组件...',
   'copy.success': '已复制',
   'copy.error': '复制失败',
   'copy.title': '点击复制',
+
+  // ---- component-owned copy -------------------------------------------------
+  'ui.dialog.confirm': '确认',
+  'ui.dialog.cancel': '取消',
+  'ui.dialog.prev': '上一页',
+  'ui.dialog.next': '下一页',
+  'ui.dialog.role': '角色',
+  'ui.dialog.waiting': '等待标题完成...',
+  'ui.dialog.drawer': '抽屉',
+  'ui.drawer.close': '关闭抽屉',
+  'ui.datePicker.today': '回到今日',
+  'ui.datePicker.confirm': '确定',
+  'ui.datePicker.cancel': '取消',
+  'ui.datePicker.selectDate': '选择日期',
+  'ui.datePicker.selectMonth': '选择年月',
+  'ui.datePicker.prevMonth': '上个月',
+  'ui.datePicker.nextMonth': '下个月',
+  'ui.datePicker.prevYear': '上一年',
+  'ui.datePicker.nextYear': '下一年',
+  'ui.datePicker.prevYears': '上一个年份段',
+  'ui.datePicker.nextYears': '下一个年份段',
+  'ui.datePicker.yearSuffix': '年',
+  'ui.datePicker.monthSuffix': '月',
+  'ui.datePicker.daySuffix': '日',
+  'ui.loading.default': '正在加载...',
+  'ui.loading.loading': '加载中',
+  'ui.loading.progress': '正在加载 {loaded} / {total} 项资源',
+  'ui.loading.startup': '正在整理工具箱与农场素材…',
+  'ui.loading.startupPhase': '晨间准备',
+  'ui.loading.startupDone': '件素材已归位',
+  'ui.emptyState.imageAlt': '暂无数据',
+  'ui.emptyState.message': '没有更多数据了',
+  'ui.pagination.label': '分页',
+  'ui.pagination.pageSize': '每页条数',
 }
 
 export const enDict: Record<string, string> = {
@@ -71,20 +93,6 @@ export const enDict: Record<string, string> = {
   'nav.api': 'API',
   'nav.backToTop': 'Back to top',
   'header.github': 'GitHub',
-  'home.badge': 'Pixel Farm UI Kit',
-  'home.desc':
-    'A React component kit with Stardew-like soil under its boots. Buttons feel like copper tools, cards like town notices, and calendars remind players not to miss the Flower Dance.',
-  'home.start': 'Enter the Farm',
-  'home.github': 'View on GitHub',
-  'home.feature1.title': 'Plant Components Like Crops',
-  'home.feature1.desc':
-    'Buttons, cards, calendars, popups, and feedback components carry pixel borders for event pages, docs, and playful interfaces.',
-  'home.feature2.title': 'Try Before You Ship',
-  'home.feature2.desc':
-    'Every page includes a demo plot, use-case notes, code samples, and API tables so you can pick the right tool fast.',
-  'home.feature3.title': 'Seasonal Interface Mood',
-  'home.feature3.desc':
-    'Spring planting, summer quests, autumn harvests, and winter inventory checks give everyday UI a stronger personality.',
   'guide.install': 'Installation',
   'guide.installDesc': 'Pack the toolkit with your preferred package manager:',
   'guide.usage': 'Usage',
@@ -99,19 +107,6 @@ export const enDict: Record<string, string> = {
   'guide.feature5': 'Useful for docs, campaign pages, game-adjacent UIs, and expressive products',
   'components.title': 'Components',
   'components.desc': 'Pick a plot to test: each component page includes intro copy, playful use cases, code examples, and API notes.',
-  'sidebar.guide': 'Guide',
-  'sidebar.components': 'Components',
-  'sidebar.button': 'Button',
-  'sidebar.calendar': 'Calendar',
-  'sidebar.datePicker': 'DatePicker',
-  'sidebar.card': 'Card',
-  'sidebar.dialog': 'Dialog',
-  'sidebar.popup': 'Popup',
-  'sidebar.typewriter': 'Typewriter',
-  'sidebar.loading': 'Loading',
-  'sidebar.message': 'Message',
-  'sidebar.emptyState': 'EmptyState',
-  'sidebar.tab': 'Tab',
   'demo.showCode': 'Show Code',
   'demo.hideCode': 'Hide Code',
   'demo.copyReady': 'React application example',
@@ -123,17 +118,70 @@ export const enDict: Record<string, string> = {
   'api.description': 'Description',
   'api.type': 'Type',
   'api.default': 'Default',
-  'api.required': 'Required',
-  'lang.zh': '中文',
-  'lang.en': 'English',
   'toc.title': 'Table of Contents',
   'search.placeholder': 'Search components...',
   'copy.success': 'Copied',
   'copy.error': 'Copy failed',
   'copy.title': 'Click to copy',
+
+  // ---- component-owned copy -------------------------------------------------
+  'ui.dialog.confirm': 'Confirm',
+  'ui.dialog.cancel': 'Cancel',
+  'ui.dialog.prev': 'Previous page',
+  'ui.dialog.next': 'Next page',
+  'ui.dialog.role': 'Character',
+  'ui.dialog.waiting': 'Waiting for the title…',
+  'ui.dialog.drawer': 'Drawer',
+  'ui.drawer.close': 'Close drawer',
+  'ui.datePicker.today': 'Back to today',
+  'ui.datePicker.confirm': 'OK',
+  'ui.datePicker.cancel': 'Cancel',
+  'ui.datePicker.selectDate': 'Select a date',
+  'ui.datePicker.selectMonth': 'Select month and year',
+  'ui.datePicker.prevMonth': 'Previous month',
+  'ui.datePicker.nextMonth': 'Next month',
+  'ui.datePicker.prevYear': 'Previous year',
+  'ui.datePicker.nextYear': 'Next year',
+  'ui.datePicker.prevYears': 'Earlier years',
+  'ui.datePicker.nextYears': 'Later years',
+  // Intentionally empty: English does not suffix date parts the way Chinese
+  // does. `dictionaries.test.ts` exempts these three keys specifically.
+  'ui.datePicker.yearSuffix': '',
+  'ui.datePicker.monthSuffix': '',
+  'ui.datePicker.daySuffix': '',
+  'ui.loading.default': 'Loading…',
+  'ui.loading.loading': 'Loading',
+  'ui.loading.progress': 'Loading {loaded} of {total} assets',
+  'ui.loading.startup': 'Packing the toolbox and farm assets…',
+  'ui.loading.startupPhase': 'Morning prep',
+  'ui.loading.startupDone': 'assets in place',
+  'ui.emptyState.imageAlt': 'No data',
+  'ui.emptyState.message': 'Nothing here yet',
+  'ui.pagination.label': 'Pagination',
+  'ui.pagination.pageSize': 'Items per page',
 }
 
 export const dictionaries: Record<Lang, Record<string, string>> = {
   zh: zhDict,
   en: enDict,
+}
+
+// `{{name}}` rather than ICU `{name}`: the project has no runtime formatter
+// dependency and four strings do not justify pulling one in.
+export type CopyKey = keyof typeof zhDict & keyof typeof enDict
+
+/**
+ * Fill `{{token}}` placeholders in a dictionary string. Exported so components
+ * can compose copy with runtime values (progress counts, item counts) without
+ * pulling in an i18n library.
+ *
+ * Returns the template unchanged when the key is missing rather than throwing:
+ * a component whose fallback label vanished should still render.
+ */
+export function interpolate(template: string, values?: Record<string, string | number>) {
+  if (!values) return template
+
+  return template.replace(/\{\{(\w+)\}\}/g, (match, token: string) =>
+    token in values ? String(values[token]) : match,
+  )
 }

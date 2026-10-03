@@ -1,24 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { addMonths, getMonthStartTimestamp } from '../../utils/calendar'
 import { classNames } from '../../utils/classNames'
-import { formatMonthLabel, formatYearLabel } from './calendarLabels'
+import {
+  DEFAULT_CALENDAR_LOCALE,
+  formatMonthButtonLabel,
+  formatMonthLabel,
+  formatMonthLabels,
+  formatYearLabel,
+  type CalendarLocale,
+} from './calendarLabels'
 import StarNineSliceButton from './NineSliceButton'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './CalendarToolbar.module.scss'
-
-const MONTH_LABELS = [
-  '1月',
-  '2月',
-  '3月',
-  '4月',
-  '5月',
-  '6月',
-  '7月',
-  '8月',
-  '9月',
-  '10月',
-  '11月',
-  '12月',
-] as const
 
 const YEARS_PER_PAGE = 12
 
@@ -27,6 +20,8 @@ export interface CalendarToolbarProps {
   todayTimestamp: number
   todayLabel: string
   showToday?: boolean
+  /** Locale for month names and year formatting. Defaults to `zh-CN`. */
+  locale?: CalendarLocale
   onSelectMonth: (monthTimestamp: number) => void
 }
 
@@ -41,13 +36,19 @@ function CalendarToolbar({
   todayTimestamp,
   todayLabel,
   showToday = true,
+  locale = DEFAULT_CALENDAR_LOCALE,
   onSelectMonth,
 }: CalendarToolbarProps) {
+  const copy = useComponentCopy()
   const [isOpen, setIsOpen] = useState(false)
   const [isYearView, setIsYearView] = useState(false)
   const [visibleYear, setVisibleYear] = useState(() => new Date(monthTimestamp).getFullYear())
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
+
+  // Month names come from `Intl` rather than a hardcoded 1月–12月 table, which
+  // is why the quick-jump grid can show `Jan…Dec` under an English locale.
+  const monthLabels = formatMonthLabels(locale)
 
   const selectedYear = new Date(monthTimestamp).getFullYear()
   const selectedMonth = new Date(monthTimestamp).getMonth()
@@ -140,7 +141,7 @@ function CalendarToolbar({
           type="button"
           variant="concise"
           size="small"
-          aria-label="Previous month"
+          aria-label={copy.t('ui.datePicker.prevMonth')}
           onClick={() => onSelectMonth(addMonths(monthTimestamp, -1))}
         >
           &lt;
@@ -154,7 +155,7 @@ function CalendarToolbar({
           aria-expanded={isOpen}
           onClick={handleToggle}
         >
-          {formatMonthLabel(monthTimestamp)}
+          {formatMonthLabel(monthTimestamp, locale)}
           <span className={styles['calendar-toolbar__caret']} aria-hidden="true" />
         </button>
 
@@ -162,7 +163,7 @@ function CalendarToolbar({
           type="button"
           variant="concise"
           size="small"
-          aria-label="Next month"
+          aria-label={copy.t('ui.datePicker.nextMonth')}
           onClick={() => onSelectMonth(addMonths(monthTimestamp, 1))}
         >
           &gt;
@@ -184,13 +185,13 @@ function CalendarToolbar({
       ) : null}
 
       {isOpen ? (
-        <div className={styles['calendar-toolbar__panel']} role="dialog" aria-label="选择年月">
+        <div className={styles['calendar-toolbar__panel']} role="dialog" aria-label={copy.t('ui.datePicker.selectMonth')}>
           <div className={styles['calendar-toolbar__panel-header']}>
             <StarNineSliceButton
               type="button"
               variant="concise"
               size="small"
-              aria-label={isYearView ? 'Previous years' : 'Previous year'}
+              aria-label={isYearView ? copy.t('ui.datePicker.prevYears') : copy.t('ui.datePicker.prevYear')}
               onClick={() => handleStep(-1)}
             >
               &lt;
@@ -203,14 +204,14 @@ function CalendarToolbar({
             >
               {isYearView
                 ? `${pageStartYear} - ${pageStartYear + YEARS_PER_PAGE - 1}`
-                : formatYearLabel(visibleYear)}
+                : formatYearLabel(visibleYear, locale)}
             </button>
 
             <StarNineSliceButton
               type="button"
               variant="concise"
               size="small"
-              aria-label={isYearView ? 'Next years' : 'Next year'}
+              aria-label={isYearView ? copy.t('ui.datePicker.nextYears') : copy.t('ui.datePicker.nextYear')}
               onClick={() => handleStep(1)}
             >
               &gt;
@@ -231,13 +232,13 @@ function CalendarToolbar({
                   aria-current={year === currentYear ? 'date' : undefined}
                   onClick={() => handleSelectYear(year)}
                 >
-                  {formatYearLabel(year)}
+                  {formatYearLabel(year, locale)}
                 </button>
               ))}
             </div>
           ) : (
             <div className={styles['calendar-toolbar__grid']}>
-              {MONTH_LABELS.map((label, monthIndex) => (
+              {monthLabels.map((label, monthIndex) => (
                 <button
                   key={label}
                   type="button"
@@ -253,7 +254,7 @@ function CalendarToolbar({
                   aria-current={
                     visibleYear === currentYear && monthIndex === currentMonth ? 'date' : undefined
                   }
-                  aria-label={`${formatYearLabel(visibleYear)}${monthIndex + 1}月`}
+                  aria-label={formatMonthButtonLabel(visibleYear, monthIndex, locale)}
                   onClick={() => handleSelectMonth(monthIndex)}
                 >
                   {label}

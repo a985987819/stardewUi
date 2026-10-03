@@ -180,7 +180,7 @@ describe('DatePicker', () => {
     const initialGridLabel = getGrid().getAttribute('aria-label')
     expect(initialGridLabel).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+    fireEvent.click(screen.getByRole('button', { name: '下个月' }))
 
     const navigatedGridLabel = getGrid().getAttribute('aria-label')
     expect(navigatedGridLabel).toBeTruthy()

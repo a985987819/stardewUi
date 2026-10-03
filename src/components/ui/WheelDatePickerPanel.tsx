@@ -1,5 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { normalizeToDayTimestamp } from '../../utils/calendar'
+import { formatUnitSuffixes, toIntlLocale } from './calendarLabels'
+import { useComponentCopy } from './useComponentCopy'
 import WheelColumn from './WheelColumn'
 import styles from './WheelPicker.module.scss'
 
@@ -57,6 +59,11 @@ function WheelDatePickerPanel({
   cancelLabel = '取消',
   columnLabels = ['年', '月', '日'],
 }: WheelDatePickerPanelProps) {
+  // The panel is internal to DatePicker, which already resolves all four
+  // strings from the host app's language and passes them down as props. The
+  // defaults here exist only so the panel can be rendered on its own in a test.
+  const copy = useComponentCopy()
+  const suffixes = formatUnitSuffixes(toIntlLocale(copy.lang))
   const todayDate = new Date(todayTimestamp)
   const todayYear = todayDate.getFullYear()
 
@@ -156,7 +163,7 @@ function WheelDatePickerPanel({
   })
 
   return (
-    <div className={styles['date-picker-inline']} role="dialog" aria-label="选择日期">
+    <div className={styles['date-picker-inline']} role="dialog" aria-label={copy.t('ui.datePicker.selectDate')}>
       <div className={styles['date-picker-inline__columns']}>
         <WheelColumn
           key="year"
@@ -164,7 +171,7 @@ function WheelDatePickerPanel({
           values={years}
           value={year}
           onChange={handleYearChange}
-          format={(item) => `${item}年`}
+          format={(item) => `${item}${suffixes.year}`}
           fallbackValue={seedYear}
           rowHeight={ROW_HEIGHT}
           visibleCount={VISIBLE_COUNT}
@@ -176,7 +183,7 @@ function WheelDatePickerPanel({
           value={monthIndex}
           onChange={handleMonthChange}
           loop
-          format={(item) => `${item + 1}月`}
+          format={(item) => `${item + 1}${suffixes.month}`}
           fallbackValue={seedMonthIndex}
           rowHeight={ROW_HEIGHT}
           visibleCount={VISIBLE_COUNT}
@@ -188,7 +195,7 @@ function WheelDatePickerPanel({
           value={day}
           onChange={handleDayChange}
           loop
-          format={(item) => `${item}日`}
+          format={(item) => `${item}${suffixes.day}`}
           fallbackValue={clampedDay}
           rowHeight={ROW_HEIGHT}
           visibleCount={VISIBLE_COUNT}

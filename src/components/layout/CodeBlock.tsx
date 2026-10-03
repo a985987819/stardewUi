@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Copy } from 'lucide-react'
+import { useI18n } from '../../i18n'
 import { classNames } from '../../utils/classNames'
 import { highlightCode } from './codeHighlight'
 import styles from './CodeBlock.module.scss'
@@ -17,6 +18,10 @@ function StarCodeBlock({
   showLineNumbers = true,
   className = '',
 }: CodeBlockProps) {
+  // The copy button was two hardcoded Chinese strings while the dictionary
+  // already carried `copy.success` / `copy.title` — the keys existed and nothing
+  // read them.
+  const { t } = useI18n()
   const [copied, setCopied] = useState(false)
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -65,12 +70,12 @@ function StarCodeBlock({
           {copied ? (
             <>
               <Check size={14} />
-              <span>已复制</span>
+              <span>{t('copy.success')}</span>
             </>
           ) : (
             <>
               <Copy size={14} />
-              <span>复制</span>
+              <span>{t('copy.title')}</span>
             </>
           )}
         </button>

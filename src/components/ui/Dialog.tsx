@@ -4,6 +4,8 @@ import { classNames } from '../../utils/classNames'
 import { StarCard } from './Card'
 import StarNineSliceButton from './NineSliceButton'
 import StarTypewriter from './Typewriter'
+import { OVERLAY_ENTER_TOTAL_MS, OVERLAY_EXIT_TOTAL_MS, overlayMotionStyle } from './overlayMotion'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './Dialog.module.scss'
 
 export interface DialogAction {
@@ -16,7 +18,6 @@ export interface DialogAction {
 export type DialogMask = 'dark' | 'light'
 export type DialogPlacement = 'center' | 'bottom'
 
-const DIALOG_TRANSITION_MS = 220
 type DialogMotionState = 'closed' | 'opening' | 'open' | 'closing'
 
 const PAGE_FOCUS_CLASS = 'stardew-dialog-page-focused'
@@ -70,15 +71,23 @@ export interface StarDialogProps {
    * dialog too, or an explicit `true` to keep it even on a single page.
    */
   showPagination?: boolean
+  /**
+   * Labels for the built-in footer and pager. Every one falls back to the host
+   * app's language via `ui.dialog.*`, then to Chinese when the component is
+   * used standalone — pass these to reword without touching the dictionary.
+   */
+  confirmLabel?: string
+  cancelLabel?: string
+  /** Accessible name for the pager arrows. Also used as their tooltip. */
+  prevLabel?: string
+  nextLabel?: string
+  /** Alt text for `image` when no `name` is supplied. */
+  roleLabel?: string
+  /** Shown in place of the body while the typewriter is still finishing the title. */
+  waitingText?: string
   onClose?: () => void
 }
 
-const LABEL_CONFIRM = '确认'
-const LABEL_CANCEL = '取消'
-const LABEL_ROLE = '角色'
-const TITLE_PREV = '上一页'
-const TITLE_NEXT = '下一页'
-const WAITING_TEXT = '等待标题完成...'
 function StarDialog({
   open,
   title,
@@ -95,6 +104,12 @@ function StarDialog({
   typewriter = true,
   typewriterSpeed = 100,
   showPagination,
+  confirmLabel,
+  cancelLabel,
+  prevLabel,
+  nextLabel,
+  roleLabel,
+  waitingText,
   onClose,
 }: StarDialogProps) {
   const [rendered, setRendered] = useState(open)
@@ -114,6 +129,17 @@ function StarDialog({
   const totalPages = pages.length
   const isFirstPage = currentPage === 0
   const isLastPage = currentPage >= totalPages - 1
+
+  // Resolve built-in copy once. Prop wins, then the host app's language, then
+  // the Chinese default that predates i18n — the order matters because this
+  // component also runs as a standalone package with no provider mounted.
+  const copy = useComponentCopy()
+  const resolvedConfirm = confirmLabel ?? copy.t('ui.dialog.confirm')
+  const resolvedCancel = cancelLabel ?? copy.t('ui.dialog.cancel')
+  const resolvedPrev = prevLabel ?? copy.t('ui.dialog.prev')
+  const resolvedNext = nextLabel ?? copy.t('ui.dialog.next')
+  const resolvedRole = roleLabel ?? copy.t('ui.dialog.role')
+  const resolvedWaiting = waitingText ?? copy.t('ui.dialog.waiting')
 
   // Restart the typewriter sequence when the dialog opens or its copy changes.
   // These resets run during render rather than in effects: an effect would commit
@@ -160,7 +186,7 @@ function StarDialog({
         setMotionState(motion ? 'opening' : 'open')
 
         if (motion) {
-          transitionTimer = setTimeout(() => setMotionState('open'), DIALOG_TRANSITION_MS)
+          transitionTimer = setTimeout(() => setMotionState('open'), OVERLAY_ENTER_TOTAL_MS)
         }
       })
     } else if (renderedRef.current) {
@@ -172,11 +198,15 @@ function StarDialog({
         })
       } else {
         frameId = window.requestAnimationFrame(() => setMotionState('closing'))
+        // Includes the stylesheet's close delay, so React never unmounts the
+        // portal before the panel has actually left. Unmounting early is what
+        // produced the old snap: the exit was still running and the whole
+        // subtree disappeared on frame one.
         transitionTimer = setTimeout(() => {
           renderedRef.current = false
           setMotionState('closed')
           setRendered(false)
-        }, DIALOG_TRANSITION_MS)
+        }, OVERLAY_EXIT_TOTAL_MS)
       }
     }
 
@@ -285,8 +315,8 @@ function StarDialog({
   // `primary` treatment made the confirm action harder to read against the
   // dialog surface, and the pair reads as one group again.
   const defaultActions: DialogAction[] = [
-    { label: LABEL_CONFIRM, onClick: onClose },
-    { label: LABEL_CANCEL, onClick: onClose },
+    { label: resolvedConfirm, onClick: onClose },
+    { label: resolvedCancel, onClick: onClose },
   ]
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
@@ -313,6 +343,7 @@ function StarDialog({
         maskClosable && styles['stardew-dialog-overlay--clickable']
       )}
       data-state={motionState}
+      style={overlayMotionStyle}
       onClick={handleOverlayClick}
     >
       <div
@@ -362,7 +393,7 @@ function StarDialog({
                       completeTrigger={contentCompleteTrigger}
                     />
                   ) : (
-                    <span className={styles['stardew-dialog__waiting']}>{WAITING_TEXT}</span>
+                    <span className={styles['stardew-dialog__waiting']}>{resolvedWaiting}</span>
                   )
                 ) : (
                   pages[currentPage]
@@ -399,8 +430,8 @@ function StarDialog({
                           <button
                             type="button"
                             className={styles['stardew-dialog__nav-tri']}
-                            title={TITLE_PREV}
-                            aria-label={TITLE_PREV}
+                            title={resolvedPrev}
+                            aria-label={resolvedPrev}
                             onClick={handlePrev}
                           >
                             <span
@@ -416,8 +447,8 @@ function StarDialog({
                           <button
                             type="button"
                             className={styles['stardew-dialog__nav-tri']}
-                            title={TITLE_NEXT}
-                            aria-label={TITLE_NEXT}
+                            title={resolvedNext}
+                            aria-label={resolvedNext}
                             onClick={handleNext}
                           >
                             <span
@@ -442,7 +473,7 @@ function StarDialog({
                 {image ? (
                   <div className={styles['stardew-dialog__image-panel']}>
                     <div className={styles['stardew-dialog__image-wrap']}>
-                      <img src={image} alt={name || LABEL_ROLE} className={styles['stardew-dialog__image']} />
+                      <img src={image} alt={name || resolvedRole} className={styles['stardew-dialog__image']} />
                     </div>
                   </div>
                 ) : null}

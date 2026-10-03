@@ -1,9 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Dialog from './Dialog'
+import { OVERLAY_ENTER_TOTAL_MS, OVERLAY_EXIT_TOTAL_MS } from './overlayMotion'
 import styles from './Dialog.module.scss'
 
-const DIALOG_TRANSITION_MS = 220
+// Imported, not retyped: the exit deadline now includes the stylesheet's close
+// delay, and a local copy of that number is exactly how the two drift apart.
+const DIALOG_ENTER_MS = OVERLAY_ENTER_TOTAL_MS
+const DIALOG_EXIT_MS = OVERLAY_EXIT_TOTAL_MS
 
 describe('Dialog', () => {
   beforeEach(() => {
@@ -177,7 +181,7 @@ describe('Dialog', () => {
       expect(dialog).toHaveAttribute('data-state', 'opening')
 
       await act(async () => {
-        vi.advanceTimersByTime(DIALOG_TRANSITION_MS + 24)
+        vi.advanceTimersByTime(DIALOG_ENTER_MS + 24)
       })
       expect(dialog).toHaveAttribute('data-state', 'open')
 
@@ -190,7 +194,7 @@ describe('Dialog', () => {
       expect(screen.getByText('矿洞的门缓缓打开')).toBeInTheDocument()
 
       await act(async () => {
-        vi.advanceTimersByTime(DIALOG_TRANSITION_MS)
+        vi.advanceTimersByTime(DIALOG_EXIT_MS)
       })
       expect(screen.queryByText('矿洞的门缓缓打开')).not.toBeInTheDocument()
     })

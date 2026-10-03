@@ -3,6 +3,7 @@ import carrotStage2 from '../../assets/Carrot_Stage_2.png'
 import carrotStage4 from '../../assets/Carrot_Stage_4.png'
 import qualitySprinkler from '../../assets/Quality_Sprinkler.png'
 import { classNames } from '../../utils/classNames'
+import { useComponentCopy } from './useComponentCopy'
 import styles from './Loading.module.scss'
 
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
@@ -19,7 +20,6 @@ export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   fill?: boolean
 }
 
-const LOADING_DEFAULT_TEXT = '正在加载...'
 const CARROT_COUNT = 8
 // One full eight-carrot cycle lands at 4.8s: fast enough to read as "working",
 // slow enough to keep the trailing dots from flickering.
@@ -63,10 +63,14 @@ function StarLoading({
     return () => window.clearTimeout(timer)
   }, [active, grownCarrots, safeSpeed])
 
-  const resolvedText = text === undefined ? LOADING_DEFAULT_TEXT : text
+  // Trailing-dot trail. Both the ASCII run and the typographic ellipsis are
+  // stripped first: the English string ends in `…`, which is not matched by a
+  // plain-dot pattern and would leave the trail glued to a permanent ellipsis.
+  const copy = useComponentCopy()
+  const resolvedText = text === undefined ? copy.t('ui.loading.default') : text
   const displayedText =
     resolvedText && active
-      ? `${resolvedText.replace(/\.+$/, '')}${'.'.repeat(grownCarrots % 4)}`
+      ? `${resolvedText.replace(/[.…]+$/, '')}${'.'.repeat(grownCarrots % 4)}`
       : resolvedText
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
   const rootStyle = useMemo(
@@ -91,7 +95,7 @@ function StarLoading({
       )}
       style={rootStyle}
       role={isAriaHidden ? undefined : role ?? 'status'}
-      aria-label={isAriaHidden ? undefined : displayedText || LOADING_DEFAULT_TEXT}
+      aria-label={isAriaHidden ? undefined : displayedText || copy.t('ui.loading.loading')}
       data-active={active || undefined}
       data-phase={grownCarrots === CARROT_COUNT ? 'complete' : 'growing'}
     >

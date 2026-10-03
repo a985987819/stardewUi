@@ -40,7 +40,17 @@ function StarHeader() {
 
         <div className={styles['doc-header-actions']}>
           <StarLangSwitch />
-          <a href="https://github.com/a985987819/stardewUi" target="_blank" rel="noopener noreferrer" className={styles['doc-header-github']}>
+          <a
+            href="https://github.com/a985987819/stardewUi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['doc-header-github']}
+            // An icon-only link has no accessible name, so a screen reader
+            // announced it as a bare "link". `header.github` existed in the
+            // dictionary the whole time with nothing reading it.
+            title={t('header.github')}
+            aria-label={t('header.github')}
+          >
             <ExternalLink size={20} />
           </a>
           <button className={styles['doc-header-menu-btn']} onClick={() => setIsMenuOpen(!isMenuOpen)}>
