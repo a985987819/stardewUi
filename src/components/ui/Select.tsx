@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useEffect, useRef, useState, type CSSProperties,
+  type ForwardedRef,
+  type MutableRefObject,
+  type RefObject, type HTMLAttributes, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
@@ -77,21 +80,24 @@ type SelectCssVariables = CSSProperties & {
  * the same polygon so both surfaces keep the same stepped corners. Selection
  * commits on click, the panel closes on outside clicks and on Escape.
  */
-function StarSelect({
-  options,
-  value,
-  defaultValue,
-  onChange,
-  placeholder,
-  disabled = false,
-  size = 'medium',
-  block = false,
-  className,
-  name,
-  style,
-  'aria-label': ariaLabel = 'Select',
-  ...rest
-}: StarSelectProps) {
+function StarSelect(
+  {
+    options,
+    value,
+    defaultValue,
+    onChange,
+    placeholder,
+    disabled = false,
+    size = 'medium',
+    block = false,
+    className,
+    name,
+    style,
+    'aria-label': ariaLabel = 'Select',
+    ...rest
+  }: StarSelectProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue)
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -141,7 +147,7 @@ function StarSelect({
   return (
     <div
       {...rest}
-      ref={containerRef}
+      ref={mergeRefs(containerRef, ref)}
       className={classNames(
         styles['star-select'],
         styles[`star-select--${size}`],
@@ -230,5 +236,30 @@ function StarSelect({
   )
 }
 
-export { StarSelect }
-export default StarSelect
+/**
+ * Write to both a local ref and the caller's when they are not the same object.
+ *
+ * The local ref already exists for internal bookkeeping; exposing the node to
+ * callers means both need to keep working, and naively assigning one would
+ * clobber the other.
+ */
+function mergeRefs<T>(local: RefObject<T | null>, forwarded: ForwardedRef<T>) {
+  // A callback ref works for both: it is invoked by React with the node on mount
+  // and `null` on unmount, which is exactly the shape needed to drive both.
+  //
+  // The tempting shortcut — returning `forwarded` when it is an object and
+  // writing `forwarded.current` into `local` — is wrong: React has not assigned
+  // `forwarded.current` yet at that point, so the local ref gets nulled and the
+  // component's own focus/measurement logic silently stops working.
+  return (node: T | null) => {
+    ;(local as MutableRefObject<T | null>).current = node
+
+    if (typeof forwarded === 'function') forwarded(node)
+    else if (forwarded) (forwarded as MutableRefObject<T | null>).current = node
+  }
+}
+
+const StarSelectWithRef = forwardRef<HTMLDivElement, StarSelectProps>(StarSelect)
+
+export { StarSelectWithRef as StarSelect }
+export default StarSelectWithRef

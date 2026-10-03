@@ -1,4 +1,4 @@
-import { useState, type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from 'react'
+import { forwardRef, useState, type ButtonHTMLAttributes, type CSSProperties, type ForwardedRef, type MouseEvent } from 'react'
 import { classNames } from '../../utils/classNames'
 import { deriveProgressPaletteWithWarning } from '../../utils/progressPalette'
 import { isSupportedPaletteColor } from '../../utils/devWarnings'
@@ -102,20 +102,23 @@ type SwitchCssVariables = CSSProperties & {
  * while a parchment thumb with a lit top edge slides across in stepped
  * pixel motion. The centre dot echoes the slot colour like a latch keyhole.
  */
-function StarSwitch({
-  checked,
-  defaultChecked = false,
-  onChange,
-  disabled = false,
-  size = 'medium',
-  color = DEFAULT_ON_COLOR,
-  className,
-  style,
-  onClick,
-  name,
-  required = false,
-  ...rest
-}: StarSwitchProps) {
+function StarSwitch(
+  {
+    checked,
+    defaultChecked = false,
+    onChange,
+    disabled = false,
+    size = 'medium',
+    color = DEFAULT_ON_COLOR,
+    className,
+    style,
+    onClick,
+    name,
+    required = false,
+    ...rest
+  }: StarSwitchProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) {
   // Same controlled/uncontrolled shape as Checkbox and the rest of the input
   // family: `value ?? internal` resolves the visible state, and the click
   // handler writes to the internal store *only* when uncontrolled.
@@ -170,6 +173,7 @@ function StarSwitch({
   return (
     <button
       {...rest}
+      ref={ref}
       type="button"
       role="switch"
       aria-checked={currentChecked}
@@ -221,5 +225,12 @@ function StarSwitch({
   )
 }
 
-export { StarSwitch }
-export default StarSwitch
+/**
+ * Exposed so callers can move focus deliberately — focusing the field after a
+ * clear, or wiring a keyboard shortcut to the setting. The ref lands on the
+ * `<button>`, which is the real focusable element.
+ */
+const StarSwitchWithRef = forwardRef<HTMLButtonElement, StarSwitchProps>(StarSwitch)
+
+export { StarSwitchWithRef as StarSwitch }
+export default StarSwitchWithRef

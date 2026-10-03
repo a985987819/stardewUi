@@ -1,5 +1,6 @@
 // Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import {
+  forwardRef,
   useId,
   useEffect,
   useRef,
@@ -9,6 +10,9 @@ import {
   type KeyboardEvent,
   type ReactNode,
   type TextareaHTMLAttributes,
+  type ForwardedRef,
+  type MutableRefObject,
+  type RefObject,
 } from 'react'
 import { X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
@@ -72,31 +76,34 @@ type TextareaCssVariables = CSSProperties & {
   '--star-textarea-accent'?: string
 }
 
-function StarTextarea({
-  value,
-  defaultValue = '',
-  onChange,
-  size = 'medium',
-  status = 'default',
-  color,
-  label,
-  message,
-  showCount = false,
-  block = false,
-  autoSize = false,
-  rows = 4,
-  allowClear = false,
-  clearLabel = 'Clear',
-  onPressEnter,
-  disabled = false,
-  readOnly = false,
-  maxLength,
-  placeholder,
-  className,
-  style,
-  id,
-  ...rest
-}: StarTextareaProps) {
+function StarTextarea(
+  {
+    value,
+    defaultValue = '',
+    onChange,
+    size = 'medium',
+    status = 'default',
+    color,
+    label,
+    message,
+    showCount = false,
+    block = false,
+    autoSize = false,
+    rows = 4,
+    allowClear = false,
+    clearLabel = 'Clear',
+    onPressEnter,
+    disabled = false,
+    readOnly = false,
+    maxLength,
+    placeholder,
+    className,
+    style,
+    id,
+    ...rest
+  }: StarTextareaProps,
+  ref: ForwardedRef<HTMLTextAreaElement>,
+) {
   const generatedId = useId()
   const textareaId = id ?? `star-textarea-${generatedId}`
   const controlRef = useRef<HTMLTextAreaElement>(null)
@@ -179,7 +186,7 @@ function StarTextarea({
         <span className={styles['star-textarea__plate']} aria-hidden />
         <textarea
           {...rest}
-          ref={controlRef}
+          ref={mergeRefs(controlRef, ref)}
           id={textareaId}
           className={styles['star-textarea__control']}
           value={text}
@@ -217,5 +224,30 @@ function StarTextarea({
   )
 }
 
-export { StarTextarea }
-export default StarTextarea
+/**
+ * Write to both a local ref and the caller's when they are not the same object.
+ *
+ * The local ref already exists for internal bookkeeping (auto-focus, measuring,
+ * keyboard handling); exposing the node to callers means both need to keep
+ * working, and naively assigning one would clobber the other.
+ */
+function mergeRefs<T>(local: RefObject<T | null>, forwarded: ForwardedRef<T>) {
+  // A callback ref works for both: it is invoked by React with the node on mount
+  // and `null` on unmount, which is exactly the shape needed to drive both.
+  //
+  // The tempting shortcut — returning `forwarded` when it is an object and
+  // writing `forwarded.current` into `local` — is wrong: React has not assigned
+  // `forwarded.current` yet at that point, so the local ref gets nulled and the
+  // component's own focus/measurement logic silently stops working.
+  return (node: T | null) => {
+    ;(local as MutableRefObject<T | null>).current = node
+
+    if (typeof forwarded === 'function') forwarded(node)
+    else if (forwarded) (forwarded as MutableRefObject<T | null>).current = node
+  }
+}
+
+const StarTextareaWithRef = forwardRef<HTMLTextAreaElement, StarTextareaProps>(StarTextarea)
+
+export { StarTextareaWithRef as StarTextarea }
+export default StarTextareaWithRef

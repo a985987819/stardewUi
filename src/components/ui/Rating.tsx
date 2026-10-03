@@ -1,4 +1,13 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ForwardedRef,
+  type KeyboardEvent,
+  type PointerEvent,
+} from 'react'
 import { classNames } from '../../utils/classNames'
 import styles from './Rating.module.scss'
 
@@ -157,20 +166,23 @@ function RatingIconButton({ icon, fill, position, count, disabled, onPointerUp, 
   )
 }
 
-function StarRating({
-  value,
-  defaultValue = 0,
-  count = 5,
-  allowHalf = false,
-  icon = 'heart',
-  disabled = false,
-  onChange,
-  color,
-  emptyColor = '#CDBDA8',
-  'aria-label': ariaLabel = 'Rating',
-  className,
-  style,
-}: StarRatingProps) {
+function StarRating(
+  {
+    value,
+    defaultValue = 0,
+    count = 5,
+    allowHalf = false,
+    icon = 'heart',
+    disabled = false,
+    onChange,
+    color,
+    emptyColor = '#CDBDA8',
+    'aria-label': ariaLabel = 'Rating',
+    className,
+    style,
+  }: StarRatingProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [internalValue, setInternalValue] = useState(() => clamp(defaultValue, count))
   const pendingActivationRef = useRef<{ index: number; timer: number } | null>(null)
   const ignoreNativeDoubleClickRef = useRef(false)
@@ -256,6 +268,7 @@ function StarRating({
       aria-valuenow={currentValue}
       aria-valuetext={`${currentValue} / ${count}`}
       aria-disabled={disabled || undefined}
+      ref={ref}
       tabIndex={disabled ? -1 : 0}
       className={classNames(styles['star-rating'], disabled && styles['star-rating--disabled'], className)}
       style={{ '--star-rating-color': filledColor, '--star-rating-empty-color': emptyColor, ...style } as CSSProperties}
@@ -281,5 +294,8 @@ function StarRating({
   )
 }
 
-export { StarRating }
-export default StarRating
+
+const StarRatingWithRef = forwardRef<HTMLDivElement, StarRatingProps>(StarRating)
+
+export { StarRatingWithRef as StarRating }
+export default StarRatingWithRef

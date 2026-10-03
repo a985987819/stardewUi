@@ -1,6 +1,8 @@
 import {
+  forwardRef,
   useId,
   useState,
+  type ForwardedRef,
   type CSSProperties,
   type ChangeEvent,
   type InputHTMLAttributes,
@@ -68,7 +70,8 @@ type InputCssVariables = CSSProperties & {
   '--star-input-accent'?: string
 }
 
-function StarInput({
+function StarInput(
+  {
   value,
   defaultValue = '',
   onChange,
@@ -93,7 +96,9 @@ function StarInput({
   style,
   id,
   ...rest
-}: StarInputProps) {
+}: StarInputProps,
+  ref: ForwardedRef<HTMLInputElement>,
+) {
   const generatedId = useId()
   const inputId = id ?? `star-input-${generatedId}`
   const messageId = `${inputId}-message`
@@ -151,6 +156,7 @@ function StarInput({
           <input
             {...rest}
             id={inputId}
+            ref={ref}
             className={styles['star-input__control']}
             value={text}
             onChange={handleChange}
@@ -197,5 +203,12 @@ function StarInput({
   )
 }
 
-export { StarInput }
-export default StarInput
+/**
+ * The ref lands on the inner `<input>`, not the wrapper div — the wrapper is a
+ * layout box and cannot take focus, so exposing it would hand callers a node
+ * where `.focus()` silently does nothing.
+ */
+const StarInputWithRef = forwardRef<HTMLInputElement, StarInputProps>(StarInput)
+
+export { StarInputWithRef as StarInput }
+export default StarInputWithRef

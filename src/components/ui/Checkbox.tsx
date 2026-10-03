@@ -1,8 +1,10 @@
 import {
+  forwardRef,
   useEffect,
   useRef,
   useState,
   type CSSProperties,
+  type ForwardedRef,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -104,21 +106,24 @@ function CheckboxMark({ checked }: { checked: boolean }) {
  * check is revealed by a left-to-right mask when added; removal intentionally
  * follows Rating's shake, enlarge, shrink, and fade sequence.
  */
-function StarCheckbox({
-  options,
-  value,
-  defaultValue = [],
-  onChange,
-  direction = 'horizontal',
-  disabled = false,
-  size = 'medium',
-  shape = 'square',
-  radio = false,
-  className,
-  style,
-  'aria-label': ariaLabel = 'Checkbox',
-  ...rest
-}: StarCheckboxProps) {
+function StarCheckbox(
+  {
+    options,
+    value,
+    defaultValue = [],
+    onChange,
+    direction = 'horizontal',
+    disabled = false,
+    size = 'medium',
+    shape = 'square',
+    radio = false,
+    className,
+    style,
+    'aria-label': ariaLabel = 'Checkbox',
+    ...rest
+  }: StarCheckboxProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [internalValue, setInternalValue] = useState<string[]>(() => [...new Set(defaultValue)])
   const rawSelectedValues = value ?? internalValue
   // Radio mode remains API-compatible with checkbox mode (it still reports a
@@ -146,6 +151,7 @@ function StarCheckbox({
   return (
     <div
       {...rest}
+      ref={ref}
       role={radio ? 'radiogroup' : 'group'}
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
@@ -191,5 +197,8 @@ function StarCheckbox({
   )
 }
 
-export { StarCheckbox }
-export default StarCheckbox
+
+const StarCheckboxWithRef = forwardRef<HTMLDivElement, StarCheckboxProps>(StarCheckbox)
+
+export { StarCheckboxWithRef as StarCheckbox }
+export default StarCheckboxWithRef
