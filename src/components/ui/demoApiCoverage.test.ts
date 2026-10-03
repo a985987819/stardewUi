@@ -275,17 +275,69 @@ describe('demo API tables match their component props', () => {
     const rowText = page.match(/property: 'variant', description: '按钮类型', type: "([^"]+)"/)?.[1]
     expect(rowText, 'the zh variant row no longer matches; re-check this guard').toBeDefined()
 
-    const component = read(resolve(UI_DIR, 'NineSliceButton.tsx'))
-    const body = component.match(/export type NineSliceButtonVariant\s*=\s*([\s\S]*?)\nexport type/)?.[1] ?? ''
-    const declared = body
-      .split('\n')
-      .map((line) => line.trim().replace(/^[|]\s*/, '').replace(/^'|'$/g, ''))
-      .filter(Boolean)
-
-    expect(declared.length).toBeGreaterThan(7)
-
-    for (const value of declared) {
+    expect(declaredVariants().length).toBeGreaterThan(7)
+    for (const value of declaredVariants()) {
       expect(rowText, `variant '${value}' is accepted by the component but absent from the table`).toContain(value)
     }
   })
+
+  it('NineSliceButton renders every variant in the gallery, not just a few', () => {
+    // The table listed twelve while the page showed four, so the documented
+    // options could not be discovered by clicking. The gallery is a const array
+    // whose entries are single-quoted literals; its length must match the
+    // component's own union exactly.
+    const page = read(resolve(PAGES_DIR, 'NineSliceButtonDemo.tsx'))
+    const gallery = page.match(/const ALL_VARIANTS = \[([\s\S]*?)\] as const/)?.[1]
+    expect(gallery, 'the ALL_VARIANTS gallery disappeared; re-check this guard').toBeDefined()
+
+    const shown = (gallery!.match(/'([a-z]+)'/g) ?? []).map((m) => m.replace(/'/g, ''))
+
+    expect(shown).toEqual(declaredVariants())
+  })
+
+  it('every demo array has the same length in both languages', () => {
+    // `satisfies Record<Lang, …>` already guarantees matching *keys*, so a
+    // length mismatch inside an array is the one class of desync it cannot
+    // catch: `t.labels[5]` would silently be `undefined` on the shorter side
+    // rather than a compile error. Reported here so a desync is a red test.
+    const pageFiles = readdirSync(PAGES_DIR).filter((f) => f.endsWith('.tsx') && !f.endsWith('.test.tsx'))
+
+    for (const file of pageFiles) {
+      const text = read(resolve(PAGES_DIR, file))
+      const zh = text.match(/\n\s*zh:\s*\{([\s\S]*?)\n\s*\},\n\s*en:\s*\{/)
+      const en = text.match(/\n\s*en:\s*\{([\s\S]*?)\n\s*\},\n\s*\}\s*satisfies/)
+      if (!zh || !en) continue
+
+      const arrays = (block: string) => {
+        const found: Record<string, number> = {}
+        for (const m of block.matchAll(/(\w+):\s*\[([\s\S]*?)\]/g)) {
+          // Count only top-level entries: a nested `['x']` would inflate this.
+          found[m[1]] = m[2].split(',').filter((part) => part.trim().length > 0).length
+        }
+        return found
+      }
+
+      const left = arrays(zh[1])
+      const right = arrays(en[1])
+
+      for (const [key, count] of Object.entries(left)) {
+        if (!(key in right)) continue
+        expect(
+          right[key],
+          `${file}: array '${key}' has ${count} zh entries but ${right[key]} en entries`,
+        ).toBe(count)
+      }
+    }
+  })
 })
+
+/** The `variant` union as declared by the component. */
+function declaredVariants(): string[] {
+  const component = read(resolve(UI_DIR, 'NineSliceButton.tsx'))
+  const body = component.match(/export type NineSliceButtonVariant\s*=\s*([\s\S]*?)\nexport type/)?.[1] ?? ''
+
+  return body
+    .split('\n')
+    .map((line) => line.trim().replace(/^[|]\s*/, '').replace(/^'|'$/g, ''))
+    .filter(Boolean)
+}

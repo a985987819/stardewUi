@@ -13,7 +13,15 @@ const seasonalThemes: Array<{ key: NineSliceButtonTheme; zh: string; en: string 
   { key: 'winter', zh: '冬天', en: 'Winter' },
 ]
 
-const actionVariants = ['primary', 'secondary', 'success', 'danger'] as const
+/**
+ * Every `variant` the component accepts, in the same order as the API table.
+ * This used to list only four — the table advertised twelve and the page showed
+ * four, so the documented options were undiscoverable by clicking.
+ */
+const ALL_VARIANTS = [
+  'default', 'primary', 'secondary', 'info', 'success', 'warning',
+  'danger', 'disabled', 'dashed', 'text', 'link', 'concise',
+] as const
 
 const copy = {
   zh: {
@@ -29,8 +37,12 @@ const copy = {
       disabled: ['禁用状态', '当体力不足或任务未解锁时，禁用态会保留形状但降低权重。'],
       multi: ['多实例场景', '同一页面里可以放置多个按钮，用作背包、商店或任务列表操作。'],
     },
-    labels: ['默认按钮', '小按钮', '大按钮', '木质边框', '森林边框', '湖蓝边框', '工具', '收藏', '禁用按钮', '加载按钮', '块级按钮'],
-    actionLabels: ['主要操作', '次要操作', '成功确认', '删除操作'],
+    labels: ['默认按钮', '小按钮', '大按钮', '木质边框', '森林边框', '湖蓝边框', '工具', '收藏', '禁用按钮', '加载按钮', '块级按钮', '古典外观'],
+    // 与 ALL_VARIANTS 同序，用于 variant 画廊里的按钮文字
+    actionLabels: [
+      '默认', '主要操作', '次要操作', '信息提示', '成功确认', '警告',
+      '删除操作', '已禁用变体', '虚线边框', '纯文字', '链接', '紧凑',
+    ],
   },
   en: {
     title: 'Button',
@@ -45,8 +57,11 @@ const copy = {
       disabled: ['Disabled State', 'When stamina is low or a quest is locked, disabled buttons keep shape while lowering priority.'],
       multi: ['Multiple Instances', 'Render many independent buttons for backpacks, shops, and quest lists.'],
     },
-    labels: ['Default', 'Small', 'Large', 'Wood Border', 'Forest Border', 'Lake Border', 'Tool', 'Favorite', 'Disabled', 'Loading', 'Block Button'],
-    actionLabels: ['Primary', 'Secondary', 'Success', 'Danger'],
+    labels: ['Default', 'Small', 'Large', 'Wood Border', 'Forest Border', 'Lake Border', 'Tool', 'Favorite', 'Disabled', 'Loading', 'Block Button', 'Classical'],
+    actionLabels: [
+      'Default', 'Primary', 'Secondary', 'Info', 'Success', 'Warning',
+      'Danger', 'Disabled', 'Dashed', 'Text', 'Link', 'Concise',
+    ],
   },
 } satisfies Record<Lang, { title: string; desc: string; toc: string[]; demo: Record<string, [string, string]>; labels: string[]; actionLabels: string[] }>
 
@@ -93,7 +108,7 @@ function StarNineSliceButtonDemoPage() {
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="basic" title={t.demo.basic[0]} description={t.demo.basic[1]} code={code}>
         <StarNineSliceButton>{label(0)}</StarNineSliceButton>
-        {actionVariants.map((variant, index) => (
+        {ALL_VARIANTS.map((variant, index) => (
           <StarNineSliceButton key={variant} variant={variant}>{t.actionLabels[index]}</StarNineSliceButton>
         ))}
       </StarComponentDemo>

@@ -18,6 +18,8 @@ const copy = {
       ['禁用状态', '只读评分仍会保留已获得的图标状态。'],
     ],
     actions: ['-1', '+1'],
+    // 评分控件只画图标没有文本，aria-label 是读屏用户唯一能听到的名称。
+    labels: ['好感度评级', '动效评分', '星级评分', '三颗心', '十颗心', '七颗星', '已禁用的评分'],
   },
   en: {
     title: 'Rating',
@@ -31,8 +33,12 @@ const copy = {
       ['Disabled', 'Read-only scores keep their earned icon state.'],
     ],
     actions: ['-1', '+1'],
+    labels: [
+      'Friendship rating', 'Motion demo rating', 'Star rating',
+      'Three hearts', 'Ten hearts', 'Seven stars', 'Disabled rating',
+    ],
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; actions: string[] }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; actions: string[]; labels: string[] }>
 
 const apiData = {
   zh: [
@@ -69,7 +75,7 @@ export function FriendshipRating() {
 
   return (
     <>
-      <StarRating value={friendship} onChange={setFriendship} aria-label="好感度评级" />
+      <StarRating value={friendship} onChange={setFriendship} aria-label={t.labels[0]} />
       <output>Friendship: {friendship} / 5</output>
     </>
   )
@@ -114,11 +120,11 @@ function StarRatingDemoPage() {
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={friendshipCode} data={[{ label: 'friendship', value: `${friendship} / 5` }]}>
-        <StarRating value={friendship} onChange={setFriendship} aria-label="好感度评级" />
+        <StarRating value={friendship} onChange={setFriendship} aria-label={t.labels[0]} />
       </StarComponentDemo>
       <StarComponentDemo id="motion" title={t.demos[1][0]} description={t.demos[1][1]} code={motionCode} data={[{ label: 'rating', value: `${motionValue} / ${MOTION_MAX}` }]}>
         <div style={{ display: 'grid', gap: 18 }}>
-          <StarRating value={motionValue} count={MOTION_MAX} onChange={setMotionValue} aria-label="动效评分" />
+          <StarRating value={motionValue} count={MOTION_MAX} onChange={setMotionValue} aria-label={t.labels[1]} />
           <div style={{ display: 'flex', gap: 10 }}>
             <StarNineSliceButton variant="secondary" disabled={motionValue <= 0} onClick={() => setMotionValue((current) => Math.max(0, current - 1))}>{t.actions[0]}</StarNineSliceButton>
             <StarNineSliceButton variant="primary" disabled={motionValue >= MOTION_MAX} onClick={() => setMotionValue((current) => Math.min(MOTION_MAX, current + 1))}>{t.actions[1]}</StarNineSliceButton>
@@ -126,17 +132,17 @@ function StarRatingDemoPage() {
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="half" title={t.demos[2][0]} description={t.demos[2][1]} code={halfRatingCode} data={[{ label: 'score', value: `${stars} / 5` }]}>
-        <StarRating value={stars} onChange={setStars} icon="star" allowHalf color="#D7992E" aria-label="星级评分" />
+        <StarRating value={stars} onChange={setStars} icon="star" allowHalf color="#D7992E" aria-label={t.labels[2]} />
       </StarComponentDemo>
       <StarComponentDemo id="count" title={t.demos[3][0]} description={t.demos[3][1]} code={'<StarRating count={3} defaultValue={2} />\n<StarRating count={10} defaultValue={6} />'}>
         <div style={{ display: 'grid', gap: 16 }}>
-          <StarRating count={3} defaultValue={2} aria-label="三颗心" />
-          <StarRating count={10} defaultValue={6} aria-label="十颗心" />
-          <StarRating count={7} defaultValue={4} icon="star" color="#D7992E" aria-label="七颗星" />
+          <StarRating count={3} defaultValue={2} aria-label={t.labels[3]} />
+          <StarRating count={10} defaultValue={6} aria-label={t.labels[4]} />
+          <StarRating count={7} defaultValue={4} icon="star" color="#D7992E" aria-label={t.labels[5]} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo id="disabled" title={t.demos[4][0]} description={t.demos[4][1]} code={'<StarRating defaultValue={4} disabled />'}>
-        <StarRating defaultValue={4} disabled aria-label="已禁用的评分" />
+        <StarRating defaultValue={4} disabled aria-label={t.labels[6]} />
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>

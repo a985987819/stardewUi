@@ -28,6 +28,13 @@ const copy = {
     cropCount: '当前数量',
     showZeroLabel: 'count 为 0 时仍显示',
     textBadge: '限定',
+    // 角标只有数字没有可读名称，这些 aria-label 是读屏用户唯一能听到的描述，
+    // 写死中文等于英文页下读出中文。顺序与使用处一一对应。
+    labels: [
+      '七件物品', '超过上限折叠为 5+', '数量折叠为 99+', '数量为零也显示',
+      '有新鲜货上架', '节日限定角标', '数量折叠为 99+', '三条待办警告',
+      '两条新提示', '有好消息',
+    ],
   },
   en: {
     title: 'Badge',
@@ -51,8 +58,13 @@ const copy = {
     cropCount: 'Current count',
     showZeroLabel: 'Show at zero',
     textBadge: 'EVENT',
+    labels: [
+      '7 items', 'Collapsed to 5+ past the limit', 'Collapsed to 99+',
+      'Shown even at zero', 'Fresh stock arrived', 'Event badge',
+      'Collapsed to 99+', '3 tasks need attention', '2 new notices', 'Good news',
+    ],
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; inbox: string; backpack: string; mails: { label: string; value: string }[]; harvest: string; crop: string; water: string; pick: string; collectAll: string; restock: string; cropCount: string; showZeroLabel: string; textBadge: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; inbox: string; backpack: string; mails: { label: string; value: string }[]; harvest: string; crop: string; water: string; pick: string; collectAll: string; restock: string; cropCount: string; showZeroLabel: string; textBadge: string; labels: string[] }>
 
 const apiData = {
   zh: [
@@ -120,12 +132,12 @@ function StarBadgeDemoPage() {
         code={standaloneCode}
       >
         <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-          <StarBadge count={7} aria-label="物品七件" />
-          <StarBadge count={7} overflowCount={5} aria-label="超过上限折叠为 5+" />
-          <StarBadge count={120} aria-label="数量折叠为 99+" />
-          <StarBadge count={0} showZero aria-label="数量为零也显示" />
-          <StarBadge dot color="#71964A" aria-label="有新鲜货上架" />
-          <StarBadge text={t.textBadge} color="#308BE2" aria-label="节日限定角标" />
+          <StarBadge count={7} aria-label={t.labels[0]} />
+          <StarBadge count={7} overflowCount={5} aria-label={t.labels[1]} />
+          <StarBadge count={120} aria-label={t.labels[2]} />
+          <StarBadge count={0} showZero aria-label={t.labels[3]} />
+          <StarBadge dot color="#71964A" aria-label={t.labels[4]} />
+          <StarBadge text={t.textBadge} color="#308BE2" aria-label={t.labels[5]} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -135,10 +147,10 @@ function StarBadgeDemoPage() {
         code={'<StarBadge count={120} overflowCount={99} />\n<StarBadge count={0} showZero />\n<StarBadge dot color="#308BE2" />'}
       >
         <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-          <StarBadge count={120} aria-label="数量折叠为 99+" />
-          <StarBadge count={3} color="#D7992E" aria-label="三条待办警告" />
-          <StarBadge count={2} color="#308BE2" aria-label="两条新提示" />
-          <StarBadge dot color="#71964A" aria-label="有好消息" />
+          <StarBadge count={120} aria-label={t.labels[2]} />
+          <StarBadge count={3} color="#D7992E" aria-label={t.labels[7]} />
+          <StarBadge count={2} color="#308BE2" aria-label={t.labels[8]} />
+          <StarBadge dot color="#71964A" aria-label={t.labels[9]} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
