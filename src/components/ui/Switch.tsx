@@ -1,18 +1,46 @@
-import { type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from 'react'
+import { useState, type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from 'react'
 import { classNames } from '../../utils/classNames'
-import { deriveProgressPalette } from '../../utils/progressPalette'
+import { deriveProgressPaletteWithWarning } from '../../utils/progressPalette'
+import { isSupportedPaletteColor } from '../../utils/devWarnings'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Switch.module.scss'
 
 export interface StarSwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
-  /** Controlled on/off value. */
+  /**
+   * Controlled on/off value. Leave it out to let the switch own its state, in
+   * which case `defaultChecked` decides the starting position.
+   */
   checked?: boolean
+  /**
+   * Starting position for the uncontrolled mode. Ignored once `checked` is
+   * provided.
+   *
+   * This prop is why `<StarSwitch />` works on its own. Without it the switch
+   * was controlled-only, so a bare `<StarSwitch />` — or one without an
+   * `onChange` — accepted clicks silently changed nothing, which reads as a
+   * broken component rather than as a controlled-input contract. Every other
+   * input in this library (Input, Textarea, Checkbox, Radio, Select, Rating)
+   * has always offered this pair.
+   */
+  defaultChecked?: boolean
   /** Called with the value the switch is moving to. */
   onChange?: (checked: boolean) => void
   disabled?: boolean
   size?: 'small' | 'medium' | 'large'
   /** Colour the slot lights up with while checked. Its edge tint is derived from it. */
   color?: string
+  /**
+   * Form field name. When set, the switch also writes a hidden input so
+   * `new FormData(form)` receives `'true'` / `'false'`.
+   *
+   * Note this is a different contract from a native checkbox, which submits
+   * only when checked. The switch is a two-state control rather than a
+   * checkable one, so it always submits — pass `name` only when that is what
+   * the server expects.
+   */
+  name?: string
+  /** Submitted as `'required'` by the browser's own validation. */
+  required?: boolean
 }
 
 /**
@@ -75,7 +103,8 @@ type SwitchCssVariables = CSSProperties & {
  * pixel motion. The centre dot echoes the slot colour like a latch keyhole.
  */
 function StarSwitch({
-  checked = false,
+  checked,
+  defaultChecked = false,
   onChange,
   disabled = false,
   size = 'medium',
@@ -83,18 +112,42 @@ function StarSwitch({
   className,
   style,
   onClick,
+  name,
+  required = false,
   ...rest
 }: StarSwitchProps) {
+  // Same controlled/uncontrolled shape as Checkbox and the rest of the input
+  // family: `value ?? internal` resolves the visible state, and the click
+  // handler writes to the internal store *only* when uncontrolled.
+  const [internalChecked, setInternalChecked] = useState(defaultChecked)
+  const isControlled = checked !== undefined
+  const currentChecked = isControlled ? checked : internalChecked
+
   const { trackWidth, thumbSize } = SWITCH_SIZES[size]
-  const palette = deriveProgressPalette(color)
-  // Keep valid CSS colour values usable for the lit slot. Hex colours also
-  // receive a matched palette from Progress; other CSS values fall back to the
-  // stable farm-material colours rather than being discarded.
+
+  // `color` has two jobs here and they need different tolerances. The *fill* of
+  // the lit slot is a plain CSS custom property, so any colour the browser
+  // understands will render. The *edge tint* is derived by mixing channels, which
+  // only works from a hex value. The switch used to accept anything for the fill
+  // while the edge silently took the default palette, producing a fill/edge
+  // mismatch that was harder to diagnose than either behaviour alone.
+  //
+  // So: pass the fill through as-is, warn only when the derived edge would be
+  // wrong, and say so in the message rather than making the caller guess which
+  // half of the switch is broken.
+  const palette = deriveProgressPaletteWithWarning(color, 'Switch', () => true)
   const visibleColor = typeof color === 'string' && color.trim() ? color.trim() : DEFAULT_ON_COLOR
+  if (typeof color === 'string' && color.trim() && !isSupportedPaletteColor(color)) {
+    console.warn(
+      `[stardew-ui] <Switch color="${color.trim()}"> renders the slot in that colour, but its ` +
+        `edge tint is derived by mixing channels and needs a hex value, so the edge fell back to ` +
+        `the default. Pass a hex colour such as "#71964A" to get a matched edge.`,
+    )
+  }
   const travel = thumbTravel(trackWidth, thumbSize)
 
   const switchStyle: SwitchCssVariables = {
-    '--switch-thumb-translate': `${checked ? travel : 0}px`,
+    '--switch-thumb-translate': `${currentChecked ? travel : 0}px`,
     // The stylesheet steps the slide by this many jumps, so it must be derived
     // from the same geometry or the last frame lands between pixels.
     '--switch-travel-steps': String(Math.max(1, Math.round(travel / SWITCH_TRAVEL_STEP_PX))),
@@ -107,7 +160,11 @@ function StarSwitch({
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event)
-    if (!event.defaultPrevented && !disabled) onChange?.(!checked)
+    if (event.defaultPrevented || disabled) return
+
+    const next = !currentChecked
+    if (!isControlled) setInternalChecked(next)
+    onChange?.(next)
   }
 
   return (
@@ -115,12 +172,12 @@ function StarSwitch({
       {...rest}
       type="button"
       role="switch"
-      aria-checked={checked}
+      aria-checked={currentChecked}
       disabled={disabled}
       className={classNames(
         styles['star-switch'],
         styles[`star-switch--${size}`],
-        checked && styles['star-switch--checked'],
+        currentChecked && styles['star-switch--checked'],
         disabled && styles['star-switch--disabled'],
         className,
       )}
@@ -137,6 +194,29 @@ function StarSwitch({
           <span className={styles['star-switch__thumb-dot']} />
         </span>
       </span>
+      {/* Form participation. The switch is a `<button>`, and a button's content
+          model excludes *interactive* descendants — `input[type="hidden"]` is
+          explicitly not interactive, so this is valid nesting and avoids
+          wrapping the root element in an extra node (which would change the
+          public DOM shape and every existing test selector).
+          Without it, `<StarSwitch name="x" />` contributes nothing to
+          `new FormData(form)`: the value silently never arrives on submit.
+          `aria-hidden` because the button already carries `role="switch"`;
+          a second live control would make a screen reader announce it twice. */}
+      {name ? (
+        <input
+          type="hidden"
+          name={name}
+          value={currentChecked ? 'true' : 'false'}
+          // `required` lives here rather than on the button: `<button>` has no
+          // such attribute, and this is the element the browser actually
+          // validates. A hidden input is barred from constraint validation, so
+          // the flag is accepted for symmetry with the other inputs and
+          // documented as decorative.
+          required={required}
+          aria-hidden
+        />
+      ) : null}
     </button>
   )
 }

@@ -38,19 +38,25 @@ const copy = {
 
 const apiData = {
   zh: [
-    { property: 'checked', description: '受控的开关状态', type: 'boolean', default: 'false' },
+    { property: 'checked', description: '受控的开关状态；不传则由组件自持状态', type: 'boolean', default: '-' },
+    { property: 'defaultChecked', description: '非受控模式的初始状态', type: 'boolean', default: 'false' },
     { property: 'onChange', description: '状态变化回调', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'size', description: '开关尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'color', description: '打开时凹槽与锁孔点亮的颜色；顶部暗边从它自动推导', type: 'string', default: "'#71964A'" },
+    { property: 'name', description: '表单字段名；设置后额外渲染隐藏 input，使 FormData 能取到 true/false', type: 'string', default: '-' },
+    { property: 'required', description: '随隐藏 input 一起提交的必填标记', type: 'boolean', default: 'false' },
     { property: 'aria-label', description: '开关控件的无障碍名称', type: 'string', default: '-' },
   ],
   en: [
-    { property: 'checked', description: 'Controlled on/off state.', type: 'boolean', default: 'false' },
+    { property: 'checked', description: 'Controlled on/off state; omit to let the switch own it.', type: 'boolean', default: '-' },
+    { property: 'defaultChecked', description: 'Starting state for the uncontrolled mode.', type: 'boolean', default: 'false' },
     { property: 'onChange', description: 'Change callback.', type: '(checked: boolean) => void', default: '-' },
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'size', description: 'Switch size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'color', description: 'Colour the lit groove and keyhole dot take while checked; its dark edge is derived automatically.', type: 'string', default: "'#71964A'" },
+    { property: 'name', description: 'Form field name; renders a hidden input so FormData receives true/false.', type: 'string', default: '-' },
+    { property: 'required', description: 'Required flag submitted with the hidden input.', type: 'boolean', default: 'false' },
     { property: 'aria-label', description: 'Accessible name of the switch.', type: 'string', default: '-' },
   ],
 }

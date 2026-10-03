@@ -67,8 +67,13 @@ describe('Switch motion', () => {
   it('derives the step count from the same travel distance the transform uses', () => {
     // One source for both: if these ever diverge the last frame lands between
     // pixels and the thumb appears to smear on the last frame.
-    expect(tsx).toMatch(/const travel = thumbTravel\(trackWidth, thumbSize\)/)
-    expect(tsx).toMatch(/'--switch-thumb-translate': `\$\{checked \? travel : 0\}px`/)
+    //
+    // The resolved state variable is named here rather than pattern-matched, so
+    // this also pins *which* value the slide follows. It followed `checked`
+    // during the uncontrolled-mode fix; using the resolved value is what makes
+    // the thumb travel in sync when the switch owns its own state.
+    expect(tsx).toMatch(/const currentChecked = isControlled \? checked : internalChecked/)
+    expect(tsx).toMatch(/'--switch-thumb-translate': `\$\{currentChecked \? travel : 0\}px`/)
     expect(tsx).toMatch(/'--switch-travel-steps': String\(Math\.max\(1, Math\.round\(travel \/ SWITCH_TRAVEL_STEP_PX\)\)\)/)
   })
 
