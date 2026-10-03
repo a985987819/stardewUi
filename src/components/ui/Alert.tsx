@@ -32,6 +32,14 @@ export interface StarAlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
   icon?: ReactNode
   /** Shows a pixel × that dismisses the banner. */
   closable?: boolean
+  /**
+   * Controlled visibility. Leave it out to let the alert own its dismissed
+   * state. A closable alert used to hide itself permanently, so a form error
+   * could never come back after the user fixed and broke the field again.
+   */
+  visible?: boolean
+  /** Starting visibility for the uncontrolled mode. */
+  defaultVisible?: boolean
   /** Called after the built-in close button dismisses the banner. */
   onClose?: () => void
   /** Accessible name of the built-in close button. */
@@ -90,6 +98,8 @@ function StarAlert({
   showIcon = false,
   icon,
   closable = false,
+  visible,
+  defaultVisible = true,
   onClose,
   closeLabel = 'Close',
   modal = false,
@@ -102,23 +112,34 @@ function StarAlert({
   style,
   ...rest
 }: StarAlertProps) {
-  const [dismissed, setDismissed] = useState(false)
+  // Uncontrolled support, same `prop ?? internal` shape as the input family.
+  // A closable alert used to hide itself permanently, with no way back — which
+  // breaks the most common use of all: a form error that should reappear when
+  // the field goes bad again.
+  const [internalDismissed, setInternalDismissed] = useState(!defaultVisible)
+  const isVisibleControlled = visible !== undefined
+  const dismissed = isVisibleControlled ? !visible : internalDismissed
+
+  const hide = useCallback(() => {
+    if (!isVisibleControlled) setInternalDismissed(true)
+  }, [isVisibleControlled])
+
   const panelRef = useRef<HTMLDivElement>(null)
   const IconGlyph = ALERT_ICONS[type]
 
   const handleClose = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
       event.stopPropagation()
-      setDismissed(true)
+      hide()
       onClose?.()
     },
-    [onClose],
+    [hide, onClose],
   )
 
   const requestClose = useCallback(() => {
-    setDismissed(true)
+    hide()
     onClose?.()
-  }, [onClose])
+  }, [hide, onClose])
 
   // Shared with Dialog and Drawer. This replaces a hand-rolled `panelRef.focus()`
   // that moved focus in but never brought it back and never kept Tab inside —

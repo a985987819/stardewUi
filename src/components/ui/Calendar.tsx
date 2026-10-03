@@ -15,6 +15,13 @@ import { useComponentCopy } from './useComponentCopy'
 import styles from './Calendar.module.scss'
 
 export interface CalendarItem {
+  /**
+   * Stable identifier for this entry. Supply one when two events can share a
+   * title on the same day — without it the grid falls back to
+   * `title + index` for its React key, so two identically named events are
+   * indistinguishable to React and one of them cannot be addressed.
+   */
+  id?: string
   date: CalendarInput
   title: string
   description?: string
@@ -29,6 +36,14 @@ export interface StarCalendarProps {
   value?: number
   defaultValue?: number
   onMonthChange?: (monthTimestamp: number) => void
+  /**
+   * Called with the timestamp of the day that was clicked.
+   *
+   * The calendar had no way to report a day selection at all: clicking set an
+   * internal hover/tooltip state and nothing else, so `value` could never be
+   * driven from a click. `onMonthChange` only covered paging.
+   */
+  onSelect?: (dayTimestamp: number) => void
   items?: CalendarItem[]
   maxVisibleMarkers?: number
   iconMap?: Record<string, ReactNode | string>
@@ -101,6 +116,7 @@ function Calendar({
   value,
   defaultValue,
   onMonthChange,
+  onSelect,
   items = [],
   maxVisibleMarkers = DEFAULT_MAX_VISIBLE_MARKERS,
   iconMap,
@@ -205,7 +221,10 @@ function Calendar({
         cells={cells}
         showOutsideDays={showOutsideDays}
         locale={resolvedLocale}
-        onSelectDay={(dayTimestamp) => setActiveDayTimestamp(dayTimestamp)}
+        onSelectDay={(dayTimestamp) => {
+          setActiveDayTimestamp(dayTimestamp)
+          onSelect?.(dayTimestamp)
+        }}
         renderCellContent={renderCellContent}
         getCellButtonProps={(cell) => ({
           'aria-label': formatDayLabel(cell.dateTimestamp),

@@ -8,6 +8,7 @@ import {
   type MessageProps,
   type MessageRecord,
 } from './messageConfig'
+import type { MessageHandle } from './messageConfig'
 import styles from './Message.module.scss'
 
 export type {
@@ -140,9 +141,23 @@ export function message(props: MessageProps | string, options?: MessageOptions |
   messages.set(id, { ...config, id })
   renderMessages()
 
-  return {
+  const handle: MessageHandle = {
     close: () => dismissMessage(id),
+    // Merge rather than replace: an update usually only knows the new copy
+    // ("上传失败"), and replacing the whole record would silently drop the
+    // position and duration the caller set at creation time.
+    update: (next) => {
+      const current = messages.get(id)
+
+      // Already dismissed — updating a closed message would resurrect it.
+      if (!current) return
+
+      messages.set(id, { ...current, ...next, id })
+      renderMessages()
+    },
   }
+
+  return handle
 }
 
 message.normal = (content: string, options?: MessageOptions | number) =>

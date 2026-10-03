@@ -1,8 +1,10 @@
 import {
+  forwardRef,
   useEffect,
   useRef,
   useState,
   type CSSProperties,
+  type ForwardedRef,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -113,7 +115,7 @@ function StarRadio({
   style,
   'aria-label': ariaLabel = 'Radio',
   ...rest
-}: StarRadioProps) {
+}: StarRadioProps, ref: ForwardedRef<HTMLDivElement>) {
   const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue)
   const selectedValue = value ?? internalValue
 
@@ -130,6 +132,7 @@ function StarRadio({
   return (
     <div
       {...rest}
+      ref={ref}
       role="radiogroup"
       aria-label={ariaLabel}
       aria-disabled={disabled || undefined}
@@ -173,5 +176,12 @@ function StarRadio({
   )
 }
 
-export { StarRadio }
-export default StarRadio
+/**
+ * The ref lands on the group root. Individual options are buttons inside it;
+ * exposing the group is what lets a caller focus the control as a whole, which
+ * is the only level a single ref can meaningfully point at here.
+ */
+const StarRadioWithRef = forwardRef<HTMLDivElement, StarRadioProps>(StarRadio)
+
+export { StarRadioWithRef as StarRadio }
+export default StarRadioWithRef

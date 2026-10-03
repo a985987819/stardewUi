@@ -16,6 +16,17 @@ export interface StarTagProps extends HTMLAttributes<HTMLSpanElement> {
   onClose?: () => void
   /** Accessible name of the built-in close button. */
   closeLabel?: string
+  /**
+   * Controlled visibility. Leave it out to let the tag own its dismissed state.
+   *
+   * A closable tag used to hide itself permanently once dismissed, with no way
+   * back. That breaks the two common uses: a filter chip the user removes and
+   * then re-adds, and a validation message that should return when the input
+   * goes bad again. Both need to reset it from outside.
+   */
+  visible?: boolean
+  /** Starting visibility for the uncontrolled mode. */
+  defaultVisible?: boolean
   /** Tag content. */
   children?: ReactNode
 }
@@ -45,22 +56,27 @@ function StarTag({
   closable = false,
   onClose,
   closeLabel = 'Close',
+  visible,
+  defaultVisible = true,
   children,
   className,
   style,
   ...rest
 }: StarTagProps) {
-  const [closed, setClosed] = useState(false)
+  // Uncontrolled support, same `prop ?? internal` shape as the input family.
+  const [internalVisible, setInternalVisible] = useState(defaultVisible)
+  const isControlled = visible !== undefined
+  const currentVisible = isControlled ? visible : internalVisible
 
   const handleClose = (event: MouseEvent<HTMLButtonElement>) => {
     // The button lives inside the tag; swallowing the event keeps a wrapping
     // clickable (card row, filter chip) from reacting to the removal.
     event.stopPropagation()
-    setClosed(true)
+    if (!isControlled) setInternalVisible(false)
     onClose?.()
   }
 
-  if (closed) return null
+  if (!currentVisible) return null
 
   const cssVariables: TagCssVariables = {
     '--star-tag-clip': TAG_CLIP_PATH,

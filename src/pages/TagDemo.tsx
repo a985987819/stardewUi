@@ -42,6 +42,8 @@ const apiData = {
   zh: [
     { property: 'color', description: '预设配色：更换木框、文字与关闭悬停色', type: "'default' | 'green' | 'red' | 'yellow' | 'blue' | 'purple'", default: "'default'" },
     { property: 'closable', description: '是否显示像素 × 关闭按钮', type: 'boolean', default: 'false' },
+    { property: 'visible', description: '受控可见性；关闭后可由外部复位', type: 'boolean', default: '-' },
+    { property: 'defaultVisible', description: '非受控模式的初始可见性', type: 'boolean', default: 'true' },
     { property: 'onClose', description: '点击关闭按钮移除标签后触发', type: '() => void', default: '-' },
     { property: 'closeLabel', description: '关闭按钮的无障碍名称', type: 'string', default: "'Close'" },
     { property: 'children', description: '标签内容', type: 'ReactNode', default: '-' },
@@ -49,6 +51,8 @@ const apiData = {
   en: [
     { property: 'color', description: 'Preset ink for the ring, text, and close-hover accent.', type: "'default' | 'green' | 'red' | 'yellow' | 'blue' | 'purple'", default: "'default'" },
     { property: 'closable', description: 'Shows the pixel × close button.', type: 'boolean', default: 'false' },
+    { property: 'visible', description: 'Controlled visibility; lets a dismissed tag be restored.', type: 'boolean', default: '-' },
+    { property: 'defaultVisible', description: 'Starting visibility for the uncontrolled mode.', type: 'boolean', default: 'true' },
     { property: 'onClose', description: 'Fires after the close button removes the tag.', type: '() => void', default: '-' },
     { property: 'closeLabel', description: 'Accessible name of the close button.', type: 'string', default: "'Close'" },
     { property: 'children', description: 'Tag content.', type: 'ReactNode', default: '-' },

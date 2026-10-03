@@ -98,6 +98,8 @@ const apiData = {
     { property: 'action', description: '消息内操作按钮', type: 'MessageAction', default: '-' },
     { property: 'onClose', description: '消息关闭后触发', type: '() => void', default: '-' },
     { property: 'onClick', description: '点击消息主体时触发', type: '() => void', default: '-' },
+    { property: '返回值 close()', description: '关闭这条消息', type: '() => void', default: '-' },
+    { property: '返回值 update()', description: '就地更新这条消息；合并传入字段，保留创建时的位置与时长', type: '(next: Partial<MessageOptions> & { content?: string; type?: MessageType }) => void', default: '-' },
   ],
   en: [
     { property: 'content', description: 'Message content.', type: 'string', default: '-', required: true },
@@ -107,6 +109,8 @@ const apiData = {
     { property: 'action', description: 'An in-message action button.', type: 'MessageAction', default: '-' },
     { property: 'onClose', description: 'Called after the message closes.', type: '() => void', default: '-' },
     { property: 'onClick', description: 'Called when the message body is clicked.', type: '() => void', default: '-' },
+    { property: 'Return: close()', description: 'Closes this message.', type: '() => void', default: '-' },
+    { property: 'Return: update()', description: 'Updates this message in place; merges the given fields and keeps the original position and duration.', type: '(next: Partial<MessageOptions> & { content?: string; type?: MessageType }) => void', default: '-' },
   ],
 }
 
