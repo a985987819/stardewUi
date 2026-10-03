@@ -193,7 +193,7 @@ import { StarNineSliceButton } from 'stardew-valley-ui'
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| variant | `'default' \| 'primary' \| 'warning' \| 'danger' \| 'dashed' \| 'text' \| 'link' \| 'concise'` | `'default'` | 按钮变体 |
+| variant | `'default' \| 'primary' \| 'secondary' \| 'info' \| 'success' \| 'warning' \| 'danger' \| 'disabled' \| 'dashed' \| 'text' \| 'link' \| 'concise'` | `'default'` | 按钮变体，共 12 档 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 按钮尺寸 |
 | theme | `'spring' \| 'summer' \| 'autumn' \| 'winter'` | - | 季节主题 |
 | appearance | `'regular' \| 'classical'` | `'regular'` | 外观风格 |
@@ -265,6 +265,7 @@ import { StarCard } from 'stardew-valley-ui'
 | headerExtra | `ReactNode` | - | 标题栏额外内容 |
 | footer | `ReactNode` | - | 页脚内容 |
 | hoverable | `boolean` | `false` | 是否有悬浮效果 |
+| children | `ReactNode` | - | 卡片主体内容 |
 
 预设配色：`night-village`、`forest-farm`、`wooden-cabin`、`lake-night`、`flower-festival`、`mine-starry`、`farmland`、`orchard-grass`、`workshop-ore`、`night-celebration`
 
@@ -357,7 +358,8 @@ import { StarDialog } from 'stardew-valley-ui'
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| open | `boolean` | - | 是否打开 |
+| open | `boolean` | - | 是否打开；不传则对话框自持状态 |
+| defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
 | title | `string` | - | 对话标题 |
 | content | `string \| string[]` | - | 对话内容，数组表示多页 |
 | image | `string` | - | 角色头像 |
@@ -371,6 +373,12 @@ import { StarDialog } from 'stardew-valley-ui'
 | maskClosable | `boolean` | `true` | 点击遮罩是否关闭 |
 | typewriter | `boolean` | `true` | 打字机效果 |
 | typewriterSpeed | `number` | `100` | 打字速度（毫秒） |
+| showPagination | `boolean` | 自动 | 是否显示上一页/下一页分页器；默认跟随内容（单页隐藏），`true` 强制显示，`false` 强制隐藏 |
+| confirmLabel / cancelLabel | `string` | 跟随语言 | 内置「确认 / 取消」按钮的可覆盖文案 |
+| prevLabel / nextLabel | `string` | 跟随语言 | 分页箭头的无障碍名称，同时用作悬浮提示 |
+| roleLabel | `string` | 跟随语言 | `image` 的替代文本；未传时回退到 `name` 与内置文案 |
+| waitingText | `string` | 跟随语言 | 打字机尚未完成标题时，正文位置显示的占位文案 |
+| onOpenChange | `(open: boolean) => void` | - | 可见性变化回调；关闭按钮、遮罩、Escape 都会以 `false` 触发 |
 | onClose | `() => void` | - | 关闭回调 |
 
 ---
@@ -405,7 +413,8 @@ function InventoryDrawer() {
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| open | `boolean` | - | 受控可见状态 |
+| open | `boolean` | - | 受控可见状态；不传则抽屉自持状态 |
+| defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
 | placement | `'top' \| 'right' \| 'bottom' \| 'left'` | `'right'` | 抽屉进入方向 |
 | title | `ReactNode` | - | 可选标题 |
 | footer | `ReactNode` | - | 可选固定页脚 |
@@ -414,6 +423,9 @@ function InventoryDrawer() {
 | maskStyle | `CSSProperties` | - | 覆盖遮罩层的内联样式 |
 | focusEffect | `boolean` | `true` | 是否缩小并柔化原页面 |
 | maskClosable | `boolean` | `true` | 点击遮罩是否请求关闭 |
+| closeLabel | `string` | 跟随语言 | 关闭按钮的无障碍名称 |
+| ariaLabel | `string` | 跟随语言 | 面板的无障碍名称；`title` 为非字符串节点时使用 |
+| onOpenChange | `(open: boolean) => void` | - | 可见性变化回调；关闭按钮、遮罩、Escape 均触发 |
 | onClose | `() => void` | - | 点击关闭按钮、遮罩或 Escape 时触发 |
 
 ---
@@ -492,7 +504,7 @@ setTimeout(() => close(), 1000)
 |------|------|--------|------|
 | content | `string` | - | 消息内容 |
 | type | `'normal' \| 'info' \| 'success' \| 'warning' \| 'error'` | `'normal'` | 消息类型 |
-| position | `'top' \| 'bottom-left' \| 'bottom-right'` | `'top'` | 消息位置 |
+| position | `'top' \| 'top-left' \| 'top-right' \| 'left' \| 'center' \| 'right' \| 'bottom' \| 'bottom-left' \| 'bottom-right'` | `'top'` | 消息位置，共 9 档 |
 | duration | `number` | `3000` | 持续时间，0 不自动关闭 |
 | onClose | `() => void` | - | 关闭回调 |
 
@@ -527,9 +539,12 @@ import { StarCalendar } from 'stardew-valley-ui'
 | iconMap | `Record<string, ReactNode \| string>` | - | 图标映射 |
 | showOutsideDays | `boolean` | `true` | 是否显示非当月日期 |
 | onMonthChange | `(timestamp: number) => void` | - | 月份切换回调 |
+| onSelect | `(dayTimestamp: number) => void` | - | 点击某一天时的回调 |
 | todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
 | showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
 | todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区 |
+| locale | `string` | 跟随宿主语言 | 月份名、周头与年份标题的 locale，如 `'en-US'` |
+| className | `string` | - | 追加到根元素的类名 |
 
 > 翻月、「回到今日」和下拉选月都会走 `onMonthChange`；目标月份和当前一致时不会重复触发。
 
@@ -537,6 +552,7 @@ import { StarCalendar } from 'stardew-valley-ui'
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
+| id | `string` | 稳定标识；同一天存在同名事件时必填，否则 React 无法区分 |
 | date | `number \| string \| Date` | 日期 |
 | title | `string` | 事件标题 |
 | description | `string` | 事件描述 |
@@ -601,6 +617,56 @@ import { StarDatePicker } from 'stardew-valley-ui'
 | todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
 | showToday | `boolean` | `true` | 是否显示「回到今日」按钮（仅 `calendar`） |
 | todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区；仅影响「今日」的判断与按钮落点，不会改动选中值 |
+| locale | `string` | 跟随宿主语言 | 月份名、周头与行内触发器的 locale，如 `'en-US'` |
+| className | `string` | - | 追加到行内容器根元素的类名 |
+
+---
+
+### StarProgress - 进度条
+
+像素风进度条：一格一格地填充，格子的描边与高光由 `color` 推导，用于体力、经验、季节进度等需要「可数」的场合。
+
+```tsx
+<StarProgress value={7} max={10} showLabel />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| value | `number` | - | 当前值，超出 `0…max` 会被夹紧 |
+| max | `number` | `100` | 满格代表的总量 |
+| segmentSize | `number` | `10` | 一个完整像素格代表的量 |
+| color | `string` | `'#ce053c'` | 填充色；描边、阴影与高光由它推导。只接受 3/6 位 hex，传 CSS 颜色名会在开发期告警 |
+| showLabel | `boolean` | `false` | 是否显示数值 |
+| variant | `'default' \| 'compact'` | `'default'` | 标准生命格，或密集六像素 HUD 行 |
+
+> `variant` 描述的是**密度**而非语义色，与 `StarNineSliceButton` 的 `variant`（12 个语义值）同名不同义，容易混淆。按钮那侧叫语义，这里叫密度更准确。
+
+---
+
+### StarRating - 评分
+
+像素爱心/星星评分：加星时整颗图标按进度格的弹入曲线弹一下，减星时先左右摇晃再缩小消失。用于村民好感、收藏度、任务评价。
+
+```tsx
+<StarRating value={friendship} onChange={setFriendship} count={5} aria-label="好感度" />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| value / defaultValue | `number` | `0` | 受控值或非受控初始值 |
+| count | `number` | `5` | 图标数量 |
+| icon | `'heart' \| 'star'` | `'heart'` | 图标类型 |
+| allowHalf | `boolean` | `false` | 允许半格，**需要双击**该图标 |
+| disabled | `boolean` | `false` | 禁用交互但保留已获得的图标状态 |
+| onChange | `(value: number) => void` | - | 用户选定评分时触发，**传出数字而非事件对象** |
+| color | `string` | 心 `#e53935` / 星 `#d7992e` | 已点亮图标颜色 |
+| emptyColor | `string` | `'#cdbda8'` | 未点亮图标颜色 |
+| aria-label | `string` | - | 无障碍名称；控件只画图标，没有文本 |
+| className / style | `string` / `CSSProperties` | - | 追加到 `role="slider"` 根元素的类名与内联样式 |
+
+> `allowHalf` 的半格需要**精准双击**：单击先记满分，双击在 350ms 窗口内才切到半格。这是刻意的防误触设计，鼠标用户需要刻意练习才能命中。
+
+组件支持 `ref`，指向 `role="slider"` 的根元素，可以 `.focus()`。
 
 ---
 
@@ -687,6 +753,7 @@ import { StarPopup } from 'stardew-valley-ui'
 | defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
 | mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒） |
 | mouseLeaveDelay | `number` | `120` | 移开隐藏延迟（毫秒） |
+| children | `ReactNode` | - | 触发元素；组件会把它包进定位容器 |
 
 ---
 
@@ -735,6 +802,7 @@ import { StarTypewriter } from 'stardew-valley-ui'
 | startDelay | `number` | `0` | 开始延迟（毫秒） |
 | onComplete | `() => void` | - | 打字完成回调 |
 | completeTrigger | `number` | `0` | 外部触发立即完成 |
+| className | `string` | - | 追加到根元素的类名 |
 
 ---
 
@@ -794,11 +862,14 @@ import { StarSwitch } from 'stardew-valley-ui'
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| checked | `boolean` | `false` | 是否选中 |
+| checked | `boolean` | `false` | 是否选中；不传则开关自持状态 |
+| defaultChecked | `boolean` | `false` | 非受控模式的初始位置（`checked` 存在时被忽略） |
 | onChange | `(checked: boolean) => void` | - | 变化回调 |
 | disabled | `boolean` | `false` | 是否禁用 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 开关尺寸 |
 | color | `string` | `'#71964A'` | 打开时凹槽与锁孔点亮的颜色；顶部暗边从它自动推导 |
+| name | `string` | - | 表单字段名；设置后渲染隐藏 input，提交时得到 `'true'` / `'false'`（与原生 checkbox「选中才提交」的契约不同） |
+| required | `boolean` | - | 交由浏览器原生校验，随表单提交 |
 
 ---
 
@@ -858,6 +929,8 @@ import { StarTag } from 'stardew-valley-ui'
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
 | onClose | `() => void` | - | 点击关闭按钮移除标签后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
+| visible | `boolean` | - | 受控可见性；不传则关闭后由标签自持 |
+| defaultVisible | `boolean` | `true` | 非受控模式的初始可见性 |
 | children | `ReactNode` | - | 标签内容 |
 
 ---
@@ -917,6 +990,7 @@ const crops = [
 | disabled | `boolean` | `false` | 禁用整个选择器 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 触发框尺寸 |
 | block | `boolean` | `false` | 撑满容器宽度 |
+| name | `string` | - | 表单字段名；根元素是 `<div>`，设置后渲染隐藏 input 参与提交 |
 | aria-label | `string` | `'Select'` | 触发框与清单的无障碍名称 |
 
 ---
@@ -966,6 +1040,7 @@ const [name, setName] = useState('')
 | showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
 | block | `boolean` | `false` | 撑满容器宽度 |
 | clearLabel | `string` | `'Clear'` | 清空按钮的无障碍名称 |
+| onClear | `() => void` | - | 点击清空按钮后触发（配合 `allowClear`） |
 
 其余原生属性（`placeholder`、`disabled`、`readOnly`、`maxLength`、`name`、`onFocus`…）会透传到内部的 `<input>`。
 
@@ -995,6 +1070,7 @@ import { StarTextarea } from 'stardew-valley-ui'
 | label | `ReactNode` | - | 可见标题，绑定输入框 |
 | message | `ReactNode` | - | 框下方的提示或校验文案 |
 | status | `'default' \| 'warning' \| 'error' \| 'success'` | `'default'` | 语义状态，决定边框与光标颜色 |
+| size | `'small' \| 'medium' \| 'large'` | `'medium'` | 输入框尺寸 |
 | color | `string` | - | 自定义强调色，覆盖 status |
 | showCount | `boolean` | `false` | 显示字数（配合 `maxLength` 显示 `n/max`） |
 | block | `boolean` | `false` | 撑满容器宽度 |
@@ -1062,8 +1138,15 @@ import { StarAlert } from 'stardew-valley-ui'
 | showIcon | `boolean` | `false` | 显示与色带同色的语义图标（可用 icon 替换） |
 | icon | `ReactNode` | - | 自定义图标，替换内置的语义图标 |
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
+| visible | `boolean` | - | 受控可见性；不传则关闭后由横幅自持 |
+| defaultVisible | `boolean` | `true` | 非受控模式的初始可见性 |
 | onClose | `() => void` | - | 关闭后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
+| modal | `boolean` | `false` | 以遮挡式警示对话框（`alertdialog`）渲染，身后的页面变暗且不可点击 |
+| maskClosable | `boolean` | `false` | 仅 `modal`：点击遮罩是否关闭 |
+| escClosable | `boolean` | `false` | 仅 `modal`：按 Escape 是否关闭 |
+| actions | `ReactNode` | - | 底部右侧的操作区（如「知道了」确认按钮） |
+| modalLabel | `string` | - | `modal` 模式下对话框本身的无障碍名称 |
 
 ---
 
@@ -1093,19 +1176,6 @@ import { StarSkeleton } from 'stardew-valley-ui'
 | avatarShape | `'square' \| 'circle'` | `'square'` | 头像占位的形状 |
 | active | `boolean` | `true` | 是否播放条纹步进动画 |
 | children | `ReactNode` | - | loading 为 `false` 时渲染的真实内容 |
-
----
-
-------|------|--------|------|
-| title | `ReactNode` | - | 气泡内容，支持任意 ReactNode |
-| placement | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | 气泡出现的位置 |
-| open | `boolean` | - | 受控可见性；不传则由悬停/聚焦接管 |
-| defaultOpen | `boolean` | `false` | 非受控模式的初始可见性 |
-| mouseEnterDelay | `number` | `100` | 悬停显示延迟（毫秒）；`0` 立即显示 |
-| mouseLeaveDelay | `number` | `150` | 移开隐藏延迟（毫秒） |
-| arrow | `boolean` | `true` | 是否显示指向触发元素的像素箭头 |
-| color | `string` | `'#F7EFC5'` | 底色；边框与奶油墨色由它自动推导 |
-| onOpenChange | `(open: boolean) => void` | - | 可见性将要变化时触发 |
 
 ---
 
@@ -1148,6 +1218,7 @@ import { StarPagination } from 'stardew-valley-ui'
 | onChange | `(page: number, pageSize: number) => void` | - | 页码变化时触发 |
 | hideOnSinglePage | `boolean` | `false` | 只有一页时是否隐藏 |
 | showTotal | `(total: number, range: [number, number]) => ReactNode` | - | 自定义总条数文案，range 为当前页起止条目 |
+| ariaLabel | `string` | 跟随语言 | 翻页器的无障碍名称 |
 
 ---
 
@@ -1354,6 +1425,29 @@ import { StarPixelText } from 'stardew-valley-ui'
 | renderMode | `'pixelated' \| 'source'` | `'pixelated'` | 输出粗颗粒像素，或保留同尺寸的原始 Canvas 字形；后者适合无缝前后对比 |
 | aria-label | `string` | 文本本身 | Canvas 图像的无障碍名称 |
 | className / ...rest | `CanvasHTMLAttributes<HTMLCanvasElement>` | - | 追加样式及其余原生 Canvas 属性 |
+
+---
+
+### StarAvatar - 头像
+
+带多层木纹与受光边框的像素头像，方框与圆框两种形状。图片加载失败时回退到 `name` 或 `alt` 派生的首字母缩写，不会出现破图。
+
+```tsx
+<StarAvatar src="/portrait.png" name="阿比盖尔" shape="circle" size={64} />
+```
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| src | `string` | - | 头像图片地址 |
+| alt | `string` | - | 替代文本，同时也是派生首字母的来源 |
+| name | `string` | - | 显式后备名称；派生首字母时优先于 `alt` |
+| shape | `'square' \| 'circle'` | `'square'` | 方框（类 Card 圆角）或正圆 |
+| size | `'small' \| 'medium' \| 'large' \| number` | `'medium'` | 预设档位或精确像素 |
+| color | `string` | - | 木框底色；光照层与 Card 同样按它推导 |
+| children | `ReactNode` | - | 无图时的替代内容，显示在首字母缩写的位置 |
+| className / style / ...rest | - | - | 追加到根元素；其余原生属性透传到根 `<span>` |
+
+> `size` 收字面量也收数字，是全库唯一如此的 `size`：`64` 表示 64px，而 `<StarInput size={64}>` 是类型错误。想要「档位」语义时用另外六个组件的 `size`。
 
 ---
 
