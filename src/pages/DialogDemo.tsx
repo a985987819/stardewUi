@@ -99,7 +99,9 @@ const copy = {
 
 const apiData = {
   zh: [
-    { property: 'open', description: '是否打开', type: 'boolean', default: '-', required: true },
+    { property: 'open', description: '受控可见性；不传则由组件自持状态', type: 'boolean', default: '-' },
+    { property: 'defaultOpen', description: '非受控模式的初始可见性', type: 'boolean', default: 'false' },
+    { property: 'onOpenChange', description: '打开与关闭时触发，参数为新的可见性', type: '(open: boolean) => void', default: '-' },
     { property: 'content', description: '内容或分页内容', type: 'string | string[]', default: '-', required: true },
     { property: 'title', description: '标题', type: 'string', default: '-' },
     { property: 'image', description: '右侧角色立绘', type: 'string', default: '-' },
@@ -122,7 +124,9 @@ const apiData = {
     { property: 'roleLabel', description: '未传 name 时角色图片的替代文本', type: 'string', default: '跟随语言' },
     { property: 'waitingText', description: '标题打字机未完成时正文区的提示', type: 'string', default: '跟随语言' },],
   en: [
-    { property: 'open', description: 'Controls visibility.', type: 'boolean', default: '-', required: true },
+    { property: 'open', description: 'Controlled visibility; omit to let the dialog own it.', type: 'boolean', default: '-' },
+    { property: 'defaultOpen', description: 'Starting visibility for the uncontrolled mode.', type: 'boolean', default: 'false' },
+    { property: 'onOpenChange', description: 'Fires on open and on close with the next visibility.', type: '(open: boolean) => void', default: '-' },
     { property: 'content', description: 'Content or paged content.', type: 'string | string[]', default: '-', required: true },
     { property: 'title', description: 'Dialog title.', type: 'string', default: '-' },
     { property: 'image', description: 'Portrait shown on the right.', type: 'string', default: '-' },

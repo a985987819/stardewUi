@@ -12,6 +12,7 @@ import {
 import { createPortal } from 'react-dom'
 import { CircleCheck, CircleX, Info, TriangleAlert, X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import { useFocusTrap } from './useFocusTrap'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Alert.module.scss'
 
@@ -119,14 +120,18 @@ function StarAlert({
     onClose?.()
   }, [onClose])
 
-  // Modal housekeeping: lock the page behind the alert and move focus into it,
-  // so a forced notice is read rather than tabbed past.
+  // Shared with Dialog and Drawer. This replaces a hand-rolled `panelRef.focus()`
+  // that moved focus in but never brought it back and never kept Tab inside —
+  // so an alert declared `aria-modal` and then let the keyboard walk away.
+  useFocusTrap(panelRef, { active: modal && !dismissed })
+
+  // Modal housekeeping: lock the page behind the alert so a forced notice is
+  // read rather than scrolled past.
   useEffect(() => {
     if (!modal || dismissed) return undefined
 
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    panelRef.current?.focus()
 
     return () => {
       document.body.style.overflow = previousOverflow

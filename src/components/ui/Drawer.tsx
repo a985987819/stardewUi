@@ -1,16 +1,23 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { classNames } from '../../utils/classNames'
 import StarCard from './Card'
 import { OVERLAY_ENTER_TOTAL_MS, OVERLAY_EXIT_TOTAL_MS, overlayMotionStyle } from './overlayMotion'
 import { useComponentCopy } from './useComponentCopy'
+import { useFocusTrap } from './useFocusTrap'
 import styles from './Drawer.module.scss'
 
 export type DrawerPlacement = 'top' | 'right' | 'bottom' | 'left'
 
 export interface StarDrawerProps {
-  /** Controlled visibility of the drawer. */
-  open: boolean
+  /**
+   * Controlled visibility of the drawer. Leave it out to let the drawer own its
+   * state, in which case `defaultOpen` decides whether it starts open and
+   * `onOpenChange` reports every change.
+   */
+  open?: boolean
+  /** Starting visibility for the uncontrolled mode. */
+  defaultOpen?: boolean
   /** Edge the drawer enters from. */
   placement?: DrawerPlacement
   /** Optional heading shown in the drawer frame. */
@@ -31,6 +38,11 @@ export interface StarDrawerProps {
   closeLabel?: string
   /** Accessible name for the panel when no string `title` is supplied. */
   ariaLabel?: string
+  /**
+   * Called with the visibility the drawer is moving to, on open and on close.
+   * Fires for the close button, the backdrop, and Escape alike.
+   */
+  onOpenChange?: (open: boolean) => void
   /** Called when the close button, backdrop, or Escape key requests closing. */
   onClose?: () => void
 }
@@ -63,7 +75,8 @@ function removePageFocus(appRoot: HTMLElement) {
  * portal remains on `document.body` so the drawer stays crisp and full-sized.
  */
 function StarDrawer({
-  open,
+  open: openProp,
+  defaultOpen = false,
   placement = 'right',
   title,
   footer,
@@ -74,10 +87,19 @@ function StarDrawer({
   maskClosable = true,
   closeLabel,
   ariaLabel,
+  onOpenChange,
   onClose,
 }: StarDrawerProps) {
+  // Uncontrolled support, same `prop ?? internal` shape as Dialog and the
+  // input components. `open` became optional, so without this a caller who
+  // omitted it would get a drawer that never opened.
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+
   const [rendered, setRendered] = useState(open)
   const renderedRef = useRef(open)
+  const panelRef = useRef<HTMLElement | null>(null)
   const [motionState, setMotionState] = useState<DrawerMotionState>(open ? 'opening' : 'closed')
   const [activePlacement, setActivePlacement] = useState<DrawerPlacement>(placement)
   // True only when an open request arrives while the exit is still playing. The
@@ -126,6 +148,22 @@ function StarDrawer({
     }
   }, [open, placement])
 
+  useFocusTrap(panelRef, { active: rendered })
+
+  /** Single close path, so the uncontrolled mode has one place to write. */
+  const requestClose = useCallback(() => {
+    if (!isControlled) setInternalOpen(false)
+    onClose?.()
+  }, [isControlled, onClose])
+
+  // Report both modes' changes from one place by watching the resolved value.
+  const lastOpenRef = useRef(open)
+  useEffect(() => {
+    if (lastOpenRef.current === open) return
+    lastOpenRef.current = open
+    onOpenChange?.(open)
+  }, [onOpenChange, open])
+
   useEffect(() => {
     if (!rendered || !focusEffect || typeof document === 'undefined') return
 
@@ -140,12 +178,12 @@ function StarDrawer({
     if (!open) return
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose?.()
+      if (event.key === 'Escape') requestClose()
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose, open])
+  }, [open, requestClose])
 
   // The close button and the panel's own accessible name were English-only
   // literals until now, so a Chinese-speaking screen-reader user got an English
@@ -155,10 +193,16 @@ function StarDrawer({
   const resolvedCloseLabel = closeLabel ?? copy.t('ui.drawer.close')
   const resolvedAriaLabel = ariaLabel ?? (typeof title === 'string' ? title : copy.t('ui.dialog.drawer'))
 
+  // Same reasoning as Dialog: `aria-modal="true"` is a promise, and the drawer
+  // was making it without containing focus. The close button lives inside the
+  // panel, so Tab now cycles between the drawer's own controls instead of
+  // walking into the page behind.
+  useFocusTrap(panelRef, { active: rendered })
+
   if (!rendered || typeof document === 'undefined') return null
 
   const handleMaskClick = () => {
-    if (maskClosable) onClose?.()
+    if (maskClosable) requestClose()
   }
 
   return createPortal(
@@ -174,6 +218,7 @@ function StarDrawer({
         onClick={handleMaskClick}
       />
       <aside
+        ref={panelRef}
         className={classNames(
           styles['stardew-drawer'],
           styles[`stardew-drawer--${activePlacement}`],
@@ -192,7 +237,7 @@ function StarDrawer({
           showTitle={Boolean(title)}
           headerExtra={
             title && onClose ? (
-              <button type="button" className={styles['stardew-drawer__close']} aria-label={resolvedCloseLabel} onClick={onClose}>
+              <button type="button" className={styles['stardew-drawer__close']} aria-label={resolvedCloseLabel} onClick={requestClose}>
                 ×
               </button>
             ) : undefined
@@ -204,7 +249,7 @@ function StarDrawer({
               type="button"
               className={classNames(styles['stardew-drawer__close'], styles['stardew-drawer__close--floating'])}
               aria-label={resolvedCloseLabel}
-              onClick={onClose}
+              onClick={requestClose}
             >
               ×
             </button>

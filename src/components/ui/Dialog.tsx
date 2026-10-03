@@ -6,6 +6,7 @@ import StarNineSliceButton from './NineSliceButton'
 import StarTypewriter from './Typewriter'
 import { OVERLAY_ENTER_TOTAL_MS, OVERLAY_EXIT_TOTAL_MS, overlayMotionStyle } from './overlayMotion'
 import { useComponentCopy } from './useComponentCopy'
+import { useFocusTrap } from './useFocusTrap'
 import styles from './Dialog.module.scss'
 
 export interface DialogAction {
@@ -42,7 +43,18 @@ function removePageFocus(appRoot: HTMLElement) {
 }
 
 export interface StarDialogProps {
-  open: boolean
+  /**
+   * Controlled visibility. Leave it out to let the dialog own its state, in
+   * which case `defaultOpen` decides whether it starts open and `onOpenChange`
+   * reports every change.
+   *
+   * It used to be required, which meant the simplest possible usage — "show a
+   * confirmation, close it when dismissed" — still required the caller to
+   * declare a `useState`, which is a lot of ceremony for a boolean.
+   */
+  open?: boolean
+  /** Starting visibility for the uncontrolled mode. */
+  defaultOpen?: boolean
   title?: string
   content: string | string[]
   image?: string
@@ -85,11 +97,18 @@ export interface StarDialogProps {
   roleLabel?: string
   /** Shown in place of the body while the typewriter is still finishing the title. */
   waitingText?: string
+  /**
+   * Called with the visibility the dialog is moving to, on open and on close.
+   * Receives `false` for every dismissal path — the close button, the backdrop,
+   * Escape — so one handler covers them all.
+   */
+  onOpenChange?: (open: boolean) => void
   onClose?: () => void
 }
 
 function StarDialog({
-  open,
+  open: openProp,
+  defaultOpen = false,
   title,
   content,
   image,
@@ -110,10 +129,18 @@ function StarDialog({
   nextLabel,
   roleLabel,
   waitingText,
+  onOpenChange,
   onClose,
 }: StarDialogProps) {
+  // Uncontrolled support, following the same `prop ?? internal` shape the input
+  // components use. `open` became optional, so without this a caller who omits
+  // it would get a dialog that never opens.
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
   const [rendered, setRendered] = useState(open)
   const renderedRef = useRef(open)
+  const panelRef = useRef<HTMLDivElement | null>(null)
   const [motionState, setMotionState] = useState<DialogMotionState>(
     open && motion ? 'opening' : open ? 'open' : 'closed'
   )
@@ -262,11 +289,23 @@ function StarDialog({
     }
   }, [contentComplete, isLastPage, titleComplete, totalPages, typewriter])
 
+  /**
+   * Every dismissal path funnels through here so the uncontrolled mode has a
+   * single place to close. `onOpenChange` is deliberately *not* fired from this
+   * function: it watches the resolved `open` value, so a controlled caller's
+   * change and an uncontrolled internal write are both reported exactly once,
+   * from the same place.
+   */
+  const requestClose = useCallback(() => {
+    if (!isControlled) setInternalOpen(false)
+    onClose?.()
+  }, [isControlled, onClose])
+
   const handleOverlayClick = useCallback(() => {
     if (maskClosable) {
-      onClose?.()
+      requestClose()
     }
-  }, [maskClosable, onClose])
+  }, [maskClosable, requestClose])
 
   const handleTitleComplete = useCallback(() => {
     setTitleComplete(true)
@@ -295,7 +334,7 @@ function StarDialog({
       if (!open) return
 
       if (e.key === 'Escape' && maskClosable) {
-        onClose?.()
+        requestClose()
       }
 
       // Enter and Space are the keyboard's "activate the focused control"
@@ -321,14 +360,14 @@ function StarDialog({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleNext, handlePrev, maskClosable, onClose, open])
+  }, [handleNext, handlePrev, maskClosable, open, requestClose])
 
   // Confirm and cancel deliberately share the same default button. The darker
   // `primary` treatment made the confirm action harder to read against the
   // dialog surface, and the pair reads as one group again.
   const defaultActions: DialogAction[] = [
-    { label: resolvedConfirm, onClick: onClose },
-    { label: resolvedCancel, onClick: onClose },
+    { label: resolvedConfirm, onClick: requestClose },
+    { label: resolvedCancel, onClick: requestClose },
   ]
 
   const finalActions = actions === null ? [] : actions ?? defaultActions
@@ -338,6 +377,22 @@ function StarDialog({
   // 分页和动作都没有时，整条页脚（含它的上分隔线）一起收掉，免得留一条空线
   const defaultFooter = showActions || showPager
   const hasSidebar = Boolean(image || name)
+
+  // The panel declares `aria-modal="true"`, which promises assistive tech that
+  // focus is contained and restored. Honouring that promise is what keeps the
+  // attribute honest — see `useFocusTrap` for why an unkept promise is worse
+  // than no attribute at all.
+  useFocusTrap(panelRef, { active: rendered })
+
+  // Report every visibility change to `onOpenChange` regardless of mode, so a
+  // caller can drive an external `open` prop without branching on which mode
+  // they are in.
+  const lastOpenRef = useRef(open)
+  useEffect(() => {
+    if (lastOpenRef.current === open) return
+    lastOpenRef.current = open
+    onOpenChange?.(open)
+  }, [onClose, onOpenChange, open])
 
   if (!rendered) return null
 
@@ -359,6 +414,7 @@ function StarDialog({
       onClick={handleOverlayClick}
     >
       <div
+        ref={panelRef}
         className={classNames(styles['stardew-dialog'], styles[`stardew-dialog--${placement}`])}
         role="dialog"
         aria-modal="true"

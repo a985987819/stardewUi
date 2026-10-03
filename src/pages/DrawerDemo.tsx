@@ -58,7 +58,9 @@ const copy = {
 
 const apiData = {
   zh: [
-    { property: 'open', description: '受控的抽屉可见状态', type: 'boolean', default: '-', required: true },
+    { property: 'open', description: '受控可见性；不传则由组件自持状态', type: 'boolean', default: '-' },
+    { property: 'defaultOpen', description: '非受控模式的初始可见性', type: 'boolean', default: 'false' },
+    { property: 'onOpenChange', description: '打开与关闭时触发，参数为新的可见性', type: '(open: boolean) => void', default: '-' },
     { property: 'placement', description: '抽屉进入方向', type: "'top' | 'right' | 'bottom' | 'left'", default: "'right'" },
     { property: 'title', description: '可选标题', type: 'ReactNode', default: '-' },
     { property: 'footer', description: '可选固定页脚', type: 'ReactNode', default: '-' },
@@ -71,7 +73,9 @@ const apiData = {
     { property: 'closeLabel', description: '关闭按钮的无障碍名称；默认跟随语言', type: 'string', default: '跟随语言' },
     { property: 'ariaLabel', description: '未传字符串 title 时抽屉的无障碍名称', type: 'string', default: '跟随语言' },],
   en: [
-    { property: 'open', description: 'Controlled drawer visibility.', type: 'boolean', default: '-', required: true },
+    { property: 'open', description: 'Controlled visibility; omit to let the drawer own it.', type: 'boolean', default: '-' },
+    { property: 'defaultOpen', description: 'Starting visibility for the uncontrolled mode.', type: 'boolean', default: 'false' },
+    { property: 'onOpenChange', description: 'Fires on open and on close with the next visibility.', type: '(open: boolean) => void', default: '-' },
     { property: 'placement', description: 'Drawer entry edge.', type: "'top' | 'right' | 'bottom' | 'left'", default: "'right'" },
     { property: 'title', description: 'Optional heading.', type: 'ReactNode', default: '-' },
     { property: 'footer', description: 'Optional fixed footer.', type: 'ReactNode', default: '-' },
