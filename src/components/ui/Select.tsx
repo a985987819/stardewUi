@@ -32,6 +32,12 @@ export interface StarSelectProps extends Omit<HTMLAttributes<HTMLDivElement>, 'o
   size?: SelectSize
   /** Stretches the select to the container width. */
   block?: boolean
+  /**
+   * Form field name. The root is a `<div>`, so `name` would be ignored by the
+   * browser if it merely spread onto it; a hidden input carries the selected
+   * value into `new FormData(form)` instead.
+   */
+  name?: string
   /** Accessible name of the trigger. */
   'aria-label'?: string
 }
@@ -81,6 +87,7 @@ function StarSelect({
   size = 'medium',
   block = false,
   className,
+  name,
   style,
   'aria-label': ariaLabel = 'Select',
   ...rest
@@ -214,6 +221,11 @@ function StarSelect({
           </div>
         </div>
       ) : null}
+      {/* Form participation. The root is a `<div>`, so a `name` passed through
+          `...rest` would land on a div and be ignored by the browser — the
+          selected value would silently never appear in `new FormData(form)`.
+          A hidden input carries it into the form instead. */}
+      {name ? <input type="hidden" name={name} value={selectedValue ?? ''} aria-hidden /> : null}
     </div>
   )
 }

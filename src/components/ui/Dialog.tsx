@@ -298,7 +298,19 @@ function StarDialog({
         onClose?.()
       }
 
-      if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
+      // Enter and Space are the keyboard's "activate the focused control"
+      // keys. A dialog that claims them unconditionally swallows form submits
+      // and button presses anywhere inside itself — a `content` prop that
+      // mentions a confirmation step would page forward instead of submitting.
+      // Paging on Enter stays available when the focus is not on a control,
+      // which is where it is actually a convenience (the user has just read the
+      // page and wants to move on).
+      const target = e.target as HTMLElement | null
+      const onControl =
+        !!target?.closest?.('button, a[href], input, textarea, select, [role="button"], [role="link"]') ||
+        target?.isContentEditable === true
+
+      if (e.key === 'ArrowRight' || ((e.key === 'Enter' || e.key === ' ') && !onControl)) {
         handleNext()
       }
 

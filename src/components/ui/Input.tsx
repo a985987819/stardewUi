@@ -86,6 +86,7 @@ function StarInput({
   clearLabel = 'Clear',
   disabled = false,
   readOnly = false,
+  required = false,
   maxLength,
   placeholder,
   className,
@@ -95,6 +96,7 @@ function StarInput({
 }: StarInputProps) {
   const generatedId = useId()
   const inputId = id ?? `star-input-${generatedId}`
+  const messageId = `${inputId}-message`
   // The <input> is always controlled; `value` only decides whether React or the
   // field itself owns the text.
   const [innerValue, setInnerValue] = useState(defaultValue)
@@ -156,6 +158,12 @@ function StarInput({
             readOnly={readOnly}
             maxLength={maxLength}
             placeholder={placeholder}
+            required={required}
+            // `status="error"` paints a red frame, which a screen reader cannot
+            // see. Without these the visual and the announced state disagree,
+            // and the message below is never associated with the field.
+            aria-invalid={status === 'error' || undefined}
+            aria-describedby={message ? messageId : undefined}
           />
           {showCount ? (
             <span className={styles['star-input__count']}>
@@ -177,7 +185,11 @@ function StarInput({
       </div>
 
       {message ? (
-        <p className={styles['star-input__message']} role={status === 'error' ? 'alert' : undefined}>
+        <p
+          id={messageId}
+          className={styles['star-input__message']}
+          role={status === 'error' ? 'alert' : undefined}
+        >
           {message}
         </p>
       ) : null}
