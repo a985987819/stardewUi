@@ -73,3 +73,21 @@ export {
   type GapBorderCornerData,
   type CreateGapBorderCornersOptions,
 } from './utils/gapBorderCorners'
+// `CalendarItem['date']` is typed `CalendarInput`, so without these a consumer
+// cannot construct a valid `items` array — they would have to deep-import
+// `utils/calendar` from src, which the package does not expose.
+export {
+  CHINA_STANDARD_TIME_OFFSET_MINUTES,
+  normalizeToDayTimestamp,
+  getMonthStartTimestamp,
+  getTodayTimestamp,
+  addMonths,
+  isSameDay,
+  sortRangeTimestamps,
+  isDayInRange,
+  groupCalendarItemsByDay,
+  buildCalendarCells,
+  type CalendarInput,
+  type CalendarDayOfWeek,
+  type CalendarCell,
+} from './utils/calendar'

@@ -27,7 +27,12 @@ import { BUTTON_VARIANT_COLORS, STAR_COLORS } from '../../styles/colorTokens'
 import StarLoading from './Loading'
 import styles from './NineSliceButton.module.scss'
 
-type NineSliceButtonVariant =
+/**
+ * Exported because the value set is public API: the demo page's variant gallery
+ * and any consumer building a themed toolbar both need to name these members,
+ * and a local `type` left them unnameable outside this module.
+ */
+export type NineSliceButtonVariant =
   | 'default'
   | 'primary'
   | 'secondary'
@@ -40,7 +45,7 @@ type NineSliceButtonVariant =
   | 'text'
   | 'link'
   | 'concise'
-type NineSliceButtonSize = 'small' | 'medium' | 'large'
+export type NineSliceButtonSize = 'small' | 'medium' | 'large'
 export type NineSliceButtonTheme = 'spring' | 'summer' | 'autumn' | 'winter'
 
 type ButtonTone = {

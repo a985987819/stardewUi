@@ -1,22 +1,36 @@
 export { StarCard, StarCardImage, StarCardMeta } from './Card'
+export type { StarCardProps, CardColor, CardThemeColor } from './Card'
 export { default as StarDialog } from './Dialog'
 export type { DialogMask, DialogPlacement, StarDialogProps, DialogAction } from './Dialog'
 export { default as StarDrawer } from './Drawer'
 export type { DrawerPlacement, StarDrawerProps } from './Drawer'
 export { default as StarEmptyState } from './EmptyState'
 export {
-    EMPTY_STATE_DEFAULT_IMAGE_SRC,
-    EMPTY_STATE_DEFAULT_MESSAGE,
-    type EmptyStateDirection,
-    type StarEmptyStateProps,
+  EMPTY_STATE_DEFAULT_IMAGE_SRC,
+  EMPTY_STATE_DEFAULT_MESSAGE,
+  type EmptyStateDirection,
+  type StarEmptyStateProps,
 } from './EmptyState'
 export { default as StarTypewriter } from './Typewriter'
+export type { StarTypewriterProps } from './Typewriter'
 export { default as StarLoading } from './Loading'
 export { message } from './Message'
-export type { MessageAction, MessageOptions, MessagePosition, MessageProps, MessageType } from './Message'
-export { default as StarNineSliceButton } from './NineSliceButton'
+export type {
+  MessageAction,
+  MessageOptions,
+  MessagePosition,
+  MessageProps,
+  MessageType,
+  MessageBottom,
+} from './Message'
 export type { StarLoadingProps } from './Loading'
-export type { StarNineSliceButtonProps, NineSliceButtonTheme } from './NineSliceButton'
+export { default as StarNineSliceButton } from './NineSliceButton'
+export type {
+  StarNineSliceButtonProps,
+  NineSliceButtonTheme,
+  NineSliceButtonVariant,
+  NineSliceButtonSize,
+} from './NineSliceButton'
 export { default as StarPopup } from './Popup'
 export type { PopupPlacement, PopupTrigger, StarPopupProps, PopupAction } from './Popup'
 export { default as StarCalendar } from './Calendar'
@@ -26,7 +40,7 @@ export type { StarDatePickerProps } from './DatePicker'
 export { default as StarTab } from './Tab'
 export type { StarTabItem, StarTabProps, TabPosition } from './Tab'
 export { StarSwitch } from './Switch'
-export type { SwitchProps } from './Switch'
+export type { StarSwitchProps, SwitchProps } from './Switch'
 export { default as StarCheckbox } from './Checkbox'
 export type { CheckboxDirection, CheckboxOption, CheckboxShape, CheckboxSize, StarCheckboxProps } from './Checkbox'
 export { default as StarRating } from './Rating'
