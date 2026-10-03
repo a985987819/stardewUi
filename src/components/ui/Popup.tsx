@@ -11,7 +11,7 @@ import {
 } from 'react'
 import {
   classNames,
-  deriveProgressPalette,
+  deriveProgressPaletteWithWarning,
   flipBubblePlacement,
   resolveBubblePlacement,
   WOOD_PANEL_THEME,
@@ -358,7 +358,7 @@ function StarPopup({
     // the ink to cream so text stays readable on a saturated surface.
     ...(color
       ? (() => {
-          const palette = deriveProgressPalette(color)
+          const palette = deriveProgressPaletteWithWarning(color, 'Popup')
           return {
             '--wood-panel-border': palette.border,
             '--wood-panel-frame': palette.border,

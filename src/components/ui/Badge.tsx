@@ -1,7 +1,7 @@
 // Batch: 2026-09-27 P0 batch — internal marker for tooling only; no runtime effect.
 import { type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { classNames } from '../../utils/classNames'
-import { deriveProgressPalette } from '../../utils/progressPalette'
+import { deriveProgressPaletteWithWarning } from '../../utils/progressPalette'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Badge.module.scss'
 
@@ -56,7 +56,7 @@ function StarBadge({
   style,
   ...rest
 }: StarBadgeProps) {
-  const palette = deriveProgressPalette(color)
+  const palette = deriveProgressPaletteWithWarning(color, 'Badge')
   // Quantities are whole and non-negative: NaN and negatives read as "nothing
   // earned yet", and fractions floor to the whole items actually earned.
   const safeCount =

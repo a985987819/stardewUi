@@ -1,6 +1,6 @@
 import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react'
 import { classNames } from '../../utils/classNames'
-import { deriveProgressPalette, DEFAULT_PROGRESS_COLOR } from '../../utils/progressPalette'
+import { deriveProgressPaletteWithWarning, DEFAULT_PROGRESS_COLOR } from '../../utils/progressPalette'
 import styles from './Progress.module.scss'
 
 export interface StarProgressProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
@@ -69,7 +69,7 @@ function StarProgress({
   const safeValue = clamp(Number.isFinite(value) ? value : 0, 0, safeMax)
   const segmentCount = Math.max(1, Math.ceil(safeMax / safeSegmentSize))
   const completedSegments = Math.min(segmentCount, Math.floor(safeValue / safeSegmentSize))
-  const palette = deriveProgressPalette(color)
+  const palette = deriveProgressPaletteWithWarning(color, 'Progress')
 
   return (
     <div

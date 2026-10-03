@@ -1,3 +1,5 @@
+import { warnUnsupportedColor } from './devWarnings'
+
 export interface ProgressPalette {
   fill: string
   border: string
@@ -52,4 +54,21 @@ export function deriveProgressPalette(color?: string): ProgressPalette {
     highlight: mix(fill, '#fff1ec', 0.43),
     empty: mix(fill, '#fff3ec', 0.68),
   }
+}
+
+/**
+ * Derive a palette and complain when the requested colour was not usable.
+ *
+ * Prefer this over `deriveProgressPalette` in components: the plain function
+ * has to stay silent because it is also used internally (on colours the library
+ * generated itself), while a caller-supplied `color` that gets discarded should
+ * never fail quietly.
+ */
+export function deriveProgressPaletteWithWarning(
+  color: string | undefined,
+  component: string,
+  allowed?: (value: string) => boolean,
+): ProgressPalette {
+  warnUnsupportedColor(component, color, allowed)
+  return deriveProgressPalette(color)
 }
