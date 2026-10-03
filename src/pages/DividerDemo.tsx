@@ -234,7 +234,7 @@ function StarDividerDemoPage() {
           </div>
         </div>
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Divider API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

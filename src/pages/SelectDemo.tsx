@@ -124,7 +124,7 @@ function StarSelectDemoPage() {
         </div>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Select API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

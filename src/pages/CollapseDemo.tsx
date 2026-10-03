@@ -206,7 +206,7 @@ function StarCollapseDemoPage() {
         </div>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Collapse API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

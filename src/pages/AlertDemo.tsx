@@ -267,7 +267,7 @@ function StarAlertDemoPage() {
         <NoticeBoard posts={BOARD_POSTS[lang]} postLabel={t.postNext} emptyLabel={t.boardEmpty} closeLabel={t.boardClose} />
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Alert API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

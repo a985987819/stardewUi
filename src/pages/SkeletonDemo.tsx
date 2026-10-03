@@ -68,6 +68,7 @@ const apiData = {
     { property: 'avatar', description: '是否在左侧显示头像占位', type: 'boolean', default: 'false' },
     { property: 'avatarShape', description: '头像占位的形状', type: "'square' | 'circle'", default: "'square'" },
     { property: 'children', description: 'loading 为 false 时渲染的真实内容', type: 'ReactNode', default: '-' },
+    { property: 'active', description: '播放条纹流动动画；关闭后为静态占位', type: 'boolean', default: 'true' },
   ],
   en: [
     { property: 'loading', description: 'Shows the skeleton; when false, children render instead.', type: 'boolean', default: 'true' },
@@ -76,6 +77,7 @@ const apiData = {
     { property: 'avatar', description: 'Shows an avatar block on the left.', type: 'boolean', default: 'false' },
     { property: 'avatarShape', description: 'Shape of the avatar block.', type: "'square' | 'circle'", default: "'square'" },
     { property: 'children', description: 'Real content rendered when loading is false.', type: 'ReactNode', default: '-' },
+    { property: 'active', description: 'Plays the marching-stripe animation; off gives a calm placeholder.', type: 'boolean', default: 'true' },
   ],
 }
 
@@ -178,7 +180,7 @@ function StarSkeletonDemoPage() {
         />
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Skeleton API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

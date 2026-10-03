@@ -90,7 +90,8 @@ const apiData = {
     { property: 'mouseEnterDelay', description: '悬停显示延迟（毫秒）', type: 'number', default: '100' },
     { property: 'mouseLeaveDelay', description: '移开隐藏延迟（毫秒）', type: 'number', default: '120' },
     { property: 'offset', description: '气泡与触发元素的距离', type: 'number', default: '12' },
-  ],
+    { property: 'children', description: '触发元素；气泡挂在它旁边', type: 'ReactNode', default: '-' },
+    { property: 'onOpenChange', description: 'hover/click 试图改变可见性时触发，可用于受控模式', type: '(open: boolean) => void', default: '-' },],
   en: [
     { property: 'content', description: 'Bubble content.', type: 'ReactNode', default: '-', required: true },
     { property: 'placement', description: 'Twelve placements (four sides × start/center/end).', type: 'PopupPlacement', default: "'right'" },
@@ -105,7 +106,8 @@ const apiData = {
     { property: 'mouseEnterDelay', description: 'Hover-in delay in ms.', type: 'number', default: '100' },
     { property: 'mouseLeaveDelay', description: 'Hover-out delay in ms.', type: 'number', default: '120' },
     { property: 'offset', description: 'Distance between bubble and trigger.', type: 'number', default: '12' },
-  ],
+    { property: 'children', description: 'The trigger element; the bubble is anchored beside it.', type: 'ReactNode', default: '-' },
+    { property: 'onOpenChange', description: 'Fires when hover/click wants to change visibility; use it for controlled mode.', type: '(open: boolean) => void', default: '-' },],
 }
 
 const dialCode = `import { StarPopup, StarNineSliceButton } from 'stardew-valley-ui'

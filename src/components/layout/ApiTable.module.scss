@@ -40,6 +40,12 @@
     border-bottom: 2px solid var(--color-border);
     color: var(--color-text-secondary);
     font-family: inherit;
+    // The `type` column holds union strings like
+    // `'default' | 'primary' | 'warning' | 'danger' | 'dashed'`, which are far
+    // wider in English and have no spaces to break at. Without this the table
+    // grows past the viewport and the horizontal scroll becomes the only way to
+    // read a third of every API reference.
+    overflow-wrap: anywhere;
 
     code {
       @apply px-1.5 py-0.5 text-[13px];
@@ -109,6 +115,12 @@
     border-radius: 3px;
     background: var(--star-raw-rgba-255-240-210-0-7);
     border: 1px solid var(--star-raw-rgba-157-65-0-0-18);
+    // Long unions used to set an unbounded inline-block width, which is what
+    // forced the table into horizontal scroll. Letting each chip wrap keeps the
+    // chip styling while letting a long union stack vertically.
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    vertical-align: top;
     transition: all 0.1s ease;
 
     &:hover {

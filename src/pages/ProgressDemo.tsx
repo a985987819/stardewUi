@@ -157,7 +157,7 @@ function StarProgressDemoPage() {
           <StarProgress value={48} max={60} segmentSize={5} variant="compact" color="#7699B5" showLabel />
         </div>
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Progress API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

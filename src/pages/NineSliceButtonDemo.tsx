@@ -52,19 +52,31 @@ const copy = {
 
 const apiData = {
   zh: [
-    { property: 'variant', description: '按钮类型', type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'", default: "'default'" },
+    { property: 'variant', description: '按钮类型', type: "'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'danger' | 'disabled' | 'dashed' | 'text' | 'link' | 'concise'", default: "'default'" },
     { property: 'size', description: '按钮尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'disabled', description: '是否禁用', type: 'boolean', default: 'false' },
     { property: 'loading', description: '是否显示加载状态', type: 'boolean', default: 'false' },
+    { property: 'block', description: '撑满父容器宽度', type: 'boolean', default: 'false' },
     { property: 'theme', description: '季节主题，仅对默认按钮生效', type: "'spring' | 'summer' | 'autumn' | 'winter'", default: '-' },
+    { property: 'appearance', description: '外观：常规或古典描边', type: "'regular' | 'classical'", default: "'regular'" },
+    { property: 'icon', description: '按钮前置图标', type: 'ReactNode | string', default: '-' },
+    { property: 'color', description: '自定义底色，覆盖 variant 配色', type: 'string', default: '-' },
+    { property: 'backgroundSrc', description: '自定义九宫格背景图，优先于内置主题', type: 'string', default: '-' },
+    { property: 'backgroundInsets', description: '九宫格切图边距', type: '{ top: number; right: number; bottom: number; left: number }', default: '内置值' },
     { property: 'onClick', description: '点击事件回调', type: '(event: MouseEvent) => void', default: '-' },
   ],
   en: [
-    { property: 'variant', description: 'Button visual variant.', type: "'default' | 'primary' | 'warning' | 'danger' | 'dashed' | 'text' | 'link'", default: "'default'" },
+    { property: 'variant', description: 'Button visual variant.', type: "'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'danger' | 'disabled' | 'dashed' | 'text' | 'link' | 'concise'", default: "'default'" },
     { property: 'size', description: 'Button size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'loading', description: 'Shows loading state.', type: 'boolean', default: 'false' },
+    { property: 'block', description: 'Stretches to the parent width.', type: 'boolean', default: 'false' },
     { property: 'theme', description: 'Seasonal theme for default buttons.', type: "'spring' | 'summer' | 'autumn' | 'winter'", default: '-' },
+    { property: 'appearance', description: 'Appearance: regular or classical outline.', type: "'regular' | 'classical'", default: "'regular'" },
+    { property: 'icon', description: 'Leading icon inside the button.', type: 'ReactNode | string', default: '-' },
+    { property: 'color', description: 'Custom body colour, overriding the variant palette.', type: 'string', default: '-' },
+    { property: 'backgroundSrc', description: 'Custom nine-slice background image; wins over built-in themes.', type: 'string', default: '-' },
+    { property: 'backgroundInsets', description: 'Nine-slice inset measurements.', type: '{ top: number; right: number; bottom: number; left: number }', default: 'built-in' },
     { property: 'onClick', description: 'Click callback.', type: '(event: MouseEvent) => void', default: '-' },
   ],
 }

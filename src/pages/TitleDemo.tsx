@@ -172,7 +172,7 @@ function StarTitleDemoPage() {
         <StarTitle level={1}>{sample.festival}</StarTitle>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Title API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

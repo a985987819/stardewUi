@@ -119,7 +119,7 @@ function StarRadioDemoPage() {
         </div>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Radio API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

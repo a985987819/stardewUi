@@ -68,7 +68,8 @@ const apiData = {
     { property: 'focusEffect', description: '是否缩小并柔化原页面', type: 'boolean', default: 'true' },
     { property: 'maskClosable', description: '点击遮罩是否请求关闭', type: 'boolean', default: 'true' },
     { property: 'onClose', description: '关闭按钮、遮罩或 Escape 请求关闭时触发', type: '() => void', default: '-' },
-  ],
+    { property: 'closeLabel', description: '关闭按钮的无障碍名称；默认跟随语言', type: 'string', default: '跟随语言' },
+    { property: 'ariaLabel', description: '未传字符串 title 时抽屉的无障碍名称', type: 'string', default: '跟随语言' },],
   en: [
     { property: 'open', description: 'Controlled drawer visibility.', type: 'boolean', default: '-', required: true },
     { property: 'placement', description: 'Drawer entry edge.', type: "'top' | 'right' | 'bottom' | 'left'", default: "'right'" },
@@ -80,7 +81,8 @@ const apiData = {
     { property: 'focusEffect', description: 'Whether the page scales and softens.', type: 'boolean', default: 'true' },
     { property: 'maskClosable', description: 'Request close on mask click.', type: 'boolean', default: 'true' },
     { property: 'onClose', description: 'Called by close button, mask, or Escape.', type: '() => void', default: '-' },
-  ],
+    { property: 'closeLabel', description: 'Accessible name of the close button; follows the host language by default.', type: 'string', default: '跟随语言' },
+    { property: 'ariaLabel', description: 'Accessible name of the panel when no string title is supplied.', type: 'string', default: '跟随语言' },],
 }
 
 function StarDrawerDemoPage() {

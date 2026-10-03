@@ -68,7 +68,10 @@ const apiData = {
     { property: 'todayLabel', description: '「回到今日」按钮文案', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: '是否显示「回到今日」按钮', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: '计算「今日」所用的时区偏移（分钟），480 即东八区', type: 'number', default: '480' },
-  ],
+    { property: 'onMonthChange', description: '点击前后翻月时触发，参数为新月份的月初时间戳', type: '(monthTimestamp: number) => void', default: '-' },
+    { property: 'maxVisibleMarkers', description: '单日最多显示的角标数，超出折叠为 +N', type: 'number', default: '3' },
+    { property: 'locale', description: '月份名、周头与年份标题的 locale', type: 'string', default: "'zh-CN'" },
+    { property: 'showOutsideDays', description: '显示当前月之外的相邻月日期', type: 'boolean', default: 'true' },],
   en: [
     { property: 'value', description: 'Controlled month timestamp.', type: 'number', default: '-' },
     { property: 'defaultValue', description: 'Initial uncontrolled month timestamp.', type: 'number', default: '-' },
@@ -77,7 +80,10 @@ const apiData = {
     { property: 'todayLabel', description: 'Label of the today button.', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: 'Whether the today button is rendered.', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: 'Timezone offset in minutes used to resolve today; 480 is UTC+8.', type: 'number', default: '480' },
-  ],
+    { property: 'onMonthChange', description: 'Fires when the month changes, with the new month-start timestamp.', type: '(monthTimestamp: number) => void', default: '-' },
+    { property: 'maxVisibleMarkers', description: 'Maximum markers per day; the rest collapse into +N.', type: 'number', default: '3' },
+    { property: 'locale', description: 'Locale for month names, the weekday header, and the year heading.', type: 'string', default: "'zh-CN'" },
+    { property: 'showOutsideDays', description: 'Shows adjacent-month days around the current month.', type: 'boolean', default: 'true' },],
 }
 
 const eventCalendarCode = `import { StarCalendar, type CalendarItem } from 'stardew-valley-ui'

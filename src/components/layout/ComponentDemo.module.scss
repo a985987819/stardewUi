@@ -4,6 +4,11 @@
   &-desc {
     @apply mb-4 text-sm;
     color: var(--color-text-secondary);
+    // Demo blurbs are the longest English strings on the site and are full of
+    // prop names like `mouseEnterDelay` with no break opportunity. This is the
+    // only long-word fallback on the demo card, and without it a single long
+    // prop name widens the whole card past the viewport.
+    overflow-wrap: anywhere;
 
     strong {
       color: var(--star-raw-hex-7a3514);

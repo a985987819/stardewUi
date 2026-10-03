@@ -88,7 +88,7 @@ function StarAvatarDemoPage() {
           <AvatarItem label={t.labels[5]}><StarAvatar size="large" shape="circle" color="#6A7DC9" name={v.clint} /></AvatarItem>
         </div>
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Avatar API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

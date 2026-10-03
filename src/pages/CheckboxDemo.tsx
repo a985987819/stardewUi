@@ -152,7 +152,7 @@ function StarCheckboxDemoPage() {
       >
         <StarCheckbox radio options={makeOptions(t.radio)} value={fence} onChange={setFence} aria-label={t.demos[4][0]} />
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Checkbox API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

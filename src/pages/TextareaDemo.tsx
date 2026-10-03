@@ -94,6 +94,7 @@ const apiData = {
     { property: 'allowClear', description: '显示一键清空按钮（有内容且可编辑时出现）', type: 'boolean', default: 'false' },
     { property: 'clearLabel', description: '清空按钮的无障碍名称', type: 'string', default: "'Clear'" },
     { property: 'onPressEnter', description: '按下回车时触发（Shift+Enter 与输入法选词不触发）', type: '(event: KeyboardEvent) => void', default: '-' },
+    { property: 'autoSize', description: '随内容自动增高，并禁用手动拖拽手柄', type: 'boolean', default: 'false' },
   ],
   en: [
     { property: 'value', description: 'Controlled text; omit to let the field keep its own state.', type: 'string', default: '-' },
@@ -110,6 +111,7 @@ const apiData = {
     { property: 'allowClear', description: 'Shows a clear button while editable with content.', type: 'boolean', default: 'false' },
     { property: 'clearLabel', description: 'Accessible name of the clear button.', type: 'string', default: "'Clear'" },
     { property: 'onPressEnter', description: 'Fires on bare Enter (Shift+Enter and IME composing excluded).', type: '(event: KeyboardEvent) => void', default: '-' },
+    { property: 'autoSize', description: 'Grows with the content and disables the manual resize grip.', type: 'boolean', default: 'false' },
   ],
 }
 
@@ -255,7 +257,7 @@ function StarTextareaDemoPage() {
         />
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Textarea API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

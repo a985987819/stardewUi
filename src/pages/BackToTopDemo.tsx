@@ -150,7 +150,6 @@ const apiData = {
       default: 'null',
     },
     { property: 'label', description: '按钮的无障碍名称', type: 'string', default: "'Back to top'" },
-    { property: 'children', description: '替换默认的纸飞机图案', type: 'ReactNode', default: '像素纸飞机' },
     {
       property: 'onVisibleChange',
       description: '纸飞机浮现 / 隐藏时触发，挂载时也会触发一次',
@@ -163,7 +162,6 @@ const apiData = {
       type: 'string | number',
       default: '-',
     },
-    { property: 'className', description: '附加类名', type: 'string', default: '-' },
   ],
   en: [
     { property: 'threshold', description: 'Scroll distance before the plane appears.', type: 'number', default: '0' },
@@ -183,7 +181,6 @@ const apiData = {
       default: 'null',
     },
     { property: 'label', description: 'Accessible name of the button.', type: 'string', default: "'Back to top'" },
-    { property: 'children', description: 'Replaces the default paper plane.', type: 'ReactNode', default: 'pixel plane' },
     {
       property: 'onVisibleChange',
       description: 'Fires when the plane appears or disappears, including on mount.',
@@ -196,7 +193,6 @@ const apiData = {
       type: 'string | number',
       default: '-',
     },
-    { property: 'className', description: 'Extra class name.', type: 'string', default: '-' },
   ],
 }
 
@@ -337,7 +333,7 @@ function StarBackToTopDemoPage() {
       </StarComponentDemo>
 
       <div id="api" className="component-page-api">
-        <StarApiTable title="BackToTop API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

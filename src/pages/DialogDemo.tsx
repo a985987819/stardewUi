@@ -115,7 +115,12 @@ const apiData = {
     { property: 'typewriterSpeed', description: '每个字之间的间隔（毫秒）', type: 'number', default: '100' },
     { property: 'showPagination', description: '是否显示分页；不传则单页时隐藏', type: 'boolean', default: '单页隐藏' },
     { property: 'onClose', description: '关闭时的回调', type: '() => void', default: '-' },
-  ],
+    { property: 'confirmLabel', description: '内置页脚「确认」按钮文案；默认跟随语言', type: 'string', default: '跟随语言' },
+    { property: 'cancelLabel', description: '内置页脚「取消」按钮文案；默认跟随语言', type: 'string', default: '跟随语言' },
+    { property: 'prevLabel', description: '上一页按钮的无障碍名称与提示', type: 'string', default: '跟随语言' },
+    { property: 'nextLabel', description: '下一页按钮的无障碍名称与提示', type: 'string', default: '跟随语言' },
+    { property: 'roleLabel', description: '未传 name 时角色图片的替代文本', type: 'string', default: '跟随语言' },
+    { property: 'waitingText', description: '标题打字机未完成时正文区的提示', type: 'string', default: '跟随语言' },],
   en: [
     { property: 'open', description: 'Controls visibility.', type: 'boolean', default: '-', required: true },
     { property: 'content', description: 'Content or paged content.', type: 'string | string[]', default: '-', required: true },
@@ -133,7 +138,12 @@ const apiData = {
     { property: 'typewriterSpeed', description: 'Delay between characters, in ms.', type: 'number', default: '100' },
     { property: 'showPagination', description: 'Shows the prev/next pager; a single page hides it unless this is set.', type: 'boolean', default: 'single page hides' },
     { property: 'onClose', description: 'Called when the dialog closes.', type: '() => void', default: '-' },
-  ],
+    { property: 'confirmLabel', description: 'Label of the built-in confirm action; follows the host language by default.', type: 'string', default: '跟随语言' },
+    { property: 'cancelLabel', description: 'Label of the built-in cancel action; follows the host language by default.', type: 'string', default: '跟随语言' },
+    { property: 'prevLabel', description: 'Accessible name and tooltip of the previous-page button.', type: 'string', default: '跟随语言' },
+    { property: 'nextLabel', description: 'Accessible name and tooltip of the next-page button.', type: 'string', default: '跟随语言' },
+    { property: 'roleLabel', description: 'Alt text of the character image when no name is supplied.', type: 'string', default: '跟随语言' },
+    { property: 'waitingText', description: 'Copy shown in the body while the title typewriter finishes.', type: 'string', default: '跟随语言' },],
 }
 
 function StarDialogDemoPage() {

@@ -52,7 +52,10 @@ const apiData = {
     { property: 'todayLabel', description: '「回到今日」按钮文案', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: '是否显示「回到今日」按钮（仅月历形式）', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: '计算「今日」所用的时区偏移（分钟），480 即东八区', type: 'number', default: '480' },
-  ],
+    { property: 'minDate', description: '可选的最早日期（时间戳），更早的日期不可选', type: 'number', default: '-' },
+    { property: 'maxDate', description: '可选的最晚日期（时间戳），更晚的日期不可选', type: 'number', default: '-' },
+    { property: 'showOutsideDays', description: '显示当前月之外的相邻月日期', type: 'boolean', default: 'true' },
+    { property: 'locale', description: '月份名、周头与行内触发器的 locale', type: 'string', default: "'zh-CN'" },],
   en: [
     { property: 'mode', description: 'Selection mode.', type: "'single' | 'range'", default: "'single'" },
     { property: 'interaction', description: 'Interaction: month grid or the inline three-wheel form.', type: "'calendar' | 'inline'", default: "'calendar'" },
@@ -66,7 +69,10 @@ const apiData = {
     { property: 'todayLabel', description: 'Label of the today button.', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: 'Whether the today button is rendered (calendar form only).', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: 'Timezone offset in minutes used to resolve today; 480 is UTC+8.', type: 'number', default: '480' },
-  ],
+    { property: 'minDate', description: 'Earliest selectable date (timestamp); earlier days are disabled.', type: 'number', default: '-' },
+    { property: 'maxDate', description: 'Latest selectable date (timestamp); later days are disabled.', type: 'number', default: '-' },
+    { property: 'showOutsideDays', description: 'Shows adjacent-month days around the current month.', type: 'boolean', default: 'true' },
+    { property: 'locale', description: 'Locale for month names, the weekday header, and the inline trigger.', type: 'string', default: "'zh-CN'" },],
 }
 
 const singlePickerCode = `import { useState } from 'react'

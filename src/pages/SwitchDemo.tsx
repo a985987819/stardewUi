@@ -43,6 +43,7 @@ const apiData = {
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'size', description: '开关尺寸', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'color', description: '打开时凹槽与锁孔点亮的颜色；顶部暗边从它自动推导', type: 'string', default: "'#71964A'" },
+    { property: 'aria-label', description: '开关控件的无障碍名称', type: 'string', default: '-' },
   ],
   en: [
     { property: 'checked', description: 'Controlled on/off state.', type: 'boolean', default: 'false' },
@@ -50,6 +51,7 @@ const apiData = {
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'size', description: 'Switch size.', type: "'small' | 'medium' | 'large'", default: "'medium'" },
     { property: 'color', description: 'Colour the lit groove and keyhole dot take while checked; its dark edge is derived automatically.', type: 'string', default: "'#71964A'" },
+    { property: 'aria-label', description: 'Accessible name of the switch.', type: 'string', default: '-' },
   ],
 }
 
@@ -145,7 +147,7 @@ function StarSwitchDemoPage() {
         </SwitchField>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="Switch API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

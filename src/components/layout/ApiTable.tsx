@@ -30,7 +30,13 @@ function StarApiTable({ title, data }: ApiTableProps) {
   const columns: ApiColumn[] = [
     { title: t('api.property'), dataIndex: 'property', width: 150 },
     { title: t('api.description'), dataIndex: 'description' },
-    { title: t('api.type'), dataIndex: 'type', width: 280 },
+    // The `type` column has no fixed width on purpose. It used to be pinned to
+    // 280px, which was sized for the longest Chinese union string; in English
+    // the same unions are ~40% wider, so the cells overflowed and the whole
+    // table started scrolling sideways. With `overflow-wrap: anywhere` on the
+    // cells, letting the column take its natural width and wrap keeps it
+    // readable instead of scrollable.
+    { title: t('api.type'), dataIndex: 'type' },
     { title: t('api.default'), dataIndex: 'default', width: 120 },
   ]
 

@@ -43,6 +43,8 @@ const apiData = {
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'color', description: '已点亮图标颜色', type: 'string', default: '心 #E53935 / 星 #D7992E' },
     { property: 'emptyColor', description: '未点亮图标颜色', type: 'string', default: '#CDBDA8' },
+    { property: 'onChange', description: '用户选定评分时触发，参数为新分数', type: '(value: number) => void', default: '-' },
+    { property: 'aria-label', description: '评分控件的无障碍名称', type: 'string', default: '-' },
   ],
   en: [
     { property: 'value / defaultValue', description: 'Controlled or initial score.', type: 'number', default: '0' },
@@ -52,6 +54,8 @@ const apiData = {
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'color', description: 'Filled icon color.', type: 'string', default: 'heart #E53935 / star #D7992E' },
     { property: 'emptyColor', description: 'Empty icon color.', type: 'string', default: '#CDBDA8' },
+    { property: 'onChange', description: 'Fires with the next score when the player picks one.', type: '(value: number) => void', default: '-' },
+    { property: 'aria-label', description: 'Accessible name of the score picker.', type: 'string', default: '-' },
   ],
 }
 
@@ -134,7 +138,7 @@ function StarRatingDemoPage() {
       <StarComponentDemo id="disabled" title={t.demos[4][0]} description={t.demos[4][1]} code={'<StarRating defaultValue={4} disabled />'}>
         <StarRating defaultValue={4} disabled aria-label="已禁用的评分" />
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Rating API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

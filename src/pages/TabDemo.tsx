@@ -153,7 +153,7 @@ function StarTabDemoPage() {
       <StarComponentDemo id="nodeContent" title={copy.sections.node[0]} description={copy.sections.node[1]} code={code}>
         <div style={{ width: '100%' }}><StarTab items={[{ key: 'table', label: lang === 'zh' ? '收益表' : 'Profit', content: <table style={{ width: '100%', borderCollapse: 'collapse' }}><tbody><tr><td>{lang === 'zh' ? '草莓' : 'Strawberry'}</td><td>☆☆☆☆☆</td></tr><tr><td>{lang === 'zh' ? '蓝莓' : 'Blueberry'}</td><td>☆☆☆☆</td></tr></tbody></table> }]} /></div>
       </StarComponentDemo>
-      <div id="api" className="component-page-api"><StarApiTable title="Tab API" data={apiData[lang]} /></div>
+      <div id="api" className="component-page-api"><StarApiTable data={apiData[lang]} /></div>
     </StarComponentPage>
   )
 }

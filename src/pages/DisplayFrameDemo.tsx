@@ -167,7 +167,7 @@ function StarDisplayFrameDemoPage() {
         </StarDisplayFrame>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
-        <StarApiTable title="DisplayFrame API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

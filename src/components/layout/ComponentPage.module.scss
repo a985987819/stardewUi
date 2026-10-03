@@ -1,6 +1,10 @@
 .component-page {
   @apply max-w-full;
 
+  // English copy runs roughly twice as long as the Chinese it replaces, and a
+  // handful of prop names (`typewriterSpeed`, `showPagination`) have no
+  // break opportunities in the middle. `anywhere` on the header lets those wrap
+  // mid-token instead of pushing the page into a horizontal scroll.
   &-header {
     display: grid;
     justify-items: start;
@@ -12,6 +16,7 @@
 
   &-header-title {
     max-width: 100%;
+    overflow-wrap: break-word;
   }
 
   &-header-desc {
@@ -20,6 +25,7 @@
     color: var(--color-text-secondary);
     font-size: 16px;
     line-height: 1.6;
+    overflow-wrap: break-word;
   }
 
   &-content {

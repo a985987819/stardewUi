@@ -95,6 +95,8 @@ const apiData = {
     { property: 'allowClear', description: '显示一键清空按钮', type: 'boolean', default: 'false' },
     { property: 'showCount', description: '显示字数（配合 maxLength 显示 n/max）', type: 'boolean', default: 'false' },
     { property: 'block', description: '撑满容器宽度', type: 'boolean', default: 'false' },
+    { property: 'onClear', description: '内置清空按钮清空输入框后触发', type: '() => void', default: '-' },
+    { property: 'clearLabel', description: '清空按钮的无障碍名称', type: 'string', default: "'Clear'" },
   ],
   en: [
     { property: 'value / defaultValue', description: 'Controlled text or initial text.', type: 'string', default: "''" },
@@ -108,6 +110,8 @@ const apiData = {
     { property: 'allowClear', description: 'Shows the clear button.', type: 'boolean', default: 'false' },
     { property: 'showCount', description: 'Shows the length (n/max with maxLength).', type: 'boolean', default: 'false' },
     { property: 'block', description: 'Stretches to the container width.', type: 'boolean', default: 'false' },
+    { property: 'onClear', description: 'Fires after the built-in clear button empties the field.', type: '() => void', default: '-' },
+    { property: 'clearLabel', description: 'Accessible name of the clear button.', type: 'string', default: "'Clear'" },
   ],
 }
 
@@ -270,7 +274,7 @@ function StarInputDemoPage() {
       </StarComponentDemo>
 
       <div id="api" className="component-page-api">
-        <StarApiTable title="Input API" data={apiData[lang]} />
+        <StarApiTable data={apiData[lang]} />
       </div>
     </StarComponentPage>
   )

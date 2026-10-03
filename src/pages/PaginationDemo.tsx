@@ -89,7 +89,7 @@ const apiData = {
     { property: 'onChange', description: '页码变化时触发', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'hideOnSinglePage', description: '只有一页时是否隐藏', type: 'boolean', default: 'false' },
     { property: 'ariaLabel', description: '翻页器的无障碍名称', type: 'string', default: "'Pagination'" },
-  ],
+    { property: 'showTotal', description: '自定义总数文案', type: '(total: number, range: [number, number]) => ReactNode', default: '-' },],
   en: [
     { property: 'total', description: 'Total item count; the pager derives the page count from it.', type: 'number', default: '-' },
     { property: 'pageSize', description: 'Items per page.', type: 'number', default: '10' },
@@ -102,7 +102,7 @@ const apiData = {
     { property: 'onChange', description: 'Fires when the page changes.', type: '(page: number, pageSize: number) => void', default: '-' },
     { property: 'hideOnSinglePage', description: 'Hides the pager when everything fits on one page.', type: 'boolean', default: 'false' },
     { property: 'ariaLabel', description: 'Accessible name of the pager.', type: 'string', default: "'Pagination'" },
-  ],
+    { property: 'showTotal', description: 'Renders custom total copy.', type: '(total: number, range: [number, number]) => ReactNode', default: '-' },],
 }
 
 const basicCode = `import { useState } from 'react'
