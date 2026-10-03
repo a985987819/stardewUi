@@ -27,6 +27,10 @@ export const zhDict: Record<string, string> = {
   'guide.usageDesc': '在你的项目里导入组件，就像从木箱里取出今天要用的工具：',
   'guide.config': '配置',
   'guide.configDesc': '如果使用 Vite，请确认 PostCSS 配置已经就绪：',
+  'guide.selfUse.board': '开荒第一天的检查清单',
+  'guide.selfUse.title': '自行使用',
+  'guide.selfUse.lede':
+    '把组件库放进背包，再从最常用的一把工具开始；下面这条路线适合在自己的 React 项目里慢慢搭一座小镇。',
   'guide.features': '特性',
   'guide.feature1': '基于 React 和 TypeScript 开发',
   'guide.feature2': '提供完整类型提示，写代码时不必翻找镇长档案',
@@ -99,6 +103,10 @@ export const enDict: Record<string, string> = {
   'guide.usageDesc': 'Import a component like pulling today’s tool from the chest:',
   'guide.config': 'Configuration',
   'guide.configDesc': 'If you use Vite, make sure PostCSS is configured correctly:',
+  'guide.selfUse.board': 'Day one checklist',
+  'guide.selfUse.title': 'Use it yourself',
+  'guide.selfUse.lede':
+    'Pack the component kit into your backpack and start with the tool you reach for most; the route below is for building a small town in your own React project, one piece at a time.',
   'guide.features': 'Features',
   'guide.feature1': 'Built with React and TypeScript',
   'guide.feature2': 'Typed APIs so you do not need to dig through the mayor’s archive',

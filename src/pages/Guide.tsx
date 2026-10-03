@@ -31,10 +31,10 @@ function StarGuidePage() {
   return (
     <div className={styles['guide-section']}>
       <header className={styles['guide-intro']}>
-        <span>开荒第一天的检查清单</span>
-        <StarTitle level={1} className={styles['guide-intro-title']}>自行使用</StarTitle>
+        <span>{t('guide.selfUse.board')}</span>
+        <StarTitle level={1} className={styles['guide-intro-title']}>{t('guide.selfUse.title')}</StarTitle>
         <p className={styles['guide-intro-desc']}>
-          <StarTypewriter text="把组件库放进背包，再从最常用的一把工具开始；下面这条路线适合在自己的 React 项目里慢慢搭一座小镇。" speed={60} />
+          <StarTypewriter text={t('guide.selfUse.lede')} speed={60} />
         </p>
       </header>
       <h2>{t('guide.install')}</h2>
