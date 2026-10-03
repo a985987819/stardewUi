@@ -2,6 +2,18 @@
 // keyframes here so Checkbox, Progress, and Rating do not slowly diverge.
 // Components refer to the names through CSS variables because CSS Modules would
 // otherwise scope an animation identifier independently in every module.
+//
+// Three tiers live here:
+//
+//   1. --star-motion-*-name/-duration  — reusable *keyframes* (discrete events:
+//      a star being earned, a check appearing).
+//   2. --star-motion-duration-*         — durations for state *transitions*.
+//   3. --star-motion-ease-*             — the shared easing vocabulary.
+//
+// Anything that only needs "this transition must match that transition" — a
+// timer in TS flipping `data-state` from `opening` to `open`, say — should read
+// a duration from tier 2 so the JS deadline and the CSS animation can never
+// drift apart. See DRAWER_TRANSITION_MS in Drawer.tsx.
 :root {
   --star-motion-mask-reveal-name: star-motion-mask-reveal;
   --star-motion-pop-in-name: star-motion-pop-in;
@@ -13,6 +25,34 @@
   // Rating's former 540ms removal is deliberately halved. Checkbox uses this
   // same exit sequence, so its red check now leaves at the matching tempo.
   --star-motion-loss-duration: 270ms;
+
+  // ---- transition durations -------------------------------------------------
+  // Tiny control feedback: hover tints, pressed offsets, checked colour swaps.
+  --star-motion-duration-micro: 90ms;
+  --star-motion-duration-fast: 140ms;
+  --star-motion-duration-base: 200ms;
+  --star-motion-duration-slow: 260ms;
+
+  // Overlay lifecycles. Drawer and Dialog both read these; keep the pair in sync
+  // with DRAWER_TRANSITION_MS / DIALOG_TRANSITION_MS.
+  --star-motion-duration-overlay-in: 240ms;
+  --star-motion-duration-overlay-out: 180ms;
+
+  // The backdrop needs to finish fading before the panel starts leaving, or the
+  // scrim visibly outlives the thing it is dimming.
+  --star-motion-delay-overlay-out: 30ms;
+
+  // ---- easing ---------------------------------------------------------------
+  // Departing: quick out of the gate, long settle. Overshoot on the way in is
+  // reserved for things that physically pop (a dialog bursting open).
+  --star-motion-ease-exit: cubic-bezier(0.32, 0, 0.67, 0);
+  --star-motion-ease-enter: cubic-bezier(0.16, 0.84, 0.28, 1);
+  // The house entrance curve: accelerates hard, then eases back with a slight
+  // overshoot. Used by Drawer/Dialog pop and by any control that should feel
+  // sprung rather than linear.
+  --star-motion-ease-spring: cubic-bezier(0.16, 0.85, 0.3, 1.15);
+  // Standard in-out for anything that moves but should not bounce.
+  --star-motion-ease-standard: cubic-bezier(0.32, 0.72, 0.28, 1);
 }
 
 // Checkbox entrance: a literal left-to-right mask which holds back most of the

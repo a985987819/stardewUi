@@ -1,8 +1,15 @@
+// One timing source for both overlay lifecycles. Drawer and Dialog share the
+// same entrance/exit curve, the same scrim fade, and the same close delay —
+// opening a drawer then a dialog used to produce visibly different motion, and
+// the only reason was that each had its own literals. The numbers are injected
+// by `overlayMotion.ts` because a JS timer has to hit the same deadline the
+// animation does; the comment there explains why that coupling is unavoidable.
 :global([data-star-app='true']) {
   transform-origin: center center;
   transition:
-    opacity 0.2s ease-out,
-    transform 0.2s cubic-bezier(0.22, 0.8, 0.24, 1);
+    opacity var(--star-motion-duration-base) ease-out,
+    filter var(--star-motion-duration-base) ease-out,
+    transform var(--stardew-overlay-enter) var(--star-motion-ease-spring);
 }
 
 // `will-change` belongs on the state that animates, never on the resting state of
@@ -72,16 +79,42 @@
 
   &[data-state='opening'],
   &[data-state='closing'] {
-    animation-duration: 0.2s;
     animation-fill-mode: both;
   }
 
   &[data-state='opening'] {
-    animation-timing-function: cubic-bezier(0.22, 0.8, 0.24, 1);
+    animation-duration: var(--stardew-overlay-enter);
+    animation-timing-function: var(--star-motion-ease-spring);
   }
 
+  // The close delay lives here rather than in JS so the hold is a property of
+  // the motion, not of the component's bookkeeping. `fill-mode: both` is what
+  // makes that safe: during the hold it paints the exit's 0% keyframe, which is
+  // exactly the resting position, so the panel waits still instead of jumping
+  // to its off-screen start and then sliding back in.
   &[data-state='closing'] {
-    animation-timing-function: cubic-bezier(0.42, 0, 0.78, 0.2);
+    animation-delay: var(--stardew-overlay-exit-delay);
+    animation-duration: var(--stardew-overlay-exit);
+    animation-timing-function: var(--star-motion-ease-exit);
+  }
+
+  // Reopening during the close hold: the panel is mid-exit, and the entrance
+  // keyframe starts one full viewport away. Playing it would send the drawer
+  // off-screen and drag it back, so instead the travel is skipped and only the
+  // opacity is restored — the panel simply reappears where it belongs.
+  // `Drawer.tsx` sets `data-skip-enter` for exactly this case.
+  //
+  // Two attributes rather than one, and this must not be simplified. The
+  // placement rules below (`&--right[data-state='opening']` etc.) also carry two
+  // attributes, so at equal specificity the later rule wins on source order —
+  // which meant the skip rule was silently dead and the drawer still flew a
+  // full viewport off-screen on reopen. Matching on `data-state` as well
+  // raises this to three attributes and makes it win regardless of order.
+  &[data-state='opening'][data-skip-enter='true'] {
+    animation-name: stardew-drawer-settle-in;
+    animation-delay: 0s;
+    animation-duration: var(--star-motion-duration-fast);
+    animation-timing-function: var(--star-motion-ease-enter);
   }
 
   &--right[data-state='opening'] {
@@ -123,7 +156,9 @@
       linear-gradient(135deg, var(--star-raw-rgba-255-236-184-0-06) 25%, transparent 25%) 0 0 / 8px 8px,
       var(--star-raw-rgba-38-25-17-0-58);
     opacity: 0;
-    transition: opacity 0.18s ease-out;
+    transition:
+      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-enter),
+      visibility 0s linear var(--stardew-overlay-mask-enter);
     will-change: opacity;
   }
 
@@ -134,6 +169,20 @@
   .stardew-drawer-layer[data-state='opening'] &__mask,
   .stardew-drawer-layer[data-state='open'] &__mask {
     opacity: 1;
+    transition:
+      opacity var(--stardew-overlay-mask-enter) var(--star-motion-ease-enter),
+      visibility 0s linear 0s;
+  }
+
+  // On the way out the scrim clears faster than the panel travels, so the panel
+  // is never the only thing left on screen. The scrim also does not wait out
+  // the panel's close delay: the backdrop responds to the click immediately,
+  // which is what makes the dismissal feel acknowledged rather than ignored.
+  .stardew-drawer-layer[data-state='closing'] &__mask {
+    opacity: 0;
+    transition:
+      opacity var(--stardew-overlay-mask-exit) var(--star-motion-ease-exit),
+      visibility 0s linear var(--stardew-overlay-mask-exit);
   }
 
   &__shell {
@@ -183,10 +232,15 @@
     font-size: 20px;
     line-height: 1;
     box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-24);
+    transition:
+      transform var(--star-motion-duration-fast) var(--star-motion-ease-standard),
+      box-shadow var(--star-motion-duration-fast) var(--star-motion-ease-standard),
+      background var(--star-motion-duration-fast) var(--star-motion-ease-standard);
 
     &:hover {
       background: var(--star-raw-hex-9b440d);
       transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0 var(--star-raw-rgba-77-38-8-0-24);
     }
 
     &:active {
@@ -236,6 +290,8 @@
   }
 }
 
+// The entrance overshoots very slightly past the resting position before
+// settling — the drawer arrives with a little weight instead of stopping dead.
 @keyframes stardew-drawer-enter-right {
   from {
     transform: translate3d(calc(100% + 24px), 0, 0);
@@ -276,43 +332,84 @@
   }
 }
 
+// Exits fade as well as travel. A drawer that only slides off leaves a hard
+// edge hanging on screen for the last third of its travel; the fade lets it
+// dissolve into the farm behind it instead.
 @keyframes stardew-drawer-exit-right {
-  from {
+  0% {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 
-  to {
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
     transform: translate3d(calc(100% + 24px), 0, 0);
   }
 }
 
 @keyframes stardew-drawer-exit-left {
-  from {
+  0% {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 
-  to {
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
     transform: translate3d(calc(-100% - 24px), 0, 0);
   }
 }
 
 @keyframes stardew-drawer-exit-top {
-  from {
+  0% {
+    opacity: 1;
     transform: translate3d(0, 0, 0);
   }
 
-  to {
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
     transform: translate3d(0, calc(-100% - 24px), 0);
   }
 }
 
 @keyframes stardew-drawer-exit-bottom {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, calc(100% + 24px), 0);
+  }
+}
+
+// Reopening mid-exit: hold the panel still and bring the opacity back, so the
+// drawer recovers instead of dashing off-screen and returning.
+@keyframes stardew-drawer-settle-in {
   from {
+    opacity: 0;
     transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translate3d(0, calc(100% + 24px), 0);
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 

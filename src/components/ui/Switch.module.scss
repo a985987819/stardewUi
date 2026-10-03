@@ -13,15 +13,28 @@
  * `Switch.tsx` only injects the clip paths, the lit colours, and the thumb
  * travel, because those depend on TypeScript-side constants.
  *
- * Depth language matches Checkbox/Input: a lit top edge (`--switch-glint`),
- * a dark lower bevel, and hard stepped shadows instead of blurs.
+ * Depth language is shared with Rating: the whole track carries one hard
+ * `drop-shadow` offset down-right (no blur — a blur reads as smooth UI, not
+ * pixel UI), the thumb carries a second, shorter one so it floats *above* the
+ * groove, and every raised face gets a lit top edge plus a dark lower bevel.
+ * Nothing here uses `box-shadow` blur radii.
+ *
+ * Transitions are stepped on purpose, but tuned so each frame lands on the 2px
+ * pixel grid instead of smearing between pixels: the thumb crosses its 28px of
+ * travel in `SWITCH_TRAVEL_STEPS` jumps, i.e. exactly 2px per frame. Colours,
+ * by contrast, cross-fade on a real curve — a 3-step colour ramp reads as a
+ * strobe, not as a light coming on.
  */
 $switch-frame: var(--star-raw-hex-9d4100);
+$switch-frame-lit: var(--star-raw-hex-b85c07);
 $switch-surface: var(--star-raw-hex-ffc675);
+$switch-surface-off: var(--star-raw-hex-e8b878);
 $switch-glint: var(--star-raw-hex-ffe0b2);
+$switch-glint-strong: var(--star-raw-hex-fff3dc);
 $switch-bevel-dark: var(--star-raw-hex-ddc79b);
 $switch-slot-off: var(--star-raw-hex-ddc79b);
 $switch-thumb: var(--star-raw-hex-f7efc5);
+$switch-thumb-edge: var(--star-raw-hex-b99a63);
 $switch-accent: var(--star-raw-hex-71964a);
 $switch-frame-width: 3px;
 
@@ -31,6 +44,12 @@ $switch-frame-width: 3px;
   --switch-thumb-translate: 0px;
   --switch-on-color: #{$switch-accent};
   --switch-on-edge: var(--star-raw-hex-2f5233);
+  // Resting lift. The thumb sits a pixel proud of the groove; pressing the
+  // switch drops it flush, which is what sells the control as pressable.
+  --switch-thumb-lift: -1px;
+  // Travel steps, injected by Switch.tsx from the real track width so each
+  // frame lands on the 2px grid at every size.
+  --switch-travel-steps: 14;
 
   position: relative;
   display: inline-flex;
@@ -47,7 +66,7 @@ $switch-frame-width: 3px;
   cursor: pointer;
   color: inherit;
   font: inherit;
-  transition: transform 90ms steps(2);
+  transition: transform var(--star-motion-duration-micro) steps(2);
 
   &:focus-visible {
     outline: 2px solid var(--switch-on-color);
@@ -68,18 +87,21 @@ $switch-frame-width: 3px;
     --switch-track-width: 46px;
     --switch-track-height: 26px;
     --switch-thumb-size: 18px;
+    --switch-travel-steps: 7;
   }
 
   &--medium {
     --switch-track-width: 58px;
     --switch-track-height: 32px;
     --switch-thumb-size: 22px;
+    --switch-travel-steps: 11;
   }
 
   &--large {
     --switch-track-width: 70px;
     --switch-track-height: 38px;
     --switch-thumb-size: 28px;
+    --switch-travel-steps: 14;
   }
 
   &__track {
@@ -87,6 +109,16 @@ $switch-frame-width: 3px;
     display: block;
     width: var(--switch-track-width);
     height: var(--switch-track-height);
+    // Rating's signature: one hard offset silhouette shadow, no blur. This is
+    // what lifts the panel off the page it is sitting on.
+    filter: drop-shadow(2px 3px 0 var(--star-raw-rgba-74-44-26-0-34));
+    transition: filter var(--star-motion-duration-fast) var(--star-motion-ease-standard);
+  }
+
+  // Pressing sinks the whole panel's shadow by a pixel, so the control appears
+  // to meet the page instead of hover above it.
+  &:active:not(.star-switch--disabled) .star-switch__track {
+    filter: drop-shadow(1px 1px 0 var(--star-raw-rgba-74-44-26-0-28));
   }
 
   // Dark frame ring, painted across the whole box and re-cut by the housing.
@@ -110,10 +142,18 @@ $switch-frame-width: 3px;
     box-shadow:
       inset 0 2px 0 $switch-glint,
       inset 0 -2px 0 $switch-bevel-dark;
+    // Smooth cross-fade rather than the old 3-step ramp: the housing warms up
+    // as the light comes on, and a stepped tint looked like a rendering fault.
+    transition: background var(--star-motion-duration-slow) var(--star-motion-ease-standard);
   }
 
-  // Recessed groove: pale wood while off, the checked colour while on. The
-  // inset dark band under the top edge keeps it reading as carved, not painted.
+  &--checked &__housing {
+    background: $switch-surface-off;
+  }
+
+  // Recessed groove: pale wood while off, the checked colour while on. A dark
+  // band under the top edge carves it; a lit band on the checked state pushes
+  // the back wall away so the groove reads as deeper when it is filled.
   &__slot {
     position: absolute;
     top: var(--switch-slot-inset);
@@ -125,7 +165,7 @@ $switch-frame-width: 3px;
 
     box-shadow: inset 0 2px 0 var(--star-raw-rgba-157-65-0-0-2);
 
-    transition: background 120ms steps(3);
+    transition: background var(--star-motion-duration-base) var(--star-motion-ease-standard);
   }
 
   &--checked &__slot {
@@ -139,6 +179,9 @@ $switch-frame-width: 3px;
   // step finer than the housing so the smaller block still reads two steps.
   // It is two pixels taller than the groove on each side, so it rides over
   // the slot edges like a raised block instead of sinking into it.
+  //
+  // The extra `drop-shadow` here is what makes it a *thumb* rather than a
+  // sticker: it casts its own shadow onto the groove, so it visibly floats.
   &__thumb {
     position: absolute;
     top: 50%;
@@ -150,15 +193,29 @@ $switch-frame-width: 3px;
     clip-path: var(--switch-thumb-clip);
 
     box-shadow:
-      inset 0 2px 0 $switch-glint,
-      inset 0 -2px 0 var(--star-raw-rgba-157-65-0-0-28);
+      inset 0 2px 0 $switch-glint-strong,
+      inset 0 -2px 0 var(--star-raw-rgba-157-65-0-0-28),
+      inset -2px 0 0 var(--star-raw-rgba-157-65-0-0-14);
 
-    transform: translateY(-50%) translateX(var(--switch-thumb-translate));
-    transition: transform 180ms steps(5), background 120ms steps(3);
+    filter: drop-shadow(1px 2px 0 var(--star-raw-rgba-74-44-26-0-28));
+    transform: translateY(calc(-50% + var(--switch-thumb-lift))) translateX(var(--switch-thumb-translate));
+    // Travel is stepped, but at 2px per frame it reads as continuous motion
+    // rather than the visible 5-hop jump the old timing produced.
+    transition:
+      transform var(--star-motion-duration-base) steps(var(--switch-travel-steps)),
+      filter var(--star-motion-duration-fast) var(--star-motion-ease-standard);
+  }
+
+  // Pressing drops the thumb onto the groove and softens its cast shadow.
+  &:active:not(.star-switch--disabled) &__thumb {
+    --switch-thumb-lift: 1px;
+
+    filter: drop-shadow(0 0 0 var(--star-raw-rgba-74-44-26-0-28));
   }
 
   // Centre keyhole dot: quiet wood while off, the lit colour while on — it
-  // echoes the slot so the state reads twice at a glance.
+  // echoes the slot so the state reads twice at a glance. It grows a pixel on
+  // hover because a latch you can aim at feels better than one you cannot.
   &__thumb-dot {
     position: absolute;
     top: 50%;
@@ -169,16 +226,23 @@ $switch-frame-width: 3px;
     box-shadow: inset 0 1px 0 $switch-glint;
 
     transform: translate(-50%, -50%);
-    transition: background 120ms steps(3);
+    transition:
+      background var(--star-motion-duration-base) var(--star-motion-ease-standard),
+      box-shadow var(--star-motion-duration-fast) var(--star-motion-ease-standard);
   }
 
   &--checked &__thumb-dot {
     background: var(--switch-on-color);
+    box-shadow:
+      inset 0 1px 0 $switch-glint,
+      0 0 0 1px var(--star-raw-rgba-255-255-255-0-12);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .star-switch,
+  .star-switch__track,
+  .star-switch__housing,
   .star-switch__slot,
   .star-switch__thumb,
   .star-switch__thumb-dot {

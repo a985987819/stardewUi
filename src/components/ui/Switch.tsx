@@ -4,7 +4,7 @@ import { deriveProgressPalette } from '../../utils/progressPalette'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Switch.module.scss'
 
-export interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
+export interface StarSwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
   /** Controlled on/off value. */
   checked?: boolean
   /** Called with the value the switch is moving to. */
@@ -14,6 +14,12 @@ export interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   /** Colour the slot lights up with while checked. Its edge tint is derived from it. */
   color?: string
 }
+
+/**
+ * Kept because `SwitchProps` shipped in the first public release. Prefer
+ * `StarSwitchProps`, which matches the naming of every other component here.
+ */
+export type SwitchProps = StarSwitchProps
 
 const SWITCH_SIZES = {
   small: { trackWidth: 46, trackHeight: 26, thumbSize: 18 },
@@ -40,9 +46,22 @@ const SWITCH_THUMB_CLIP_PATH = createSteppedRectClipPath(SWITCH_CORNER_STEPS, SW
 const THUMB_GUTTER = 4
 /** Frame ring width shared with the stylesheet's size blocks. */
 const FRAME_WIDTH = 3
+/**
+ * The thumb slides in discrete jumps to stay on the pixel grid, so each frame
+ * must advance a whole number of pixels. Two is the grid the whole library
+ * draws on; anything finer produces a sub-pixel smear that reads as a
+ * rendering fault rather than as stepped motion.
+ */
+const SWITCH_TRAVEL_STEP_PX = 2
+
+/** Full left-to-right distance the thumb covers inside the slot. */
+function thumbTravel(trackWidth: number, thumbSize: number) {
+  return trackWidth - thumbSize - (FRAME_WIDTH + THUMB_GUTTER) * 2
+}
 
 type SwitchCssVariables = CSSProperties & {
   '--switch-thumb-translate': string
+  '--switch-travel-steps': string
   '--switch-on-color': string
   '--switch-on-edge': string
   '--switch-clip': string
@@ -65,18 +84,20 @@ function StarSwitch({
   style,
   onClick,
   ...rest
-}: SwitchProps) {
+}: StarSwitchProps) {
   const { trackWidth, thumbSize } = SWITCH_SIZES[size]
   const palette = deriveProgressPalette(color)
   // Keep valid CSS colour values usable for the lit slot. Hex colours also
   // receive a matched palette from Progress; other CSS values fall back to the
   // stable farm-material colours rather than being discarded.
   const visibleColor = typeof color === 'string' && color.trim() ? color.trim() : DEFAULT_ON_COLOR
-  const slotInset = FRAME_WIDTH + THUMB_GUTTER
-  const thumbTranslate = checked ? trackWidth - thumbSize - slotInset * 2 : 0
+  const travel = thumbTravel(trackWidth, thumbSize)
 
   const switchStyle: SwitchCssVariables = {
-    '--switch-thumb-translate': `${thumbTranslate}px`,
+    '--switch-thumb-translate': `${checked ? travel : 0}px`,
+    // The stylesheet steps the slide by this many jumps, so it must be derived
+    // from the same geometry or the last frame lands between pixels.
+    '--switch-travel-steps': String(Math.max(1, Math.round(travel / SWITCH_TRAVEL_STEP_PX))),
     '--switch-on-color': visibleColor,
     '--switch-on-edge': palette.border,
     '--switch-clip': SWITCH_CLIP_PATH,
