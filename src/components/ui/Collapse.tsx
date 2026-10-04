@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { resolveAriaLabel } from '../../utils/a11y'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Collapse.module.scss'
@@ -73,6 +74,9 @@ function StarCollapse({
   const uid = useId()
   const [innerKeys, setInnerKeys] = useState<Set<string>>(() => new Set(defaultActiveKeys))
   const openKeys = activeKeys ? new Set(activeKeys) : innerKeys
+  // Accepts both `ariaLabel` and the DOM spelling, so a caller who reaches for
+  // `aria-label` does not silently lose the accessible name.
+  const resolvedAriaLabel = resolveAriaLabel(ariaLabel, rest)
 
   const toggle = (key: string, disabled?: boolean) => {
     if (disabled) return
@@ -96,7 +100,7 @@ function StarCollapse({
     <div
       {...rest}
       role={accordion ? undefined : 'group'}
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       className={classNames(styles['star-collapse'], className)}
       style={{ ...cssVariables, ...style }}
     >

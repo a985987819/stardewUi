@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { resolveAriaLabel } from '../../utils/a11y'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import { useComponentCopy } from './useComponentCopy'
@@ -100,6 +101,10 @@ function StarPagination({
   // The nav and the page-size select previously fell back to English-only
   // literals, so a Chinese screen-reader user heard an English landmark.
   const copy = useComponentCopy()
+  // Accepts both `ariaLabel` and the DOM spelling, so a caller who reaches for
+  // `aria-label` does not silently lose the accessible name — `{...rest}` expands
+  // first, so without this the hyphenated version would be overwritten.
+  const resolvedNavLabel = resolveAriaLabel(ariaLabel, rest) ?? copy.t('ui.pagination.label')
 
   // Board counts are finite and non-negative: NaN or negative totals collapse
   // to an empty board instead of leaking NaN into the page chips.
@@ -149,14 +154,14 @@ function StarPagination({
   return (
     <nav
       {...rest}
-      aria-label={ariaLabel ?? copy.t('ui.pagination.label')}
+      aria-label={resolvedNavLabel}
       className={classNames(styles['star-pagination'], className)}
       style={{ ...cssVariables, ...style }}
     >
       <button
         type="button"
         className={classNames(styles['star-pagination__step'], styles['star-pagination__step--prev'])}
-        aria-label="Previous page"
+        aria-label={copy.t('ui.pagination.prev')}
         disabled={activePage <= 1}
         onClick={() => goTo(activePage - 1)}
       >
@@ -173,7 +178,7 @@ function StarPagination({
               chunk.page === activePage && styles['is-active'],
             )}
             aria-current={chunk.page === activePage ? 'page' : undefined}
-            aria-label={`Page ${chunk.page}`}
+            aria-label={copy.t('ui.pagination.page', { page: chunk.page })}
             onClick={() => goTo(chunk.page)}
           >
             {chunk.page}
@@ -188,7 +193,7 @@ function StarPagination({
       <button
         type="button"
         className={classNames(styles['star-pagination__step'], styles['star-pagination__step--next'])}
-        aria-label="Next page"
+        aria-label={copy.t('ui.pagination.next')}
         disabled={activePage >= totalPages}
         onClick={() => goTo(activePage + 1)}
       >

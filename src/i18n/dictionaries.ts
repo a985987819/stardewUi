@@ -89,6 +89,9 @@ export const zhDict: Record<string, string> = {
   'ui.emptyState.message': '没有更多数据了',
   'ui.pagination.label': '分页',
   'ui.pagination.pageSize': '每页条数',
+  'ui.pagination.prev': '上一页',
+  'ui.pagination.next': '下一页',
+  'ui.pagination.page': '第 {{page}} 页',
 }
 
 export const enDict: Record<string, string> = {
@@ -167,6 +170,9 @@ export const enDict: Record<string, string> = {
   'ui.emptyState.message': 'Nothing here yet',
   'ui.pagination.label': 'Pagination',
   'ui.pagination.pageSize': 'Items per page',
+  'ui.pagination.prev': 'Previous page',
+  'ui.pagination.next': 'Next page',
+  'ui.pagination.page': 'Page {{page}}',
 }
 
 export const dictionaries: Record<Lang, Record<string, string>> = {
