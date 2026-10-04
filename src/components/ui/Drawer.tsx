@@ -148,8 +148,6 @@ function StarDrawer({
     }
   }, [open, placement])
 
-  useFocusTrap(panelRef, { active: rendered })
-
   /** Single close path, so the uncontrolled mode has one place to write. */
   const requestClose = useCallback(() => {
     if (!isControlled) setInternalOpen(false)

@@ -1,10 +1,9 @@
 import { forwardRef, useEffect, useRef, useState, type CSSProperties,
-  type ForwardedRef,
-  type MutableRefObject,
-  type RefObject, type HTMLAttributes, type ReactNode } from 'react'
+  type ForwardedRef, type HTMLAttributes, type ReactNode } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
+import { mergeRefs } from '../../utils/mergeRefs'
 import styles from './Select.module.scss'
 
 export type SelectSize = 'small' | 'medium' | 'large'
@@ -238,26 +237,9 @@ function StarSelect(
 
 /**
  * Write to both a local ref and the caller's when they are not the same object.
- *
- * The local ref already exists for internal bookkeeping; exposing the node to
- * callers means both need to keep working, and naively assigning one would
- * clobber the other.
+ * Shared with Textarea and Input — see `utils/mergeRefs.ts` for why a naive
+ * assignment would break the component's own focus handling.
  */
-function mergeRefs<T>(local: RefObject<T | null>, forwarded: ForwardedRef<T>) {
-  // A callback ref works for both: it is invoked by React with the node on mount
-  // and `null` on unmount, which is exactly the shape needed to drive both.
-  //
-  // The tempting shortcut — returning `forwarded` when it is an object and
-  // writing `forwarded.current` into `local` — is wrong: React has not assigned
-  // `forwarded.current` yet at that point, so the local ref gets nulled and the
-  // component's own focus/measurement logic silently stops working.
-  return (node: T | null) => {
-    ;(local as MutableRefObject<T | null>).current = node
-
-    if (typeof forwarded === 'function') forwarded(node)
-    else if (forwarded) (forwarded as MutableRefObject<T | null>).current = node
-  }
-}
 
 const StarSelectWithRef = forwardRef<HTMLDivElement, StarSelectProps>(StarSelect)
 

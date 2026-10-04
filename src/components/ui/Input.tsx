@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useId,
+  useRef,
   useState,
   type ForwardedRef,
   type CSSProperties,
@@ -11,6 +12,7 @@ import {
 import { X } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { createSteppedRectClipPath } from '../../utils/pixelCorners'
+import { mergeRefs } from '../../utils/mergeRefs'
 import styles from './Input.module.scss'
 
 export type InputSize = 'small' | 'medium' | 'large'
@@ -102,6 +104,11 @@ function StarInput(
   const generatedId = useId()
   const inputId = id ?? `star-input-${generatedId}`
   const messageId = `${inputId}-message`
+  // Local handle on the same node the forwarded ref points at, so the clear
+  // button can hand focus back. `showClear` is derived from the text, so the
+  // button unmounts the instant the field empties — without this the browser
+  // drops focus to `<body>` and a keyboard user has to Tab back from the top.
+  const controlRef = useRef<HTMLInputElement | null>(null)
   // The <input> is always controlled; `value` only decides whether React or the
   // field itself owns the text.
   const [innerValue, setInnerValue] = useState(defaultValue)
@@ -118,6 +125,7 @@ function StarInput(
   }
 
   const handleClear = () => {
+    controlRef.current?.focus()
     commit('')
     onClear?.()
   }
@@ -156,7 +164,7 @@ function StarInput(
           <input
             {...rest}
             id={inputId}
-            ref={ref}
+            ref={mergeRefs(controlRef, ref)}
             className={styles['star-input__control']}
             value={text}
             onChange={handleChange}
