@@ -76,6 +76,14 @@ export {
 // `CalendarItem['date']` is typed `CalendarInput`, so without these a consumer
 // cannot construct a valid `items` array — they would have to deep-import
 // `utils/calendar` from src, which the package does not expose.
+//
+// `CalendarCell` / `CalendarDayOfWeek` are the grid geometry that
+// `buildCalendarCells` returns, so they have to travel with it. Note that
+// `CalendarGrid` itself stays internal on purpose: it is Calendar and
+// DatePicker's own skeleton, and its `cells` prop means a caller would have to
+// re-derive the month grid by hand. `getCellButtonProps` already covers the
+// customisation people actually ask for, and it is reachable through the two
+// public components. Do not "fix" this by exporting CalendarGrid.
 export {
   CHINA_STANDARD_TIME_OFFSET_MINUTES,
   normalizeToDayTimestamp,

@@ -17,6 +17,7 @@ export { default as StarLoading } from './Loading'
 export { message } from './Message'
 export type {
   MessageAction,
+  MessageHandle,
   MessageOptions,
   MessagePosition,
   MessageProps,
@@ -36,7 +37,14 @@ export type { PopupPlacement, PopupTrigger, StarPopupProps, PopupAction } from '
 export { default as StarCalendar } from './Calendar'
 export type { CalendarItem, StarCalendarProps } from './Calendar'
 export { default as StarDatePicker } from './DatePicker'
-export type { StarDatePickerProps } from './DatePicker'
+export type {
+  DatePickerInteraction,
+  DatePickerMode,
+  StarDatePickerChangeValue,
+  StarDatePickerProps,
+  StarDatePickerRangeValue,
+  StarDatePickerValue,
+} from './DatePicker'
 export { default as StarTab } from './Tab'
 export type { StarTabItem, StarTabProps, TabPosition } from './Tab'
 export { StarSwitch } from './Switch'

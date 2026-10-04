@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { normalizeToDayTimestamp } from '../../utils/calendar'
 import { formatUnitSuffixes, toIntlLocale } from './calendarLabels'
 import { useComponentCopy } from './useComponentCopy'
@@ -81,6 +81,14 @@ function WheelDatePickerPanel({
   // `setDay` 的更新函数里拿不到「已经夹好的值」，所以在这里中转一下，
   // 等提交阶段再一起报给上层（见文件末尾的 `useLayoutEffect`）。
   const pendingDraftRef = useRef<number | null>(null)
+  // The panel is mounted only while open, so focusing on mount is the same as
+  // focusing on open. `preventScroll` because the panel already sits right under
+  // the trigger and the browser's scroll-into-view would jump the page.
+  const panelRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    panelRef.current?.focus({ preventScroll: true })
+  }, [])
 
   const isDateDisabled = useCallback(
     (timestamp: number) => {
@@ -163,7 +171,17 @@ function WheelDatePickerPanel({
   })
 
   return (
-    <div className={styles['date-picker-inline']} role="dialog" aria-label={copy.t('ui.datePicker.selectDate')}>
+    <div
+      ref={panelRef}
+      // `role="dialog"` is a promise that the panel takes focus when it appears;
+      // `tabIndex` is what makes the div focusable at all. Focus lands on the
+      // container rather than a column so the first Tab reaches the year column
+      // instead of skipping past it.
+      tabIndex={-1}
+      className={styles['date-picker-inline']}
+      role="dialog"
+      aria-label={copy.t('ui.datePicker.selectDate')}
+    >
       <div className={styles['date-picker-inline__columns']}>
         <WheelColumn
           key="year"

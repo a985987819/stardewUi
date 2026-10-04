@@ -14,6 +14,7 @@ import styles from './Message.module.scss'
 export type {
   MessageBottom,
   MessageAction,
+  MessageHandle,
   MessageOptions,
   MessagePosition,
   MessageProps,

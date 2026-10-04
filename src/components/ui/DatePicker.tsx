@@ -22,7 +22,7 @@ import WheelDatePickerPanel from './WheelDatePickerPanel'
 import { useComponentCopy } from './useComponentCopy'
 import styles from './DatePicker.module.scss'
 
-type DatePickerMode = 'single' | 'range'
+export type DatePickerMode = 'single' | 'range'
 
 /**
  * 交互类型。
@@ -31,16 +31,16 @@ type DatePickerMode = 'single' | 'range'
  * - `inline`：行内形式，触发器下方弹出年 / 月 / 日三列可无限滚动的轮盘，
  *   底部「确定 / 取消」；在面板里改的是草稿，确认之前不会回写上层。
  */
-type DatePickerInteraction = 'calendar' | 'inline'
+export type DatePickerInteraction = 'calendar' | 'inline'
 
-interface StarDatePickerRangeValue {
+export interface StarDatePickerRangeValue {
   startTimestamp: number | null
   endTimestamp: number | null
 }
 
-type StarDatePickerValue = number | StarDatePickerRangeValue
+export type StarDatePickerValue = number | StarDatePickerRangeValue
 
-type StarDatePickerChangeValue =
+export type StarDatePickerChangeValue =
   | { dateTimestamp: number }
   | { startTimestamp: number | null; endTimestamp: number | null }
 
@@ -249,6 +249,11 @@ function DatePicker({
   const [inlineDraft, setInlineDraft] = useState<number | null>(null)
   const [inlineDraftOwner, setInlineDraftOwner] = useState<number | null>(null)
   const [isInlineOpen, setIsInlineOpen] = useState(false)
+  // The inline panel declares `role="dialog"`, so it has to behave like one:
+  // Escape closes it, and focus returns to the trigger that opened it. Without
+  // this a keyboard user could only dismiss it by clicking 取消 or the trigger
+  // again, and after closing, focus was left wherever the last column was.
+  const inlineTriggerRef = useRef<HTMLButtonElement | null>(null)
   const lastControlledMonthRef = useRef<number | null>(getMonthFromValue(mode, value))
   const previousModeRef = useRef<DatePickerMode>(mode)
   const previousControlledRef = useRef(isControlled)
@@ -449,6 +454,23 @@ function DatePicker({
     setInlineDraftOwner(null)
   }
 
+  // Same contract as CalendarToolbar's year panel: Escape closes and hands focus
+  // back to the trigger. Mounted on `document` because the panel is not a
+  // descendant of the trigger, so a keydown handler on the trigger would never
+  // see the event.
+  useEffect(() => {
+    if (!isInlineOpen) return undefined
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      closeInline()
+      inlineTriggerRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isInlineOpen])
+
   const handleInlineDraftChange = (nextDay: number) => {
     setInlineDraft(nextDay)
     // 记住这份草稿的来源值：外部值一变，上面那段「草稿作废」就会兜住它。
@@ -543,6 +565,7 @@ function DatePicker({
       <section className={classNames(styles['date-picker-inline-wrap'], className)}>
         <button
           type="button"
+          ref={inlineTriggerRef}
           className={styles['date-picker-inline__trigger']}
           aria-haspopup="dialog"
           aria-expanded={isInlineOpen}
