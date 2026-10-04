@@ -87,14 +87,22 @@ const apiData = {
   ],
 }
 
+// A bare list of siblings will not parse anywhere it is pasted, so the snippet
+// ships the fragment wrapper a reader would have to add themselves.
 const standaloneCode = `import { StarBadge } from 'stardew-valley-ui'
 
-<StarBadge count={7} />
-<StarBadge count={7} overflowCount={5} />
-<StarBadge count={120} />
-<StarBadge count={0} showZero />
-<StarBadge dot color="#71964A" />
-<StarBadge text="EVENT" color="#308BE2" />`
+export function BadgeRow() {
+  return (
+    <>
+      <StarBadge count={7} />
+      <StarBadge count={7} overflowCount={5} />
+      <StarBadge count={120} />
+      <StarBadge count={0} showZero />
+      <StarBadge dot color="#71964A" />
+      <StarBadge text="EVENT" color="#308BE2" />
+    </>
+  )
+}`
 
 const wrapCode = `import { StarBadge, StarNineSliceButton } from 'stardew-valley-ui'
 

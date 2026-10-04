@@ -2,31 +2,37 @@ import { useState, type ReactNode } from 'react'
 import StarApiTable from '../components/layout/ApiTable'
 import StarComponentDemo from '../components/layout/ComponentDemo'
 import StarComponentPage from '../components/layout/ComponentPage'
-import { StarSwitch } from '../components/ui'
+import { StarNineSliceButton, StarSwitch } from '../components/ui'
 import { useI18n, type Lang } from '../i18n'
 
 const copy = {
   zh: {
     title: 'Switch 开关',
     desc: 'Checkbox 同族的木面板开关：暖木框内嵌一条凹槽，打开时凹槽点亮为作物绿，羊皮纸滑钮带着中心锁孔点以阶梯节奏滑过凹槽；顶部高光与硬边阴影保持全库一致的像素质感，适合灯光、自动浇水、音效和难度设置。',
-    toc: ['基础开关', '尺寸与配色', '禁用状态', 'API'],
+    toc: ['基础开关', '尺寸与配色', '禁用状态', '表单参与', 'API'],
     demos: [
       ['基础开关', '用受控状态记录开关值，点击或键盘操作都会触发 onChange；关闭时凹槽是浅木色，打开后整条凹槽点亮。'],
       ['尺寸与配色', 'small、medium、large 对应不同密度的设置项，color 决定凹槽与锁孔点亮的颜色，并自动推导顶部暗边。'],
       ['禁用状态', '任务未解锁或设置不可改时，禁用态保留形状但停止响应。'],
+      ['表单参与', '开关的根节点是 button，而 button 不是表单字段、也没有 required —— 所以传 name 后组件会额外渲染一个隐藏 input 承载值。注意它与原生 checkbox 不同：无论开或关都会提交，只有传了 name 才会出现在 FormData 里。'],
     ],
-    labels: ['谷仓灯', '自动浇水', '音效', '矿洞照明', '温室加热', '已锁定的开关'],
+    labels: ['谷仓灯', '自动浇水', '音效', '矿洞照明', '温室加热', '已锁定的开关', '自动喂食'],
+    formSubmit: '提交表单',
+    formResult: '读到的 autoFeed',
   },
   en: {
     title: 'Switch',
     desc: 'A wooden switch panel in the Checkbox family: a recessed groove inside a warm frame lights up with the checked colour while a parchment thumb with a keyhole dot slides across in stepped pixel motion; the lit top edge and hard shadows keep the shared pixel feel, for lamps, auto-watering, sound, and difficulty settings.',
-    toc: ['Basic Switch', 'Sizes & Colors', 'Disabled', 'API'],
+    toc: ['Basic Switch', 'Sizes & Colors', 'Disabled', 'Form Participation', 'API'],
     demos: [
       ['Basic Switch', 'Keep the value in state; clicking or using the keyboard both fire onChange. The groove is pale wood while off and lights up fully when on.'],
       ['Sizes & Colors', 'small, medium, and large fit different settings densities; color sets the lit groove and keyhole dot, with its dark edge derived automatically.'],
       ['Disabled', 'When a quest is locked the switch keeps its shape but stops responding.'],
+      ['Form Participation', "The switch's root is a button, and a button is neither a form field nor able to carry required — so passing name makes the component render an extra hidden input to hold the value. Note this differs from a native checkbox: it submits whether on or off, and only shows up in FormData once name is set."],
     ],
-    labels: ['Barn lamp', 'Auto watering', 'Sound', 'Mine lighting', 'Greenhouse heat', 'Locked switch'],
+    labels: ['Barn lamp', 'Auto watering', 'Sound', 'Mine lighting', 'Greenhouse heat', 'Locked switch', 'Auto feed'],
+    formSubmit: 'Submit the form',
+    formResult: 'autoFeed read back as',
   },
 } satisfies Record<Lang, {
   title: string
@@ -34,6 +40,8 @@ const copy = {
   toc: string[]
   demos: string[][]
   labels: string[]
+  formSubmit: string
+  formResult: string
 }>
 
 const apiData = {
@@ -79,10 +87,37 @@ export function FarmSettings() {
 
   return (
     <>
-      <StarSwitch checked={barnLamp} onChange={setBarnLamp} aria-label="谷仓的灯" />
-      <StarSwitch checked={autoWatering} onChange={setAutoWatering} aria-label="自动浇水" />
+      {/* Snippets stay English so they can be pasted as-is. */}
+      <StarSwitch checked={barnLamp} onChange={setBarnLamp} aria-label="Barn lamp" />
+      <StarSwitch checked={autoWatering} onChange={setAutoWatering} aria-label="Auto watering" />
       <output>{JSON.stringify({ barnLamp, autoWatering })}</output>
     </>
+  )
+}`
+
+const formCode = `import { useState } from 'react'
+import { StarNineSliceButton, StarSwitch } from 'stardew-valley-ui'
+
+export function FeedSettings() {
+  const [autoFeed, setAutoFeed] = useState(false)
+
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        const data = new FormData(event.currentTarget)
+        console.log('autoFeed =', data.get('autoFeed'))
+      }}
+    >
+      <StarSwitch
+        name="autoFeed"
+        required
+        checked={autoFeed}
+        onChange={setAutoFeed}
+        aria-label="Auto feed"
+      />
+      <StarNineSliceButton type="submit" variant="primary">Save</StarNineSliceButton>
+    </form>
   )
 }`
 
@@ -94,7 +129,9 @@ function StarSwitchDemoPage() {
   const [sound, setSound] = useState(true)
   const [mineLight, setMineLight] = useState(true)
   const [heat, setHeat] = useState(true)
-  const toc = t.toc.map((title, index) => ({ id: ['basic', 'size', 'disabled', 'api'][index], title, level: 1 }))
+  const [autoFeed, setAutoFeed] = useState(false)
+  const [formResult, setFormResult] = useState('')
+  const toc = t.toc.map((title, index) => ({ id: ['basic', 'size', 'disabled', 'form', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -126,11 +163,11 @@ function StarSwitchDemoPage() {
           { label: 'greenhouseHeat', value: String(heat) },
         ]}
       >
-        <SwitchField label={t.labels[2]}>
-          <StarSwitch size="small" checked={sound} onChange={setSound} aria-label={t.labels[2]} />
+        <SwitchField label={`${t.labels[2]} · small`}>
+          <StarSwitch size="small" checked={sound} onChange={setSound} aria-label={`${t.labels[2]} small`} />
         </SwitchField>
-        <SwitchField label={t.labels[2]}>
-          <StarSwitch checked={sound} onChange={setSound} aria-label={t.labels[2]} />
+        <SwitchField label={`${t.labels[2]} · medium`}>
+          <StarSwitch size="medium" checked={sound} onChange={setSound} aria-label={`${t.labels[2]} medium`} />
         </SwitchField>
         <SwitchField label={t.labels[3]}>
           <StarSwitch size="large" color="#D7992E" checked={mineLight} onChange={setMineLight} aria-label={t.labels[3]} />
@@ -145,12 +182,36 @@ function StarSwitchDemoPage() {
         description={t.demos[2][1]}
         code={'<StarSwitch disabled checked />'}
       >
-        <SwitchField label={t.labels[5]}>
-          <StarSwitch disabled checked aria-label={t.labels[5]} />
+        <SwitchField label={`${t.labels[5]} · on`}>
+          <StarSwitch disabled checked aria-label={`${t.labels[5]} on`} />
         </SwitchField>
-        <SwitchField label={t.labels[5]}>
-          <StarSwitch disabled aria-label={t.labels[5]} />
+        <SwitchField label={`${t.labels[5]} · off`}>
+          <StarSwitch disabled aria-label={`${t.labels[5]} off`} />
         </SwitchField>
+      </StarComponentDemo>
+      <StarComponentDemo
+        id="form"
+        title={t.demos[3][0]}
+        description={t.demos[3][1]}
+        code={formCode}
+      >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            const data = new FormData(event.currentTarget)
+            setFormResult(`${t.formResult}: ${String(data.get('autoFeed'))}`)
+          }}
+        >
+          <SwitchField label={t.labels[6]}>
+            <StarSwitch name="autoFeed" required checked={autoFeed} onChange={setAutoFeed} aria-label={t.labels[6]} />
+          </SwitchField>
+          <StarNineSliceButton type="submit" size="small" variant="primary">
+            {t.formSubmit}
+          </StarNineSliceButton>
+          {formResult ? (
+            <span style={{ fontSize: 12, opacity: 0.75 }}>{formResult}</span>
+          ) : null}
+        </form>
       </StarComponentDemo>
       <div id="api" className="component-page-api">
         <StarApiTable data={apiData[lang]} />

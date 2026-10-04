@@ -55,6 +55,9 @@ const copy = {
     questTotal: '委托总量',
     questPerPage: '每页条数',
     sizeLog: '最近一次切换',
+    noticePager: '公告分页',
+    ellipsisPager: '长列表分页',
+    sizePager: '可调每页条数的分页',
   },
   en: {
     title: 'Pagination',
@@ -73,8 +76,11 @@ const copy = {
     questTotal: 'Quest total',
     questPerPage: 'Per page',
     sizeLog: 'Last change',
+    noticePager: 'Notice board pager',
+    ellipsisPager: 'Long-run pager',
+    sizePager: 'Pager with a page-size select',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; quests: string; currentPage: string; questBoard: string; questTotal: string; questPerPage: string; sizeLog: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; quests: string; currentPage: string; questBoard: string; questTotal: string; questPerPage: string; sizeLog: string; noticePager: string; ellipsisPager: string; sizePager: string }>
 
 const apiData = {
   zh: [
@@ -155,31 +161,51 @@ const sizeCode = `import { StarPagination } from 'stardew-valley-ui'
 const boardCode = `import { useState } from 'react'
 import { StarCheckbox, StarDisplayFrame, StarPagination, StarTitle } from 'stardew-valley-ui'
 
+const QUESTS = ['Spring Foraging', 'Go To The Beach', 'Collect Mixed Seeds', 'Refine Your Craft']
+
 export function QuestBoard() {
   const [total, setTotal] = useState(45)
   const [pageSize, setPageSize] = useState(10)
   const [page, setPage] = useState(1)
+  // Ticks are keyed by page + row, so flipping pages never inherits another
+  // page's ticks.
   const [done, setDone] = useState({})
-  const quests = ... // slice the active page
   const range = [(page - 1) * pageSize + 1, Math.min(page * pageSize, total)]
+  // Every quest stands in for \`total\` rows, so the pager has something to chew.
+  const quests = Array.from({ length: total }, (_, index) => QUESTS[index % QUESTS.length])
+    .slice((page - 1) * pageSize, page * pageSize)
 
   return (
     <>
       {/* Board title floats over the top edge, then one framed row per quest */}
-      <StarTitle level={3} fontSize={34}>【委托板】</StarTitle>
-      {quests.map((quest, index) => (
-        <StarDisplayFrame key={index}>
-          <span>{quest}</span>
-          <i className="dot-leader" />
-          <StarCheckbox
-            size="small"
-            options={[{ value: String(index), label: '' }]}
-            value={done[index] ? [String(index)] : []}
-            onChange={() => setDone(...)}
-          />
-        </StarDisplayFrame>
-      ))}
-      <input type="range" min={5} max={300} value={total} onChange={...} />
+      <StarTitle level={3} fontSize={34}>【Quest Board】</StarTitle>
+      {quests.map((quest, index) => {
+        const key = \`\${page}-\${index}\`
+        return (
+          <StarDisplayFrame key={key}>
+            <span>{quest}</span>
+            <i className="dot-leader" />
+            <StarCheckbox
+              size="small"
+              aria-label={quest}
+              options={[{ value: key, label: '' }]}
+              value={done[key] ? [key] : []}
+              onChange={(next) => setDone({ ...done, [key]: next.includes(key) })}
+            />
+          </StarDisplayFrame>
+        )
+      })}
+      <input
+        type="range"
+        min={5}
+        max={300}
+        step={5}
+        value={total}
+        onChange={(event) => {
+          setTotal(Number(event.target.value))
+          setPage(1)
+        }}
+      />
       {/* The pager stays bare; its numbers live on their own line */}
       <StarPagination total={total} pageSize={pageSize} current={page} onChange={setPage} />
       <span>{range[0]}-{range[1]} / {total} · current: {page} / {Math.ceil(total / pageSize)}</span>
@@ -211,7 +237,7 @@ function StarPaginationDemoPage() {
         code={ellipsisCode}
       >
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <StarPagination total={300} defaultCurrent={15} ariaLabel="公告分页 2" />
+          <StarPagination total={300} defaultCurrent={15} ariaLabel={t.ellipsisPager} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -221,7 +247,7 @@ function StarPaginationDemoPage() {
         code={hideCode}
       >
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <StarPagination total={8} pageSize={10} hideOnSinglePage ariaLabel="公告分页 3" />
+          <StarPagination total={8} pageSize={10} hideOnSinglePage ariaLabel={t.noticePager} />
         </div>
       </StarComponentDemo>
       <StarComponentDemo
@@ -230,7 +256,7 @@ function StarPaginationDemoPage() {
         description={t.demos[3][1]}
         code={sizeCode}
       >
-        <SizeChangerPager logLabel={t.sizeLog} />
+          <SizeChangerPager logLabel={t.sizeLog} pagerLabel={t.sizePager} />
       </StarComponentDemo>
       <StarComponentDemo
         id="board"
@@ -308,7 +334,7 @@ function ControlledPagination({ pagerLabel }: { pagerLabel: string }) {
   )
 }
 
-function SizeChangerPager({ logLabel }: { logLabel: string }) {
+function SizeChangerPager({ logLabel, pagerLabel }: { logLabel: string; pagerLabel: string }) {
   const [log, setLog] = useState('')
   const [page, setPage] = useState(9)
   const [pageSize, setPageSize] = useState(5)
@@ -331,7 +357,7 @@ function SizeChangerPager({ logLabel }: { logLabel: string }) {
           setPageSize(nextSize)
           setLog(`onShowSizeChange(${nextPage}, ${nextSize})`)
         }}
-        ariaLabel="公告分页 4"
+        ariaLabel={pagerLabel}
       />
       <PagerMeta
         range={[(page - 1) * pageSize + 1, Math.min(page * pageSize, total)]}

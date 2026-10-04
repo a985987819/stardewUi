@@ -89,6 +89,98 @@ const apiData = {
     { property: 'ariaLabel', description: 'Accessible name of the panel when no string title is supplied.', type: 'string', default: '跟随语言' },],
 }
 
+/** Snippets for each card; the page previously documented 14 props with no way to copy any of them. */
+const basicCode = `import { useState } from 'react'
+import { StarDrawer, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function ShippingBin() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>Open the bin</StarNineSliceButton>
+      <StarDrawer open={open} title="Shipping Bin" onClose={() => setOpen(false)} footer={<span>Nothing queued.</span>}>
+        Put crops in overnight and collect the gold the next morning.
+      </StarDrawer>
+    </>
+  )
+}`
+
+const directionsCode = `import { useState } from 'react'
+import { StarDrawer } from 'stardew-valley-ui'
+
+export function EdgeDrawers() {
+  const [edge, setEdge] = useState(null)
+
+  return (
+    <>
+      <button onClick={() => setEdge('left')}>Left</button>
+      <button onClick={() => setEdge('right')}>Right</button>
+      <button onClick={() => setEdge('top')}>Top</button>
+      <button onClick={() => setEdge('bottom')}>Bottom</button>
+
+      {/* placement picks the edge the panel slides in from. */}
+      <StarDrawer
+        open={edge !== null}
+        placement={edge ?? 'right'}
+        title="Shipping Bin"
+        onClose={() => setEdge(null)}
+      >
+        One drawer component covers all four edges.
+      </StarDrawer>
+    </>
+  )
+}`
+
+const focusCode = `import { useState } from 'react'
+import { StarDrawer, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function FocusEffectDrawer() {
+  const [dimmed, setDimmed] = useState(false)
+  const [plain, setPlain] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton variant="primary" onClick={() => setDimmed(true)}>Dim the page</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setPlain(true)}>Leave the page alone</StarNineSliceButton>
+
+      {/* focusEffect scales and softens the page behind (the default). */}
+      <StarDrawer open={dimmed} title="Shipping Bin" onClose={() => setDimmed(false)}>
+        The page behind recedes.
+      </StarDrawer>
+
+      {/* Turn it off for a drawer the user should keep reading the page through. */}
+      <StarDrawer open={plain} focusEffect={false} title="Shipping Bin" onClose={() => setPlain(false)}>
+        The page behind stays legible.
+      </StarDrawer>
+    </>
+  )
+}`
+
+const maskCode = `import { useState } from 'react'
+import { StarDrawer, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function MaskClosableDrawer() {
+  const [open, setOpen] = useState(false)
+  const [locked, setLocked] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton variant="primary" onClick={() => setOpen(true)}>Dismissible</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setLocked(true)}>Backdrop stays</StarNineSliceButton>
+
+      {/* maskClosable (the default) closes on a backdrop click; Escape always closes. */}
+      <StarDrawer open={open} title="Shipping Bin" onClose={() => setOpen(false)}>
+        Click the backdrop or press Escape.
+      </StarDrawer>
+
+      <StarDrawer open={locked} maskClosable={false} title="Shipping Bin" onClose={() => setLocked(false)}>
+        Only the close button or Escape gets you out.
+      </StarDrawer>
+    </>
+  )
+}`
+
 function StarDrawerDemoPage() {
   const { lang } = useI18n()
   const [basicOpen, setBasicOpen] = useState(false)
@@ -103,14 +195,14 @@ function StarDrawerDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]}>
+      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={basicCode}>
         <StarNineSliceButton onClick={() => setBasicOpen(true)}>{t.open}</StarNineSliceButton>
         <StarDrawer open={basicOpen} title={t.drawerTitle} footer={<span>{t.footer}</span>} onClose={() => setBasicOpen(false)}>
           {drawerBody}
         </StarDrawer>
       </StarComponentDemo>
 
-      <StarComponentDemo id="directions" title={t.demos[1][0]} description={t.demos[1][1]}>
+      <StarComponentDemo id="directions" title={t.demos[1][0]} description={t.demos[1][1]} code={directionsCode}>
         <div className={styles['drawer-demo__direction-buttons']}>
           {DIRECTIONS.map(({ placement, zh, en }) => (
             <StarNineSliceButton key={placement} size="small" onClick={() => setDirection(placement)}>
@@ -123,14 +215,14 @@ function StarDrawerDemoPage() {
         </StarDrawer>
       </StarComponentDemo>
 
-      <StarComponentDemo id="focus" title={t.demos[2][0]} description={t.demos[2][1]}>
+      <StarComponentDemo id="focus" title={t.demos[2][0]} description={t.demos[2][1]} code={focusCode}>
         <StarNineSliceButton variant="primary" onClick={() => setFocusOpen(true)}>{t.focusOn}</StarNineSliceButton>
         <StarNineSliceButton onClick={() => setPlainOpen(true)}>{t.focusOff}</StarNineSliceButton>
         <StarDrawer open={focusOpen} title={t.focusOn} onClose={() => setFocusOpen(false)}>{drawerBody}</StarDrawer>
         <StarDrawer open={plainOpen} focusEffect={false} title={t.focusOff} onClose={() => setPlainOpen(false)}>{drawerBody}</StarDrawer>
       </StarComponentDemo>
 
-      <StarComponentDemo id="mask" title={t.demos[3][0]} description={t.demos[3][1]}>
+      <StarComponentDemo id="mask" title={t.demos[3][0]} description={t.demos[3][1]} code={maskCode}>
         <StarNineSliceButton variant="info" onClick={() => setMaskOpen(true)}>{t.customMask}</StarNineSliceButton>
         <StarDrawer
           open={maskOpen}

@@ -117,15 +117,27 @@ const apiData = {
 
 const basicCode = `import { StarTextarea } from 'stardew-valley-ui'
 
-<StarTextarea label="Letter to Pierre" autoSize rows={4} block />
-<StarTextarea label="Farm bio" size="small" defaultValue="Year four." rows={2} block />
-<StarTextarea label="Quest" color="#308BE2" rows={3} block />`
+export function JournalFields() {
+  return (
+    <>
+      <StarTextarea label="Letter to Pierre" autoSize rows={4} block />
+      <StarTextarea label="Farm bio" size="small" defaultValue="Year four." rows={2} block />
+      <StarTextarea label="Quest" color="#308BE2" rows={3} block />
+    </>
+  )
+}`
 
 const statusCode = `import { StarTextarea } from 'stardew-valley-ui'
 
-<StarTextarea label="Quest" status="error" message="Too short.">
-<StarTextarea label="Saved" status="success" message="All good." />
-<StarTextarea label="Accent" color="#308BE2" />`
+export function StatusFields() {
+  return (
+    <>
+      <StarTextarea label="Quest" status="error" message="Too short." />
+      <StarTextarea label="Saved" status="success" message="All good." />
+      <StarTextarea label="Accent" color="#308BE2" />
+    </>
+  )
+}`
 
 const countCode = `import { StarTextarea } from 'stardew-valley-ui'
 
@@ -137,7 +149,16 @@ import { StarNineSliceButton, StarTextarea } from 'stardew-valley-ui'
 export function GiftNote() {
   const [text, setText] = useState('')
   // Empty errors, short warns, a pass turns success.
-  const status = ...
+  const status = !text ? 'error' : text.length < 10 ? 'warning' : 'success'
+  const message = !text
+    ? 'Write something first.'
+    : text.length < 10
+      ? 'A bit more, please.'
+      : 'Ready to wrap.'
+
+  // Wire this to your own submit handler.
+  const wrap = (note: string) => console.log('wrapping:', note)
+
   return (
     <>
       <StarTextarea
@@ -151,7 +172,9 @@ export function GiftNote() {
         status={status}
         message={message}
       />
-      <StarNineSliceButton size="small" disabled={status !== 'success'} onClick={pack}>Wrap the gift</StarNineSliceButton>
+      <StarNineSliceButton size="small" disabled={status !== 'success'} onClick={() => wrap(text)}>
+        Wrap the gift
+      </StarNineSliceButton>
     </>
   )
 }`

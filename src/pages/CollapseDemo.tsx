@@ -92,16 +92,31 @@ const basicCode = `import { StarCollapse } from 'stardew-valley-ui'
 
 const accordionCode = `import { StarCollapse } from 'stardew-valley-ui'
 
-<StarCollapse accordion items={seasons} />`
+const SEASONS = [
+  { key: 'spring', label: 'Spring', content: 'Plant parsnips.' },
+  { key: 'summer', label: 'Summer', content: 'Plant blueberries.' },
+  { key: 'winter', label: 'Winter', content: 'Nothing grows; forage instead.' },
+]
+
+// accordion: opening one section folds the others shut.
+export function Almanac() {
+  return <StarCollapse accordion items={SEASONS} />
+}`
 
 const controlledCode = `import { useState } from 'react'
 import { StarCollapse } from 'stardew-valley-ui'
+
+const SEASONS = [
+  { key: 'spring', label: 'Spring', content: 'Plant parsnips.' },
+  { key: 'summer', label: 'Summer', content: 'Plant blueberries.' },
+  { key: 'winter', label: 'Winter', content: 'Nothing grows; forage instead.' },
+]
 
 export function Journal() {
   const [keys, setKeys] = useState<string[]>([])
   return (
     <StarCollapse
-      items={seasons}
+      items={SEASONS}
       activeKeys={keys}
       onChange={setKeys}
     />

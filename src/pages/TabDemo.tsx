@@ -82,8 +82,16 @@ const code = `<StarTab
   ]}
 />`
 
-const externalCode = `<StarTab external items={items} />            // 选项卡在内容框上方
-<StarTab external position="bottom" items={items} /> // 选项卡在内容框下方`
+// Kept in English so it can be pasted straight into a file, and wrapped in a
+// fragment because two sibling roots do not parse on their own.
+const externalCode = `export function ExternalTabs({ items }) {
+  return (
+    <>
+      <StarTab external items={items} />            {/* tabs above the panel */}
+      <StarTab external position="bottom" items={items} /> {/* tabs below the panel */}
+    </>
+  )
+}`
 
 const controlledTabCode = `import { useState } from 'react'
 import { StarTab } from 'stardew-valley-ui'

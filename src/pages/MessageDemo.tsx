@@ -114,6 +114,44 @@ const apiData = {
   ],
 }
 
+/** Snippets for each card; the returned handle is the whole point of `message()`. */
+const basicCode = `import { message } from 'stardew-valley-ui'
+
+// Bare call: a neutral message that closes itself after the default duration.
+message('Your parcel is ready at the counter.')`
+
+const typesCode = `import { message } from 'stardew-valley-ui'
+
+message.info('The shop opens at 9 AM.')
+message.success('Order delivered.')
+message.warning('Backpack is nearly full.')
+message.error('Not enough stamina to sprint.')`
+
+const positionCode = `import { message } from 'stardew-valley-ui'
+
+// Nine placements: four edges × start/center/end, plus 'center'.
+message({ content: 'Saved to slot 3', position: 'bottom' })
+message({ content: 'Low energy', position: 'top-center' })`
+
+const actionCode = `import { message, StarNineSliceButton } from 'stardew-valley-ui'
+
+// action turns the message into something the user can answer.
+message.success({
+  content: 'Shipped 12 parsnips.',
+  duration: 0,
+  action: { label: 'Undo', onClick: () => message('Put back in the bin.') },
+})`
+
+const callbacksCode = `import { message } from 'stardew-valley-ui'
+
+// update() rewrites a message in place — same slot, no new entry in the stack.
+const notice = message({ content: 'Saving…', duration: 0 })
+
+setTimeout(() => {
+  notice.update({ content: 'Saved.', type: 'success' })
+  notice.close()
+}, 1200)`
+
 function StarMessageDemoPage() {
   const { lang } = useI18n()
   const [callbackStatus, setCallbackStatus] = useState<string>('')
@@ -139,20 +177,20 @@ function StarMessageDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]}>
+      <StarComponentDemo id="basic" title={t.demos[0][0]} description={t.demos[0][1]} code={basicCode}>
         <StarNineSliceButton onClick={() => message(lang === 'zh' ? '今天的草莓已经入库。' : 'Today’s strawberries are in the shed.')}>
           {t.show}
         </StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo id="types" title={t.demos[1][0]} description={t.demos[1][1]}>
+      <StarComponentDemo id="types" title={t.demos[1][0]} description={t.demos[1][1]} code={typesCode}>
         <StarNineSliceButton variant="success" onClick={() => message.success(lang === 'zh' ? '作物已出售。' : 'Crops sold.')}>{lang === 'zh' ? '成功' : 'Success'}</StarNineSliceButton>
         <StarNineSliceButton variant="info" onClick={() => message.info(lang === 'zh' ? '旅行货车到了。' : 'Traveling cart arrived.')}>{lang === 'zh' ? '信息' : 'Info'}</StarNineSliceButton>
         <StarNineSliceButton variant="warning" onClick={() => message.warning(lang === 'zh' ? '体力快耗尽了。' : 'Stamina is running low.')}>{lang === 'zh' ? '警告' : 'Warning'}</StarNineSliceButton>
         <StarNineSliceButton variant="danger" onClick={() => message.error(lang === 'zh' ? '背包已满。' : 'Backpack is full.')}>{lang === 'zh' ? '错误' : 'Error'}</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo id="position" title={t.demos[2][0]} description={t.demos[2][1]}>
+      <StarComponentDemo id="position" title={t.demos[2][0]} description={t.demos[2][1]} code={positionCode}>
         <div className={styles['message-demo__position-grid']}>
           {POSITION_DEMOS.map(({ position, zh, en }) => {
             const label = lang === 'zh' ? zh : en
@@ -165,11 +203,11 @@ function StarMessageDemoPage() {
         </div>
       </StarComponentDemo>
 
-      <StarComponentDemo id="action" title={t.demos[3][0]} description={t.demos[3][1]}>
+      <StarComponentDemo id="action" title={t.demos[3][0]} description={t.demos[3][1]} code={actionCode}>
         <StarNineSliceButton variant="info" onClick={showGiftMessage}>{t.gift}</StarNineSliceButton>
       </StarComponentDemo>
 
-      <StarComponentDemo id="callbacks" title={t.demos[4][0]} description={t.demos[4][1]}>
+      <StarComponentDemo id="callbacks" title={t.demos[4][0]} description={t.demos[4][1]} code={callbacksCode}>
         <StarNineSliceButton onClick={() => { setCallbackStatus(t.waiting); message.info(t.closeMessage, { duration: 0, onClose: () => setCallbackStatus(t.closed) }) }}>
           {t.closeDemo}
         </StarNineSliceButton>

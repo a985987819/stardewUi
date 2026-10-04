@@ -9,6 +9,12 @@ import styles from './PopupDemo.module.scss'
  * The dial reads clockwise from 12 o'clock. Each entry pairs an angle with the
  * placement that points away from the circle's centre, so the bubble always
  * flies outward and its arrow keeps pointing back at the button.
+ *
+ * Eight of the twelve placements, because a radial layout only has room for
+ * eight spokes at readable angles. The remaining four (`top-start`,
+ * `top-end`, `bottom-start`, `bottom-end`) are the corners of a horizontal
+ * bubble on a vertical edge, and they have no meaningful angle — they get the
+ * grid below instead. Both galleries together show all twelve.
  */
 const DIAL_ITEMS: { placement: PopupPlacement; angle: number }[] = [
   { placement: 'top', angle: 90 },
@@ -19,6 +25,26 @@ const DIAL_ITEMS: { placement: PopupPlacement; angle: number }[] = [
   { placement: 'left-end', angle: -135 },
   { placement: 'left', angle: 180 },
   { placement: 'left-start', angle: 135 },
+]
+
+/**
+ * All twelve, in the order the API table lists them. Kept as the full list so
+ * the gallery and the table cannot drift: `popupPlacements.test.ts` asserts the
+ * two agree, and that every value here is a real `PopupPlacement`.
+ */
+const ALL_PLACEMENTS: PopupPlacement[] = [
+  'top',
+  'top-start',
+  'top-end',
+  'right',
+  'right-start',
+  'right-end',
+  'bottom',
+  'bottom-start',
+  'bottom-end',
+  'left',
+  'left-start',
+  'left-end',
 ]
 
 /** Satellite positions as percentages of the dial box. */
@@ -36,15 +62,17 @@ const copy = {
   zh: {
     title: '弹窗 Popup',
     desc: '贴着物品弹出的小气泡：悬停或点击触发，内容区和展示框同款外框，箭头指回触发元素。它同时承担了「悬停提示」的角色——纯文本气泡就是 tooltip（自动带 role="tooltip"），带按钮的气泡自动变成 role="dialog"，所以库内不再单列文字提示组件。',
-    toc: ['方位演示', '悬停触发', '点击触发', '带操作按钮', 'API'],
+    toc: ['方位演示', '十二档方位', '悬停触发', '点击触发', '带操作按钮', 'API'],
     demos: [
-      ['方位演示', '八个按钮围成一圈，每个按钮都用朝向圆环外侧的 placement：鼠标绕着圈扫一圈，气泡依次从 top / right-start / right / right-end / bottom / left-end / left / left-start 飞出来，箭头始终指回按钮——比看十二个文字说明直观得多。'],
+      ['方位演示', '八个按钮围成一圈，每个按钮都用朝向圆环外侧的 placement：鼠标绕着圈扫一圈，气泡依次从 top / right-start / right / right-end / bottom / left-end / left / left-start 飞出来，箭头始终指回按钮——比看文字说明直观得多。'],
+      ['十二档方位', '转盘只放得下八根辐条，剩下四档是「竖直边上的横向气泡」，没有角度可言。这里把十二档全部列出，逐个悬停即可看到气泡相对按钮的位置。'],
       ['悬停触发', 'trigger="hover"（默认）时鼠标悬停展示提示；mouseEnterDelay / mouseLeaveDelay 控制进出延迟，聚焦同样唤出、Esc 收起，和 tooltip 的手感一致。'],
       ['点击触发', 'trigger="click" 时点击后保持打开，适合移动端；点外部区域收起。'],
       ['带操作按钮', '气泡底部可以放操作按钮，此时 role 自动变成 dialog；也可以传 color 给整块气泡换装。'],
     ],
     dialCenter: 'placement\n方位',
     dialHint: '悬停圆环上的按钮，看气泡从哪一侧飞出来',
+    galleryHint: '悬停任意一格，查看该档位下气泡相对按钮的位置',
     trigger: '查看种子',
     buy: '购买',
     colorLabel: '换色气泡',
@@ -56,15 +84,17 @@ const copy = {
   en: {
     title: 'Popup',
     desc: 'A bubble that pops beside an item: hover- or click-triggered, framed like the DisplayFrame, with a pixel arrow pointing back at the trigger. It also covers the hover-hint role — a text-only bubble is a tooltip (it carries role="tooltip"), and one with buttons becomes role="dialog" — so the library ships no separate tooltip component.',
-    toc: ['Placement Dial', 'Hover Trigger', 'Click Trigger', 'With Actions', 'API'],
+    toc: ['Placement Dial', 'All Twelve Placements', 'Hover Trigger', 'Click Trigger', 'With Actions', 'API'],
     demos: [
       ['Placement Dial', 'Eight buttons around a ring, each using the placement that faces away from the centre: sweep the pointer around and bubbles fly out from top / right-start / right / right-end / bottom / left-end / left / left-start in turn, arrow always pointing back — far clearer than twelve lines of prose.'],
+      ['All Twelve Placements', 'A ring only fits eight spokes at readable angles, and the remaining four are horizontal bubbles on a vertical edge, which have no angle to speak of. Here are all twelve, side by side — hover any cell to see where the bubble sits relative to its button.'],
       ['Hover Trigger', 'With trigger="hover" (the default) the bubble appears on hover; mouseEnterDelay / mouseLeaveDelay tune the in and out timing, focus raises it too and Escape drops it — the same feel as a tooltip.'],
       ['Click Trigger', 'With trigger="click" the bubble stays open until you click it again or click outside — handy on touch devices.'],
       ['With Actions', 'The footer can hold action buttons, which flips the role to dialog; color repaints the whole plate when you need a tinted bubble.'],
     ],
     dialCenter: 'placement',
     dialHint: 'Hover a button on the ring and watch which side the bubble flies out from',
+    galleryHint: 'Hover any cell to see where that placement puts the bubble',
     trigger: 'Inspect seed',
     buy: 'Buy',
     colorLabel: 'Tinted bubble',
@@ -73,7 +103,7 @@ const copy = {
     noArrow: 'No arrow',
     noArrowTip: 'Without the arrow it is just a quiet little plate.',
   },
-} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; dialCenter: string; dialHint: string; trigger: string; buy: string; colorLabel: string; colorTip: string; seedTip: string; noArrow: string; noArrowTip: string }>
+} satisfies Record<Lang, { title: string; desc: string; toc: string[]; demos: string[][]; dialCenter: string; dialHint: string; galleryHint: string; trigger: string; buy: string; colorLabel: string; colorTip: string; seedTip: string; noArrow: string; noArrowTip: string }>
 
 const apiData = {
   zh: [
@@ -112,8 +142,9 @@ const apiData = {
 
 const dialCode = `import { StarPopup, StarNineSliceButton } from 'stardew-valley-ui'
 
-// Every satellite uses the placement that faces away from the centre, so the
-// bubble always flies outward and the arrow keeps pointing at the button.
+// The ring shows eight of the twelve. The other four — top-start, top-end,
+// bottom-start, bottom-end — are horizontal bubbles on a vertical edge, so
+// they have no radial angle; they live in the grid below.
 const DIAL = [
   { placement: 'top', angle: 90 },
   { placement: 'right-start', angle: 45 },
@@ -131,17 +162,39 @@ const DIAL = [
   </StarPopup>
 ))}`
 
+const galleryCode = `import { StarPopup, StarNineSliceButton } from 'stardew-valley-ui'
+
+// All twelve placements, in the order the API table lists them.
+const PLACEMENTS = [
+  'top', 'top-start', 'top-end',
+  'right', 'right-start', 'right-end',
+  'bottom', 'bottom-start', 'bottom-end',
+  'left', 'left-start', 'left-end',
+]
+
+{PLACEMENTS.map((placement) => (
+  <StarPopup key={placement} placement={placement} content={placement}>
+    <StarNineSliceButton size="small">{placement}</StarNineSliceButton>
+  </StarPopup>
+))}`
+
 const hoverCode = `import { StarPopup, StarNineSliceButton } from 'stardew-valley-ui'
 
-// Text-only bubble: role="tooltip", with tooltip-style delays.
-<StarPopup content="Strawberry seeds regrow after harvest.">
-  <StarNineSliceButton>Inspect seed</StarNineSliceButton>
-</StarPopup>
+export function SeedHints() {
+  return (
+    <>
+      {/* Text-only bubble: role="tooltip", with tooltip-style delays. */}
+      <StarPopup content="Strawberry seeds regrow after harvest.">
+        <StarNineSliceButton>Inspect seed</StarNineSliceButton>
+      </StarPopup>
 
-// No arrow, tinted plate, slower reveal
-<StarPopup arrow={false} color="#71964A" mouseEnterDelay={180} content="Starfruit!">
-  <StarNineSliceButton>Seasonal</StarNineSliceButton>
-</StarPopup>`
+      {/* No arrow, tinted plate, slower reveal. */}
+      <StarPopup arrow={false} color="#71964A" mouseEnterDelay={180} content="Starfruit!">
+        <StarNineSliceButton>Seasonal</StarNineSliceButton>
+      </StarPopup>
+    </>
+  )
+}`
 
 const clickCode = `import { StarPopup, StarNineSliceButton } from 'stardew-valley-ui'
 
@@ -164,7 +217,7 @@ const actionsCode = `import { StarPopup, StarNineSliceButton } from 'stardew-val
 function StarPopupDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
-  const toc = t.toc.map((title, index) => ({ id: ['dial', 'hover', 'click', 'actions', 'api'][index], title, level: 1 }))
+  const toc = t.toc.map((title, index) => ({ id: ['dial', 'gallery', 'hover', 'click', 'actions', 'api'][index], title, level: 1 }))
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
@@ -199,9 +252,27 @@ function StarPopupDemoPage() {
       </StarComponentDemo>
 
       <StarComponentDemo
-        id="hover"
+        id="gallery"
         title={t.demos[1][0]}
         description={t.demos[1][1]}
+        code={galleryCode}
+      >
+        <div className={styles['popup-demo-gallery']}>
+          {ALL_PLACEMENTS.map((placement) => (
+            <div key={placement} className={styles['popup-demo-gallery__cell']}>
+              <StarPopup placement={placement} content={placement}>
+                <StarNineSliceButton size="small">{placement}</StarNineSliceButton>
+              </StarPopup>
+            </div>
+          ))}
+        </div>
+        <p className={styles['popup-demo-dial__hint']}>{t.galleryHint}</p>
+      </StarComponentDemo>
+
+      <StarComponentDemo
+        id="hover"
+        title={t.demos[2][0]}
+        description={t.demos[2][1]}
         code={hoverCode}
       >
         <div className={styles['popup-demo-playground']}>
@@ -221,8 +292,8 @@ function StarPopupDemoPage() {
 
       <StarComponentDemo
         id="click"
-        title={t.demos[2][0]}
-        description={t.demos[2][1]}
+        title={t.demos[3][0]}
+        description={t.demos[3][1]}
         code={clickCode}
       >
         <div className={styles['popup-demo-playground']}>
@@ -236,8 +307,8 @@ function StarPopupDemoPage() {
 
       <StarComponentDemo
         id="actions"
-        title={t.demos[3][0]}
-        description={t.demos[3][1]}
+        title={t.demos[4][0]}
+        description={t.demos[4][1]}
         code={actionsCode}
       >
         <div className={styles['popup-demo-playground']}>

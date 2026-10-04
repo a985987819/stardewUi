@@ -83,14 +83,26 @@ const apiData = {
 
 const basicCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
-<StarSkeleton rows={3} />
-<StarSkeleton title={false} rows={2} />
-<StarSkeleton title={false} rows={2} active={false} />`
+export function PlaceholderRow() {
+  return (
+    <>
+      <StarSkeleton rows={3} />
+      <StarSkeleton title={false} rows={2} />
+      <StarSkeleton title={false} rows={2} active={false} />
+    </>
+  )
+}`
 
 const avatarCode = `import { StarSkeleton } from 'stardew-valley-ui'
 
-<StarSkeleton avatar rows={2} />
-<StarSkeleton avatar avatarShape="circle" rows={2} />`
+export function AvatarPlaceholders() {
+  return (
+    <>
+      <StarSkeleton avatar rows={2} />
+      <StarSkeleton avatar avatarShape="circle" rows={2} />
+    </>
+  )
+}`
 
 const toggleCode = `import { useState } from 'react'
 import { StarNineSliceButton, StarSkeleton } from 'stardew-valley-ui'
@@ -113,7 +125,19 @@ import { StarNineSliceButton, StarSkeleton } from 'stardew-valley-ui'
 
 export function MineElevator() {
   const [loading, setLoading] = useState(false)
+  const [floor, setFloor] = useState(40)
+  const [find, setFind] = useState('')
+
   // While the elevator falls, the striped supports hold the page up.
+  const descend = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setFloor((f) => f - 1)
+      setFind('Geode — chance of a fossil, amethyst, or a worm.')
+      setLoading(false)
+    }, 900)
+  }
+
   return (
     <>
       <StarNineSliceButton size="small" onClick={descend} disabled={loading}>Descend</StarNineSliceButton>

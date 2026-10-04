@@ -138,13 +138,23 @@ const apiData = {
   ],
 }
 
+// Wrapped in a fragment: a bare list of sibling JSX elements is a parse error
+// anywhere it gets pasted, and this snippet is meant to be pasted.
 const typesCode = `import { StarAlert } from 'stardew-valley-ui'
 
-<StarAlert type="info" title="Weather forecast">Rain tomorrow.</StarAlert>
-<StarAlert type="success" title="Planted" showIcon>Parsnip seeds are in.</StarAlert>
-<StarAlert type="warning" title="Backpack full">Tidy up first.</StarAlert>
-<StarAlert type="error" title="Mine danger" showIcon>Leave floor 40 now!</StarAlert>
-<StarAlert type="success" title="Junimo quest" showIcon icon={<span>★</span>}>Donate 60 exhibits.</StarAlert>`
+export function WeatherAlerts() {
+  return (
+    <>
+      <StarAlert type="info" title="Weather forecast">Rain tomorrow.</StarAlert>
+      <StarAlert type="success" title="Planted" showIcon>Parsnip seeds are in.</StarAlert>
+      <StarAlert type="warning" title="Backpack full">Tidy up first.</StarAlert>
+      <StarAlert type="error" title="Mine danger" showIcon>Leave floor 40 now!</StarAlert>
+      <StarAlert type="success" title="Junimo quest" showIcon icon={<span>★</span>}>
+        Donate 60 exhibits.
+      </StarAlert>
+    </>
+  )
+}`
 
 const closableCode = `import { useState } from 'react'
 import { StarAlert } from 'stardew-valley-ui'
@@ -199,17 +209,33 @@ export function MineLockdown() {
 const boardCode = `import { useState } from 'react'
 import { StarAlert, StarDisplayFrame, StarNineSliceButton } from 'stardew-valley-ui'
 
+// The four notice kinds the board cycles through.
+const POSTS = [
+  { type: 'info', title: 'Fair forecast', body: 'The plaza opens Friday night.' },
+  { type: 'success', title: 'Order complete', body: 'Lewis paid for 12 parsnips.' },
+  { type: 'warning', title: 'Road works', body: 'Take the mountain path.' },
+  { type: 'error', title: 'Curfew', body: 'Leave the mines by 2 AM.' },
+]
+
 export function NoticeBoard() {
   const [notices, setNotices] = useState([])
   // Rotate the four kinds, newest first, keep three at most.
+  const postNext = () => {
+    setNotices((current) => {
+      const id = (current[0]?.id ?? 0) + 1
+      return [{ id, post: POSTS[id % POSTS.length] }, ...current].slice(0, 3)
+    })
+  }
+  const takeDown = (id) => setNotices((current) => current.filter((item) => item.id !== id))
+
   return (
     <>
       <StarNineSliceButton onClick={postNext}>Post the next notice</StarNineSliceButton>
       {/* The board itself is one DisplayFrame; notices pin inside it */}
       <StarDisplayFrame>
-        {notices.map((notice) => (
-          <StarAlert key={notice.id} type={notice.type} title={notice.title} closable onClose={...}>
-            {notice.body}
+        {notices.map(({ id, post }) => (
+          <StarAlert key={id} type={post.type} title={post.title} closable onClose={() => takeDown(id)}>
+            {post.body}
           </StarAlert>
         ))}
       </StarDisplayFrame>

@@ -79,6 +79,22 @@
 
 // The playground under the dial is deliberately roomy: bubbles are positioned
 // absolutely and need somewhere to fly.
+// The twelve-placement gallery. Every cell needs slack around it because a
+// bubble is absolutely positioned and will overlap its neighbours if the grid is
+// packed tight — especially the `start`/`end` variants, which sit off to one
+// side rather than centred.
+.popup-demo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 40px 32px;
+  padding: 32px 16px;
+}
+
+.popup-demo-gallery__cell {
+  display: flex;
+  justify-content: center;
+}
+
 .popup-demo-playground {
   padding: 48px 24px;
 }

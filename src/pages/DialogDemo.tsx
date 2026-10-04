@@ -150,6 +150,237 @@ const apiData = {
     { property: 'waitingText', description: 'Copy shown in the body while the title typewriter finishes.', type: 'string', default: '跟随语言' },],
 }
 
+/**
+ * Every demo card below carries a snippet. They used to have none at all, which
+ * left 22 documented props reachable only by reading a table — you could see
+ * that `actions` existed but not how to pass it.
+ */
+const basicCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function LinusNote() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>Read the note</StarNineSliceButton>
+      <StarDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Linus"
+        content="At night the mountain carries every footstep."
+      />
+    </>
+  )
+}`
+
+const pagesCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+const LETTER = [
+  'The stones at the mine entrance have loosened.',
+  'Clear the rubble before heading down.',
+  'Be back at the foothills before dark.',
+]
+
+export function PagedLetter() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>Read the letter</StarNineSliceButton>
+      {/* An array of strings pages the body; the footer grows a pager by itself. */}
+      <StarDialog open={open} onClose={() => setOpen(false)} title="A Letter" content={LETTER} />
+    </>
+  )
+}`
+
+const actionsCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function ShipOrKeep() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>Decide</StarNineSliceButton>
+      <StarDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title="The Last Basket"
+        content="Ship them before sunset, or save a few for breakfast?"
+        actions={[
+          { label: 'Keep a few' },
+          { label: 'Ship them', variant: 'primary' },
+        ]}
+      />
+    </>
+  )
+}`
+
+const placementCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function Bulletin() {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setOpen(true)}>Night bulletin</StarNineSliceButton>
+      {/* placement picks the edge the panel grows from. */}
+      <StarDialog
+        open={open}
+        placement="bottom"
+        onClose={() => setOpen(false)}
+        title="Mine Night Bulletin"
+        content="The mine closes at midnight."
+      />
+    </>
+  )
+}`
+
+const focusCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function NoticeOrKey() {
+  const [keyOpen, setKeyOpen] = useState(false)
+  const [boardOpen, setBoardOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton variant="primary" onClick={() => setKeyOpen(true)}>Rusted key</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setBoardOpen(true)}>Morning notice</StarNineSliceButton>
+
+      {/* focusEffect scales and softens the page behind (the default). */}
+      <StarDialog
+        open={keyOpen}
+        onClose={() => setKeyOpen(false)}
+        title="A Rusted Key on the Desk"
+        content="Blue ore is lodged between the key's teeth."
+      />
+
+      {/* Turn it off for a note the user should keep seeing the world through. */}
+      <StarDialog
+        open={boardOpen}
+        focusEffect={false}
+        onClose={() => setBoardOpen(false)}
+        title="The Morning Noticeboard"
+        content="Three days until the Flower Dance."
+      />
+    </>
+  )
+}`
+
+const motionCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function KeyOrNotice() {
+  const [keyOpen, setKeyOpen] = useState(false)
+  const [noticeOpen, setNoticeOpen] = useState(false)
+
+  return (
+    <>
+      <StarNineSliceButton variant="primary" onClick={() => setKeyOpen(true)}>Found a key</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setNoticeOpen(true)}>Read a notice</StarNineSliceButton>
+
+      {/* The panel scales in and the mask fades, sharing one timing source. */}
+      <StarDialog
+        open={keyOpen}
+        onClose={() => setKeyOpen(false)}
+        title="A Key Found After the Rain"
+        content="It flashed once in the morning light."
+      />
+
+      {/* motion={false} appears instantly — right for a dialog that interrupts. */}
+      <StarDialog
+        open={noticeOpen}
+        motion={false}
+        onClose={() => setNoticeOpen(false)}
+        title="A Notice Passed By"
+        content="Fresh bread is waiting in the town square."
+      />
+    </>
+  )
+}`
+
+const footerCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function ThreeFooters() {
+  const [which, setWhich] = useState('default')
+
+  return (
+    <>
+      <StarNineSliceButton onClick={() => setWhich('default')}>Default footer</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setWhich('none')}>No footer</StarNineSliceButton>
+      <StarNineSliceButton variant="primary" onClick={() => setWhich('custom')}>Custom footer</StarNineSliceButton>
+
+      {/* The default footer holds Confirm / Cancel; a paged body adds a pager. */}
+      <StarDialog
+        open={which === 'default'}
+        onClose={() => setWhich('')}
+        title="The Travelling Merchant's Ledger"
+        content={['The first page holds an unfamiliar seed.', 'The last page reads: Friday, secret woods.']}
+      />
+
+      {/* footer={null} removes the footer region entirely. */}
+      <StarDialog
+        open={which === 'none'}
+        footer={null}
+        onClose={() => setWhich('')}
+        title="A Note on the Barn Door"
+        content="Rain is due tomorrow."
+      />
+
+      {/* Any node replaces the footer, so you can put your own controls there. */}
+      <StarDialog
+        open={which === 'custom'}
+        onClose={() => setWhich('')}
+        title="A Relic from the Dark Mine"
+        content="The spiral-carved shard is still warm."
+        footer={
+          <>
+            <span>There is room in your pack.</span>
+            <StarNineSliceButton size="small" variant="primary" onClick={() => setWhich('')}>
+              Stow it
+            </StarNineSliceButton>
+          </>
+        }
+      />
+    </>
+  )
+}`
+
+const maskCode = `import { useState } from 'react'
+import { StarDialog, StarNineSliceButton } from 'stardew-valley-ui'
+
+export function TwoMasks() {
+  const [which, setWhich] = useState<'dark' | 'light' | null>(null)
+
+  return (
+    <>
+      <StarNineSliceButton variant="primary" onClick={() => setWhich('dark')}>Dark mask</StarNineSliceButton>
+      <StarNineSliceButton onClick={() => setWhich('light')}>Light mask</StarNineSliceButton>
+
+      {/* 'dark' dims the page heavily, 'light' barely at all. */}
+      <StarDialog
+        open={which === 'dark'}
+        mask="dark"
+        onClose={() => setWhich(null)}
+        title="Footprints"
+        content="They vanish beneath the trees."
+      />
+      <StarDialog
+        open={which === 'light'}
+        mask="light"
+        onClose={() => setWhich(null)}
+        title="Fresh Seeds"
+        content="Pierre sets a packet on the counter."
+      />
+    </>
+  )
+}`
+
 function StarDialogDemoPage() {
   const { lang } = useI18n()
   const [basicOpen, setBasicOpen] = useState(false)
@@ -170,41 +401,41 @@ function StarDialogDemoPage() {
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]}>
+      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]} code={basicCode}>
         <StarNineSliceButton onClick={() => setBasicOpen(true)}>{t.basicOpen}</StarNineSliceButton>
         <StarDialog open={basicOpen} onClose={() => setBasicOpen(false)} title={lang === 'zh' ? '莱纳斯' : 'Linus'} content={lang === 'zh' ? '山里的夜会把脚步声传得很远。回农场前，先看看背包里有没有能煮成晚餐的东西吧。' : 'At night the mountain carries every footstep. Before you head home, see whether your pack holds something for supper.'} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="pages" title={t.pages[0]} description={t.pages[1]}>
+      <StarComponentDemo id="pages" title={t.pages[0]} description={t.pages[1]} code={pagesCode}>
         <StarNineSliceButton onClick={() => setPagesOpen(true)}>{t.pagesOpen}</StarNineSliceButton>
         <StarDialog open={pagesOpen} onClose={() => setPagesOpen(false)} title={lang === 'zh' ? '一封带松针香味的信' : 'A Letter That Smells of Pine'} content={lang === 'zh' ? ['矿洞口的石头松了，明早去找罗宾借一把结实的镐子。', '先清掉入口的碎石，再往下走；火把放在背包最顺手的位置。', '天黑前回到山脚。那条路在雨后很容易迷路。\n——山里的朋友'] : ['The stones at the mine entrance have loosened. Borrow a sturdy pickaxe from Robin tomorrow morning.', 'Clear the rubble before heading down, and keep your torch where your hand can find it.', 'Be back at the foothills before dark. That trail loses itself after rain.\n— A friend in the mountains']} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="actions" title={t.actions[0]} description={t.actions[1]}>
+      <StarComponentDemo id="actions" title={t.actions[0]} description={t.actions[1]} code={actionsCode}>
         <StarNineSliceButton onClick={() => setActionsOpen(true)}>{t.actionsOpen}</StarNineSliceButton>
         <StarDialog open={actionsOpen} onClose={() => setActionsOpen(false)} title={lang === 'zh' ? '出货箱前的最后一篮草莓' : 'The Last Basket of Strawberries'} content={lang === 'zh' ? '今天的草莓足够换一座新的鸡舍。要在日落前送进出货箱，还是留几颗给明早的早餐？' : 'Today’s strawberries could pay for a new coop. Ship them before sunset, or save a few for tomorrow’s breakfast?'} actions={[{ label: t.leave, onClick: () => setActionsOpen(false) }, { label: t.sell, variant: 'primary', onClick: () => setActionsOpen(false) }]} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="bottom" title={t.bottom[0]} description={t.bottom[1]}>
+      <StarComponentDemo id="bottom" title={t.bottom[0]} description={t.bottom[1]} code={placementCode}>
         <StarNineSliceButton onClick={() => setBottomOpen(true)}>{t.bottomOpen}</StarNineSliceButton>
         <StarDialog open={bottomOpen} placement="bottom" onClose={() => setBottomOpen(false)} title={lang === 'zh' ? '矿洞夜间播报' : 'Mine Night Bulletin'} content={lang === 'zh' ? '叮——矿洞将在午夜封门。把矿石和怪物掉落物收进箱子，明天再往更深处走。' : 'Ding— the mine closes at midnight. Stow your ore and monster loot; the deeper floors can wait until tomorrow.'} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="focus" title={t.focus[0]} description={t.focus[1]}>
+      <StarComponentDemo id="focus" title={t.focus[0]} description={t.focus[1]} code={focusCode}>
         <StarNineSliceButton variant="primary" onClick={() => setFocusOpen(true)}>{t.focusOn}</StarNineSliceButton>
         <StarNineSliceButton onClick={() => setWideOpen(true)}>{t.focusOff}</StarNineSliceButton>
         <StarDialog open={focusOpen} onClose={() => setFocusOpen(false)} title={lang === 'zh' ? '书桌上的生锈钥匙' : 'A Rusted Key on the Desk'} content={lang === 'zh' ? '钥匙齿缝里嵌着蓝色矿石。它也许能打开矿井更深处那扇从未开启的门。' : 'Blue ore is lodged between the key’s teeth. It may open the unopened door far below the mine.'} />
         <StarDialog open={wideOpen} focusEffect={false} onClose={() => setWideOpen(false)} title={lang === 'zh' ? '早晨的公告板' : 'The Morning Noticeboard'} content={lang === 'zh' ? '花舞节还有三天。农场、溪流和镇上的人都还在视野里，这只是路过时读到的一张便条。' : 'Three days until the Flower Dance. The farm, the creek, and the town stay in view—this is only a note read in passing.'} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="motion" title={t.motion[0]} description={t.motion[1]}>
+      <StarComponentDemo id="motion" title={t.motion[0]} description={t.motion[1]} code={motionCode}>
         <StarNineSliceButton variant="primary" onClick={() => setMotionOpen(true)}>{t.motionOn}</StarNineSliceButton>
         <StarNineSliceButton onClick={() => setInstantOpen(true)}>{t.motionOff}</StarNineSliceButton>
         <StarDialog open={motionOpen} onClose={() => setMotionOpen(false)} title={lang === 'zh' ? '雨后捡到的钥匙' : 'A Key Found After the Rain'} content={lang === 'zh' ? '它从湿漉漉的石阶缝里滑出来，在晨光下闪了一下。' : 'It slipped from a crack in the rain-soaked steps and flashed once in the morning light.'} />
         <StarDialog open={instantOpen} motion={false} onClose={() => setInstantOpen(false)} title={lang === 'zh' ? '路过时的公告' : 'A Notice Passed By'} content={lang === 'zh' ? '镇广场今天有新鲜面包。若你正好路过，别让它凉了。' : 'Fresh bread is waiting in the town square today. If you pass by, do not let it go cold.'} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="footer" title={t.footer[0]} description={t.footer[1]}>
+      <StarComponentDemo id="footer" title={t.footer[0]} description={t.footer[1]} code={footerCode}>
         <StarNineSliceButton onClick={() => setDefaultFooterOpen(true)}>{t.footerDefault}</StarNineSliceButton>
         <StarNineSliceButton onClick={() => setEmptyFooterOpen(true)}>{t.footerNone}</StarNineSliceButton>
         <StarNineSliceButton variant="primary" onClick={() => setCustomFooterOpen(true)}>{t.footerCustom}</StarNineSliceButton>
@@ -213,7 +444,7 @@ function StarDialogDemoPage() {
         <StarDialog open={customFooterOpen} onClose={() => setCustomFooterOpen(false)} title={lang === 'zh' ? '幽暗矿洞的遗物' : 'A Relic from the Dark Mine'} content={lang === 'zh' ? '这枚刻着螺旋纹的石片摸起来仍有余温。它应该待在背包里，而不是继续留在这里。' : 'The spiral-carved shard is still warm to the touch. It belongs in your pack, not down here.'} footer={<><span>{lang === 'zh' ? '物品栏还有空位。' : 'There is room in your pack.'}</span><StarNineSliceButton type="button" size="small" variant="primary" onClick={() => setCustomFooterOpen(false)}>{t.pack}</StarNineSliceButton></>} />
       </StarComponentDemo>
 
-      <StarComponentDemo id="masks" title={t.masks[0]} description={t.masks[1]}>
+      <StarComponentDemo id="masks" title={t.masks[0]} description={t.masks[1]} code={maskCode}>
         <StarNineSliceButton variant="primary" onClick={() => setDarkMaskOpen(true)}>{t.darkMask}</StarNineSliceButton>
         <StarNineSliceButton onClick={() => setLightMaskOpen(true)}>{t.lightMask}</StarNineSliceButton>
         <StarDialog open={darkMaskOpen} mask="dark" onClose={() => setDarkMaskOpen(false)} title={t.darkMask} content={lang === 'zh' ? '山路尽头的脚印忽然消失在树影里。先别急着回头，听听风里有没有别的声音。' : 'At the end of the trail, the footprints vanish beneath the trees. Do not turn around just yet; listen for another sound in the wind.'} />

@@ -13,7 +13,7 @@ const copy = {
     demos: [
       ['基础评分', '默认爱心适合好感度、收藏度和任务评价。'],
       ['增减动效', '加星时整颗图标按进度条格子的弹入曲线弹一下；减星时先左右摇晃，摇完点亮的那层再缩小消失。用下面的按钮加减试试。'],
-      ['星星与半格', '星星图标支持半格，适合更精细的评分。'],
+      ['星星与半格', '星星图标支持半格，适合更精细的评分。开启 allowHalf 后，在同一颗图标上点第二次就会落到半格（组件留了 350ms 的判定窗口，超时按整格算）——不点第二下就看不到这个能力。'],
       ['评分个数', 'count 决定图标数量，3 到 10 个都行，图标会自己排开。'],
       ['禁用状态', '只读评分仍会保留已获得的图标状态。'],
     ],
@@ -28,7 +28,7 @@ const copy = {
     demos: [
       ['Basic Rating', 'Hearts suit friendship, favorites, and quest reviews.'],
       ['Add & Remove Motion', 'Earning a star pops the whole icon in on the Progress-cell curve; losing one wobbles it first, then shrinks the lit layer away. Use the buttons below to try both.'],
-      ['Stars & Halves', 'Stars can be scored in half steps.'],
+      ['Stars & Halves', 'Stars can be scored in half steps. With allowHalf on, clicking the same icon a second time lands on the half — the component keeps a 350ms window to tell a double-click from two deliberate clicks, and anything slower counts as a whole step. Without that second click the feature is invisible.'],
       ['Icon Count', 'count sets how many icons to draw — three to ten — and they lay themselves out.'],
       ['Disabled', 'Read-only scores keep their earned icon state.'],
     ],
@@ -45,7 +45,7 @@ const apiData = {
     { property: 'value / defaultValue', description: '受控值或默认评分', type: 'number', default: '0' },
     { property: 'count', description: '评分图标总数', type: 'number', default: '5' },
     { property: 'icon', description: '图标类型', type: "'heart' | 'star'", default: "'heart'" },
-    { property: 'allowHalf', description: '允许半格评分', type: 'boolean', default: 'false' },
+    { property: 'allowHalf', description: '允许半格评分；在同一颗图标上点第二次落到半格', type: 'boolean', default: 'false' },
     { property: 'disabled', description: '禁用交互', type: 'boolean', default: 'false' },
     { property: 'color', description: '已点亮图标颜色', type: 'string', default: '心 #E53935 / 星 #D7992E' },
     { property: 'emptyColor', description: '未点亮图标颜色', type: 'string', default: '#CDBDA8' },
@@ -56,7 +56,7 @@ const apiData = {
     { property: 'value / defaultValue', description: 'Controlled or initial score.', type: 'number', default: '0' },
     { property: 'count', description: 'Number of score icons.', type: 'number', default: '5' },
     { property: 'icon', description: 'Icon type.', type: "'heart' | 'star'", default: "'heart'" },
-    { property: 'allowHalf', description: 'Allows half-step values.', type: 'boolean', default: 'false' },
+    { property: 'allowHalf', description: 'Allows half-step values; click the same icon twice to land on the half.', type: 'boolean', default: 'false' },
     { property: 'disabled', description: 'Disables interaction.', type: 'boolean', default: 'false' },
     { property: 'color', description: 'Filled icon color.', type: 'string', default: 'heart #E53935 / star #D7992E' },
     { property: 'emptyColor', description: 'Empty icon color.', type: 'string', default: '#CDBDA8' },
@@ -75,7 +75,7 @@ export function FriendshipRating() {
 
   return (
     <>
-      <StarRating value={friendship} onChange={setFriendship} aria-label={t.labels[0]} />
+      <StarRating value={friendship} onChange={setFriendship} aria-label="Friendship" />
       <output>Friendship: {friendship} / 5</output>
     </>
   )
