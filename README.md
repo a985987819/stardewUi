@@ -149,6 +149,31 @@ skills add a985987819/stardewUi
 
 ---
 
+## 目录
+
+- [安装](#安装) · [快速开始](#快速开始) · [在其他前端项目中使用](#在其他前端项目中使用)
+- [让 AI Agent 直接使用](#让-ai-agent-直接使用)
+- **组件**
+  - 容器与展示：[Card](#starcard---卡片) · [Title](#startitle---标题) · [PixelText](#starpixeltext---像素化文本) · [DisplayFrame](#stardisplayframe---展示框) · [Avatar](#staravatar---头像) · [Divider](#stardivider---分割线) · [EmptyState](#staremptystate---空状态) · [Loading](#starloading---加载) · [Tag](#startag---标签) · [Badge](#starbadge---徽标) · [Collapse](#starcollapse---折叠面板) · [Skeleton](#starskeleton---骨架屏)
+  - 表单与操作：[NineSliceButton](#starnineslicebutton---九宫格按钮) · [Input](#starinput---输入框) · [Textarea](#startextarea---多行输入) · [Switch](#starswitch---开关) · [Radio](#starradio---单选框) · [Checkbox](#starcheckbox---多选框) · [Select](#starselect---下拉选择) · [Rating](#starrating---评分) · [Progress](#starprogress---进度条)
+  - 反馈与浮层：[Dialog](#stardialog---对话框) · [Drawer](#stardrawer---抽屉) · [Popup](#starpopup---弹窗) · [message](#message---消息提示) · [Typewriter](#startypewriter---打字机) · [Alert](#staralert---警告提示) · [BackToTop](#starbacktotop---回到顶部)
+  - 日期与导航：[Calendar](#starcalendar---日历) · [DatePicker](#stardatepicker---日期选择器) · [Tab](#startab---选项卡) · [Pagination](#starpagination---分页)
+- **其他**：[Hooks](#hooks) · [工具函数](#工具函数) · [类型](#类型)
+- **项目**：[构建与发布](#构建与发布) · [本地开发](#本地开发) · [新增与移除组件](#新增与移除组件) · [版权说明](#版权说明) · [致谢](#致谢)
+
+### 延伸文档
+
+| 文档 | 内容 |
+|------|------|
+| [接入指南](docs/consumer-integration.md) | 样式入口选择、素材与路径、SSR / RSC 边界 |
+| [组件开发规范](docs/component-conventions.md) | 命名、五方一致性契约、文案约定、新增与移除流程 |
+| [发布到 npm](docs/publishing.md) | 令牌生成、版本号、发布后核验、常见报错对照 |
+| [致谢](docs/acknowledgements.md) | 视觉参考来源与许可说明 |
+
+> 在线演示站（每个组件都有可交互示例与完整 API 表）：<https://a985987819.github.io/stardewUi/>
+
+---
+
 ## 组件列表
 
 ### StarNineSliceButton - 九宫格按钮

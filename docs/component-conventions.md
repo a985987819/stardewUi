@@ -1,5 +1,7 @@
 # 组件开发规范
 
+> [返回 README 目录](../README.md#目录)
+
 本组件库把「一个组件」的信息收敛到**一处**：`src/router/componentRegistry.tsx` 里的 `COMPONENT_ROUTES`。
 路由表、左侧导航、组件总览页、冒烟测试都从它派生，因此新增组件的正确做法只有一条 —— **补目录条目**，
 其余入口自动跟随。

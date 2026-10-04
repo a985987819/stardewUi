@@ -1,5 +1,7 @@
 # 致谢
 
+> [返回 README 目录](../README.md#目录)
+
 ## Animal Island UI
 
 本项目的欢迎页在「加载完成后先以一张轻松、具有叙事感的欢迎画面迎接访客，再由访客主动进入内容」这一交互节奏上，受 [Animal Island UI](https://guokaigdg.github.io/animal-island-ui/#/) 启发。

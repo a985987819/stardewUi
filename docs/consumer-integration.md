@@ -1,5 +1,7 @@
 # 接入指南
 
+> [返回 README 目录](../README.md#目录)
+
 `stardew-valley-ui` 是面向 React 18+ 的组件库。公开入口有四个：
 
 | 子路径 | 内容 |

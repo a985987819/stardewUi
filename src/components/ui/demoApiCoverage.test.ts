@@ -2,6 +2,11 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+// Type-only, so it contributes nothing at runtime: the helpers below parse page
+// sources as text and must not pull the pages into the module graph.
+import type * as ts from 'typescript'
+
+const tsc: typeof ts = require('typescript')
 
 /**
  * Keeps each demo page's API table honest about the component it documents.
@@ -300,36 +305,82 @@ describe('demo API tables match their component props', () => {
     // length mismatch inside an array is the one class of desync it cannot
     // catch: `t.labels[5]` would silently be `undefined` on the shorter side
     // rather than a compile error. Reported here so a desync is a red test.
+    //
+    // Counted by parsing rather than by `split(',')`. That shortcut was wrong
+    // in two ways, both of which had already produced false results here:
+    //   - A comma *inside* an element inflates the count. English copy is full
+    //     of them ("Wednesday, 9 AM"), so the English side read longer than the
+    //     Chinese and the test blamed a desync that did not exist.
+    //   - The block boundaries were matched with `\n\s*`, which never fires on
+    //     this repo's CRLF files, so the whole check silently skipped several
+    //     pages — a green test that had never looked.
     const pageFiles = readdirSync(PAGES_DIR).filter((f) => f.endsWith('.tsx') && !f.endsWith('.test.tsx'))
 
     for (const file of pageFiles) {
       const text = read(resolve(PAGES_DIR, file))
-      const zh = text.match(/\n\s*zh:\s*\{([\s\S]*?)\n\s*\},\n\s*en:\s*\{/)
-      const en = text.match(/\n\s*en:\s*\{([\s\S]*?)\n\s*\},\n\s*\}\s*satisfies/)
-      if (!zh || !en) continue
+      const counts = arrayLengthsByLang(text)
+      if (!counts) continue
 
-      const arrays = (block: string) => {
-        const found: Record<string, number> = {}
-        for (const m of block.matchAll(/(\w+):\s*\[([\s\S]*?)\]/g)) {
-          // Count only top-level entries: a nested `['x']` would inflate this.
-          found[m[1]] = m[2].split(',').filter((part) => part.trim().length > 0).length
-        }
-        return found
-      }
-
-      const left = arrays(zh[1])
-      const right = arrays(en[1])
-
-      for (const [key, count] of Object.entries(left)) {
-        if (!(key in right)) continue
+      for (const [key, count] of Object.entries(counts.zh)) {
+        if (!(key in counts.en)) continue
         expect(
-          right[key],
-          `${file}: array '${key}' has ${count} zh entries but ${right[key]} en entries`,
+          counts.en[key],
+          `${file}: array '${key}' has ${count} zh entries but ${counts.en[key]} en entries`,
         ).toBe(count)
       }
     }
   })
 })
+
+/**
+ * Entry counts for every array literal in a demo page's `copy.zh` / `copy.en`,
+ * or `null` when the page has no such pair.
+ *
+ * Uses the TypeScript parser so nested arrays, commas inside strings, and CRLF
+ * line endings are all handled the way the language actually reads them.
+ */
+function arrayLengthsByLang(text: string): { zh: Record<string, number>; en: Record<string, number> } | null {
+  const source = tsc.createSourceFile('page.tsx', text, tsc.ScriptTarget.ESNext, true, tsc.ScriptKind.TSX)
+
+  const result: { zh: Record<string, number>; en: Record<string, number> } = { zh: {}, en: {} }
+
+  const visit = (node: ts.Node) => {
+    if (tsc.isVariableDeclaration(node) && tsc.isIdentifier(node.name) && node.name.text === 'copy') {
+      // `const copy = {…} satisfies Record<…>` parses as a SatisfiesExpression
+      // wrapping the literal, so unwrap before looking for zh / en.
+      const init = unwrapSatisfies(node.initializer)
+      if (init && tsc.isObjectLiteralExpression(init)) {
+        for (const lang of ['zh', 'en'] as const) {
+          const prop = init.properties.find(
+            (p): p is ts.PropertyAssignment =>
+              tsc.isPropertyAssignment(p) &&
+              tsc.isIdentifier(p.name) &&
+              p.name.text === lang,
+          )
+          if (!prop || !tsc.isObjectLiteralExpression(prop.initializer)) continue
+          for (const entry of prop.initializer.properties) {
+            if (!tsc.isPropertyAssignment(entry) || !tsc.isIdentifier(entry.name)) continue
+            if (!tsc.isArrayLiteralExpression(entry.initializer)) continue
+            result[lang][entry.name.text] = entry.initializer.elements.length
+          }
+        }
+      }
+    }
+    tsc.forEachChild(node, visit)
+  }
+
+  visit(source)
+  return Object.keys(result.zh).length > 0 || Object.keys(result.en).length > 0 ? result : null
+}
+
+/** Peel `expr satisfies T` / `expr as T` wrappers off an initializer. */
+function unwrapSatisfies(node: ts.Expression | undefined): ts.Expression | undefined {
+  if (!node) return undefined
+  if (tsc.isSatisfiesExpression(node) || tsc.isAsExpression(node) || tsc.isParenthesizedExpression(node)) {
+    return unwrapSatisfies(node.expression)
+  }
+  return node
+}
 
 /** The `variant` union as declared by the component. */
 function declaredVariants(): string[] {

@@ -1,5 +1,7 @@
 # 发布到 npm
 
+> [返回 README 目录](../README.md#目录)
+
 包名 **`stardew-valley-ui`**，发布目标是 **npm 官方源**（`https://registry.npmjs.org/`）。
 
 > 本机 `~/.npmrc` 里保留了淘宝镜像 `registry.npmmirror.com` 用于日常装包，它是**只读镜像，绝不能用于发布**。

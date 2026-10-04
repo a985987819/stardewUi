@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -138,6 +138,84 @@ describe('README component sections', () => {
     // Both were listed in the component list with no section at all. `allowHalf`
     // in particular needs a documented double-click.
     expect(readmeSections()).toContain(component)
+  })
+})
+
+/**
+ * The table of contents is the only navigation a 1800-line README has, so a
+ * stale entry is worse than no entry: a reader clicks through to a component
+ * that moved and concludes the component is gone.
+ *
+ * GitHub derives heading anchors by lowercasing, dropping most punctuation, and
+ * replacing spaces with hyphens. `### StarCard - 卡片` therefore becomes
+ * `starcard---卡片`: the hyphen before the space, the space, and the hyphen after
+ * it all collapse into three hyphens. `message - 消息提示` and
+ * `createGapBorderCorners - …` are the same shape.
+ */
+describe('README table of contents', () => {
+  /** GitHub's anchor slug for a heading. */
+  const slug = (heading: string) =>
+    heading
+      .trim()
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .replace(/\s/g, '-')
+
+  const tocLinks = (): string[] => {
+    const toc = readme.slice(readme.indexOf('## 目录'), readme.indexOf('## 组件列表'))
+    return [...toc.matchAll(/\]\(#([^)]+)\)/g)].map((m) => m[1])
+  }
+
+  it('exists', () => {
+    expect(tocLinks().length).toBeGreaterThan(30)
+  })
+
+  it('only links to headings that exist', () => {
+    const headings = new Set(
+      [...readme.matchAll(/^#{2,4}\s+(.+)$/gm)].map((m) => slug(m[1])),
+    )
+
+    const broken = tocLinks().filter((link) => !headings.has(link))
+
+    expect(broken, `目录里的锚点指向不存在的标题：${broken.join(', ')}`).toEqual([])
+  })
+
+  it('links to every component section', () => {
+    const links = new Set(tocLinks())
+    const missing = readmeSections().filter((name) => {
+      const heading = new RegExp(`^### ${name} - .*$`, 'm').exec(readme)
+      return heading ? !links.has(slug(heading[0].replace(/^### /, ''))) : true
+    })
+
+    expect(missing, `组件有章节但目录里没有链接：${missing.join(', ')}`).toEqual([])
+  })
+
+  it('indexes every file under docs/', () => {
+    // A doc nobody links to is a doc nobody finds. The README already links
+    // three of them from the body; this catches the ones added without an index
+    // entry, which is how `publishing.md` and `acknowledgements.md` drifted.
+    const listed = [...readme.matchAll(/\]\((docs\/[^)]+\.md)\)/g)].map((m) => m[1])
+    expect(listed.length).toBeGreaterThan(0)
+
+    const onDisk = readdirSync(resolve(process.cwd(), 'docs'))
+      .filter((name) => name.endsWith('.md'))
+      .map((name) => `docs/${name}`)
+
+    const missing = onDisk.filter((path) => !listed.includes(path))
+    expect(missing, `docs/ 下有文件未被 README 索引：${missing.join(', ')}`).toEqual([])
+  })
+
+  it('gives every doc a link back to the README', () => {
+    const onDisk = readdirSync(resolve(process.cwd(), 'docs')).filter((name) => name.endsWith('.md'))
+
+    const orphans = onDisk.filter((name) => {
+      const text = read(`docs/${name}`)
+      // Within the first few lines: a breadcrumb belongs at the top, not buried
+      // in a paragraph halfway down.
+      return !text.slice(0, 400).includes('../README.md')
+    })
+
+    expect(orphans, `docs/ 下有文件没有回到 README 的链接：${orphans.join(', ')}`).toEqual([])
   })
 })
 
