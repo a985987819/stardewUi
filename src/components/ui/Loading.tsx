@@ -6,12 +6,29 @@ import { classNames } from '../../utils/classNames'
 import { useComponentCopy } from './useComponentCopy'
 import styles from './Loading.module.scss'
 
+export type LoadingSize = 'small' | 'medium' | 'large'
+
+/**
+ * The three preset diameters, in pixels. The numbers are the sizes the sprite
+ * sheet was drawn at, so a preset always lands on a whole source pixel.
+ */
+const LOADING_SIZES: Record<LoadingSize, number> = {
+  small: 96,
+  medium: 144,
+  large: 192,
+}
+
 export interface StarLoadingProps extends HTMLAttributes<HTMLDivElement> {
   /** Stops the loop in its current state. Resuming starts a fresh crop. */
   active?: boolean
   text?: string
-  /** Diameter, in pixels, of the complete sprinkler-and-carrot garden. */
-  size?: number
+  /**
+   * Preset size, or an exact pixel diameter for the one-off case. Takes the
+   * same shape as every other `size` in the library, with `number` kept as the
+   * escape hatch — the three presets are just the diameters the sprite was
+   * drawn at, so nothing is lost by naming them.
+   */
+  size?: LoadingSize | number
   /** Milliseconds between each carrot growth step. Lower values run faster. Defaults to 600. */
   speed?: number
   gap?: number
@@ -30,7 +47,7 @@ const initialState = 0
 function StarLoading({
   active = true,
   text,
-  size = 144,
+  size = 'medium',
   speed = DEFAULT_GROW_SPEED,
   gap = 8,
   center = false,
@@ -73,14 +90,16 @@ function StarLoading({
       ? `${resolvedText.replace(/[.…]+$/, '')}${'.'.repeat(grownCarrots % 4)}`
       : resolvedText
   const isAriaHidden = rest['aria-hidden'] === true || rest['aria-hidden'] === 'true'
+  // Same escape hatch as Avatar: a preset name, or a caller-supplied diameter.
+  const sizePx = typeof size === 'number' ? size : LOADING_SIZES[size]
   const rootStyle = useMemo(
     () =>
       ({
         ...style,
-        '--star-loading-size': `${size}px`,
+        '--star-loading-size': `${sizePx}px`,
         '--star-loading-gap': `${gap}px`,
       }) as CSSProperties,
-    [gap, size, style]
+    [gap, sizePx, style]
   )
 
   return (

@@ -24,7 +24,7 @@ export type {
   MessageType,
   MessageBottom,
 } from './Message'
-export type { StarLoadingProps } from './Loading'
+export type { LoadingSize, StarLoadingProps } from './Loading'
 export { default as StarNineSliceButton } from './NineSliceButton'
 export type {
   StarNineSliceButtonProps,
