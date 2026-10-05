@@ -12,13 +12,29 @@ describe('Tag', () => {
     expect(container.firstElementChild).toHaveClass('is-pinned', styles['star-tag'])
   })
 
-  it('applies a colour preset modifier class', () => {
-    const { container, rerender } = render(<Tag color="green">新鲜作物</Tag>)
+  it('applies a tone preset modifier class', () => {
+    const { container, rerender } = render(<Tag tone="green">新鲜作物</Tag>)
     expect(container.firstElementChild).toHaveClass(styles['star-tag--green'])
 
-    rerender(<Tag color="blue">深海鱼</Tag>)
+    rerender(<Tag tone="blue">深海鱼</Tag>)
     expect(container.firstElementChild).toHaveClass(styles['star-tag--blue'])
     expect(container.firstElementChild).not.toHaveClass(styles['star-tag--green'])
+  })
+
+  it('lets an explicit color override the tone preset', () => {
+    const { container } = render(
+      <Tag tone="green" color="#4a7c2f">
+        新鲜作物
+      </Tag>,
+    )
+    const tag = container.firstElementChild as HTMLElement
+
+    // The preset still supplies the class, but the inline custom properties win,
+    // so the ring / text / accent all land on the given colour.
+    expect(tag).toHaveClass(styles['star-tag--green'])
+    expect(tag.style.getPropertyValue('--tag-ring')).toBe('#4a7c2f')
+    expect(tag.style.getPropertyValue('--tag-text')).toBe('#4a7c2f')
+    expect(tag.style.getPropertyValue('--tag-accent')).toBe('#4a7c2f')
   })
 
   it('keeps the default tag free of a preset modifier class', () => {

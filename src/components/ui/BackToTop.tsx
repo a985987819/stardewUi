@@ -23,7 +23,7 @@ export const BACK_TO_TOP_DEFAULT_OFFSET = 32
 /**
  * Length of the fly-away played on click, in ms.
  *
- * Exported because a caller that owns `visible` has to schedule its own hand-off
+ * Exported because a caller that owns `open` has to schedule its own hand-off
  * after the animation is over. `BackToTop.module.scss`'s `$flight-duration` must
  * stay equal to this number; a test locks the pair together.
  */
@@ -62,8 +62,13 @@ export interface StarBackToTopProps extends HTMLAttributes<HTMLButtonElement> {
    * Take the visibility over from the scroll listener. Useful for demos and for
    * pages that show the button on their own terms; leave it out to let the
    * component watch the scroll position itself.
+   *
+   * Named `open` to match the rest of the family — and to stop colliding with
+   * the CSS `visibility` property, which means something narrower (an element
+   * that occupies space but paints nothing). This button has no in-between
+   * state: it is on screen or it is not.
    */
-  visible?: boolean
+  open?: boolean
   /**
    * The element that actually scrolls. Defaults to the window, which is what a
    * normal page uses; pass a scrollable panel to drive the button from inside it.
@@ -72,7 +77,7 @@ export interface StarBackToTopProps extends HTMLAttributes<HTMLButtonElement> {
   /** Accessible name for the button. */
   label?: string
   /** Called whenever the plane appears or disappears, including on mount. */
-  onVisibleChange?: (visible: boolean) => void
+  onOpenChange?: (open: boolean) => void
   /**
    * Plays the fly-away every time this value changes, for a caller that resets
    * the scroll itself. Pass a router's route key and the plane acknowledges the
@@ -119,21 +124,21 @@ function StarBackToTop({
   bottom = BACK_TO_TOP_DEFAULT_OFFSET,
   right = BACK_TO_TOP_DEFAULT_OFFSET,
   scrollBehavior = 'smooth',
-  visible: visibleProp,
+  open: openProp,
   container = null,
   label = 'Back to top',
   children,
   className,
   style,
   onClick,
-  onVisibleChange,
+  onOpenChange,
   flightKey,
   ...rest
 }: StarBackToTopProps) {
-  const controlled = visibleProp !== undefined
+  const controlled = openProp !== undefined
   const [scrolled, setScrolled] = useState(false)
   const [flying, setFlying] = useState(false)
-  const shown = controlled ? visibleProp : scrolled
+  const shown = controlled ? openProp : scrolled
 
   useEffect(() => {
     if (controlled) return undefined
@@ -158,8 +163,8 @@ function StarBackToTop({
   }, [container, controlled, threshold])
 
   useEffect(() => {
-    onVisibleChange?.(shown)
-  }, [onVisibleChange, shown])
+    onOpenChange?.(shown)
+  }, [onOpenChange, shown])
 
   // The flight effect below has to read the current visibility without listing it
   // as a dependency: a navigation and the scroll listener's own update land in the

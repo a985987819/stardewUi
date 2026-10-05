@@ -14,13 +14,13 @@ import Calendar from './Calendar'
  * on the next bad keystroke, a toast whose copy changes.
  */
 describe('Tag visibility can be driven from outside', () => {
-  it('does not hide itself while the caller holds it visible', () => {
-    // The controlled contract: `visible` is the source of truth, so clicking
+  it('does not hide itself while the caller holds it open', () => {
+    // The controlled contract: `open` is the source of truth, so clicking
     // the × reports intent through `onClose` but does not yank the tag away.
     // The caller decides — that is the whole point of the controlled mode.
     const onClose = vi.fn()
     render(
-      <Tag visible closable onClose={onClose} closeLabel="Remove">
+      <Tag open closable onClose={onClose} closeLabel="Remove">
         农场
       </Tag>,
     )
@@ -30,16 +30,16 @@ describe('Tag visibility can be driven from outside', () => {
     expect(screen.getByText('农场')).toBeInTheDocument()
   })
 
-  it('hides and restores as the caller flips visible', () => {
+  it('hides and restores as the caller flips open', () => {
     const { rerender } = render(
-      <Tag visible={false} closable closeLabel="Remove">
+      <Tag open={false} closable closeLabel="Remove">
         农场
       </Tag>,
     )
     expect(screen.queryByText('农场')).not.toBeInTheDocument()
 
     rerender(
-      <Tag visible closable closeLabel="Remove">
+      <Tag open closable closeLabel="Remove">
         农场
       </Tag>,
     )
@@ -57,9 +57,9 @@ describe('Tag visibility can be driven from outside', () => {
     expect(screen.queryByText('农场')).not.toBeInTheDocument()
   })
 
-  it('honours defaultVisible for the uncontrolled start state', () => {
+  it('honours defaultOpen for the uncontrolled start state', () => {
     render(
-      <Tag defaultVisible={false} closable closeLabel="Remove">
+      <Tag defaultOpen={false} closable closeLabel="Remove">
         农场
       </Tag>,
     )
@@ -72,21 +72,21 @@ describe('Alert visibility can be driven from outside', () => {
     // The canonical case: user fixes the field, alert dismissed; user breaks
     // it again, the message must return.
     const { rerender } = render(
-      <Alert visible type="error" closable closeLabel="知道了">
+      <Alert open type="error" closable closeLabel="知道了">
         种子名称不能为空
       </Alert>,
     )
     expect(screen.getByText('种子名称不能为空')).toBeInTheDocument()
 
     rerender(
-      <Alert visible={false} type="error" closable closeLabel="知道了">
+      <Alert open={false} type="error" closable closeLabel="知道了">
         种子名称不能为空
       </Alert>,
     )
     expect(screen.queryByText('种子名称不能为空')).not.toBeInTheDocument()
 
     rerender(
-      <Alert visible type="error" closable closeLabel="知道了">
+      <Alert open type="error" closable closeLabel="知道了">
         种子名称不能为空
       </Alert>,
     )

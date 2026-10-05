@@ -74,54 +74,38 @@ describe('Card', () => {
       expect(card.style.getPropertyValue('--card-body-right-shadow')).toMatch(/^rgba\(/)
     })
 
-    it('应该应用night-village配色', () => {
-      const { container } = render(<Card color="night-village">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-night-village'])
+    // The named palettes arrive through `surface`, and they land in the same
+    // `--card-bg` custom property a raw CSS colour does — there is no preset
+    // class, because a class could only carry a fixed value while the colour
+    // needs to drive the derived lighting layers. So each preset is checked by
+    // the body colour it actually resolves to.
+    it.each([
+      ['night-village', '#774b62'],
+      ['forest-farm', '#82b651'],
+      ['wooden-cabin', '#d36c2a'],
+      ['lake-night', '#4988c3'],
+      ['flower-festival', '#bd7e99'],
+      ['mine-starry', '#6a7dc9'],
+      ['farmland', '#cc7f47'],
+      ['orchard-grass', '#6aa545'],
+      ['workshop-ore', '#6b7e90'],
+      ['night-celebration', '#3d56ce'],
+    ] as const)('resolves the %s surface preset', (preset, expected) => {
+      const { container } = render(<Card surface={preset}>内容</Card>)
+      const card = container.firstChild as HTMLElement
+
+      expect(card.style.getPropertyValue('--card-bg')).toBe(expected)
     })
 
-    it('应该应用forest-farm配色', () => {
-      const { container } = render(<Card color="forest-farm">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-forest-farm'])
-    })
+    it('lets surface win over color when both are given', () => {
+      const { container } = render(
+        <Card surface="night-village" color="#123456">
+          内容
+        </Card>,
+      )
+      const card = container.firstChild as HTMLElement
 
-    it('应该应用wooden-cabin配色', () => {
-      const { container } = render(<Card color="wooden-cabin">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-wooden-cabin'])
-    })
-
-    it('应该应用lake-night配色', () => {
-      const { container } = render(<Card color="lake-night">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-lake-night'])
-    })
-
-    it('应该应用flower-festival配色', () => {
-      const { container } = render(<Card color="flower-festival">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-flower-festival'])
-    })
-
-    it('应该应用mine-starry配色', () => {
-      const { container } = render(<Card color="mine-starry">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-mine-starry'])
-    })
-
-    it('应该应用farmland配色', () => {
-      const { container } = render(<Card color="farmland">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-farmland'])
-    })
-
-    it('应该应用orchard-grass配色', () => {
-      const { container } = render(<Card color="orchard-grass">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-orchard-grass'])
-    })
-
-    it('应该应用workshop-ore配色', () => {
-      const { container } = render(<Card color="workshop-ore">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-workshop-ore'])
-    })
-
-    it('应该应用night-celebration配色', () => {
-      const { container } = render(<Card color="night-celebration">内容</Card>)
-      expect(container.firstChild).toHaveClass(styles['stardew-card--color-night-celebration'])
+      expect(card.style.getPropertyValue('--card-bg')).toBe('#774b62')
     })
   })
 

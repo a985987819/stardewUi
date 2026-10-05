@@ -74,13 +74,13 @@ describe('BackToTop', () => {
   })
 
   it('reports visibility changes to its caller', () => {
-    const onVisibleChange = vi.fn()
-    render(<StarBackToTop onVisibleChange={onVisibleChange} />)
+    const onOpenChange = vi.fn()
+    render(<StarBackToTop onOpenChange={onOpenChange} />)
 
-    expect(onVisibleChange).toHaveBeenLastCalledWith(false)
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
 
     scrollPageTo(120)
-    expect(onVisibleChange).toHaveBeenLastCalledWith(true)
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
   })
 
   it('scrolls the window back to the top when clicked', () => {
@@ -231,11 +231,11 @@ describe('BackToTop', () => {
   })
 
   it('gives visibility over to the caller when `visible` is provided', () => {
-    const { rerender } = render(<StarBackToTop visible />)
+    const { rerender } = render(<StarBackToTop open />)
 
     expect(getButton()).toHaveClass(styles['star-back-to-top--visible'])
 
-    rerender(<StarBackToTop visible={false} />)
+    rerender(<StarBackToTop open={false} />)
     expect(getButton()).not.toHaveClass(styles['star-back-to-top--visible'])
 
     // A controlled plane ignores the scroll position in both directions.

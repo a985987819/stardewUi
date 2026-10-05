@@ -62,7 +62,7 @@ const copy = {
       ],
       [
         '自定义显示',
-        '**threshold** 决定滚多少像素才浮现，**bottom / right** 决定停靠位置；传 **visible** 则显示时机完全由调用方接管。',
+        '**threshold** 决定滚多少像素才浮现，**bottom / right** 决定停靠位置；传 **open** 则显示时机完全由调用方接管。',
       ],
     ],
     liveScrollTop: '页面滚动',
@@ -76,7 +76,7 @@ const copy = {
     hearts: '好感度',
     pinOn: '固定显示纸飞机',
     pinOff: '取消固定',
-    pinnedHint: `受控实例：visible 交给按钮，bottom 抬高 ${PINNED_OFFSET}px；点一下纸飞机，本页会在飞走动画放完后替它把 visible 收回。`,
+    pinnedHint: `受控实例：open 交给按钮，bottom 抬高 ${PINNED_OFFSET}px；点一下纸飞机，本页会在飞走动画放完后替它把 open 收回。`,
   },
   en: {
     title: 'BackToTop',
@@ -93,12 +93,12 @@ const copy = {
       ],
       [
         'Controlled Visibility',
-        '**threshold** decides how far the page must scroll, **bottom / right** decide where the plane parks, and passing **visible** hands the timing over to the caller entirely.',
+        '**threshold** decides how far the page must scroll, **bottom / right** decide where the plane parks, and passing **open** hands the timing over to the caller entirely.',
       ],
     ],
     liveScrollTop: 'Scroll offset',
     liveVisible: 'Plane',
-    liveOn: 'visible',
+    liveOn: 'open',
     liveOff: 'hidden',
     toBottom: 'Scroll to bottom',
     toTop: 'Scroll to top',
@@ -107,7 +107,7 @@ const copy = {
     hearts: 'friendship',
     pinOn: 'Pin the plane',
     pinOff: 'Unpin',
-    pinnedHint: `A controlled instance: the button owns \`visible\`, and \`bottom\` lifts it ${PINNED_OFFSET}px. Click it and this page hands \`visible\` back once the flight is over.`,
+    pinnedHint: `A controlled instance: the button owns \`open\`, and \`bottom\` lifts it ${PINNED_OFFSET}px. Click it and this page hands \`open\` back once the flight is over.`,
   },
 } satisfies Record<
   Lang,
@@ -142,7 +142,7 @@ const apiData = {
       type: "'auto' | 'instant' | 'smooth'",
       default: "'smooth'",
     },
-    { property: 'visible', description: '传入后由调用方接管显示时机', type: 'boolean', default: '-' },
+    { property: 'open', description: '传入后由调用方接管显示时机', type: 'boolean', default: '-' },
     {
       property: 'container',
       description: '要监听的滚动容器，默认监听 window',
@@ -151,9 +151,9 @@ const apiData = {
     },
     { property: 'label', description: '按钮的无障碍名称', type: 'string', default: "'Back to top'" },
     {
-      property: 'onVisibleChange',
+      property: 'onOpenChange',
       description: '纸飞机浮现 / 隐藏时触发，挂载时也会触发一次',
-      type: '(visible: boolean) => void',
+      type: '(open: boolean) => void',
       default: '-',
     },
     {
@@ -173,7 +173,7 @@ const apiData = {
       type: "'auto' | 'instant' | 'smooth'",
       default: "'smooth'",
     },
-    { property: 'visible', description: 'Hands the timing over to the caller.', type: 'boolean', default: '-' },
+    { property: 'open', description: 'Hands the timing over to the caller.', type: 'boolean', default: '-' },
     {
       property: 'container',
       description: 'Scroll container to watch; the window by default.',
@@ -182,9 +182,9 @@ const apiData = {
     },
     { property: 'label', description: 'Accessible name of the button.', type: 'string', default: "'Back to top'" },
     {
-      property: 'onVisibleChange',
+      property: 'onOpenChange',
       description: 'Fires when the plane appears or disappears, including on mount.',
-      type: '(visible: boolean) => void',
+      type: '(open: boolean) => void',
       default: '-',
     },
     {
@@ -306,13 +306,13 @@ function StarBackToTopDemoPage() {
         title={t.demos[2][0]}
         description={t.demos[2][1]}
         data={[
-          { label: 'visible', value: String(pinned) },
+          { label: 'open', value: String(pinned) },
           { label: 'bottom', value: `${32 + PINNED_OFFSET}px` },
         ]}
         code={`<StarBackToTop threshold={400} bottom={32} right={32} />
 
 // 或者完全接管显示时机
-<StarBackToTop visible={pinned} bottom={${32 + PINNED_OFFSET}} />
+<StarBackToTop open={pinned} bottom={${32 + PINNED_OFFSET}} />
 
 // 换页时替路由飞走一次
 <StarBackToTop flightKey={pathname} />`}
@@ -324,9 +324,9 @@ function StarBackToTopDemoPage() {
           <p className={styles['back-to-top-demo__hint']}>{t.pinnedHint}</p>
         </div>
         <StarBackToTop
-          visible={pinned}
+          open={pinned}
           bottom={32 + PINNED_OFFSET}
-          // 受控实例不会自己隐藏，所以这一页替它收尾：等飞走动画放完再摘掉 visible，
+          // 受控实例不会自己隐藏，所以这一页替它收尾：等飞走动画放完再摘掉 open，
           // 动画才不会被腰斩。这正是 BACK_TO_TOP_FLIGHT_MS 对调用方的用处。
           onClick={() => window.setTimeout(() => setPinned(false), BACK_TO_TOP_FLIGHT_MS + 60)}
         />

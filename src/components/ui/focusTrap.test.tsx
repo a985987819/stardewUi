@@ -164,7 +164,7 @@ describe('focus containment for aria-modal surfaces', () => {
     render(
       <>
         <Trigger />
-        <Alert visible modal title="注意" onClose={() => {}}>
+        <Alert open modal title="注意" onClose={() => {}}>
           提示内容
         </Alert>
       </>,

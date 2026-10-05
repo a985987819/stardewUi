@@ -25,6 +25,8 @@ const CARD_SURFACE_COLORS = {
 } as const
 
 export type CardColor = keyof typeof CARD_SURFACE_COLORS
+
+/** @deprecated The union was the ambiguity itself. Use `CardColor` for a preset, `string` for a CSS colour. */
 export type CardThemeColor = CardColor | string
 
 export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -32,15 +34,22 @@ export interface StarCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'tit
   children: ReactNode
   variant?: 'default' | 'outlined' | 'elevated'
   size?: 'small' | 'medium' | 'large'
-  color?: CardThemeColor
+  /**
+   * Card body colour, as any CSS colour.
+   *
+   * This used to take a preset name *or* a CSS colour, which made it the one
+   * prop in the library that meant two different things: `<Tag color="green">`
+   * resolved a preset while `<Card color="green">` handed the string to a canvas
+   * colour parser, and `green` is not a CSS colour, so the same word silently
+   * produced two different results. `color` is a CSS colour everywhere now.
+   */
+  color?: string
+  /** Named body surface, for the palettes the sprite set ships with. */
+  surface?: CardColor
   headerExtra?: ReactNode
   footer?: ReactNode
   hoverable?: boolean
   showTitle?: boolean
-}
-
-function isPresetCardColor(color?: CardThemeColor): color is CardColor {
-  return Boolean(color && color in CARD_SURFACE_COLORS)
 }
 
 function StarCard({
@@ -49,6 +58,7 @@ function StarCard({
   variant = 'default',
   size = 'medium',
   color,
+  surface,
   className = '',
   headerExtra,
   footer,
@@ -59,9 +69,9 @@ function StarCard({
   ...rest
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
-  // `color` is the visible card body; the reusable lighting function derives the
-  // framing, stripe bands and directional light from that one swatch.
-  const surfaceColor = isPresetCardColor(color) ? CARD_SURFACE_COLORS[color] : color ?? CARD_DEFAULT_SURFACE_COLOR
+  // `surface` names a shipped palette; `color` is a raw CSS colour. The named
+  // one wins when both are given, because it is the more specific request.
+  const surfaceColor = (surface && CARD_SURFACE_COLORS[surface]) ?? color ?? CARD_DEFAULT_SURFACE_COLOR
   const palette = deriveCardLightingFromSurface(surfaceColor)
   const cardStyle = {
     ...style,
@@ -114,7 +124,6 @@ function StarCard({
     styles['stardew-card'],
     styles[`stardew-card--${variant}`],
     styles[`stardew-card--${size}`],
-    isPresetCardColor(color) && styles[`stardew-card--color-${color}`],
     hasTitle && styles['stardew-card--with-title'],
     hoverable && styles['stardew-card--hoverable'],
     onClick && styles['stardew-card--clickable'],

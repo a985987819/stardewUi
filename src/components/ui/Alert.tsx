@@ -36,10 +36,14 @@ export interface StarAlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ti
    * Controlled visibility. Leave it out to let the alert own its dismissed
    * state. A closable alert used to hide itself permanently, so a form error
    * could never come back after the user fixed and broke the field again.
+   *
+   * Named `open` rather than `visible` to match Dialog / Drawer / Popup: an
+   * alert is something you open and close, and the old name made it the only
+   * one of its family reading a boolean as "shown" rather than "opened".
    */
-  visible?: boolean
+  open?: boolean
   /** Starting visibility for the uncontrolled mode. */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
   /** Called after the built-in close button dismisses the banner. */
   onClose?: () => void
   /** Accessible name of the built-in close button. */
@@ -98,8 +102,8 @@ function StarAlert({
   showIcon = false,
   icon,
   closable = false,
-  visible,
-  defaultVisible = true,
+  open,
+  defaultOpen = true,
   onClose,
   closeLabel = 'Close',
   modal = false,
@@ -116,13 +120,13 @@ function StarAlert({
   // A closable alert used to hide itself permanently, with no way back — which
   // breaks the most common use of all: a form error that should reappear when
   // the field goes bad again.
-  const [internalDismissed, setInternalDismissed] = useState(!defaultVisible)
-  const isVisibleControlled = visible !== undefined
-  const dismissed = isVisibleControlled ? !visible : internalDismissed
+  const [internalDismissed, setInternalDismissed] = useState(!defaultOpen)
+  const isOpenControlled = open !== undefined
+  const dismissed = isOpenControlled ? !open : internalDismissed
 
   const hide = useCallback(() => {
-    if (!isVisibleControlled) setInternalDismissed(true)
-  }, [isVisibleControlled])
+    if (!isOpenControlled) setInternalDismissed(true)
+  }, [isOpenControlled])
 
   const panelRef = useRef<HTMLDivElement>(null)
   const IconGlyph = ALERT_ICONS[type]

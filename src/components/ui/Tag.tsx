@@ -5,11 +5,24 @@ import { createSteppedRectClipPath } from '../../utils/pixelCorners'
 import styles from './Tag.module.scss'
 
 /** Preset ink colours, all drawn from the shared raw colour tokens. */
-export type TagColor = 'default' | 'green' | 'red' | 'yellow' | 'blue' | 'purple'
+export type TagTone = 'default' | 'green' | 'red' | 'yellow' | 'blue' | 'purple'
 
-export interface StarTagProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Preset ink for the frame ring and text. */
-  color?: TagColor
+/** @deprecated Renamed to `TagTone` — `color` now means a CSS colour library-wide. */
+export type TagColor = TagTone
+
+export interface StarTagProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'color'> {
+  /**
+   * Preset ink for the frame ring and text.
+   *
+   * Renamed from `color` to `tone`: these are named presets, not colours you
+   * can read off a palette, and `color` is a CSS colour string in every other
+   * component. Two components reading the same prop name as two different
+   * things is how `<Tag color="green">` and `<Card color="green">` came to mean
+   * different results. `tone` says "pick one of these"; `color` says "use this".
+   */
+  tone?: TagTone
+  /** Any CSS colour for the frame ring and text, overriding `tone`. */
+  color?: string
   /** Shows a pixel × that removes the tag. */
   closable?: boolean
   /** Called after the built-in close button removes the tag. */
@@ -23,10 +36,14 @@ export interface StarTagProps extends HTMLAttributes<HTMLSpanElement> {
    * back. That breaks the two common uses: a filter chip the user removes and
    * then re-adds, and a validation message that should return when the input
    * goes bad again. Both need to reset it from outside.
+   *
+   * Named `open` to match Dialog / Drawer / Popup / Alert, and to stop
+   * colliding with the CSS `visibility` property, which means something
+   * narrower than "this element is on screen".
    */
-  visible?: boolean
+  open?: boolean
   /** Starting visibility for the uncontrolled mode. */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
   /** Tag content. */
   children?: ReactNode
 }
@@ -43,6 +60,9 @@ const TAG_CLIP_PATH = createSteppedRectClipPath(TAG_CORNER_STEPS, TAG_CORNER_STE
 
 type TagCssVariables = CSSProperties & {
   '--star-tag-clip': string
+  '--tag-ring': string
+  '--tag-text': string
+  '--tag-accent': string
 }
 
 /**
@@ -52,34 +72,41 @@ type TagCssVariables = CSSProperties & {
  * parchment fill, so the border stays an even 2px around the stepped corners.
  */
 function StarTag({
-  color = 'default',
+  tone = 'default',
+  color,
   closable = false,
   onClose,
   closeLabel = 'Close',
-  visible,
-  defaultVisible = true,
+  open,
+  defaultOpen = true,
   children,
   className,
   style,
   ...rest
 }: StarTagProps) {
   // Uncontrolled support, same `prop ?? internal` shape as the input family.
-  const [internalVisible, setInternalVisible] = useState(defaultVisible)
-  const isControlled = visible !== undefined
-  const currentVisible = isControlled ? visible : internalVisible
+  const [internalOpen, setInternalOpen] = useState(defaultOpen)
+  const isControlled = open !== undefined
+  const currentOpen = isControlled ? open : internalOpen
 
   const handleClose = (event: MouseEvent<HTMLButtonElement>) => {
     // The button lives inside the tag; swallowing the event keeps a wrapping
     // clickable (card row, filter chip) from reacting to the removal.
     event.stopPropagation()
-    if (!isControlled) setInternalVisible(false)
+    if (!isControlled) setInternalOpen(false)
     onClose?.()
   }
 
-  if (!currentVisible) return null
+  if (!currentOpen) return null
 
+  // `tone` arrives as a class that sets all three variables; an explicit
+  // `color` then overrides them inline, which is why a custom colour wins over
+  // the preset rather than merely replacing the class.
   const cssVariables: TagCssVariables = {
     '--star-tag-clip': TAG_CLIP_PATH,
+    '--tag-ring': color ?? 'var(--tag-ring)',
+    '--tag-text': color ?? 'var(--tag-text)',
+    '--tag-accent': color ?? 'var(--tag-accent)',
   }
 
   return (
@@ -87,7 +114,7 @@ function StarTag({
       {...rest}
       className={classNames(
         styles['star-tag'],
-        color !== 'default' && styles[`star-tag--${color}`],
+        tone !== 'default' && styles[`star-tag--${tone}`],
         className,
       )}
       style={{ ...cssVariables, ...style }}
