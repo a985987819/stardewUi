@@ -166,6 +166,7 @@ skills add a985987819/stardewUi
 | 文档 | 内容 |
 |------|------|
 | [接入指南](docs/consumer-integration.md) | 样式入口选择、素材与路径、SSR / RSC 边界 |
+| [迁移指南](docs/migration-0.3.md) | 0.2.x → 0.3.0 的 breaking 变更（`visible` → `open`、`color` 语义拆分、`size` 档位） |
 | [组件开发规范](docs/component-conventions.md) | 命名、五方一致性契约、文案约定、新增与移除流程 |
 | [发布到 npm](docs/publishing.md) | 令牌生成、版本号、发布后核验、常见报错对照 |
 | [致谢](docs/acknowledgements.md) | 视觉参考来源与许可说明 |
@@ -249,12 +250,12 @@ import { StarCard } from 'stardew-valley-ui'
 </StarCard>
 
 // 预设配色
-<StarCard color="night-village">夜之村庄</StarCard>
-<StarCard color="forest-farm">森林农场</StarCard>
-<StarCard color="wooden-cabin">木屋</StarCard>
-<StarCard color="lake-night">湖之夜</StarCard>
-<StarCard color="flower-festival">花舞节</StarCard>
-<StarCard color="mine-starry">矿洞星空</StarCard>
+<StarCard surface="night-village">夜之村庄</StarCard>
+<StarCard surface="forest-farm">森林农场</StarCard>
+<StarCard surface="wooden-cabin">木屋</StarCard>
+<StarCard surface="lake-night">湖之夜</StarCard>
+<StarCard surface="flower-festival">花舞节</StarCard>
+<StarCard surface="mine-starry">矿洞星空</StarCard>
 
 // 自定义颜色
 <StarCard color="#5f4322">自定义颜色</StarCard>
@@ -286,7 +287,8 @@ import { StarCard } from 'stardew-valley-ui'
 | showTitle | `boolean` | `false` | 是否显示标题栏 |
 | variant | `'default' \| 'outlined' \| 'elevated'` | `'default'` | 卡片变体 |
 | size | `'small' \| 'medium' \| 'large'` | `'medium'` | 卡片尺寸 |
-| color | `CardThemeColor` | - | 配色，支持预设名或自定义色值 |
+| surface | `CardColor` | - | 预设配色名（村庄 / 森林 / 矿洞…） |
+| color | `string` | - | 任意 CSS 颜色作为卡片底色，覆盖 `surface` |
 | headerExtra | `ReactNode` | - | 标题栏额外内容 |
 | footer | `ReactNode` | - | 页脚内容 |
 | hoverable | `boolean` | `false` | 是否有悬浮效果 |
@@ -469,7 +471,7 @@ import { StarBackToTop } from 'stardew-valley-ui'
 <StarBackToTop threshold={400} bottom={140} />
 
 // 显示时机交给调用方，不再监听滚动
-<StarBackToTop visible={pinned} />
+<StarBackToTop open={pinned} />
 
 // 监听某个滚动容器，而不是 window
 <StarBackToTop container={panelElement} />
@@ -484,16 +486,16 @@ import { StarBackToTop } from 'stardew-valley-ui'
 | bottom | `number` | `32` | 距视口底部的固定距离（px） |
 | right | `number` | `32` | 距视口右侧的固定距离（px） |
 | scrollBehavior | `'auto' \| 'instant' \| 'smooth'` | `'smooth'` | 回顶动画，`prefers-reduced-motion` 下强制瞬间跳转 |
-| visible | `boolean` | - | 传入后由调用方接管显示时机 |
+| open | `boolean` | - | 传入后由调用方接管显示时机 |
 | flightKey | `string \| number` | - | 值一变就飞一次（隐藏时不动），适合传路由的 `pathname` |
 | container | `HTMLElement \| null` | `null` | 要监听的滚动容器，默认 `window` |
 | label | `string` | `'Back to top'` | 按钮的无障碍名称 |
 | children | `ReactNode` | 像素纸飞机 | 替换默认图案 |
-| onVisibleChange | `(visible: boolean) => void` | - | 浮现 / 隐藏时触发，挂载时也会触发一次 |
+| onOpenChange | `(open: boolean) => void` | - | 浮现 / 隐藏时触发，挂载时也会触发一次 |
 
 隐藏期间组件仍留在 DOM 里（入场过渡需要挂载点），但会带上 `aria-hidden` 与 `tabIndex={-1}`，键盘和读屏都够不着。图案尺寸是固定的 63 × 63（21 个美术像素 × 3px），放大缩小会连带改掉描边粗细，所以没有 `size` 一类的属性。
 
-点击后纸飞机沿单调的 `cubic-bezier(0.4, 0, 0.7, 0.2)` 向上飞 48px，位移和透明度共用同一条曲线，所以两者同时到终点；整段 280ms，即 `BACK_TO_TOP_FLIGHT_MS`。飞完它不会闪回来：动画的结束状态一直保持到页面真的回到顶部、隐藏样式接管为止。`prefers-reduced-motion` 下整段动画关掉，纸飞机直接消失。用 `visible` 自己管显示时机的调用方可以拿 `BACK_TO_TOP_FLIGHT_MS` 对齐收尾动作——等动画放完再摘掉 `visible`。
+点击后纸飞机沿单调的 `cubic-bezier(0.4, 0, 0.7, 0.2)` 向上飞 48px，位移和透明度共用同一条曲线，所以两者同时到终点；整段 280ms，即 `BACK_TO_TOP_FLIGHT_MS`。飞完它不会闪回来：动画的结束状态一直保持到页面真的回到顶部、隐藏样式接管为止。`prefers-reduced-motion` 下整段动画关掉，纸飞机直接消失。用 `open` 自己管显示时机的调用方可以拿 `BACK_TO_TOP_FLIGHT_MS` 对齐收尾动作——等动画放完再摘掉 `open`。
 
 换页回顶是路由的事，纸飞机不会知道；把 route key 交给 `flightKey`，它就补上飞走那一拍。**当时不在屏幕上就什么都不做**——动画从全不透明开始，硬放会在一个它从没待过的角落凭空闪出来，所以路由可以每次跳转都 bump 它，不必先问一句。本仓库的文档站就是这么用的（`Layout.tsx` 挂一只、`flightKey={pathname}`，并且只在 `pathname` 变化时才回顶，页内锚点只改 hash 就不动滚动位置）。
 
@@ -704,7 +706,7 @@ import { StarLoading } from 'stardew-valley-ui'
 
 <StarLoading />
 <StarLoading active={false} text="加载完成" />
-<StarLoading size={144} text="请稍候..." />
+<StarLoading size="medium" text="请稍候..." />
 <StarLoading speed={300} text="快速生长" />
 <StarLoading center />
 <StarLoading fill />
@@ -714,7 +716,7 @@ import { StarLoading } from 'stardew-valley-ui'
 |------|------|--------|------|
 | active | `boolean` | `true` | 是否激活动画 |
 | text | `string` | `'正在加载...'` | 加载文字 |
-| size | `number` | `144` | 完整花圃的直径 |
+| size | `'small' \| 'medium' \| 'large' \| number` | `'medium'` | 完整花圃的直径；预设档位或精确像素 |
 | speed | `number` | `600` | 每株胡萝卜生长的间隔（毫秒）；数值越小动画越快 |
 | gap | `number` | `8` | 图标与文字间距 |
 | center | `boolean` | `false` | 居中显示 |
@@ -950,12 +952,13 @@ import { StarTag } from 'stardew-valley-ui'
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| color | `'default' \| 'green' \| 'red' \| 'yellow' \| 'blue' \| 'purple'` | `'default'` | 预设配色：更换木框、文字与关闭悬停色 |
+| tone | `'default' \| 'green' \| 'red' \| 'yellow' \| 'blue' \| 'purple'` | `'default'` | 预设配色：更换木框、文字与关闭悬停色 |
+| color | `string` | - | 任意 CSS 颜色，覆盖 `tone` |
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
 | onClose | `() => void` | - | 点击关闭按钮移除标签后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
-| visible | `boolean` | - | 受控可见性；不传则关闭后由标签自持 |
-| defaultVisible | `boolean` | `true` | 非受控模式的初始可见性 |
+| open | `boolean` | - | 受控可见性；不传则关闭后由标签自持 |
+| defaultOpen | `boolean` | `true` | 非受控模式的初始可见性 |
 | children | `ReactNode` | - | 标签内容 |
 
 ---
@@ -1163,8 +1166,8 @@ import { StarAlert } from 'stardew-valley-ui'
 | showIcon | `boolean` | `false` | 显示与色带同色的语义图标（可用 icon 替换） |
 | icon | `ReactNode` | - | 自定义图标，替换内置的语义图标 |
 | closable | `boolean` | `false` | 显示像素 × 关闭按钮 |
-| visible | `boolean` | - | 受控可见性；不传则关闭后由横幅自持 |
-| defaultVisible | `boolean` | `true` | 非受控模式的初始可见性 |
+| open | `boolean` | - | 受控可见性；不传则关闭后由横幅自持 |
+| defaultOpen | `boolean` | `true` | 非受控模式的初始可见性 |
 | onClose | `() => void` | - | 关闭后触发 |
 | closeLabel | `string` | `'Close'` | 关闭按钮的无障碍名称 |
 | modal | `boolean` | `false` | 以遮挡式警示对话框（`alertdialog`）渲染，身后的页面变暗且不可点击 |
