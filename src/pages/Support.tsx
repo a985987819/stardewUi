@@ -30,7 +30,7 @@ const copy = {
     freeTitle: '先说清楚三件事',
     freeBody:
       '组件库的使用本身不收取任何费用。支持是自愿的，不影响项目的免费使用，也不会改变许可证——无论是否支持、金额多少，本项目都保持非商业许可。费用仅用于项目维护：组件开发、缺陷修复、文档完善与素材制作。',
-    methodsTitle: '两个二维码',
+    methodsTitle: '微信与支付宝',
     methodsLede: '任选其一，扫一扫就行。金额随意，不必凑整。',
     wechat: '微信支付',
     alipay: '支付宝',
@@ -41,6 +41,10 @@ const copy = {
       { icon: 'art', text: '素材制作：像素图、九宫格切片与动效的绘制打磨' },
       { icon: 'coffee', text: '杂项：构建、发版与那些"只有维护者才看得见"的活儿' },
     ],
+    afdianTitle: '爱发电（按月支持）',
+    afdianLede: '扫码直接跳转爱发电主页，可按月定额支持。金额、周期都可自己定。',
+    afdianTitle2: '不想每月固定？',
+    afdianBody2: '下面两个码一次一付，没有订阅，随时停。',
     notFor: '不接受的用途',
     notForBody:
       '付费定制开发、商业授权费、开源挂名合作——这些不是钱的问题，是许可证边界的问题。商业用途请直接放弃使用本库。',
@@ -54,7 +58,7 @@ const copy = {
     freeTitle: 'Three things first',
     freeBody:
       'Using the component library itself is free, always. Support is voluntary: it does not affect free use of the project, and it does not change the licence — this project stays non-commercial regardless of whether you support it, and how much. Money goes only to maintenance: component development, bug fixes, documentation and artwork.',
-    methodsTitle: 'Two QR codes',
+    methodsTitle: 'WeChat and Alipay',
     methodsLede: 'Pick either one and scan. Any amount works — no need to round up.',
     wechat: 'WeChat Pay',
     alipay: 'Alipay',
@@ -65,6 +69,10 @@ const copy = {
       { icon: 'art', text: 'Artwork: pixel art, nine-slice slicing, and polishing motion' },
       { icon: 'coffee', text: 'Odds and ends: builds, releases, and the work only the maintainer can see' },
     ],
+    afdianTitle: 'Afdian (monthly support)',
+    afdianLede: 'Scan to open the Afdian page, where a monthly amount can be set. You pick the amount and the period.',
+    afdianTitle2: 'Prefer no subscription?',
+    afdianBody2: 'The two codes below are one-off payments. No renewal, cancel any time by simply not paying again.',
     notFor: 'What I do not take',
     notForBody:
       'Paid feature work, commercial licensing, "open source partnership" in name only. Those are licensing-boundary questions, not money questions. If you need the library commercially, please do not use it.',
@@ -84,11 +92,30 @@ const copy = {
     alipay: string
     usageTitle: string
     usage: { icon: string; text: string }[]
+    afdianTitle: string
+    afdianLede: string
+    afdianTitle2: string
+    afdianBody2: string
     notFor: string
     notForBody: string
     thanks: string
   }
 >
+
+/**
+ * The maintainer's Afdian slug. Kept as a constant so switching accounts (or
+ * forking the project) is a one-line change rather than a hunt through JSX.
+ *
+ * Afdian's own embed snippet also ships an inline `<script>` that sets the
+ * iframe width from `document.body.clientWidth`. That is not reproduced here:
+ * React does not render `<script>` elements written as children, and the
+ * snippet's measurement runs at a point where the demo site's layout has not
+ * settled yet. A CSS `max-width` does the same job with no flash and no inline
+ * script to trip a strict CSP.
+ */
+const AFDIAN_SLUG = 'malatang1'
+const AFDIAN_URL = `https://afdian.com/leaflet?slug=${AFDIAN_SLUG}`
+const AFDIAN_PAGE = `https://afdian.com/${AFDIAN_SLUG}`
 
 /** Payment methods, in display order. Image paths are public assets. */
 const METHODS = [
@@ -152,7 +179,41 @@ function StarSupportPage() {
 
       </section>
 
-      <section className={styles['support-usage']}>
+      {/*
+        Afdian renders its own widget inside the frame, so this is a plain
+        iframe rather than one of the library's components. The title is what a
+        screen reader announces, so it names the destination rather than saying
+        "embedded content".
+      */}
+      <section className={styles['support-afdian']}>
+        <h2>{t.afdianTitle}</h2>
+        <p className={styles['support-afdian-lede']}>{t.afdianLede}</p>
+        <iframe
+          className={styles['support-afdian-frame']}
+          src={AFDIAN_URL}
+          title={lang === 'zh' ? '爱发电支持页面' : 'Afdian support page'}
+          scrolling="no"
+          frameBorder={0}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
+        <p className={styles['support-afdian-fallback']}>
+          {lang === 'zh' ? (
+            <>
+              卡片没出来？<a href={AFDIAN_PAGE} target="_blank" rel="noopener noreferrer">点此直接打开爱发电主页</a>。
+            </>
+          ) : (
+            <>
+              No card? <a href={AFDIAN_PAGE} target="_blank" rel="noopener noreferrer">Open the Afdian page directly</a>.
+            </>
+          )}
+        </p>
+      </section>
+
+      <h2 className={styles['support-oneshot-title']}>{t.afdianTitle2}</h2>
+      <p className={styles['support-oneshot-lede']}>{t.afdianBody2}</p>
+
+      <section className={styles['support-methods']}>
         <h2>{t.usageTitle}</h2>
         <ul>
           {t.usage.map((item) => {

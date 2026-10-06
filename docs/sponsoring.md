@@ -102,17 +102,42 @@ bun run build:app && bun run preview
 | 位置 | 内容 |
 | --- | --- |
 | `public/donate/*.png` | 二维码图片本体（演示站与本地预览读这里） |
-| `src/pages/Support.tsx` | 页面文案与 `METHODS` 列表 |
+| `src/pages/Support.tsx` | 页面文案、`METHODS` 列表与 `AFDIAN_SLUG` |
 | `src/i18n/dictionaries.ts` | `header.sponsor` 导航项文案（若要改按钮文字） |
 
 README 里不再直接嵌二维码，只链接到捐赠页面，所以**换码不用改 README**。
+
+## 爱发电
+
+除了一次性扫码，页面还嵌了爱发电的卡片，支持**按月定额**：
+
+```text
+src/pages/Support.tsx → AFDIAN_SLUG = 'malatang1'
+```
+
+换自己的主页只改这一处。页面上的 iframe 指向
+`https://afdian.com/leaflet?slug=<slug>`，底部的兜底链接指向
+`https://afdian.com/<slug>`——爱发电改版或网络不通时至少还有一条路。
+
+**为什么没有照抄官方那段 `<script>`**：它的响应式靠内联脚本读
+`document.body.clientWidth` 来改iframe 宽度，而 React 不会渲染作为子节点的
+`<script>`，照抄的结果是 iframe 尺寸不对且无从修复。这里改用 CSS
+`width:100% + max-width:640px`，效果相同，且不需要放开 CSP 的
+`unsafe-inline`。测试里有一条断言盯着这点。
 
 ## 其他平台
 
 没装微信的话，下面这些渠道也可以：
 
+- **爱发电**：<https://afdian.com/malatang1> —— 按月定额，也支持一次性
 - **GitHub Sponsors**：仓库主页右上角 `Sponsor` 按钮（维护者开通后可见）
-- **爱发电 / Open Collective**：适合希望按月支持开源作者的人
+
+### GitHub 的 Sponsor 按钮
+
+`.github/FUNDING.yml` 已配好，指向爱发电。注意 GitHub 支持的平台键里
+**没有爱发电**，只能走 `custom` 自定义 URL；而且 `custom` 与其他平台键
+**互斥**，同时填只有 `custom` 生效。写 `afdian: malatang1` 这种无效键名
+会被静默忽略——看起来配好了，实际一点用都没有。
 
 ## 不接受捐赠的情况
 

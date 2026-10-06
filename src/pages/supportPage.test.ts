@@ -66,6 +66,31 @@ describe('donation page states the boundaries', () => {
     expect(source).toContain('donate/alipay-qr.png')
   })
 
+  it('embeds the Afdian page with the maintainer slug', () => {
+    expect(source).toContain('malatang1')
+    expect(source).toMatch(/afdian\.com\/leaflet\?slug=/)
+
+    // Afdian's own snippet pairs the iframe with an inline <script> that sets
+    // the width from document.body.clientWidth. React silently drops <script>
+    // children, so a port that copies it would produce an iframe stuck at the
+    // wrong size with nothing to fix it. The responsive behaviour has to come
+    // from CSS instead.
+    //
+    // Checked against the component body only: the file's header comment names
+    // `<script>` when explaining why it is not used.
+    const component = source.slice(source.indexOf('function StarSupportPage'))
+    expect(component).not.toMatch(/<script/)
+    expect(source).toMatch(/className=\{styles\['support-afdian-frame'\]\}/)
+  })
+
+  it('gives the Afdian iframe a title and a direct fallback link', () => {
+    // A framed page with no title announces as "embedded content"; and if
+    // Afdian blocks the frame (or the visitor is offline), the page would be
+    // the only thing on screen with no way out.
+    expect(source).toMatch(/title=\{lang === 'zh' \?[^}]*Afdian/)
+    expect(source).toMatch(/afdian\.com\/\$\{AFDIAN_SLUG\}/)
+  })
+
   it('renders the codes as images with descriptive alt text', () => {
     // A payment QR with no alt text is unreadable to a screen reader; with a
     // generic one it reads as "image", which tells a blind user nothing about

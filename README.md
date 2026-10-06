@@ -396,8 +396,10 @@ solve the problem, but it makes the typing slightly faster.
 WeChat Pay and Alipay codes, and an itemised list of what the money is for.
 
 Any amount works — one coffee is plenty. No need to round up or come back.
-Other channels: GitHub Sponsors (a **Sponsor** button appears on the repo once
-enabled), Afdian / Open Collective.
+Other channels:
+
+- **Afdian** — <https://afdian.com/malatang1> (monthly support, or one-off)
+- **GitHub Sponsors** — a **Sponsor** button appears on the repo once enabled
 
 **Not accepted**: paid feature work, commercial licensing, "open source partnership"
 in name only. Those are licensing-boundary questions, not money questions. See

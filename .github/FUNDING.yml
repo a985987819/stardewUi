@@ -1,0 +1,14 @@
+# 让GitHub 仓库页显示 Sponsor 按钮。
+#
+# 只填 `custom`。GitHub 支持的平台键（github / open_collective / patreon /
+# ko_fi / tidelift / polar / buy_me_a_coffee 等）里没有爱发电，所以走自定义
+# URL 这条路——这是官方文档列出的方式。
+#
+# 不要同时填 `custom` 和任何平台键：两者互斥，`custom` 存在时平台键会被忽略。
+# 也不要写 `afdian: malatang1`——那不是有效键名，会被静默忽略，看起来配好了
+# 实际没有效果。
+#
+# 与项目其他支持渠道保持一致：docs/sponsoring.md 与 /support 页面列的是同一批
+# 渠道，改这里时记得同步那两处。
+
+custom: 'https://afdian.com/malatang1'

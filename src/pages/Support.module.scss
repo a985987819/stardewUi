@@ -39,6 +39,58 @@
   line-height: 1.9;
 }
 
+// The Afdian embed. The widget inside the frame is a third-party page we do
+// not control, so the frame gets a fixed height (its own recommendation) and
+// `max-width` instead of the inline script Afdian's snippet ships — see the
+// note on AFDIAN_URL in Support.tsx.
+.support-afdian {
+  margin: 24px 0;
+  padding: 22px;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel-sm);
+
+  h2 {
+    margin-bottom: 6px;
+    font-size: 20px;
+  }
+}
+
+.support-afdian-lede {
+  margin-bottom: 16px;
+  color: var(--color-text-secondary);
+}
+
+.support-afdian-frame {
+  display: block;
+  width: 100%;
+  // Matches the 640px from Afdian's snippet on desktop…
+  max-width: 640px;
+  height: 200px;
+  // …and behaves like it on narrow screens, without measuring the viewport.
+  border: 0;
+}
+
+.support-afdian-fallback {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+
+  a {
+    color: #b5763a;
+  }
+}
+
+.support-oneshot-title {
+  margin: 26px 0 4px;
+  font-size: 18px;
+}
+
+.support-oneshot-lede {
+  margin-bottom: 4px;
+  color: var(--color-text-secondary);
+}
+
 .support-methods {
   margin: 24px 0;
   padding: 22px;

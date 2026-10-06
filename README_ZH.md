@@ -2024,7 +2024,10 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 里面有微信支付与支付宝两个二维码，以及一份写明钱花在哪里的清单。
 
 金额随意，一杯就是心意，不必凑整，也不用反复来。
-其他渠道：GitHub Sponsors（开通后仓库主页右上角可见）、爱发电 / Open Collective。
+其他渠道：
+
+- **爱发电** —— <https://afdian.com/malatang1>（可按月定额支持）
+- **GitHub Sponsors** —— 开通后仓库主页右上角会出现 Sponsor 按钮
 
 **不接受**：付费定制开发、商业授权费、开源挂名合作——这些是许可证边界问题，不是钱的问题。
 细节见 [docs/sponsoring.md](docs/sponsoring.md)。
