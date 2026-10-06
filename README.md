@@ -291,30 +291,19 @@ installation, real invocation and a request template.
 <summary><b>Styles are broken or not applying at all?</b></summary>
 
 Nine times out of ten the stylesheet was never imported. It lives on a separate
-subpath and needs one explicit line:
-
-```tsx
-import 'stardew-valley-ui/style.css'
-```
-
+subpath and needs one explicit line: `import 'stardew-valley-ui/style.css'`.
 If you use the `/auto` entry, drop that line but import from
 `stardew-valley-ui/auto` instead of `stardew-valley-ui` — mixing both makes the
-loading path hard to reason about.
-See the [integration guide](docs/consumer-integration.md#style-import).
+loading path hard to reason about. See the
+[integration guide](https://github.com/a985987819/stardewUi/blob/main/docs/consumer-integration.md).
 </details>
 
 <details>
 <summary><b><code>window is not defined</code> or hydration mismatch in Next.js?</b></summary>
 
 `StarDialog`, `message`, the canvas components and the storage hooks touch the
-DOM / Canvas / Storage on the client. Mark the components that use them:
-
-```tsx
-'use client'
-import { StarDialog } from 'stardew-valley-ui'
-```
-
-SSR projects should also use the explicit stylesheet (`/style.css`) — `/auto`
+DOM / Canvas / Storage on the client. Mark the components that use them
+`'use client'`. SSR projects should also use the explicit stylesheet — `/auto`
 injects on the client, which flashes unstyled on first paint and needs CSP
 `unsafe-inline`.
 </details>
@@ -322,18 +311,12 @@ injects on the client, which flashes unstyled on first paint and needs CSP
 <details>
 <summary><b>Why didn't <code>&lt;StarTag color="green"&gt;</code> turn green?</b></summary>
 
-A breaking change in 0.3.0: `color` now means **a CSS color** across the entire
-library, and presets moved to their own prop — `tone` for Tag, `surface` for
-Card:
-
-```tsx
-<StarTag tone="green">Fresh crop</StarTag>
-<StarCard surface="night-village">Night village</StarCard>
-```
-
-The old spelling does not error — `green` is not a valid CSS color, so it quietly
-resolves to something else. That ambiguity is exactly why the split exists. Full
-list in the [migration guide](docs/migration-0.3.md).
+A breaking change in 0.3.0: `color` now means **a CSS colour** across the whole
+library, and presets moved to `tone` (Tag) / `surface` (Card). So
+`<StarTag tone="green">Fresh crop</StarTag>`. The old spelling does not error —
+`green` is not a valid CSS colour, so it quietly resolves to something else.
+That ambiguity is exactly why the split exists; full list in the
+[migration guide](docs/migration-0.3.md).
 </details>
 
 <details>
@@ -375,36 +358,26 @@ research, portfolios and non-profit experiments only. Full terms in
 
 ## Say something — honestly, anything
 
-What this library has actually gained since day one is not the 27 components.
-It's the bugs **you** ran into. **Every piece of feedback gets read**, including
+What this library has gained since day one is not the 27 components. It's the
+bugs **you** ran into. **Every piece of feedback gets read**, including
 "I don't really like this design."
 
-Four doors below. Pick one and an issue opens — no forms to fill in.
+👉 **[Open an issue](https://github.com/a985987819/stardewUi/issues/new/choose)** —
+any of these, no forms required:
 
-| I want to talk about | A one-liner example | Open an issue |
-| --- | --- | --- |
-| **It doesn't work** | "Styles didn't apply after install", "focus jumps when I open the dialog" | [New issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
-| **It's hard to use** | "Six lines to pop a dialog", "why both `open` and `visible`?" | [New issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
-| **It doesn't look right** | "This blue isn't the game's blue", "the border is a touch heavy" | [New issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
-| **Why is it built this way?** | "Why nine-slice buttons instead of rounded corners?", "was the motion curve picked at random?" | [New issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
+- **It doesn't work** — "styles didn't apply after install", "focus jumps when I open the dialog"
+- **It's hard to use** — "six lines to pop a dialog", "why both `open` and `visible`?"
+- **It doesn't look right** — "this blue isn't the game's blue", "the border is a touch heavy"
+- **Why is it built this way?** — "why nine-slice buttons instead of rounded corners?", "was the motion curve picked at random?"
 
-**The fourth category is my favourite.** Plenty of the trade-offs behind the
-implementation are written down in the
-[migration guide](docs/migration-0.3.md) and in code comments — but that is *my*
-view. Your use case is different, so what trips you up is different too. **Where
-something feels wrong to you is very likely exactly what I never considered.**
+The last category is my favourite. The trade-offs behind the implementation are
+written down in the [migration guide](docs/migration-0.3.md) and in code comments
+— but that's *my* view. Your use case is different, so what trips you up is
+different too. **Where something feels wrong to you is very likely exactly what
+I never considered.**
 
-### Prefer to just open one?
-
-👉 **[Click here to create an issue](https://github.com/a985987819/stardewUi/issues/new/choose)**
-
-- 💬 Idea / question / criticism → pick **Discussion** or open an issue directly
-- 🐛 Bug or missing feature → pick **Bug report** or **Feature request**
-- 🤝 Want to help maintain it → an issue is enough. Stack: React + TypeScript, Bun, Vite, SCSS, Vitest
-
-> **Not sure if it counts as a bug?** Then file it as one. A lot of the design
-> here has only ever been used by me, which makes me the last person qualified
-> to notice the problem.
+> Not sure if it counts as a bug? File it as one. A lot of the design here has
+> only ever been used by me, which makes me the last person qualified to notice.
 
 ---
 

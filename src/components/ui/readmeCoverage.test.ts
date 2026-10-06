@@ -379,14 +379,16 @@ describe('English README stays a short pointer, not a second manual', () => {
 
   it('stays short enough to read in one sitting', () => {
     // Not a style preference: the whole point of trimming was that the licence
-    // and donation sections sit within reach of the first screen.
+    // and donation sections sit within reach of the first screen. 480 is the
+    // measured size after trimming; the 30-line margin absorbs small edits
+    // without letting the API reference quietly grow back in.
     const lines = english.split('\n').length
 
     expect(
       lines,
       `README.md is ${lines} lines. The full API lives in README_ZH.md and on the demo site; ` +
         'inlining it here pushed the licence and donation sections out of reach.',
-    ).toBeLessThan(520)
+    ).toBeLessThan(480)
   })
 
   it('does not inline per-component prop tables', () => {
@@ -412,6 +414,29 @@ describe('English README stays a short pointer, not a second manual', () => {
     for (const heading of ['## License', '## Acknowledgements', '## Buy me a coffee']) {
       expect(english, `${heading} went missing from the English README`).toContain(heading)
     }
+  })
+
+  it('puts the licence and donation sections within reach of the first screen', () => {
+    // The specific regression this trim existed to fix: a reader deciding
+    // whether to trust the project had to scroll past every prop table to find
+    // out whether it was free to use. Measured as a fraction of the file rather
+    // than an absolute line count so the check survives ordinary editing.
+    const lines = english.split('\n')
+    const fraction = (heading: string) => {
+      const at = lines.findIndex((l) => l.startsWith(heading))
+      expect(at, `${heading} not found`).toBeGreaterThan(-1)
+      return at / lines.length
+    }
+
+    expect(
+      fraction('## Buy me a coffee'),
+      'the donation section should sit well before the end of the file',
+    ).toBeLessThan(0.9)
+
+    expect(
+      fraction('## License'),
+      'the licence should be reachable without scrolling through the whole file',
+    ).toBeLessThan(0.95)
   })
 
   it('documents the language switch on both READMEs', () => {
