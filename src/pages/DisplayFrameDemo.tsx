@@ -142,8 +142,12 @@ function StarDisplayFrameDemoPage() {
         id="free"
         title={t.demos[2][0]}
         description={t.demos[2][1]}
-        code={`<StarDisplayFrame style={{ width: 260 }}>
+        code={lang === 'zh'
+          ? `<StarDisplayFrame style={{ width: 260 }}>
   <Row label="上古种子" value="12 瓶" />
+</StarDisplayFrame>`
+          : `<StarDisplayFrame style={{ width: 260 }}>
+  <Row label="Ancient Seeds" value="12 jars" />
 </StarDisplayFrame>`}
       >
         <StarDisplayFrame style={{ width: 260 }}>

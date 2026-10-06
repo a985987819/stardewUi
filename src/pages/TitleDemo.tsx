@@ -94,6 +94,9 @@ function StarTitleDemoPage() {
         id="chinese"
         title={t.demos[1][0]}
         description={t.demos[1][1]}
+        {/* Intentionally not localized: this demo exists to show that
+            StarTitle renders CJK glyphs at the same pixel weight as latin ones,
+            so the sample text stays Chinese in both languages. */}
         code={'<StarTitle>太中了！！</StarTitle>'}
       >
         <StarTitle>太中了！！</StarTitle>

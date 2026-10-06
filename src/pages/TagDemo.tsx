@@ -122,7 +122,9 @@ function StarTagDemoPage() {
         id="colors"
         title={t.demos[1][0]}
         description={t.demos[1][1]}
-        code={'<StarTag tone="green">新鲜作物</StarTag>\n<StarTag tone="red">高峰定价</StarTag>\n<StarTag tone="yellow">高峰定价</StarTag>\n<StarTag tone="blue">深海鱼</StarTag>\n<StarTag tone="purple">秘境种子</StarTag>'}
+        code={lang === 'zh'
+          ? '<StarTag tone="green">新鲜作物</StarTag>\n<StarTag tone="red">高峰定价</StarTag>\n<StarTag tone="yellow">待交付</StarTag>\n<StarTag tone="blue">深海鱼</StarTag>\n<StarTag tone="purple">秘境种子</StarTag>'
+          : '<StarTag tone="green">Fresh crop</StarTag>\n<StarTag tone="red">Peak price</StarTag>\n<StarTag tone="yellow">Awaiting delivery</StarTag>\n<StarTag tone="blue">Deep sea fish</StarTag>\n<StarTag tone="purple">Secret seeds</StarTag>'}
       >
         <div style={{ display: 'grid', gap: 10 }}>
           {TAG_TONES.map((color, index) => (

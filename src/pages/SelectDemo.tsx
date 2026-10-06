@@ -106,7 +106,9 @@ function StarSelectDemoPage() {
         id="disabled"
         title={t.demos[1][0]}
         description={t.demos[1][1]}
-        code={'<StarSelect placeholder="选择工具" options={[{ value: "hoe", label: "锄头", disabled: true }]} />\n<StarSelect disabled options={options} defaultValue="option-0" />'}
+        code={lang === 'zh'
+          ? '<StarSelect placeholder="选择工具" options={[{ value: "hoe", label: "锄头", disabled: true }]} />\n<StarSelect disabled options={options} defaultValue="option-0" />'
+          : '<StarSelect placeholder="Pick a tool" options={[{ value: "hoe", label: "Hoe", disabled: true }]} />\n<StarSelect disabled options={options} defaultValue="option-0" />'}
       >
         <div style={{ display: 'grid', gap: 18 }}>
           <StarSelect placeholder={lang === 'zh' ? '选择工具' : 'Pick a tool'} options={makeOptions(t.tools, 0)} aria-label={t.demos[1][0]} />

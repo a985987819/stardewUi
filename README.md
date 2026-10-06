@@ -39,6 +39,10 @@ function App() {
 在线演示站（每个组件都有可交互示例与完整 API 表）：
 **<https://a985987819.github.io/stardewUi/>**
 
+**English** | [中文](README.md) · **反馈问题**：[新建 Issue](https://github.com/a985987819/stardewUi/issues/new/choose)
+
+> **Looking for the English version?** See **[README_EN.md](https://github.com/a985987819/stardewUi/blob/main/README_EN.md)**.
+
 ---
 
 ## 它能给你什么
@@ -290,6 +294,7 @@ import { StarDialog } from 'stardew-valley-ui'
 
 - [它能给你什么](#它能给你什么) · [安装](#安装) · [快速开始](#快速开始) · [在其他前端项目中使用](#在其他前端项目中使用)
 - [让 AI Agent 直接使用](#让-ai-agent-直接使用) · [常见问题](#常见问题)
+- [说点什么吧](#说点什么吧真的什么都行) · [请我喝杯咖啡](#请我喝杯咖啡-)
 - **组件**
   - 容器与展示：[Card](#starcard---卡片) · [Title](#startitle---标题) · [PixelText](#starpixeltext---像素化文本) · [DisplayFrame](#stardisplayframe---展示框) · [Avatar](#staravatar---头像) · [Divider](#stardivider---分割线) · [EmptyState](#staremptystate---空状态) · [Loading](#starloading---加载) · [Tag](#startag---标签) · [Badge](#starbadge---徽标) · [Collapse](#starcollapse---折叠面板) · [Skeleton](#starskeleton---骨架屏)
   - 表单与操作：[NineSliceButton](#starnineslicebutton---九宫格按钮) · [Input](#starinput---输入框) · [Textarea](#startextarea---多行输入) · [Switch](#starswitch---开关) · [Radio](#starradio---单选框) · [Checkbox](#starcheckbox---多选框) · [Select](#starselect---下拉选择) · [Rating](#starrating---评分) · [Progress](#starprogress---进度条)
@@ -1949,6 +1954,70 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 `README.md` 与 `i18n/dictionaries.ts` 是手写文件，找不到对应内容时只告警不报错；其余入口漏一处守卫就会红。
 
 完整约定（命名、五方一致性契约、视觉与主题、文案、完成定义、移除流程）见 [docs/component-conventions.md](docs/component-conventions.md)。
+
+---
+
+## 说点什么吧——真的什么都行
+
+这个库大概走到今天，最有价值的不是那27 个组件，而是你们踩过的坑。
+**任何一条反馈我都会读**，包括"这个设计我不太喜欢"。
+
+下面四个入口，点一下就能开 issue，不用先注册一堆东西：
+
+| 我想聊 | 一句话例子 | 点这里 |
+| --- | --- | --- |
+| **这东西不好用** | "装完样式没生效"、"点开对话框焦点跑丢了" | [提一个 Issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
+| **这东西太难用** | "六行代码才能弹个框"、"为什么又叫 `open` 又叫 `visible`" | [提一个 Issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
+| **这东西不好看** | "这个蓝和游戏里的不太像"、"描边粗了一点" | [提一个 Issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
+| **这设计凭啥这样** | "为什么按钮要用九宫格而不是圆角"、"动效曲线是随便选的吗" | [提一个 Issue](https://github.com/a985987819/stardewUi/issues/new/choose) |
+
+**第四类尤其欢迎。** 实现背后的取舍我写了不少在
+[迁移指南](docs/migration-0.3.md)和代码注释里，但那是我的视角。
+你用的场景不一样，撞到的痛点自然也不一样——**你觉得别扭的地方，很可能正是我没考虑到的地方。**
+
+### 想直接开issue？
+
+👉 **[点这里新建Issue](https://github.com/a985987819/stardewUi/issues/new/choose)**
+
+- 💬 想法 / 疑问 / 挑刺 → 选 **Discussion** 或直接开 issue
+- 🐛 报错 / 功能缺失 → 选 **Bug report** 或 **Feature request**
+- 🤝 想一起维护 → 提issue 即可，栈是 React + TypeScript、Bun、Vite、SCSS、Vitest
+
+> **不确定算不算 bug？** 那就当成 bug 提。这个库里有很多设计只有我自己用过，
+> 我很可能是最后一个发现问题的人。
+
+---
+
+## 请我喝杯咖啡 ☕
+
+> **先说清楚最重要的一件事：捐款不是购买授权。**
+> 无论捐不捐、捐多少，本项目都保持[非商业许可](LICENSE)——
+> 捐款是对维护时间的心意，不是许可证的赎买券，也不会把条款变成 MIT。
+
+维护一个组件库的开销是看不见的：27 个组件、上百个测试、每次发版前把 tarball 装进临时
+项目真跑一遍、修掉那种「只有发出去才会暴露」的问题。
+
+这些活儿没人给你派工。咖啡钱不解决问题，但能让搬砖的手速稍微快一点。
+
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/a985987819/stardewUi/main/docs/assets/donate-qr.png"
+    alt="微信赞赏码：扫一扫，请我喝杯咖啡"
+    width="220"
+  />
+</p>
+
+<p align="center">
+  <sub>
+    没有二维码？说明维护者还没放上来。<a href="docs/sponsoring.md#怎么换成我自己的二维码">怎么放，看这里</a>。<br>
+    金额随意，一杯就是心意。真的，不必凑整，也不用反复来。
+  </sub>
+</p>
+
+其他渠道：GitHub Sponsors（开通后仓库主页右上角可见）、爱发电 / Open Collective。
+
+**不接受**：付费定制开发、商业授权费、开源挂名合作——这些是许可证边界问题，不是钱的问题。
+细节见 [docs/sponsoring.md](docs/sponsoring.md)。
 
 ---
 

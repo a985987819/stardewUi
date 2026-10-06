@@ -17,7 +17,14 @@
     "stardew-valley",
     "pixel-art",
     "ui-components",
-    "component-library"
+    "component-library",
+    "pixel",
+    "retro",
+    "game-ui",
+    "typescript",
+    "design-system",
+    "farm",
+    "cozy"
   ],
   "license": "LicenseRef-StardewValleyUI-NonCommercial",
   "main": "./dist/stardew-valley-ui.cjs",
@@ -48,7 +55,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README_EN.md"
   ],
   "sideEffects": [
     "**/*.css",
