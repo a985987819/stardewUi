@@ -34,8 +34,6 @@ const copy = {
     methodsLede: '任选其一，扫一扫就行。金额随意，不必凑整。',
     wechat: '微信支付',
     alipay: '支付宝',
-    pending: '码还没放上来',
-    pendingHint: '维护者还没把收款码放进来：把图片放到 public/donate/ 下同名替换即可。',
     usageTitle: '钱花在哪',
     usage: [
       { icon: 'wrench', text: '组件开发：新组件、既有组件的能力补齐与缺陷修复' },
@@ -60,10 +58,7 @@ const copy = {
     methodsLede: 'Pick either one and scan. Any amount works — no need to round up.',
     wechat: 'WeChat Pay',
     alipay: 'Alipay',
-    pending: 'Code not set up yet',
-    pendingHint:
-      'The maintainer has not dropped a payment code in yet: replace the image under public/donate/ with the same filename.',
-    usageTitle: 'Where the money goes',
+        usageTitle: 'Where the money goes',
     usage: [
       { icon: 'wrench', text: 'Component development: new components, filling gaps in existing ones, fixing defects' },
       { icon: 'book', text: 'Documentation: writing down the parts that confused people, and recording the traps' },
@@ -87,8 +82,6 @@ const copy = {
     methodsLede: string
     wechat: string
     alipay: string
-    pending: string
-    pendingHint: string
     usageTitle: string
     usage: { icon: string; text: string }[]
     notFor: string
@@ -147,9 +140,9 @@ function StarSupportPage() {
                 src={resolveAssetPath(image)}
                 width={240}
                 height={240}
-                // The image is a placeholder until the maintainer drops a real
-                // code in, and a blank alt would read as a broken card.
-                alt={`${t[key]} — ${t.pending}`}
+                // Names the channel so a screen-reader user knows where the
+                // money is going before they pull out a phone to scan.
+                alt={lang === 'zh' ? `${t[key]}收款码` : `${t[key]} QR code`}
                 loading="lazy"
               />
               <figcaption className={styles['support-method-name']}>{t[key]}</figcaption>
@@ -157,9 +150,6 @@ function StarSupportPage() {
           ))}
         </div>
 
-        <p className={styles['support-pending']}>
-          {t.pending} — {t.pendingHint}
-        </p>
       </section>
 
       <section className={styles['support-usage']}>

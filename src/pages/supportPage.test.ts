@@ -70,7 +70,7 @@ describe('donation page states the boundaries', () => {
     // A payment QR with no alt text is unreadable to a screen reader; with a
     // generic one it reads as "image", which tells a blind user nothing about
     // where the money goes.
-    expect(source).toMatch(/alt=\{`\$\{t\[key\]\}/)
+    expect(source).toMatch(/alt=\{lang === 'zh'/)
   })
 
   it('keeps the free-use notice above the QR codes', () => {
@@ -114,6 +114,33 @@ describe('donation page is reachable', () => {
         () => readFileSync(resolve(process.cwd(), 'public/donate', asset), 'utf8'),
         `public/donate/${asset} is missing`,
       ).not.toThrow()
+    }
+  })
+
+  it('ships real PNGs of a sane size', () => {
+    // Both codes arrived as JPEGs renamed to `.png`, and at ~150KB each. The
+    // extension lying is the smaller problem: `docs/sponsoring.md` tells the
+    // maintainer to use PNG because scanners are less reliable with JPEG, so a
+    // JPEG here quietly contradicts the project's own instructions. The size
+    // cap matters too — the two load side by side on first paint.
+    for (const asset of ['wechat-qr.png', 'alipay-qr.png']) {
+      const path = resolve(process.cwd(), 'public/donate', asset)
+      const bytes = readFileSync(path)
+
+      expect(
+        bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])),
+        `public/donate/${asset} is not a PNG despite its extension`,
+      ).toBe(true)
+
+      // IHDR width/height live at bytes 16..24, big-endian, after the 8-byte
+      // signature and the 8-byte PNG+IHDR chunk header.
+      expect(bytes.readUInt32BE(16), `${asset} is narrower than 400px; it will look blurry on retina`).toBeGreaterThanOrEqual(400)
+      expect(bytes.readUInt32BE(20), `${asset} is shorter than 400px; it will look blurry on retina`).toBeGreaterThanOrEqual(400)
+
+      expect(
+        bytes.byteLength,
+        `public/donate/${asset} is ${Math.round(bytes.byteLength / 1024)}KB; the two codes load together on first paint`,
+      ).toBeLessThan(102_400)
     }
   })
 })
