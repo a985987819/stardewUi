@@ -76,6 +76,19 @@
     }
   }
 
+  // Shares the icon-button shape with the GitHub link so the header keeps one
+  // rhythm, but carries a warm tint: this one asks for something rather than
+  // just navigating out, and it should not read as another nav item.
+  &-sponsor {
+    padding: 4px;
+    color: #b5763a;
+
+    &:hover {
+      color: #8f5a26;
+      background: var(--color-bg-hover);
+    }
+  }
+
   &-menu-btn {
     @apply hidden bg-transparent border-none cursor-pointer p-1;
     color: var(--color-text);

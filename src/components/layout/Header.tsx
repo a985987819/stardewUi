@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { ExternalLink, Menu } from 'lucide-react'
+import { Coffee, ExternalLink, Menu } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { useI18n } from '../../i18n'
 import StarLangSwitch from './LangSwitch'
@@ -8,7 +8,14 @@ import styles from './Header.module.scss'
 
 function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { t } = useI18n()
+  const { lang, t } = useI18n()
+
+  // Both READMEs carry a coffee section, but GitHub slugs the Chinese heading
+  // differently from the English one, so the link has to follow the language.
+  const sponsorUrl =
+    lang === 'zh'
+      ? 'https://github.com/a985987819/stardewUi#请我喝杯咖啡-'
+      : 'https://github.com/a985987819/stardewUi#buy-me-a-coffee-'
 
   const navItems = [
     { path: '/guide/self-use', label: t('nav.guide') },
@@ -40,6 +47,16 @@ function StarHeader() {
 
         <div className={styles['doc-header-actions']}>
           <StarLangSwitch />
+          <a
+            href={sponsorUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles['doc-header-sponsor']}
+            title={t('header.sponsor')}
+            aria-label={t('header.sponsor')}
+          >
+            <Coffee size={20} />
+          </a>
           <a
             href="https://github.com/a985987819/stardewUi"
             target="_blank"
