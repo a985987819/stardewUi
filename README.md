@@ -2,11 +2,56 @@
 
 [![npm version](https://img.shields.io/npm/v/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
 [![npm downloads](https://img.shields.io/npm/dm/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
-[![license](https://img.shields.io/npm/l/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
+[![types](https://img.shields.io/npm/types/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
+[![license](https://img.shields.io/npm/l/stardew-valley-ui.svg)](https://github.com/a985987819/stardewUi/blob/main/LICENSE)
 
-一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
+> 🐣 27 个组件 ·4 条样式接入路径任选 ·零运行时配置 ·ESM / CJS / 类型声明齐全
 
-面向个人学习、研究和非商业原型：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。商业用途不被允许，详见下方版权说明与根目录 [LICENSE](LICENSE)。
+一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。
+它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
+
+不只是「把按钮换成像素图」—— 木框的阶梯缺口、羊皮纸的凹陷、进度格的逐格填充、
+对话框背后骤然缩小柔化的农场，都是按星露谷的界面语言一帧一帧画进 Canvas 与
+九宫格切片里的。**装上它，你的 React 项目就长出一座农场。**
+
+```tsx
+import { StarCard, StarNineSliceButton, StarDialog, message } from 'stardew-valley-ui'
+import 'stardew-valley-ui/style.css'
+
+function App() {
+  const [open, setOpen] = useState(false)
+  return (
+    <StarCard title="皮埃尔的杂货铺" showTitle>
+      <StarNineSliceButton variant="primary" onClick={() => setOpen(true)}>
+        看看今天卖什么
+      </StarNineSliceButton>
+      <StarDialog
+        open={open}
+        title="皮埃尔"
+        content="雨要下大了。把这包防风的种子带走吧，春天可不等人。"
+        onClose={() => setOpen(false)}
+      />
+    </StarCard>
+  )
+}
+```
+
+在线演示站（每个组件都有可交互示例与完整 API 表）：
+**<https://a985987819.github.io/stardewUi/>**
+
+---
+
+## 它能给你什么
+
+| | |
+| --- | --- |
+| 🧩 **27 个组件** | 表单、浮层、日期、导航、反馈全覆盖，全部支持受控与非受控 |
+| 🎨 **Canvas 像素渲染** | 标题、像素文本、九宫格按钮由 Canvas 逐像素绘制，不是模糊滤镜 |
+| ♿ **无障碍内建** | 焦点陷阱、Esc 关闭、`aria-modal`、键盘可达不是可选项 |
+| 🏗️ **零配置** | 像素素材随包发布，不需要往 `public/` 拷任何文件 |
+| 📦 **双格式** | ESM + CommonJS +完整类型声明，`moduleResolution` 随便怎么配 |
+| 🪄 **样式两选一** | 显式 `style.css`（适合 SSR）或 `/auto` 自动注入（适合纯客户端） |
+| 🤖 **Agent 友好** | 内置可安装 Skill，让 AI Agent 按真实 API 写，不靠猜 |
 
 ---
 
@@ -27,6 +72,10 @@ yarn add stardew-valley-ui
 ```
 
 **前置依赖**：项目需要 React >= 18.0.0 和 ReactDOM >= 18.0.0。
+`clsx` 与 `lucide-react` 会作为传递依赖自动装好，无需手动添加。
+
+> 从 **0.2.x 升级**请先读[迁移指南](docs/migration-0.3.md)：`visible` 已统一为 `open`，
+> `color` 的预设名单独走 `tone` / `surface`。
 
 ---
 
@@ -89,7 +138,12 @@ function App() {
 
 ## 在其他前端项目中使用
 
-样式只需在应用里生效一次。组件库内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式。两种方式任选其一：
+库内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式，所以可以放心地和
+Ant Design、Element Plus 等现有设计体系共存。
+
+### 样式接入：二选一，不要都来
+
+样式只需在应用里生效一次。两种路径的**组件导入写法完全一致**，只差一行css 引用：
 
 | 方式 | 写法 | 适用场景 |
 | --- | --- | --- |
@@ -105,11 +159,19 @@ import { StarCard } from 'stardew-valley-ui'
 import { StarCard } from 'stardew-valley-ui/auto'
 ```
 
-> 「自动注入」在模块加载时创建 `<style id="stardew-valley-ui-styles">`。代价是：SSR/SSG 首屏可能出现短暂无样式（样式在客户端才注入）、
-> 需要 `style-src 'unsafe-inline'` 的 CSP 放行。因此 SSR 项目仍建议用显式样式入口 —— 详细取舍见
-> [接入指南](docs/consumer-integration.md#样式引入方式)。
+两条路径**只选一条**。若项目同时保留了两者也不会重复加载——注入前会探测样式是否
+已在页面上，所以混着写也不会让 CSS 变两份。
 
-内置的默认按钮、季节按钮、日历背景、空状态和加载动画素材均随构建产物发布，安装 npm 包即可使用。传入 `backgroundSrc`、`imageSrc`、`src` 等自定义图片地址时，资源的部署与缓存策略由宿主项目负责；Vite 项目中推荐传入静态导入得到的 URL：
+> **「自动注入」的代价**：它在模块加载时创建 `<style id="stardew-valley-ui-styles">`。
+> 这意味着 SSR / SSG 首屏可能出现短暂无样式（样式在客户端才注入），并且需要
+> `style-src 'unsafe-inline'` 的 CSP 放行。因此 SSR 项目仍建议用显式样式入口 ——
+> 详细取舍见[接入指南](docs/consumer-integration.md#样式引入方式)。
+
+### 自定义图片资源
+
+内置的默认按钮、季节按钮、日历背景、空状态和加载动画素材均随构建产物发布，
+安装 npm 包即可使用。传入 `backgroundSrc`、`imageSrc`、`src` 等自定义图片地址时，
+资源的部署与缓存策略由宿主项目负责；Vite 项目中推荐传入静态导入得到的 URL：
 
 ```tsx
 import customButtonBackground from './assets/custom-button.png'
@@ -120,7 +182,11 @@ export function SaveButton() {
 }
 ```
 
-`StarDialog`、`message`、画布背景和浏览器存储 Hooks 会在客户端访问 DOM、Canvas 或 Storage。使用 Next.js、RSC 等 SSR 框架时，请将调用它们的交互组件标记为客户端组件（`'use client'`）；不要在服务端渲染阶段调用命令式的 `message(...)`。
+### SSR / RSC 边界
+
+`StarDialog`、`message`、画布背景和浏览器存储 Hooks 会在客户端访问 DOM、Canvas 或
+Storage。使用 Next.js、RSC 等 SSR 框架时，请将调用它们的交互组件标记为客户端组件
+（`'use client'`）；不要在服务端渲染阶段调用命令式的 `message(...)`。
 
 ### 公开组件一览
 
@@ -139,20 +205,91 @@ export function SaveButton() {
 
 ## 让 AI Agent 直接使用
 
-仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/SKILL.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它把「安装组件库 → 选择唯一的样式入口 → 按公开 API 实现 → 执行项目检查」收敛为一条真实接入流程，避免 Agent 凭印象编造 Props。
+仓库包含可安装的 [`stardew-valley-ui` Skill](skills/stardew-valley-ui/SKILL.md)，供 Codex、Claude Code、Cursor 及其他支持 `SKILL.md` 的 Agent 按需读取。它把「安装组件库→ 选择唯一的样式入口 → 按公开 API 实现 → 执行项目检查」收敛为一条真实接入流程，避免 Agent 凭印象编造 Props。
 
 ```bash
 skills add a985987819/stardewUi
 ```
 
-也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills 目录。安装后可直接描述页面目标，或明确调用 `$stardew-valley-ui`，例如“用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css，并用 StarDialog 确认丢弃操作”。精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释技能的安装、实际调用方式与需求模板。
+也可以将 [`skills/stardew-valley-ui/`](skills/stardew-valley-ui/) 复制到 Agent 的 skills目录。安装后可直接描述页面目标，或明确调用 `$stardew-valley-ui`，例如“用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css，并用 StarDialog 确认丢弃操作”。精确 Props 始终以已安装包的 TypeScript 声明为准。在线演示站的「使用指南 → Agent 帮我使用」同步解释技能的安装、实际调用方式与需求模板。
+
+---
+
+## 常见问题
+
+<details>
+<summary><b>装完之后样式全是乱的 / 没有生效？</b></summary>
+
+99% 是样式没引入。库把样式放在独立的子路径导出里，需要你显式引一次：
+
+```tsx
+import 'stardew-valley-ui/style.css'
+```
+
+如果你用的是 `/auto` 入口，就不用再引这行——但要记得把导入源从`stardew-valley-ui` 换成
+`stardew-valley-ui/auto`，两处混用会让加载路径变得难以推断。
+详见[接入指南](docs/consumer-integration.md#样式引入方式)。
+</details>
+
+<details>
+<summary><b>Next.js 里报 <code>window is not defined</code> 或 hydration 不匹配？</b></summary>
+
+`StarDialog`、`message`、画布类组件和存储 Hooks 会在客户端访问 DOM / Canvas / Storage。
+把用到它们的组件标记为客户端组件：
+
+```tsx
+'use client'
+import { StarDialog } from 'stardew-valley-ui'
+```
+
+同时 SSR 项目请用显式样式入口（`/style.css`），`/auto` 的样式是客户端才注入的，
+首屏会短暂无样式并需要 CSP 放行 `unsafe-inline`。
+</details>
+
+<details>
+<summary><b><code>&lt;StarTag color="green"&gt;</code> 为什么没变绿？</b></summary>
+
+这是 0.3.0 的breaking change：<code>color</code> 在全库统一只表示 **CSS 颜色**，
+预设名单独走`tone`（Tag）/ `surface`（Card）。所以要写：
+
+```tsx
+<StarTag tone="green">新鲜作物</StarTag>
+<StarCard surface="night-village">夜之村庄</StarCard>
+```
+
+写错不会报错——`green` 不是合法 CSS 颜色，会被解析成别的颜色。这也是我们把它拆开的原因。
+完整清单见[迁移指南](docs/migration-0.3.md)。
+</details>
+
+<details>
+<summary><b>控制台警告 <code>color 只接受 hex</code>？</b></summary>
+
+`StarProgress`、`StarDivider`、`StarSwitch` 等组件的调色板要靠解析 RGB 来推导描边、
+高光和阴影，所以 `color` **只接受 3/6 位 hex**（`#fff`、`#7a9c48`）。
+`red`、`var(--brand)` 这类写法现在会在开发期告警——请换成 hex。
+</details>
+
+<details>
+<summary><b>包体为什么有 4MB？</b></summary>
+
+绝大部分是**内联的像素素材**（按钮、季节主题、日历背景、空状态、加载动画）。
+换来的是零配置：不用往`public/` 拷文件、不用配 CDN、图片路径不会因为部署目录而失效。
+真正的 JS 逻辑约 107 个导出，gzip 后远小于总体积。
+</details>
+
+<details>
+<summary><b>能用在商业项目里吗？</b></summary>
+
+不能。本项目是**非商业许可**，只允许个人学习、研究、作品集与非营利实验。
+完整条款见根目录 [LICENSE](LICENSE)。
+</details>
 
 ---
 
 ## 目录
 
-- [安装](#安装) · [快速开始](#快速开始) · [在其他前端项目中使用](#在其他前端项目中使用)
-- [让 AI Agent 直接使用](#让-ai-agent-直接使用)
+- [它能给你什么](#它能给你什么) · [安装](#安装) · [快速开始](#快速开始) · [在其他前端项目中使用](#在其他前端项目中使用)
+- [让 AI Agent 直接使用](#让-ai-agent-直接使用) · [常见问题](#常见问题)
 - **组件**
   - 容器与展示：[Card](#starcard---卡片) · [Title](#startitle---标题) · [PixelText](#starpixeltext---像素化文本) · [DisplayFrame](#stardisplayframe---展示框) · [Avatar](#staravatar---头像) · [Divider](#stardivider---分割线) · [EmptyState](#staremptystate---空状态) · [Loading](#starloading---加载) · [Tag](#startag---标签) · [Badge](#starbadge---徽标) · [Collapse](#starcollapse---折叠面板) · [Skeleton](#starskeleton---骨架屏)
   - 表单与操作：[NineSliceButton](#starnineslicebutton---九宫格按钮) · [Input](#starinput---输入框) · [Textarea](#startextarea---多行输入) · [Switch](#starswitch---开关) · [Radio](#starradio---单选框) · [Checkbox](#starcheckbox---多选框) · [Select](#starselect---下拉选择) · [Rating](#starrating---评分) · [Progress](#starprogress---进度条)
@@ -1715,7 +1852,8 @@ bun run build:lib
 | `index.d.ts` / `auto.d.ts` 等 | 类型声明 |
 | 内置像素素材 | 随 JS 内联或作为 `dist/assets/**` 发出 |
 
-发布前执行校验，它会断言五个出口都存在、样式已内嵌进 `/auto` 入口、且没有把演示站资源路径带进包：
+发布前执行校验，它会断言五个出口都存在、样式已内嵌进 `/auto` 入口、`license` 字段
+是可解析的 SPDX 表达式、且没有把演示站资源路径带进包：
 
 ```bash
 bun run build:lib
@@ -1728,7 +1866,15 @@ bun run verify:package
 npm publish --registry=https://registry.npmjs.org/ --access public
 ```
 
-⚠️ **必须显式带 `--registry=https://registry.npmjs.org/`** —— 本机 `~/.npmrc` 保留了淘宝镜像用于装包，它是只读镜像，发布会被它接走而失败。
+发布时会自动跑 `prepublishOnly` 守卫（`scripts/prepublish-guard.mjs`），它在打包前拦下三种翻车方式：
+
+| 拦截 | 为什么必须拦 |
+| --- | --- |
+| `dist/` 里没有库产物 | `dist/` 是库与演示站**共用目录**，残留的 `index.html` 会被一起发上去 |
+| `dist/index.html` 存在 | 说明上次跑的是 `build:app`，发出去的是演示站而不是库 |
+| 版本号已发布过 | 提前给出明确提示，而不是等`E403` 浪费一次构建 |
+
+⚠️ **仍需显式带 `--registry=https://registry.npmjs.org/`** —— 本机 npm 配置可能保留淘宝镜像用于装包，它是只读镜像，发布会被它接走而失败（守卫也会检测并拦截镜像源）。
 
 首次发布还需要一个**启用了 Bypass 2FA 的 Granular Access Token**（npm 现在强制要求 2FA 或该令牌，否则返回 `E403`）。
 
@@ -1814,6 +1960,13 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 
 完整条款以根目录 [LICENSE](LICENSE) 为准。若你的用途涉及商业或法律判断，请不要使用本项目，并咨询有资质的专业人士。
 
+> **⚠️ 关于 0.1.0 / 0.2.0 的许可标注**：这两个版本的 `license` 字段写了 npm 无法解析的
+> `SEE LICENSE IN LICENSE`，npm 对无法解析的值会**静默回退为 MIT**，
+> 因此它们在 registry 上被标成了 MIT。实际条款始终以本仓库的 `LICENSE` 为准 ——
+> **这两个版本同样是非商业许可，MIT 标注是错的**。
+> 从 **0.3.0** 起字段改为合规的 SPDX 表达式 `LicenseRef-StardewValleyUI-NonCommercial`，
+> npm 会原样显示；`bun run verify:package` 现在会拦截这个字段，防止它再退化。
+
 ## 致谢
 
 欢迎页的交互节奏与视觉气质受到 [Animal Island UI](https://github.com/guokaigdg/animal-island-ui) 启发。详细说明见 [docs/acknowledgements.md](docs/acknowledgements.md)；本项目未复制其代码或素材。
@@ -1824,3 +1977,5 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 
 - 如果你在使用过程中遇到问题、疑问或有改进建议，欢迎提交 **Issues**。
 - 如果你有兴趣帮忙维护，需要了解：React + TypeScript、Bun、Vite、SCSS、Vitest。
+- 想让 AI Agent 帮你写用法？先装 [Agent Skill](#让-ai-agent-直接使用)，
+  它让 Agent 按真实 API 写代码而不是凭印象编 Props。

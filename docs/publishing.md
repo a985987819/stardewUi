@@ -22,13 +22,29 @@ npm version major --no-git-tag-version     # 0.1.0 → 1.0.0（破坏性变更�
 bun run build:lib
 bun run verify:package
 
-# 3. 发布
+# 3. 发布（prepublishOnly 守卫会自动跑）
 npm publish --registry=https://registry.npmjs.org/ --access public
 
 # 4. 核验（见下文「发布后核验」，不要只看退出码）
 ```
 
 成功时最后一行是 `+ stardew-valley-ui@<版本>`。
+
+## 发布守卫（prepublishOnly）
+
+`npm publish` 会先自动执行 `scripts/prepublish-guard.mjs`。它**只做检查、不做构建**
+（在 publish 钩子里跑完整 Vite 构建会在部分 npm 版本上嵌套 publish），职责是把
+「必然会浪费一次构建」的失败提前到几秒钟内：
+
+|拦截条件 | 背后的坑 |
+| --- | --- |
+| 库入口文件不存在 | 忘了构建，或上次构建失败 |
+| `dist/index.html` 存在 | `dist/` 被演示站构建覆盖了，发出去会是站点而不是库 |
+| 有效 registry 是镜像 | 淘宝源等只读镜像无法发布，失败信息晦涩 |
+| 版本号已存在于registry | 否则 npm 会返回 `E403` 并浪费整轮构建 |
+
+> 第四项会向 registry 发一次请求；**离线时该检查被跳过**而不是阻断发布，
+> 重复版本仍会由 npm 自己拒绝。
 
 ## 第一步：一次性配置凭证
 
@@ -156,6 +172,19 @@ bun run verify:package
 - `./auto` 确实重新导出了根 bundle，并内嵌了聚合后的样式表（含防重复的哨兵变量）
 - 主 bundle 里没有演示站专用的 `/stardewUi/assets/` 路径
 - 内置视觉资源已内联或已作为资产发出
+- `license` 是 npm 能解析的 SPDX 表达式
+
+### 关于 license 字段（0.3.0 修复）
+
+**0.1.0 / 0.2.0 在 npm 上被显示为 `MIT`，这是错的。**
+
+当时 `package.json` 写的是 `"license": "SEE LICENSE IN LICENSE"`。这不是合法的 SPDX
+表达式，而 **npm 对无法解析的 license 值会静默回退为 `MIT`** —— 于是非商业许可的包
+在 registry 上被标成了 MIT，商业用户看到会以为可以商用。实际条款始终以仓库根目录的
+`LICENSE` 为准。
+
+0.3.0 起改为合规的 `LicenseRef-StardewValleyUI-NonCommercial`（SPDX 对自定义许可的
+标准写法），npm 会原样显示。`verify:package` 现在会拦截这个字段，防止它再退化。
 
 ## 第五步：发布与核验
 
