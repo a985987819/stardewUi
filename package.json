@@ -56,7 +56,7 @@
   },
   "files": [
     "dist",
-    "README_EN.md"
+    "README_ZH.md"
   ],
   "sideEffects": [
     "**/*.css",
@@ -71,8 +71,10 @@
     "build:lib": "bunx vite build --mode lib && bun run check:motion && bunx tsc -p tsconfig.lib.json && node scripts/build-style-entry.mjs",
     "verify:package": "node scripts/verify-package.mjs",
     "prepublishOnly": "node scripts/prepublish-guard.mjs",
-    "gen:component": "bun scripts/new-component.mjs",
-    "rm:component": "bun scripts/rm-component.mjs",
+"gen:component": "bun scripts/new-component.mjs",
+"rm:component": "bun scripts/rm-component.mjs",
+"gen:api-tables": "node scripts/gen-api-tables.mjs",
+"check:api-tables": "node scripts/gen-api-tables.mjs --check",
     "check:components": "bunx vitest run src/router/componentRegistry.sync.test.tsx",
     "check:motion": "node scripts/check-motion-css.mjs",
     "lint": "bunx eslint .",

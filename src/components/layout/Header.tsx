@@ -11,10 +11,11 @@ function StarHeader() {
   const { lang, t } = useI18n()
 
   // Both READMEs carry a coffee section, but GitHub slugs the Chinese heading
-  // differently from the English one, so the link has to follow the language.
+  // differently from the English one, and the Chinese doc is no longer the
+  // default file — so both the path and the anchor follow the language.
   const sponsorUrl =
     lang === 'zh'
-      ? 'https://github.com/a985987819/stardewUi#请我喝杯咖啡-'
+      ? 'https://github.com/a985987819/stardewUi/blob/main/README_ZH.md#请我喝杯咖啡-'
       : 'https://github.com/a985987819/stardewUi#buy-me-a-coffee-'
 
   const navItems = [

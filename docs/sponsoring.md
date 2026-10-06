@@ -85,7 +85,8 @@ README 里的图片引用随即生效。
 图片路径在下面这几处被引用，换图时确认都指向同一张：
 
 - `README.md` → 「请我喝杯咖啡」章节
-- `README_EN.md` → "Buy me a coffee" section
+- `README.md` → "Buy me a coffee" section（npm 与GitHub 的默认文档）
+- `README_ZH.md` →「请我喝杯咖啡」章节
 - 若你在演示站首页放了赞赏入口，同步更新对应文案
 
 ### 5.不想公开收款码？

@@ -19,7 +19,7 @@
  *   src/router/lazyPages.ts               `Star<Name>DemoPage` export
  *   src/components/ui/index.ts            every `from './<Name>'` export line
  *   src/i18n/dictionaries.ts              the deprecated `sidebar.*` key whose text matches `title`
- *   README.md                             the `### Star<Name> - …` section + its type names
+ *   README_ZH.md                          the `### Star<Name> - …` section + its type names
  *
  * The lucide icon import is only dropped when no other entry still uses it, and
  * a README/i18n miss is a warning rather than an error — the files it patches
@@ -41,7 +41,10 @@ const PATHS = {
   lazyPages: 'src/router/lazyPages.ts',
   registry: 'src/router/componentRegistry.tsx',
   dictionaries: 'src/i18n/dictionaries.ts',
-  readme: 'README.md',
+  // The Chinese README holds one hand-written section per component; the English
+// one generates its tables from the demo sources, so only this file needs
+// patching. Pointing this at README.md would silently edit the English doc.
+readme: 'README_ZH.md',
   syncGuard: 'src/router/componentRegistry.sync.test.tsx',
 }
 

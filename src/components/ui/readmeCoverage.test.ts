@@ -1,7 +1,11 @@
 /// <reference types="node" />
+import { execFile as execFileCallback } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
+import { promisify } from 'node:util'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+
+const execFileAsync = promisify(execFileCallback)
 
 /**
  * Keeps the README honest about the props the components actually accept.
@@ -44,7 +48,11 @@ function readComponent(name: string) {
   return readFileSync(join(uiDir, path), 'utf8')
 }
 
-const readme = read('README.md')
+// The prop tables and TOC live in the Chinese README: it is the hand-maintained
+// document with one section per component, and this suite validates it against
+// the TypeScript declarations. `README.md` is the English one and gets its
+// tables generated from the demo sources by `scripts/gen-api-tables.mjs`.
+const readme = read('README_ZH.md')
 const uiDir = resolve(process.cwd(), 'src/components/ui')
 
 /** Every `### StarXxx` heading in the README. */
@@ -206,13 +214,17 @@ describe('README table of contents', () => {
   })
 
   it('gives every doc a link back to the README', () => {
+    // The docs are written in Chinese, so they link back to the Chinese README.
+    // Accept either file: a doc that links only to the English one is still
+    // navigable, and rejecting it would push contributors toward dead links.
     const onDisk = readdirSync(resolve(process.cwd(), 'docs')).filter((name) => name.endsWith('.md'))
 
     const orphans = onDisk.filter((name) => {
       const text = read(`docs/${name}`)
       // Within the first few lines: a breadcrumb belongs at the top, not buried
       // in a paragraph halfway down.
-      return !text.slice(0, 400).includes('../README.md')
+      const head = text.slice(0, 400)
+      return !head.includes('../README.md') && !head.includes('../README_ZH.md')
     })
 
     expect(orphans, `docs/ 下有文件没有回到 README 的链接：${orphans.join(', ')}`).toEqual([])
@@ -308,5 +320,101 @@ describe('README documents the non-obvious gestures', () => {
     // parsed RGB. `red` and `var(--brand)` now warn in development, and the
     // README should say so before someone hits the warning.
     expect(readme).toMatch(/只接受|hex/i)
+  })
+})
+/**
+ * The prop tables are generated against the declarations, so they cannot drift.
+ * The `code` samples inside them can — they are hand-written prose-shaped
+ * strings, and nothing compared them against the API until a reader copied
+ * `<StarTag color="green">` from the 0.3.0 README into a project where
+ * `color` now means a CSS color and preset names live on `tone`.
+ *
+ * Checking every prop name in every sample would be brittle (samples use
+ * abbreviations and omit props deliberately). What must never appear is a
+ * *removed* prop, because copying one produces code that silently does the
+ * wrong thing rather than failing to compile.
+ */
+describe('README samples avoid removed APIs', () => {
+  const REMOVED = [
+    // 0.3.0 unified visibility on `open`; the old spellings were dropped.
+    { name: 'defaultVisible', since: '0.3.0', instead: 'defaultOpen' },
+    { name: 'onVisibleChange', since: '0.3.0', instead: 'onOpenChange' },
+    // 0.3.0 split preset color names off `color`.
+    { name: 'color="green"', since: '0.3.0', instead: 'tone="green"' },
+    { name: 'color="red"', since: '0.3.0', instead: 'tone="red"' },
+    { name: 'color="yellow"', since: '0.3.0', instead: 'tone="yellow"' },
+    { name: 'color="blue"', since: '0.3.0', instead: 'tone="blue"' },
+    { name: 'color="purple"', since: '0.3.0', instead: 'tone="purple"' },
+  ]
+
+  it.each(REMOVED)('$name is gone since $since (use $instead)', (removed) => {
+    // The FAQ deliberately shows the old spelling to explain the migration, so
+    // prose is exempt — only fenced code samples are checked.
+    const codeBlocks = [...readme.matchAll(/```[\s\S]*?```/g)].map((m) => m[0])
+
+    const offenders = codeBlocks.filter((block) => block.includes(removed.name))
+
+    expect(
+      offenders,
+      `README code samples still use ${removed.name}, removed in ${removed.since}. ` +
+        `Readers copy these verbatim and get code that silently misbehaves. Use ${removed.instead}.`,
+    ).toEqual([])
+  })
+})
+
+/**
+ * The English README's prop tables are generated, not written.
+ *
+ * `scripts/gen-api-tables.mjs` reads `apiData.en` out of every demo page and
+ * writes the tables between the API-TABLES markers. Generation is what keeps
+ * them honest, but a generated section can also go stale in the ordinary way:
+ * someone edits a prop in the source, forgets to re-run the script, and ships a
+ * README describing an API that no longer exists.
+ *
+ * `--check` is the cheap guard (it exits non-zero when the file on disk differs
+ * from what the sources would produce). This suite is the expensive one, and it
+ * catches the thing `--check` cannot: a generator that silently stops emitting
+ * rows because a demo page was restructured.
+ */
+describe('English README API tables', () => {
+  const english = read('README.md')
+
+  it('has the generated markers', () => {
+    expect(english).toContain('<!-- API-TABLES:START -->')
+    expect(english).toContain('<!-- API-TABLES:END -->')
+  })
+
+  it('is not stale', async () => {
+    // Re-derive from the demo sources and compare against what is committed.
+    // `execFileSync` deadlocks here: vitest already holds the event loop in a
+    // state where a synchronous spawn on Windows fails with EBUSY.
+    const { stdout: derived } = await execFileAsync(
+      process.execPath,
+      [resolve(process.cwd(), 'scripts/gen-api-tables.mjs'), '--check'],
+      { encoding: 'utf8' },
+    )
+    expect(derived).toContain('up to date')
+  })
+
+  it('covers every demo page that declares an API table', () => {
+    const pages = readdirSync(resolve(process.cwd(), 'src/pages'))
+      .filter((n) => n.endsWith('Demo.tsx'))
+      .filter((n) => /\ben:\s*\[/.test(read(`src/pages/${n}`)))
+
+    const missing = pages.filter((n) => {
+      const title = /\ben:\s*\{[^{}]*?\btitle:\s*'([^']*)'/.exec(read(`src/pages/${n}`))?.[1]
+      // Fall back to the filename when a page omits a title.
+      const needle = title ?? n.replace(/Demo\.tsx$/, '')
+      return !english.includes(`<summary><b>${needle}</b>`)
+    })
+
+    expect(missing, `demo pages with no English API table: ${missing.join(', ')}`).toEqual([])
+  })
+
+  it('documents the language switch on both READMEs', () => {
+    // npm and GitHub both render README.md, so the Chinese one has to be one
+    // click away from the first screen — not buried at the bottom.
+    expect(english.slice(0, 2000)).toMatch(/README_ZH\.md/)
+    expect(read('README_ZH.md').slice(0, 2000)).toMatch(/README\.md/)
   })
 })
