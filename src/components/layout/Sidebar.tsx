@@ -1,6 +1,6 @@
 import { useMemo, useState, type ChangeEvent, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { Book, Box, ChevronDown, Search } from 'lucide-react'
+import { Book, Box, ChevronDown, Coffee, Search } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { useI18n } from '../../i18n'
 import {
@@ -51,6 +51,15 @@ const menuItems: MenuItem[] = [
           labelEn: component.title.en,
         })),
     })),
+  },
+  {
+    // Outside the guide tree on purpose: supporting the project is a different
+    // intent from learning it, and burying it under "Guide" would hide it.
+    id: '/support',
+    path: '/support',
+    labelZh: '请我喝咖啡',
+    labelEn: 'Buy me a coffee',
+    icon: <Coffee size={18} />,
   },
 ]
 

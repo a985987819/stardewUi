@@ -10,6 +10,7 @@ import {
   StarGuideDesignSystemPage,
   StarGuideLicensePage,
   StarGuideSelfUsePage,
+  StarSupportPage,
 } from './lazyPages'
 import { COMPONENT_ROUTES } from './componentRegistry'
 
@@ -26,6 +27,9 @@ export const router = createBrowserRouter(
         { path: 'guide/design-system', element: <StarGuideDesignSystemPage /> },
         { path: 'guide/license', element: <StarGuideLicensePage /> },
         { path: 'components', element: <StarComponentsPage /> },
+        // Sits outside `guide/*` on purpose: it is about supporting the project
+        // rather than using it, and it should not read as documentation.
+        { path: 'support', element: <StarSupportPage /> },
         ...COMPONENT_ROUTES.map(({ routePath, element: Component }) => ({
           path: `components/${routePath}`,
           element: <Component />,

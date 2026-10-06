@@ -17,6 +17,10 @@ export const StarGuideAgentUsePage = lazy(() => import('../pages/GuideAgentUse')
 export const StarGuideDesignSystemPage = lazy(() => import('../pages/GuideDesignSystem'))
 export const StarGuideLicensePage = lazy(() => import('../pages/GuideLicense'))
 export const StarComponentsPage = lazy(() => import('../pages/Components'))
+// A site page, not a component demo: kept here with the other non-component
+// entries rather than registered in `componentRegistry`, which only tracks
+// things with a `Star<Name>Demo` page.
+export const StarSupportPage = lazy(() => import('../pages/Support'))
 export const StarNineSliceButtonDemoPage = lazy(() => import('../pages/NineSliceButtonDemo'))
 export const StarCalendarDemoPage = lazy(() => import('../pages/CalendarDemo'))
 export const StarCardDemoPage = lazy(() => import('../pages/CardDemo'))

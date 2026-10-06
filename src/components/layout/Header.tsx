@@ -8,15 +8,7 @@ import styles from './Header.module.scss'
 
 function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { lang, t } = useI18n()
-
-  // Both READMEs carry a coffee section, but GitHub slugs the Chinese heading
-  // differently from the English one, and the Chinese doc is no longer the
-  // default file — so both the path and the anchor follow the language.
-  const sponsorUrl =
-    lang === 'zh'
-      ? 'https://github.com/a985987819/stardewUi/blob/main/README_ZH.md#请我喝杯咖啡-'
-      : 'https://github.com/a985987819/stardewUi#buy-me-a-coffee-'
+  const { t } = useI18n()
 
   const navItems = [
     { path: '/guide/self-use', label: t('nav.guide') },
@@ -48,16 +40,16 @@ function StarHeader() {
 
         <div className={styles['doc-header-actions']}>
           <StarLangSwitch />
-          <a
-            href={sponsorUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* A site route, not a GitHub link: the donation page lives here now,
+              and bouncing out to the README to find it was one step too many. */}
+          <Link
+            to="/support"
             className={styles['doc-header-sponsor']}
             title={t('header.sponsor')}
             aria-label={t('header.sponsor')}
           >
             <Coffee size={20} />
-          </a>
+          </Link>
           <a
             href="https://github.com/a985987819/stardewUi"
             target="_blank"

@@ -1,0 +1,168 @@
+// Styles for the donation page.
+//
+// Reuses the guide pages' visual vocabulary rather than inventing a new one:
+// parchment surfaces, dark-wood 3px borders, hard offset shadows. A separate
+// stylesheet is still correct because CSS Modules are scoped anyway, and the
+// page's own rules (a two-up QR grid, a bordered usage list) have nothing to
+// do with the guide pages.
+
+.support-page {
+  padding-bottom: 32px;
+  color: var(--color-text);
+}
+
+.support-intro {
+  margin-bottom: 22px;
+  padding: 26px 24px;
+  text-align: center;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel);
+
+  // Same small-caps signboard treatment the guide pages use for their eyebrow
+  // line, so the two feel like one site.
+  &-board {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+}
+
+.support-title {
+  margin-bottom: 12px;
+}
+
+.support-lede {
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.9;
+}
+
+.support-methods {
+  margin: 24px 0;
+  padding: 22px;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel-sm);
+
+  h2 {
+    margin-bottom: 6px;
+    font-size: 20px;
+  }
+}
+
+.support-methods-lede {
+  margin-bottom: 18px;
+  color: var(--color-text-secondary);
+}
+
+// Two columns on desktop, one on narrow screens. `auto-fit` rather than a
+// breakpoint so the grid decides on available width, not viewport width — the
+// page also renders inside a narrower column in some layouts.
+.support-method-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+  justify-items: center;
+}
+
+.support-method {
+  margin: 0;
+  text-align: center;
+
+  // The QR sits on parchment, so the frame has to be a lighter wood than the
+  // page border or the code reads as a hole punched in the card.
+  padding: 14px;
+  background: var(--color-bg);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel-sm);
+}
+
+.support-qr {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  // Keeps the placeholder's pixel art crisp instead of resampling it into mush.
+  image-rendering: pixelated;
+}
+
+.support-method-name {
+  margin-top: 12px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.support-pending {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+.support-usage {
+  margin: 24px 0;
+  padding: 22px;
+  background: var(--color-bg-card);
+  border: 3px solid var(--color-border-dark);
+  box-shadow: var(--shadow-pixel-sm);
+
+  h2 {
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.8;
+
+    // Icons are decorative; the label beside them carries the meaning.
+    svg {
+      flex-shrink: 0;
+      margin-top: 4px;
+      color: #b5763a;
+    }
+  }
+}
+
+.support-boundary {
+  padding: 18px 20px;
+  font-size: 14px;
+  line-height: 1.9;
+  background: var(--color-bg-secondary);
+  border-left: 6px solid var(--color-border-dark);
+
+  strong {
+    display: block;
+    margin-bottom: 6px;
+  }
+}
+
+.support-thanks {
+  margin: 26px 0 0;
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .support-intro {
+    padding: 22px 20px;
+  }
+
+  .support-methods,
+  .support-usage {
+    padding: 18px 16px;
+  }
+}

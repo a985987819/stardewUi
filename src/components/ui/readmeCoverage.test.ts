@@ -1,11 +1,7 @@
 /// <reference types="node" />
-import { execFile as execFileCallback } from 'node:child_process'
 import { readFileSync, readdirSync } from 'node:fs'
-import { promisify } from 'node:util'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-
-const execFileAsync = promisify(execFileCallback)
 
 /**
  * Keeps the README honest about the props the components actually accept.
@@ -363,52 +359,59 @@ describe('README samples avoid removed APIs', () => {
 })
 
 /**
- * The English README's prop tables are generated, not written.
+ * Keeps the English README short and pointing at the real documentation.
  *
- * `scripts/gen-api-tables.mjs` reads `apiData.en` out of every demo page and
- * writes the tables between the API-TABLES markers. Generation is what keeps
- * them honest, but a generated section can also go stale in the ordinary way:
- * someone edits a prop in the source, forgets to re-run the script, and ships a
- * README describing an API that no longer exists.
+ * It used to inline generated prop tables for all 27 components — roughly
+ * 31kB, 60% of the file. That put the licence, the acknowledgements and the
+ * donation section about four screens down, which is the opposite of what a
+ * README is for: a reader deciding whether to trust a project should not have
+ * to scroll past every prop table to find out whether it is safe to use.
  *
- * `--check` is the cheap guard (it exits non-zero when the file on disk differs
- * from what the sources would produce). This suite is the expensive one, and it
- * catches the thing `--check` cannot: a generator that silently stops emitting
- * rows because a demo page was restructured.
+ * The full API now lives in the Chinese README (hand-checked against the
+ * declarations by the suite above) and on the demo site. What this suite
+ * protects is the shape of that arrangement: the English README stays a
+ * readable length, and it never becomes a dead end — if it drops the pointers,
+ * an English reader has nowhere to look and silently concludes the library is
+ * undocumented.
  */
-describe('English README API tables', () => {
+describe('English README stays a short pointer, not a second manual', () => {
   const english = read('README.md')
 
-  it('has the generated markers', () => {
-    expect(english).toContain('<!-- API-TABLES:START -->')
-    expect(english).toContain('<!-- API-TABLES:END -->')
+  it('stays short enough to read in one sitting', () => {
+    // Not a style preference: the whole point of trimming was that the licence
+    // and donation sections sit within reach of the first screen.
+    const lines = english.split('\n').length
+
+    expect(
+      lines,
+      `README.md is ${lines} lines. The full API lives in README_ZH.md and on the demo site; ` +
+        'inlining it here pushed the licence and donation sections out of reach.',
+    ).toBeLessThan(520)
   })
 
-  it('is not stale', async () => {
-    // Re-derive from the demo sources and compare against what is committed.
-    // `execFileSync` deadlocks here: vitest already holds the event loop in a
-    // state where a synchronous spawn on Windows fails with EBUSY.
-    const { stdout: derived } = await execFileAsync(
-      process.execPath,
-      [resolve(process.cwd(), 'scripts/gen-api-tables.mjs'), '--check'],
-      { encoding: 'utf8' },
-    )
-    expect(derived).toContain('up to date')
+  it('does not inline per-component prop tables', () => {
+    // One `### StarXxx -` heading per component is what the trimmed version
+    // looks like. If these come back, the API reference moved into this file.
+    const sections = [...english.matchAll(/^### Star\w+\s*[-—]/gm)]
+
+    expect(
+      sections.length,
+      `README.md has ${sections.length} per-component sections; it should link out instead.`,
+    ).toBe(0)
   })
 
-  it('covers every demo page that declares an API table', () => {
-    const pages = readdirSync(resolve(process.cwd(), 'src/pages'))
-      .filter((n) => n.endsWith('Demo.tsx'))
-      .filter((n) => /\ben:\s*\[/.test(read(`src/pages/${n}`)))
+  it('points readers at the complete API reference', () => {
+    // A trimmed README is only useful if what it removed is still reachable.
+    expect(english).toMatch(/README_ZH\.md/)
+    expect(english).toMatch(/live demo|github\.io/i)
+    // And the Chinese document has to actually contain it.
+    expect(read('README_ZH.md')).toMatch(/^## Hooks$/m)
+  })
 
-    const missing = pages.filter((n) => {
-      const title = /\ben:\s*\{[^{}]*?\btitle:\s*'([^']*)'/.exec(read(`src/pages/${n}`))?.[1]
-      // Fall back to the filename when a page omits a title.
-      const needle = title ?? n.replace(/Demo\.tsx$/, '')
-      return !english.includes(`<summary><b>${needle}</b>`)
-    })
-
-    expect(missing, `demo pages with no English API table: ${missing.join(', ')}`).toEqual([])
+  it('keeps the licence, acknowledgements and donation reachable', () => {
+    for (const heading of ['## License', '## Acknowledgements', '## Buy me a coffee']) {
+      expect(english, `${heading} went missing from the English README`).toContain(heading)
+    }
   })
 
   it('documents the language switch on both READMEs', () => {
