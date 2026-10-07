@@ -1,0 +1,62 @@
+name: 风格改进
+description: 视觉、动效、像素风格或文案读起来不对——「不好看」也是有效反馈
+title: "[风格] "
+labels: ["enhancement", "design", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **「这个设计我不太喜欢」是有效反馈**，和其他任何一条一样会被读完。
+
+        这一类反馈不需要你给出解决方案——你指出哪里不对，我来判断怎么改。
+        但「哪里不对」和「你希望它变成什么样」这两句，写了会快很多。
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 问题出在哪
+      options:
+        - 像素风格不对（太圆滑 / 太模糊 / 阶梯不对）
+        - 配色不对
+        - 动效不对（太快、太飘、时机不对）
+        - 间距与对齐
+        - 文案读起来别扭
+        - 深浅色主题
+        - 移动端表现
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-wrong
+    attributes:
+      label: 哪里不对
+      description: 说不上来为什么也可以，直觉往往比分析准。
+      placeholder: 这个按钮的描边比游戏里的重，一眼看去很糊
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 你希望它是什么样
+      description: 有参考图最好——游戏截图、手绘、别的项目的图都行。
+    validations:
+      required: false
+
+  - type: input
+    id: component
+    attributes:
+      label: 涉及哪个组件
+      description: 不知道可以留空。
+      placeholder: StarNineSliceButton
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我描述的是主观感受，不是功能故障（功能故障请用「Bug 反馈」）
+          required: true

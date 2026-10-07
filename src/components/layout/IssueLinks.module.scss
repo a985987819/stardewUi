@@ -1,0 +1,80 @@
+// The footer's issue links. Inline content, not a floating control: this sits in
+// the document flow at the end of a page, so it is laid out like a column of
+// quiet links rather than like the corner launcher — the two share their target
+// list, never their presentation.
+.issue-links {
+  @apply flex flex-col items-center;
+  gap: 10px;
+  padding: 20px 16px 8px;
+  text-align: center;
+}
+
+.issue-links-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+
+.issue-links-list {
+  @apply flex flex-wrap justify-center;
+  margin: 0;
+  padding: 0;
+  gap: 10px;
+  list-style: none;
+}
+
+.issue-links-item {
+  @apply inline-flex items-center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 2px solid var(--color-border-dark);
+  background: var(--color-bg-card);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-text);
+  clip-path: polygon(
+    5px 0,
+    100% 0,
+    100% calc(100% - 5px),
+    calc(100% - 5px) 100%,
+    0 100%,
+    0 5px
+  );
+
+  &:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-primary);
+  }
+}
+
+.issue-links-repo {
+  @apply inline-flex items-center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}

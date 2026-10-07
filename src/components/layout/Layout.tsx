@@ -2,11 +2,13 @@ import { Suspense, useLayoutEffect, useMemo, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import StarHeader from './Header'
 import StarSidebar from './Sidebar'
+import IssueLauncher from './IssueLauncher'
+import IssueLinks from './IssueLinks'
 import StarDivider from '../ui/Divider'
 import StarLoading from '../ui/Loading'
 import StarBackToTop from '../ui/BackToTop'
 import StarTableOfContents, { type TocItem } from './TableOfContents'
-import { useI18n } from '../../i18n'
+import { useI18n, useLangQueryParam } from '../../i18n'
 import type { DocLayoutOutletContext } from './docLayoutContext'
 import styles from './Layout.module.scss'
 
@@ -15,6 +17,10 @@ function StarLayout() {
   const outletContext = useMemo<DocLayoutOutletContext>(() => ({ setTableOfContents }), [])
   const { pathname } = useLocation()
   const { t } = useI18n()
+  // Every `<Link>` in the shell navigates by pathname alone, so without this the
+  // `?lang=` a reader arrived with would evaporate on the first click and any
+  // URL they copied afterwards would reopen in the wrong language.
+  useLangQueryParam()
 
   // 换页即回顶：新页面从顶部开始，右下角那只纸飞机负责飞走那一拍，哪怕这一跳是
   // 路由替它做的。
@@ -55,11 +61,18 @@ function StarLayout() {
         {/* 页脚：横向铺满整列的木栅栏，挂在内容区外面，不跟正文共用容器宽度 */}
         <footer className={styles['doc-footer']}>
           <StarDivider />
+          {/* 页脚也给出提 issue 的入口：读完整页再做决定的人，不该再去发现
+              角落里的悬浮按钮。链接与悬浮按钮共用同一份模板清单。 */}
+          <IssueLinks />
         </footer>
       </main>
       {/* 全站就养这一只纸飞机：任何页面滚动到离开顶部，它自己就会浮现；换页时由
           `flightKey` 触发飞走，替用户按下这一颗按钮。固定在视口上，不占栅格。 */}
       <StarBackToTop flightKey={pathname} label={t('nav.backToTop')} />
+      {/* 悬浮的提 issue 入口。放在 Layout 而不是页面里：它是全站都能用的出口，
+          挂在某一页上会让读者以为只有那一页支持反馈。自身叠在纸飞机上方，
+          两者共用右边缘、不同高度，不会互相遮挡。 */}
+      <IssueLauncher />
     </div>
   )
 }

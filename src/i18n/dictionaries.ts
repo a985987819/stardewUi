@@ -18,7 +18,6 @@ export type Lang = 'zh' | 'en'
 export const zhDict: Record<string, string> = {
   'nav.guide': '指南',
   'nav.components': '组件',
-  'nav.api': 'API',
   'nav.backToTop': '回到顶部',
   'header.github': '查看 GitHub',
   'header.sponsor': '请我喝杯咖啡',
@@ -56,6 +55,24 @@ export const zhDict: Record<string, string> = {
   'copy.success': '已复制',
   'copy.error': '复制失败',
   'copy.title': '点击复制',
+
+  // ---- issue reporting -------------------------------------------------------
+  // The four templates in `.github/ISSUE_TEMPLATE/`. Each `label` says who should
+  // file it; each `Hint` says what that template will ask for, so the reader can
+  // pick before leaving rather than after landing on a blank form.
+  'issue.launcher.open': '提交 issue',
+  'issue.launcher.close': '关闭提 issue 菜单',
+  'issue.launcher.menuTitle': '你想反馈什么？',
+  'issue.template.bug': 'Bug 反馈',
+  'issue.template.bugHint': '行为和预期不一致',
+  'issue.template.error': '我要报错',
+  'issue.template.errorHint': '装不上、构建失败或类型报错',
+  'issue.template.style': '风格改进',
+  'issue.template.styleHint': '视觉、动效或文案读起来不对',
+  'issue.template.request': '许愿组件',
+  'issue.template.requestHint': '你的项目缺一个组件',
+  'issue.footer.title': '有问题？告诉我',
+  'issue.footer.repo': '在 GitHub 上查看仓库',
 
   // ---- component-owned copy -------------------------------------------------
   'ui.dialog.confirm': '确认',
@@ -98,7 +115,6 @@ export const zhDict: Record<string, string> = {
 export const enDict: Record<string, string> = {
   'nav.guide': 'Guide',
   'nav.components': 'Components',
-  'nav.api': 'API',
   'nav.backToTop': 'Back to top',
   'header.github': 'GitHub',
   'header.sponsor': 'Buy me a coffee',
@@ -136,6 +152,22 @@ export const enDict: Record<string, string> = {
   'copy.success': 'Copied',
   'copy.error': 'Copy failed',
   'copy.title': 'Click to copy',
+
+  // ---- issue reporting -------------------------------------------------------
+  // Mirrors the zh block key for key; `dictionaries.test.ts` fails on a mismatch.
+  'issue.launcher.open': 'Report an issue',
+  'issue.launcher.close': 'Close the issue menu',
+  'issue.launcher.menuTitle': 'What would you like to report?',
+  'issue.template.bug': 'Bug',
+  'issue.template.bugHint': 'It behaves differently than expected',
+  'issue.template.error': 'I hit an error',
+  'issue.template.errorHint': 'Install, build or type error',
+  'issue.template.style': 'Style feedback',
+  'issue.template.styleHint': 'The look, motion or wording reads wrong',
+  'issue.template.request': 'Request a component',
+  'issue.template.requestHint': 'Your project needs one we do not have',
+  'issue.footer.title': 'Something off? Tell me',
+  'issue.footer.repo': 'View the repository on GitHub',
 
   // ---- component-owned copy -------------------------------------------------
   'ui.dialog.confirm': 'Confirm',

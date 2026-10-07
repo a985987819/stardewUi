@@ -1,0 +1,189 @@
+// The launcher sits on the right edge, stacked **above** the back-to-top plane.
+//
+// They cannot share the corner: two fixed controls at the same right/bottom
+// offset overlap, and whichever paints last hides the other behind it — which
+// for the plane means its click target is silently gone. Vertically stacking on
+// one edge keeps both reachable and reads as a single control pair.
+$plane-offset: 32px;
+// Enough clearance for the plane plus the gap the two need to read as separate.
+$stacked-offset: $plane-offset + 52px;
+
+.issue-launcher {
+  position: fixed;
+  right: $plane-offset;
+  bottom: $stacked-offset;
+  // Above the plane (z-index 900) and page chrome; below the portal layers Dialog
+  // and Drawer own (4000+), so an open dialog is never trapped behind this menu.
+  //
+  // The whole group is lifted rather than just the menu: the menu is a sibling of
+  // the trigger, so raising only the menu would leave the trigger underneath the
+  // plane and make the close control unclickable exactly when it is needed most.
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    // The plane is 44px wide and its default corner is already close to the
+    // edge on a phone; matching that offset keeps both inside the safe area.
+    right: 16px;
+    bottom: $plane-offset + 20px;
+  }
+}
+
+.issue-launcher-trigger {
+  @apply flex items-center justify-center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 3px solid var(--color-border-dark);
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  cursor: pointer;
+  // The stepped corner that every other control in the kit has. Drawn rather than
+  // a `border-radius`, because a rounded pill would read as a different family.
+  clip-path: polygon(
+    6px 0,
+    100% 0,
+    100% calc(100% - 6px),
+    calc(100% - 6px) 100%,
+    0 100%,
+    0 6px
+  );
+
+  &:hover {
+    background: var(--color-bg-hover);
+  }
+
+  // The press hop is the shared gesture across every control in the kit, so it
+  // reuses that vocabulary rather than inventing a private duration. The
+  // distance is written literally because the shared tokens cover timing, not
+  // distance — and `check-motion-css.mjs` treats an undefined motion variable as
+  // a hard failure, so a fallback would pass locally and break the build.
+  &:active {
+    transform: translate(1px, 1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  &.is-open {
+    background: var(--color-primary-bg);
+  }
+}
+
+.issue-launcher-menu {
+  @apply flex flex-col;
+  // Wide enough that a four-character Chinese label and its hint each sit on
+  // their own line. At 300px the labels wrapped mid-phrase ("我要报 / 错"), which
+  // read as two separate entries and made the icon sit beside the wrong half.
+  width: min(340px, calc(100vw - 32px));
+  padding: 12px;
+  border: 3px solid var(--color-border-dark);
+  background: var(--color-bg-secondary);
+  // Above the trigger so the menu covers it rather than the other way round: the
+  // trigger stays visible as the close affordance, and the list reads as the
+  // thing that opened from it.
+  order: -1;
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
+
+  // Collapsed state. Kept mounted rather than removed so the menu can animate,
+  // and paired with `hidden` in the component so it leaves the accessibility tree
+  // and the tab order — `opacity: 0` alone would leave every link focusable
+  // behind a panel the reader cannot see.
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+    transform var(--star-motion-tint-duration) var(--star-motion-tint-ease),
+    visibility var(--star-motion-tint-duration) var(--star-motion-tint-ease);
+
+  &.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+}
+
+.issue-launcher-menu-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+
+.issue-launcher-list {
+  @apply flex flex-col;
+  margin: 0;
+  padding: 0;
+  gap: 6px;
+  list-style: none;
+}
+
+.issue-launcher-item {
+  @apply flex items-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 2px solid transparent;
+  text-decoration: none;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+
+  &:hover {
+    background: var(--color-bg-hover);
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  // Centred against the two-line block (label + hint), not pinned to the first
+  // line. Top-aligned left the icon floating beside the gap between them once a
+  // label wrapped.
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--color-primary);
+  }
+}
+
+.issue-launcher-item-label {
+  @apply block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.issue-launcher-item-hint {
+  @apply block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+// Reduced motion: the menu still opens and closes, it just arrives rather than
+// travelling. Removing the transition entirely would make the two states feel
+// like different components.
+@media (prefers-reduced-motion: reduce) {
+  .issue-launcher-menu {
+    transition: none;
+    transform: none;
+  }
+}

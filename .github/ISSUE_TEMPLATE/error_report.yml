@@ -1,0 +1,70 @@
+name: 我要报错
+description: 装不上、构建失败、TypeScript 报错、或不确定该报 bug 还是提问
+title: ""
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        卡在哪儿都能报。**不确定该用哪个模板，就用这个**——我会把它转到合适的地方，
+        不会让你重填一遍。
+
+        这一项的唯一要求：把**完整的报错原文**贴出来。截图里的字没法复制，
+        搜索引擎搜不到，我也没法逐字判断。
+
+  - type: textarea
+    id: error
+    attributes:
+      label: 报错原文
+      description: 从第一条开始，全部贴。TypeScript 的错误请连同文件路径和行号。
+      render: ""
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-you-did
+    attributes:
+      label: 你做了什么才触发它
+      render: ""
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: "0.4.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: 卡在哪一步
+      options:
+        - 安装
+        - 构建 / 打包
+        - TypeScript 类型检查
+        - 样式没生效
+        - 运行时
+        - 部署（Vercel / GitHub Pages / Nginx）
+        - 说不清
+    validations:
+      required: true
+
+  - type: textarea
+    id: package-manager
+    attributes:
+      label: 包管理器与配置
+      description: 用的哪个包管理器，React 版本，Vite / Next 版本等。
+      render: json
+    validations:
+      required: false
+
+  - type: textarea
+    id: question
+    attributes:
+      label: 你想问什么
+      description: 不确定是 bug 还是用法问题，都可以写在这。
+    validations:
+      required: false

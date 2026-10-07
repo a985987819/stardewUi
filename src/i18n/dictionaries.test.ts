@@ -57,8 +57,32 @@ describe('dictionary integrity', () => {
   it('namespaces component-owned copy under ui.*', () => {
     // A `ui.` prefix is what lets a reader tell "the docs site says this" from
     // "the component says this", and it is what `useComponentCopy` looks up.
+    //
+    // The two doc-chrome families that are neither of those: `issue.*` is the
+    // reporting routes, which have to match the template names in
+    // `.github/ISSUE_TEMPLATE/` — the key and the file are read together by the
+    // launcher, and renaming one without the other silently drops the reader onto
+    // a blank form.
+    const DOC_CHROME = /^(nav|guide|components|demo|api|toc|search|copy|header|issue)\./
+
     for (const key of Object.keys(zhDict)) {
-      expect(key.startsWith('ui.') || /^(nav|guide|components|demo|api|toc|search|copy|header)\./.test(key)).toBe(true)
+      expect(key.startsWith('ui.') || DOC_CHROME.test(key), `unexpected namespace: ${key}`).toBe(true)
+    }
+  })
+
+  it('pairs every issue route with its own hint', () => {
+    // Each entry in the launcher offers a label and, separately, a line saying
+    // what that template will ask for. Half the value of routing by intent is
+    // knowing *before* you leave, so the hint is not optional copy: a label with no
+    // hint sends the reader to GitHub to find out what they just committed to.
+    const label = (key: string) => `issue.template.${key}`
+    const hint = (key: string) => `${label(key)}Hint`
+
+    for (const key of ['bug', 'error', 'style', 'request']) {
+      expect(zhDict[label(key)]?.trim(), `zh ${label(key)}`).not.toBe('')
+      expect(zhDict[hint(key)]?.trim(), `zh ${hint(key)}`).not.toBe('')
+      expect(enDict[label(key)]?.trim(), `en ${label(key)}`).not.toBe('')
+      expect(enDict[hint(key)]?.trim(), `en ${hint(key)}`).not.toBe('')
     }
   })
 

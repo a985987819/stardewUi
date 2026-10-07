@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Coffee, ExternalLink, Menu } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
+import { GITHUB_REPO_URL } from '../../utils/githubIssues'
 import { useI18n } from '../../i18n'
 import StarLangSwitch from './LangSwitch'
 import styles from './Header.module.scss'
@@ -10,10 +11,13 @@ function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useI18n()
 
+  // Only routes that exist. `/api` used to sit here, but there has never been an
+  // API index page: clicking it fell through to the `*` catch-all and bounced
+  // back to the home page, which reads as a broken link rather than a missing
+  // feature. The per-component pages under /components carry the API tables.
   const navItems = [
     { path: '/guide/self-use', label: t('nav.guide') },
     { path: '/components', label: t('nav.components') },
-    { path: '/api', label: t('nav.api') },
   ]
 
   return (
@@ -51,7 +55,10 @@ function StarHeader() {
             <Coffee size={20} />
           </Link>
           <a
-            href="https://github.com/a985987819/stardewUi"
+            // From the shared constant, not a literal: the launcher, the footer and
+            // this header all point at the same repository, and three copies of the
+            // URL is three chances for one of them to be a fork or a typo.
+            href={GITHUB_REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className={styles['doc-header-github']}

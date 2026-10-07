@@ -1,0 +1,62 @@
+name: 许愿组件
+description: 你项目里缺一个组件——说清楚它要做什么，我来判断值不值得做
+title: "[许愿] "
+labels: ["enhancement", "component-request", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        组件库不收「加个 xx 组件」这种一句话需求——**不知道它要解决什么问题，
+        做出来大概率不是你想要的**。
+
+        所以这一项只需要你回答一个问题：**你在做什么的时候，发现缺少它。**
+        场景比功能列表有用得多。如果你已经写了一个粗糙版本，贴上来更好。
+
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 你在做什么的时候发现缺少它
+      description: 描述你原本想用现有组件怎么凑合，以及凑合起来哪里别扭。
+      placeholder: |
+        我要做一个农场库存页，现在只能用 StarCard 列表硬凑。
+        但物品有稀有度，想按边框颜色区分，一张卡只能一个 surface，
+        于是只能给每种稀有度写一个自定义组件，很啰嗦。
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: 你期望的用法
+      description: 写成代码片段最好。没想清楚也没关系，先写你脑子里那个画面。
+      render: tsx
+    validations:
+      required: false
+
+  - type: input
+    id: component-name
+    attributes:
+      label: 希望叫什么
+      description: 库内统一 `Star` 前缀，例如填「Tabs」就会是 `StarTabs`。
+      placeholder: Tabs
+    validations:
+      required: false
+
+  - type: textarea
+    id: look-alike
+    attributes:
+      label: 你已经写出来的版本
+      description: 有就直接贴代码，我会看它需要什么 props。
+      render: tsx
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我说明了使用场景，而不是只列功能
+          required: true
+        - label: 我搜索过已有 issue，这个组件不在计划里
+          required: true

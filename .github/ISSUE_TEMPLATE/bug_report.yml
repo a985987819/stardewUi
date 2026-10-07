@@ -1,0 +1,95 @@
+name: Bug 反馈
+description: 某个组件的行为和你预期的不一样——报错、样式失效、交互异常
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢你发现问题。**先搜一下已有 issue**，避免重复——同一个问题报三次会让修复
+        排期变慢，而这对你没有好处。
+
+        描述得越具体，越可能一次修好。下面每一项都有用处：即使某一项你不确定，
+        也写「不确定」而不是跳过。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 你的预期是什么，实际又是什么？把两者都写出来。
+      placeholder: |
+        预期：点击「确定」后对话框关闭
+        实际：对话框没反应，控制台报 Uncaught TypeError
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 怎么复现
+      description: 从空白项目开始，一步一步写。哪一步开始不对？
+      placeholder: |
+        1. 打开 /components/dialog 页面
+        2. 点第二个示例里的「打开」
+        3. 在对话框里按 Enter
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: 最小复现代码
+      description: 从演示站复制那段示例，或者贴你自己的。
+      render: ""
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: "0.4.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: 运行环境
+      multiple: true
+      options:
+        - 浏览器（请在下面补充具体浏览器与版本）
+        - Node.js / SSR
+        - Next.js (App Router)
+        - Next.js (Pages Router)
+        - React Native
+        - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: 控制台报错
+      description: 浏览器控制台的红色输出，原样贴即可。
+      render: ""
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 补充说明
+      description: 其他你觉得相关的信息，比如这个 bug 从哪个版本开始出现。
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 提交前确认
+      options:
+        - label: 我搜索过已有 issue，这不是重复报告
+          required: true
+        - label: 我提供的是最小复现步骤，移除无关代码后问题依然存在
