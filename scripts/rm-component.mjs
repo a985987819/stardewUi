@@ -4,8 +4,8 @@
  * image of `gen:component`. Deleting a component by hand means touching five
  * files, and the sync guard only catches *some* drifts: a leftover
  * `pages/<Name>Demo.tsx` or a barrel export without a catalogue entry fails the
- * suite, but a stale `sidebar.*` i18n key or a README section fails nothing and
- * rots quietly. This script removes all of it and then runs the guard.
+ * suite, but a stale `sidebar.*` i18n key fails nothing and rots quietly. This
+ * script removes all of it and then runs the guard.
  *
  *   bun run rm:component Title
  *
@@ -19,15 +19,22 @@
  *   src/router/lazyPages.ts               `Star<Name>DemoPage` export
  *   src/components/ui/index.ts            every `from './<Name>'` export line
  *   src/i18n/dictionaries.ts              the deprecated `sidebar.*` key whose text matches `title`
- *   README_ZH.md                          the `### Star<Name> - …` section + its type names
  *
  * The lucide icon import is only dropped when no other entry still uses it, and
- * a README/i18n miss is a warning rather than an error — the files it patches
- * are hand-maintained and may already be out of sync.
+ * an i18n miss is a warning rather than an error — that file is hand-maintained
+ * and may already be out of sync.
+ *
+ * The READMEs are deliberately *not* patched. They used to hold a hand-written
+ * `### Star<Name> - …` section per component plus a type index, and this script
+ * deleted the matching section; both were removed when the READMEs were cut down
+ * to install-and-first-component material, because a Props table maintained by
+ * hand drifts from the declarations that actually ship. The demo site's
+ * per-component pages now own that surface, and they are derived from
+ * `pages/<Name>Demo.tsx` — a file this script deletes along with the rest.
  *
  * Flags: --no-verify --dry-run --help
  */
-import { existsSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs'
+import { readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -41,10 +48,6 @@ const PATHS = {
   lazyPages: 'src/router/lazyPages.ts',
   registry: 'src/router/componentRegistry.tsx',
   dictionaries: 'src/i18n/dictionaries.ts',
-  // The Chinese README holds one hand-written section per component; the English
-// one generates its tables from the demo sources, so only this file needs
-// patching. Pointing this at README.md would silently edit the English doc.
-readme: 'README_ZH.md',
   syncGuard: 'src/router/componentRegistry.sync.test.tsx',
 }
 
@@ -190,86 +193,15 @@ function removeNamedImport(source, module, identifier, relativePath) {
   return `${source.slice(0, openIndex)}${block}${source.slice(markerIndex)}`
 }
 
+// ------------------------------------------------------------- i18n
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 const dropLines = (source, predicate) =>
   source
     .split('\n')
     .filter((line) => !predicate(line))
     .join('\n')
-
-// ------------------------------------------------------------- markdown / i18n
-
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-/** Text of a `#### heading` line, e.g. `StarTitle - 标题` becomes `StarTitle`. */
-function headingLead(line) {
-  const match = line.match(/^#{2,4}\s+(.+?)(?:\s+[-—–]\s+.*)?$/)
-  return match ? match[1].trim() : undefined
-}
-
-/**
- * Removes one `###` section from the README, up to the next `###`/`##` heading.
- *
- * The section's own trailing `---` and the blank lines around it go too, then a
- * single blank line is re-inserted before the next heading. That reproduces the
- * file's `…table… \n\n---\n\n### Next` rhythm exactly, which matters because the
- * README is hand-maintained: an off-by-one here leaves a stray separator or a
- * double blank line that no test would ever catch.
- *
- * Handles the headings that do not follow the `Star<Name>` convention
- * (`### message - 消息提示`, `### PixelButton - 像素按钮`).
- */
-function removeReadmeSection(source, name) {
-  const candidates = [`Star${name}`, name].map((value) => value.toLowerCase())
-  const lines = source.split('\n')
-  const start = lines.findIndex((line) => {
-    if (!line.startsWith('### ')) return false
-    const lead = headingLead(line)
-    return lead !== undefined && candidates.includes(lead.toLowerCase())
-  })
-
-  if (start === -1) return { source, heading: undefined }
-
-  const heading = lines[start].trim()
-
-  let next = lines.length
-  for (let index = start + 1; index < lines.length; index += 1) {
-    if (/^#{2,3}\s/.test(lines[index])) {
-      next = index
-      break
-    }
-  }
-
-  // Walk to the section's last non-blank line — its own `---` sits inside that
-  // range — then absorb the blank lines that precede the next heading.
-  let contentEnd = next
-  while (contentEnd > start && lines[contentEnd - 1].trim() === '') contentEnd -= 1
-  while (contentEnd < lines.length && lines[contentEnd].trim() === '') contentEnd += 1
-
-  const head = lines.slice(0, start)
-  while (head.length > 0 && head[head.length - 1].trim() === '') head.pop()
-
-  const tail = lines.slice(contentEnd)
-  const merged = [...head, '', ...tail]
-
-  return { source: merged.join('\n'), heading }
-}
-
-/** Drops the standalone `<TypeName>,` lines of the README type index. */
-function removeReadmeTypeLines(source, typeNames) {
-  if (typeNames.length === 0) return { source, removed: [] }
-
-  const removed = []
-  const next = dropLines(source, (line) => {
-    const trimmed = line.trim()
-    if (!trimmed.endsWith(',')) return false
-    const identifier = trimmed.slice(0, -1).trim()
-    if (!typeNames.includes(identifier)) return false
-    removed.push(identifier)
-    return true
-  })
-
-  return { source: next, removed }
-}
 
 /**
  * Removes the deprecated `sidebar.*` keys whose text matches the entry's own
@@ -287,13 +219,6 @@ function removeSidebarKeys(source, { zh, en }) {
   })
 
   return { source: next, removed }
-}
-
-/** Collects the type names a module exports, for the README type index. */
-function exportedTypeNames(componentPath) {
-  if (!existsSync(resolve(projectRoot, componentPath))) return []
-  const source = read(componentPath)
-  return [...source.matchAll(/export (?:interface|type) (\w+)/g)].map((match) => match[1])
 }
 
 /** Files that belong to this component: `<Name>.*` and `<Name>Demo.*`. */
@@ -332,8 +257,6 @@ function main() {
     warn(`${PATHS.componentDir}/${name}.tsx 不存在 —— 组件文件可能已经被删过`)
   }
 
-  const typeNames = exportedTypeNames(`${PATHS.componentDir}/${name}.tsx`)
-
   // --- registry ---------------------------------------------------------
   const registryAfterEntry = registrySource.slice(0, entry.start) + registrySource.slice(entry.end)
   const iconStillUsed = new RegExp(`icon: <${escapeRegExp(entry.icon)}\\b`).test(registryAfterEntry)
@@ -363,15 +286,10 @@ function main() {
   if (barrelRemoved.length === 0) warn(`${PATHS.uiBarrel} 里没有 from './${name}' 的导出`)
   const nextBarrel = barrelLines.filter((line) => !barrelPattern.test(line)).join(barrelEol)
 
-  // --- i18n + README ----------------------------------------------------
+  // --- i18n -------------------------------------------------------------
   const dictionariesSource = read(PATHS.dictionaries)
   const sidebar = removeSidebarKeys(dictionariesSource, entry)
   if (sidebar.removed.length === 0) warn(`${PATHS.dictionaries} 里没有匹配 "${entry.zh}/${entry.en}" 的废弃 sidebar.* 键`)
-
-  const readmeSource = read(PATHS.readme)
-  const readmeSection = removeReadmeSection(readmeSource, name)
-  if (!readmeSection.heading) warn(`${PATHS.readme} 里没找到 ${name} 的 "### " 章节`)
-  const readmeTypes = removeReadmeTypeLines(readmeSection.source, typeNames)
 
   const plan = [
     ...targetFiles.map((path) => `删除文件   ${path}`),
@@ -380,8 +298,6 @@ function main() {
     `删除导出   ${PATHS.uiBarrel}  ->  ${barrelRemoved.length} 行`,
     `删除懒加载 ${PATHS.lazyPages}  ->  Star${name}DemoPage`,
     `删除文案   ${PATHS.dictionaries}  ->  ${[...new Set(sidebar.removed)].join(', ') || '（无）'}`,
-    `删除文档   ${PATHS.readme}  ->  ${readmeSection.heading ?? '（无）'}`,
-    `删除类型   ${PATHS.readme}  ->  ${readmeTypes.removed.join(', ') || '（无）'}`,
   ]
 
   if (options.dryRun) {
@@ -398,7 +314,6 @@ function main() {
   write(PATHS.lazyPages, nextLazyPages)
   write(PATHS.uiBarrel, nextBarrel)
   write(PATHS.dictionaries, sidebar.source)
-  write(PATHS.readme, readmeTypes.source)
 
   console.log(`\n✓ ${name} 已从组件目录移除（先前路由 /components/${entry.routePath}）\n\n  ${plan.join('\n  ')}\n`)
   console.log(`  目录条目已删除，左侧导航 / 组件总览 / 路由表会随之少掉这一条。`)

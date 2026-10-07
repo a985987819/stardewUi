@@ -54,7 +54,7 @@ const reviewBriefZh = `请检查这次 StardewValley UI 的接入：
 2. style.css 与 /auto 是否只选用了一种；
 3. 组件状态是否受控，键盘操作是否可用；
 4. SSR 边界和 message() 调用是否只发生在客户端；
-5. 是否遵守本项目“仅限非商业用途”的许可。`
+5. 保留版权声明与 MIT 许可文本，并说明项目与《星露谷物语》无官方关联。`
 
 const reviewBriefEn = `Please review this StardewValley UI integration:
 
@@ -62,7 +62,7 @@ const reviewBriefEn = `Please review this StardewValley UI integration:
 2. Is exactly one of style.css and /auto used?
 3. Is component state controlled, and is keyboard operation usable?
 4. Do SSR boundaries and message() calls stay on the client?
-5. Does it respect this project's non-commercial license?`
+5. Does it keep the copyright notice and the MIT license text, and avoid implying official Stardew Valley affiliation?`
 
 const skillTree = `stardew-valley-ui/
 ├── SKILL.md                         # 安装、实际调用、规则与交付清单
@@ -75,7 +75,7 @@ const copy = {
     board: 'AI 技能包 · STARDEW VALLEY UI',
     title: '让 Agent 真正会用',
     lede: '这不是一段一次性的提示词，而是一份可安装、按需加载的项目知识包：让 AI 知道什么时候该用、去哪里查、哪些规则绝不能越界。',
-    chips: ['React + TypeScript', '公开 API 对照', '像素风约束', '非商业许可'],
+    chips: ['React + TypeScript', '公开 API 对照', '像素风约束', 'MIT 许可'],
     blocks: [
       [
         '快速开始',
@@ -90,7 +90,7 @@ const copy = {
     quick: [
       ['安装技能', '使用 skills CLI，或把仓库中的技能目录复制到 Agent 识别的 skills 位置。'],
       ['直接提需求', '说明页面目标、数据与交互，例如“$stardew-valley-ui 用 Stardew Valley UI 做一个农场库存页；显式引入一次 style.css”。'],
-      ['按真实流程验收', '让 Agent 确认安装状态、只选一种样式入口、复查公开导入与可访问性，再运行项目检查并说明客户端边界和非商业许可。'],
+      ['按真实流程验收', '让 Agent 确认安装状态、只选一种样式入口、复查公开导入与可访问性，再运行项目检查并说明客户端边界与 MIT 保留义务。'],
     ],
     workflow: [
       ['发现', 'Agent 根据 SKILL.md 的 description 判断任务是否需要安装、接入或复查 StardewValley UI。'],
@@ -110,8 +110,8 @@ const copy = {
       ['日期与导航', 'StarCalendar · StarDatePicker · StarTab'],
     ],
     reviewSubheading: '交付前巡一遍田',
-    calloutTitle: '许可边界：',
-    calloutBody: 'StardewValley UI 与这份技能均遵循项目的非商业许可证。Agent 可以实现和复查代码，但不能替你决定产品目标、商业授权或素材权利。',
+    calloutTitle: '协议不管的部分：',
+    calloutBody: 'StardewValley UI 与这份技能均以 MIT 发布，代码可商用。MIT 只管代码：它不授予《星露谷物语》的名称、商标与游戏素材——那些权利归各自权利人所有。Agent 可以实现和复查代码，但不能替你决定产品目标，也不能引入游戏素材。',
     installCommand: installCommandZh,
     agentBrief: agentBriefZh,
     reviewBrief: reviewBriefZh,
@@ -120,7 +120,7 @@ const copy = {
     board: 'AI SKILL PACK · STARDEW VALLEY UI',
     title: 'Make your Agent actually able to use it',
     lede: 'This is not a one-off prompt but an installable, load-on-demand knowledge pack: it teaches an AI when to reach for the kit, where to look things up, and which rules it must never cross.',
-    chips: ['React + TypeScript', 'Public API reference', 'Pixel-art constraints', 'Non-commercial license'],
+    chips: ['React + TypeScript', 'Public API reference', 'Pixel-art constraints', 'MIT license'],
     blocks: [
       [
         'Quick start',
@@ -152,7 +152,7 @@ const copy = {
       ['Just ask', 'Describe the page goal, data, and interactions — e.g. "$stardew-valley-ui build a farm inventory page with Stardew Valley UI; import style.css exactly once".'],
       [
         'Accept by real flow',
-        'Have the Agent confirm install state, use exactly one style entry, re-check public imports and accessibility, then run the project checks and state the client boundary and non-commercial limits.',
+        'Have the Agent confirm install state, use exactly one style entry, re-check public imports and accessibility, then run the project checks and state the client boundary and the MIT notice obligations.',
       ],
     ],
     workflow: [
@@ -177,9 +177,9 @@ const copy = {
       ['Date & navigation', 'StarCalendar · StarDatePicker · StarTab'],
     ],
     reviewSubheading: 'Walk the field before delivering',
-    calloutTitle: 'License boundary: ',
+    calloutTitle: 'What the license does not cover: ',
     calloutBody:
-      'Both StardewValley UI and this skill follow the project non-commercial license. An Agent may implement and review code, but it cannot decide your product goals, commercial licensing, or asset rights for you.',
+      'StardewValley UI and this skill are both MIT licensed, so the code may be used commercially. MIT covers code only: it grants no rights to the Stardew Valley name, trademarks, or game assets — those stay with their respective owners. An Agent may implement and review code, but it cannot decide your product goals or pull in game assets.',
     installCommand: installCommandEn,
     agentBrief: agentBriefEn,
     reviewBrief: reviewBriefEn,

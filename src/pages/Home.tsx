@@ -19,7 +19,7 @@ const copy = {
     installHint: '安装后从一个 Card、Button 或 Dialog 开始；其余工具会在需要时慢慢长出来。',
     componentCount: '块可试种的组件田',
     typeSafe: 'TypeScript 类型守卫',
-    noCommercial: '仅限非商业使用',
+    multiUse: 'MIT 开源，可商用',
     routesTitle: '从第一天开始，不用翻箱倒柜',
     routesDescription: '无论你独自搭建、与 Agent 协作，还是想先对齐设计与授权边界，这里都有一条已经铺好的小路。',
     routes: [
@@ -27,7 +27,7 @@ const copy = {
       ['Agent 帮我使用', '把场景和验收条件写进提示词，让它帮你搭好结构。'],
       ['设计规范', '用一致的层级、像素节拍和反馈，让页面好看也好用。'],
     ],
-    license: '许可提醒：本项目仅供非商业学习、研究与原型使用。',
+    license: '许可提醒：本项目以 MIT 协议开源，可商用（含闭源产品），只需保留版权声明与许可文本。',
   },
   en: {
     eyebrow: 'PIXEL UI COMPONENT LIBRARY · REACT + TYPESCRIPT',
@@ -40,7 +40,7 @@ const copy = {
     installHint: 'Install it, then begin with one Card, Button, or Dialog. The rest of the toolkit can grow when you need it.',
     componentCount: 'component plots to explore',
     typeSafe: 'TypeScript type safety',
-    noCommercial: 'Non-commercial use only',
+    multiUse: 'MIT licensed, commercial OK',
     routesTitle: 'A clear path from day one',
     routesDescription: 'Whether you are building alone, pairing with an agent, or aligning design and licensing first, there is a trail ready for you.',
     routes: [
@@ -48,7 +48,7 @@ const copy = {
       ['Use it with an agent', 'Describe the scenario and acceptance checks, then let an agent build the structure.'],
       ['Design system', 'Use consistent hierarchy, pixel rhythm, and feedback so pages look good and work well.'],
     ],
-    license: 'License note: this project is for non-commercial learning, research, and prototypes only.',
+    license: 'License note: this project is MIT licensed — commercial use (including closed-source products) is fine, just keep the copyright notice and the license text.',
   },
 } as const
 
@@ -61,7 +61,7 @@ function StarHomePage() {
   const highlights = [
     { icon: <Blocks size={21} />, value: COMPONENT_ROUTES.length, label: text.componentCount },
     { icon: <ShieldCheck size={21} />, value: '100%', label: text.typeSafe },
-    { icon: <Palette size={21} />, value: 'PIXEL', label: text.noCommercial },
+    { icon: <Palette size={21} />, value: 'PIXEL', label: text.multiUse },
   ]
 
   return (

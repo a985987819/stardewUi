@@ -41,10 +41,26 @@ describe('donation page states the boundaries', () => {
     ).toContain(free)
   })
 
-  it.each(['zh', 'en'] as const)('%s says support does not change the licence', (lang) => {
+  it.each(['zh', 'en'] as const)('%s says support buys time, not access', (lang) => {
     const text = textOf(lang)
 
-    expect(text).toMatch(lang === 'zh' ? /不会改变许可证|保持非商业许可/ : /does not change the licence/)
+    // Under MIT there is no licence to sell, so the promise that money changes
+    // nothing has to be stated in terms of what money actually buys. The old
+    // wording ("does not change the licence") described a restriction that no
+    // longer exists, and would have read as boilerplate nobody had updated.
+    expect(text).toMatch(
+      lang === 'zh' ? /买到的是维护时间，不是授权/ : /buys the maintainer time rather than access/,
+    )
+  })
+
+  it.each(['zh', 'en'] as const)('%s states that MIT allows free commercial use', (lang) => {
+    const text = textOf(lang)
+
+    // The reason the sentence above is not optional. Without it, a reader can
+    // still infer that commercial use must involve a private arrangement.
+    expect(text).toMatch(
+      lang === 'zh' ? /MIT 协议允许任何人免费商用/ : /MIT lets anyone use it commercially without paying/,
+    )
   })
 
   it.each(['zh', 'en'] as const)('%s says money goes to maintenance', (lang) => {

@@ -103,18 +103,22 @@ if (autoBundle.length < stylesheet.length) {
 
 const assetSummary = assetFiles.length > 0 ? `${assetFiles.length} emitted assets` : 'embedded library assets'
 
-// `license` must be an SPDX expression npm can parse. The previous value,
-// "SEE LICENSE IN LICENSE", is not one: npm falls back to MIT for any
-// expression it cannot parse, and 0.1.0 / 0.2.0 are therefore published on the
-// registry as MIT — telling commercial users the non-commercial terms in LICENSE
-// do not apply. `LicenseRef-` is the SPDX escape hatch for a custom license.
+// `license` must be a SPDX expression npm can parse. This guard was written when
+// the package carried a custom non-commercial license, and it has been through
+// both ways of getting this wrong: `SEE LICENSE IN LICENSE` was not an
+// expression at all, and npm silently falls back to MIT for anything it cannot
+// parse. That fallback is harmless now that MIT is the real license, but it is
+// also how 0.1.0 and 0.2.0 shipped — while `LICENSE` held terms that forbade
+// commercial use, npm labelled those versions MIT on the registry. A typo here
+// is therefore invisible until it reaches npm, and then it is a legal statement
+// about someone else's terms.
 const declaredLicense = packageJson.license ?? ''
 if (!/^(MIT|ISC|Apache-2\.0|BSD-[23]-Clause|GPL-3\.0|LicenseRef-[\w.-]+)$/.test(declaredLicense)) {
   fail(
     `the license field is "${declaredLicense}", which npm cannot parse as SPDX.\n` +
-    '           npm silently falls back to MIT for unparseable values, which would\n' +
-    '           mislabel this non-commercial package. Use a valid SPDX expression —\n' +
-    '           "LicenseRef-StardewValleyUI-NonCommercial" — so the registry shows the real terms.',
+      '           npm silently falls back to MIT for any unparseable value, so the registry\n' +
+      '           would label this package with terms LICENSE does not grant. Use a valid\n' +
+      '           SPDX expression — currently "MIT".',
   )
 }
 
@@ -122,4 +126,4 @@ console.log(
   `Package verification passed: ${assetSummary}, all public entry points are present, ` +
   `and ./auto embeds ${(stylesheet.length / 1024).toFixed(1)} KB of CSS.`,
 )
-console.log(`License: ${declaredLicense} (npm will display this verbatim, not MIT).`)
+console.log(`License: ${declaredLicense} (npm will display this verbatim).`)

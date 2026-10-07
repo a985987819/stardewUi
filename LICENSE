@@ -1,26 +1,33 @@
-StardewValley UI Non-Commercial License
+MIT License
 
-Copyright (c) StardewValley UI contributors.
+Copyright (c) 2026 StardewValley UI contributors
 
-Permission is granted to copy, modify, and redistribute this repository and
-its derivative works solely for personal learning, research, portfolio display,
-non-profit open-source experiments, and internal prototypes that are not
-offered, sold, or operated commercially.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The following uses are prohibited:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-1. Selling, renting, sublicensing, relicensing for a fee, or otherwise
-   monetising this repository or any derivative work.
-2. Including it in paid products or services, commercial websites, advertising,
-   marketing, lead generation, client work, or any activity that directly or
-   indirectly generates revenue.
-3. Removing this license or the repository attribution, or representing the
-   work as an official Stardew Valley product, collaboration, or endorsement.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Redistributions and derivative works permitted above must retain this license
-and clear attribution to the StardewValley UI project.
+---
 
-This repository does not grant any right to Stardew Valley names, trademarks,
-characters, music, artwork, or other game assets. Those rights remain with
-their respective owners. This repository is provided "AS IS", without warranty
-of any kind. The licensors are not liable for claims arising from its use.
+A note on the project name
+---------------------------
+
+This project is an original, independent library. It is not affiliated with,
+endorsed by, or associated with ConcernedApe LLC or the game Stardew Valley.
+
+No game assets — artwork, music, fonts, names, or trademarks — are distributed
+with this package. Those rights remain with their respective owners. The name
+is used descriptively, to say what the library is inspired by.

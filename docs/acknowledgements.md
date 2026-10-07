@@ -1,6 +1,6 @@
 # 致谢
 
-> [返回 README 目录](../README.md#目录)
+> [返回 README 目录](../README_ZH.md#目录)
 
 ## Animal Island UI
 

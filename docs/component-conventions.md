@@ -1,6 +1,6 @@
 # 组件开发规范
 
-> [返回 README 目录](../README.md#目录)
+> [返回 README 目录](../README_ZH.md#目录)
 
 本组件库把「一个组件」的信息收敛到**一处**：`src/router/componentRegistry.tsx` 里的 `COMPONENT_ROUTES`。
 路由表、左侧导航、组件总览页、冒烟测试都从它派生，因此新增组件的正确做法只有一条 —— **补目录条目**，
@@ -102,7 +102,8 @@ bun run test:run             # 全量测试（含守卫）
 - 演示页文案：页面内自建 `copy` 对象，`zh` / `en` 两套齐全，并用 `satisfies Record<Lang, ...>` 锁住形状。
   `const t = copy[lang]` 之后所有文案都从 `t` 取，方便一次性补翻译。
 - 每个演示页结尾必须有 API 表：`<div id="api" className="component-page-api"><StarApiTable ... /></div>`，
-  数据字段是 `property` / `description` / `type` / `default`。
+  数据字段是 `property` / `description` / `type` / `default`。这是 Props 的唯一权威来源——
+  README 不再手写 Props 表，正是因为手写表格会与这里、以及与发布的 `.d.ts` 漂移。
 - 每个演示槽位都要有 `id`，并出现在 `toc` 的 `id` 数组里（`TableOfContents` 依赖它做锚点）。
 
 ## 6. 完成定义（DoD）
@@ -113,15 +114,17 @@ bun run test:run             # 全量测试（含守卫）
 - [ ] `components/ui/<Component>.test.tsx` 覆盖基础渲染 + 关键交互（受控值、禁用态等）；
 - [ ] `bun run check:components` 通过；
 - [ ] `bunx tsc -b`、`bun run lint`、`bun run test:run` 全绿；
-- [ ] `bun run dev` 后手点左侧导航里的新条目，或跑 `bun run test:smoke http://127.0.0.1:5199/stardewUi`；
-- [ ] README 的组件列表里补上该组件的用法与 API 表。
+- [ ] `bun run dev` 后手点左侧导航里的新条目，或跑 `bun run test:smoke http://127.0.0.1:5199/stardewUi`。
+
+> **不需要改 README。** README 只讲安装与第一个组件，逐组件的 Props 表由演示页的
+> `<StarApiTable>` 生成——手写的表格会与真正发布的 `.d.ts` 漂移，而类型声明才是权威来源。
 
 ## 7. 移除组件
 
 删除一个组件就是把上面那条链反向走一遍，仍然只有一条命令：
 
 ```bash
-bun run rm:component Title              # 删文件 + 摘条目 + 摘导出 + 清 README/i18n，末尾自动跑守卫
+bun run rm:component Title              # 删文件 + 摘条目 + 摘导出 + 清废弃 i18n 文案，末尾自动跑守卫
 bun run rm:component Title --dry-run    # 只看计划，不删不改
 ```
 
@@ -134,10 +137,12 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 | 删除导入 | 同一个文件里的 `Star<Component>DemoPage`，以及**不再被其他条目使用**的 lucide 图标 |
 | 删除导出 | `lazyPages.ts` 的 `Star<Component>DemoPage`，`ui/index.ts` 里所有 `from './<Component>'` 行 |
 | 清废弃文案 | `i18n/dictionaries.ts` 中值等于该条目 `title.zh` / `title.en` 的 `sidebar.*` 键（键名与组件名早已漂移，如 `sidebar.datePicker`，只能按文案匹配） |
-| 清文档 | `README.md` 的 `### Star<Component> - …` 整节（含 API 表与收尾分隔线）+ 类型清单里该模块导出的类型名 |
 
-其中 README / i18n 两项是**尽力而为**：缺失只告警不报错（那两处是手写文件，本来就可能没有对应内容）。
+i18n 这一项是**尽力而为**：缺失只告警不报错（那是手写文件，本来就可能没有对应内容）。
 其余动作漏一处，守卫就会红 —— 脚本末尾直接跑守卫，所以「删了但漏掉某个入口」不可能静默通过。
+
+README 不在清理范围内：它已不含逐组件章节（见 §6 的说明），组件的 API 表跟着
+`pages/<Component>Demo.tsx` 一起被删掉，演示站上的对应路由也随之消失。
 
 > 历史坑：`rm-component.mjs` 自己就是靠「`gen:component` 生成 → `rm:component` 删除 → `git diff` 必须为空」
 > 的往返测试才发现的 —— 删**最后一条**目录条目时多退一个换行，收尾的 `]` 会被挤到 `},` 同一行；
@@ -149,7 +154,7 @@ bun run rm:component Title --dry-run    # 只看计划，不删不改
 ```bash
 bun run gen:component <Name> [--zh --en --icon --desc-zh --desc-en --route --category]  # 脚手架
 bun run gen:component <Name> --dry-run                                       # 只看计划不落盘
-bun run rm:component <Name> [--no-verify] [--dry-run]                        # 移除组件（含清 README/i18n）
+bun run rm:component <Name> [--no-verify] [--dry-run]                        # 移除组件（含清废弃 i18n 文案）
 bun run check:components                                                     # 目录同步守卫
 bunx vitest run src/components/ui/<Component>.test.tsx                       # 单组件测试
 bun run test:smoke http://127.0.0.1:5199/stardewUi                           # 无头路由冒烟
@@ -160,6 +165,7 @@ bun run test:smoke http://127.0.0.1:5199/stardewUi                           # �
 - `Tab` 尚无同名单测（守卫暂未强制单测文件，因为现在是欠账状态，
   补齐后可以考虑把「每个公共组件必须有同名单测」也写进守卫）。
 - 演示页文案（`copy`）与 API 表仍写在页面里，未来若要自动生成文档站，需要把 `meta` 单独抽成模块。
-- `rm:component` 对 README / i18n 的清理依赖「章节骨架 + 文案匹配」这两条软约定，没有自动化测试兜底。
-  改动该脚本后请手工跑一次往返：`bun run gen:component SmokeTest …` → 手工补一个 `### StarSmokeTest` 章节 →
-  `bun run rm:component SmokeTest`，`git diff` 必须为空。未来可以把它固化成一条 `test:roundtrip` 脚本。
+- `rm:component` 对 i18n 的清理依赖「文案匹配」这条软约定，没有自动化测试兜底。
+  改动该脚本后请手工跑一次往返：`bun run gen:component SmokeTest …` → 手工补一个匹配的
+  `sidebar.*` 废弃键 → `bun run rm:component SmokeTest`，`git diff` 应为空。
+  未来可以把它固化成一条 `test:roundtrip` 脚本。

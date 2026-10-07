@@ -7,7 +7,7 @@
 [![English](https://img.shields.io/badge/README-English-1a1a1a?style=flat-square&logo=github)](README.md)
 [![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-1a1a1a?style=flat-square&logo=github)](README_ZH.md)
 
-> 🐣 27 components · 2 style entry paths, pick one · zero runtime config · ESM / CJS / full types
+> 🐣 32 components · two style entry paths, pick one · zero runtime config · ESM / CJS / full types
 
 A **Stardew Valley-inspired, pixel-art React component library**, built with React,
 TypeScript and Vite. It ships composable UI components plus utilities for dates,
@@ -42,7 +42,7 @@ function App() {
 ```
 
 Live demo (every component has an interactive example and a full API table):
-**<https://a985987819.github.io/stardewUi/>**
+**<https://a985987819.github.io/stardewUi/?lang=en>**
 
 **[中文文档](README_ZH.md)** · **Report an issue](https://github.com/a985987819/stardewUi/issues/new/choose)
 
@@ -52,7 +52,7 @@ Live demo (every component has an interactive example and a full API table):
 
 | | |
 | --- | --- |
-| 🧩 **27 components** | Forms, overlays, dates, navigation and feedback — all controlled or uncontrolled |
+| 🧩 **32 components** | Forms, overlays, dates, navigation and feedback — all controlled or uncontrolled |
 | 🎨 **Canvas pixel rendering** | Titles, pixel text and nine-slice buttons are drawn per pixel, not blurred with a filter |
 | ♿ **Accessibility built in** | Focus traps, Esc to close, `aria-modal` and keyboard reachability are not optional |
 | 🏗️ **Zero config** | Pixel assets ship inside the package; nothing to copy into your `public/` |
@@ -99,8 +99,8 @@ import { StarCard, StarNineSliceButton } from 'stardew-valley-ui/auto'
 ```
 
 Pick **one** path only. Keeping both is harmless (injection probes the page first
-and skips if the stylesheet is already there). Guidance:
-[integration guide](docs/consumer-integration.md#style-import).
+and skips if the stylesheet is already there). The trade-offs are in the
+[integration guide](docs/consumer-integration.md).
 
 ### 2. Use a component
 
@@ -112,11 +112,7 @@ function App() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div>
-      <StarCard title="Harvest board" showTitle>
-        <p>Ship it and move on to the next season.</p>
-      </StarCard>
-
+    <StarCard title="Harvest board" showTitle>
       <StarNineSliceButton variant="primary" onClick={() => setOpen(true)}>
         Open dialog
       </StarNineSliceButton>
@@ -131,22 +127,13 @@ function App() {
           { text: 'Ship it', variant: 'primary', onClick: () => message.success('Shipped!') },
         ]}
       />
-    </div>
+    </StarCard>
   )
 }
 ```
 
-### 3. Imperative feedback
-
-```tsx
-import { message } from 'stardew-valley-ui'
-
-message.success('Saved to the shipping bin')
-message.error('The barn is full')
-```
-
-`message` is a command-style API, not a component — call it from anywhere,
-including outside React's render phase.
+`message` is a command-style API — call it from anywhere, including outside
+React's render phase.
 
 ---
 
@@ -156,40 +143,11 @@ Class names inside the library are CSS Modules, so nothing leaks into your globa
 scope. It composes cleanly with Ant Design, Element Plus, or any existing design
 system.
 
-### Style import: pick one, not both
-
-Styles need to take effect exactly once. Both paths use **identical component
-imports** — only the CSS line differs:
-
-| Path | How | When |
-| --- | --- | --- |
-| **Explicit stylesheet** (preferred) | `import 'stardew-valley-ui/style.css'` + import components from `stardew-valley-ui` | Everything, especially Next.js / SSR / CSP-restricted projects |
-| **Auto-injecting entry** | Import components from `stardew-valley-ui/auto` | Client-only apps (Vite / CRA) that want to skip the CSS line |
-
-```tsx
-// Path 1: main.tsx or app/layout.tsx
-import 'stardew-valley-ui/style.css'
-import { StarCard } from 'stardew-valley-ui'
-
-// Path 2: no CSS import at all
-import { StarCard } from 'stardew-valley-ui/auto'
-```
-
-Pick **one**. Keeping both is harmless — injection probes for the stylesheet and
-skips if it is already on the page, so you will never ship the CSS twice.
-
-> **The cost of auto-injection**: it creates a `<style id="stardew-valley-ui-styles">`
-> at module load. That means SSR / SSG can briefly render unstyled (the styles land
-> on the client), and it needs `style-src 'unsafe-inline'` in your CSP. SSR projects
-> should still use the explicit stylesheet — see the
-> [integration guide](docs/consumer-integration.md#style-import).
-
-### Custom image assets
-
-Built-in button, seasonal theme, calendar background, empty-state and loading
-artwork all ship with the package — install and they just work. When you pass your
-own via `backgroundSrc`, `imageSrc`, `src` and friends, hosting and caching are
-your project's business. In Vite, pass a statically imported URL:
+**Custom image assets**: the built-in button, seasonal theme, calendar
+background, empty-state and loading artwork all ship with the package — install
+and they just work. When you pass your own via `backgroundSrc`, `imageSrc`, `src`
+and friends, hosting and caching are your project's business. In Vite, pass a
+statically imported URL:
 
 ```tsx
 import customButtonBackground from './assets/custom-button.png'
@@ -200,44 +158,38 @@ export function SaveButton() {
 }
 ```
 
-### SSR / RSC boundary
+**SSR / RSC boundary**: `StarDialog`, `message`, the canvas backgrounds and the
+storage hooks touch the DOM, Canvas or Storage on the client. With Next.js, RSC
+or any SSR framework, mark the interactive components that use them as client
+components (`'use client'`), and never call the imperative `message(...)` during
+a server render pass.
 
-`StarDialog`, `message`, the canvas backgrounds and the storage hooks touch the
-DOM, Canvas or Storage on the client. With Next.js, RSC or any SSR framework,
-mark the interactive components that use them as client components
-(`'use client'`), and never call the imperative `message(...)` during a server
-render pass.
-
-### Where the full API lives
-
-This README stays short on purpose. The **complete prop tables for all 27
-components — plus every hook, utility and type — live in the
-[Chinese README](README_ZH.md)**, which is generated from the demo sources and
-checked against the TypeScript declarations by the test suite.
-
-Two pages on the **live demo** carry the same API in English, with live
-examples you can interact with:
-
-- **[Components](https://a985987819.github.io/stardewUi/components)** — the catalogue
-- **[Buy me a coffee](https://a985987819.github.io/stardewUi/support)** — support & donation
-
-Switch the demo to English with the globe icon in the header.
+For assets, SSR / RSC boundaries and the maintainer's release checklist, see
+[docs/consumer-integration.md](docs/consumer-integration.md).
 
 ### Component index
 
 | Category | Exports |
 |----------|---------|
-| Containers & display | `StarCard`, `StarTitle`, `StarPixelText`, `StarDisplayFrame`, `StarDivider`, `StarAvatar`, `StarEmptyState`, `StarLoading`, `StarTag`, `StarBadge`, `StarCollapse`, `StarSkeleton` |
+| Containers & display | `StarCard`, `StarTitle`, `StarPixelText`, `StarDisplayFrame`, `StarDivider`, `StarAvatar`, `StarEmptyState`, `StarLoading`, `StarTag`, `StarBadge`, `StarCollapse`, `StarSkeleton`, `StarBackToTop` |
 | Forms & actions | `StarNineSliceButton`, `StarInput`, `StarTextarea`, `StarSwitch`, `StarRadio`, `StarCheckbox`, `StarSelect`, `StarRating`, `StarProgress` |
 | Feedback & overlays | `StarDialog`, `StarDrawer`, `StarPopup`, `message`, `StarTypewriter`, `StarAlert` |
 | Dates & navigation | `StarCalendar`, `StarDatePicker`, `StarTab`, `StarPagination` |
 
-Full prop types are importable from the root entry via `import type`. Every
-component accepts `className`, and most container components forward native
-`style` and the matching DOM attributes.
+Hooks (`useToggle`, `useClipboard`, `useLocalStorage`, `useNineSliceBackground`),
+utilities (`classNames`, `copyToClipboard`, `resolveAssetPath`, the pixel-shape and
+nine-slice helpers) and every Props type are exported from the root entry; import
+types with `import type`.
 
-For assets, SSR / RSC boundaries and the maintainer's release checklist, see
-[docs/consumer-integration.md](docs/consumer-integration.md).
+**Where the full API lives.** Every component page on the live demo ends in an
+API table, bilingual and next to a runnable example:
+
+- **[Components](https://a985987819.github.io/stardewUi/components?lang=en)** — the catalogue, with a page per component
+
+This README deliberately does not carry per-component Props tables. Hand-written
+tables drift from the real type declarations, and the declarations are the only
+authoritative source. The demo generates its tables from the same source that
+ships the package.
 
 ---
 
@@ -262,26 +214,16 @@ git clone --depth 1 https://github.com/a985987819/stardewUi.git .agents/skills/s
 skills add a985987819/stardewUi
 ```
 
-<details>
-<summary><b>Don't want to install anything?</b></summary>
-
-You don't have to. Paste this into your agent instead:
+Don't want to install anything? Paste this into your agent instead:
 
 > Use the `stardew-valley-ui` React component library. Install it, import
 > `stardew-valley-ui/style.css` exactly once, then build the page from its public
 > API. Check the installed package's `.d.ts` files for real prop names — do not
-> guess them. Follow the repo's component conventions at
-> <https://github.com/a985987819/stardewUi/blob/main/docs/component-conventions.md>.
-
-That is the whole instruction. The Skill just automates it.
-</details>
+> guess them.
 
 Once installed, describe the page you want or invoke `$stardew-valley-ui`
-explicitly — e.g. "build a farm inventory page with Stardew Valley UI; import
-style.css once, and confirm a discard action with StarDialog." Exact props always
-come from the installed package's TypeScript declarations, so the agent cannot
-drift from what you actually have. The live demo's "Guide → Agent help" covers
-installation, real invocation and a request template.
+explicitly. Exact props always come from the installed package's TypeScript
+declarations, so the agent cannot drift from what you actually have.
 
 ---
 
@@ -293,9 +235,7 @@ installation, real invocation and a request template.
 Nine times out of ten the stylesheet was never imported. It lives on a separate
 subpath and needs one explicit line: `import 'stardew-valley-ui/style.css'`.
 If you use the `/auto` entry, drop that line but import from
-`stardew-valley-ui/auto` instead of `stardew-valley-ui` — mixing both makes the
-loading path hard to reason about. See the
-[integration guide](https://github.com/a985987819/stardewUi/blob/main/docs/consumer-integration.md).
+`stardew-valley-ui/auto` instead of `stardew-valley-ui`.
 </details>
 
 <details>
@@ -329,21 +269,34 @@ mixing RGB channels to produce borders, highlights and shadows, so `color` takes
 </details>
 
 <details>
+<summary><b>How do I link the demo in a specific language?</b></summary>
+
+Add the parameter: <https://a985987819.github.io/stardewUi/?lang=en> or `?lang=zh`.
+It takes priority over whatever the browser remembers, so the link works for the
+person you send it to. Without a parameter the demo keeps your last choice
+(Chinese on a first visit). The globe icon in the header rewrites the parameter as
+you switch, and in-app navigation preserves it.
+</details>
+
+<details>
 <summary><b>Why is the package 4MB?</b></summary>
 
 Almost all of it is **inlined pixel artwork** — buttons, seasonal themes,
 calendar backgrounds, empty states, loading animations. What you get in exchange
 is zero config: no files to copy into `public/`, no CDN to configure, and image
-paths that cannot break when your deploy directory changes. The actual JS is 107
+paths that cannot break when your deploy directory changes. The actual JS is ~100
 exports and gzips far smaller.
 </details>
 
 <details>
 <summary><b>Can I use it in a commercial project?</b></summary>
 
-No. This project ships under a **non-commercial license** — personal learning,
-research, portfolios and non-profit experiments only. Full terms in
-[LICENSE](LICENSE).
+Yes. This project is **MIT licensed** — use it commercially, in closed-source
+products, in paid services, whatever you like. The only requirements are keeping
+the copyright notice and the license text. Full terms in [LICENSE](LICENSE).
+
+This project is not affiliated with or endorsed by the makers of Stardew Valley,
+and ships none of their assets.
 </details>
 
 ---
@@ -351,30 +304,51 @@ research, portfolios and non-profit experiments only. Full terms in
 ## Table of contents
 
 - [What you get](#what-you-get) · [Install](#install) · [Quick start](#quick-start) · [Using it inside another frontend project](#using-it-inside-another-frontend-project)
-- [Let an AI Agent use it for you](#let-an-ai-agent-use-it-for-you) · [Frequently asked questions](#frequently-asked-questions)
-- [Say something — honestly, anything](#say-something--honestly-anything) · [Buy me a coffee](#buy-me-a-coffee-) · [License](#license) · [Acknowledgements](#acknowledgements) · [Contributing](#contributing)
+- [Let an AI Agent use it for you](#let-an-ai-agent-use-it-for-you) · [Frequently asked questions](#frequently-asked-questions) · [License](#license)
+- [Say something — honestly, anything](#say-something--honestly-anything) · [Buy me a coffee](#buy-me-a-coffee-) · [Acknowledgements](#acknowledgements) · [Contributing](#contributing)
+
+---
+
+## License
+
+**MIT.** You may use, modify, and redistribute this project, including
+commercially and inside closed-source products. The two requirements are to keep
+the copyright notice and the license text.
+
+This is an original, independent library. It is **not affiliated with, endorsed
+by, or associated with ConcernedApe LLC or the game Stardew Valley**, and no game
+artwork, music, fonts, or other assets are distributed with it — those rights
+remain with their respective owners. The name is used descriptively, to say what
+the library is inspired by.
+
+The full terms live in [LICENSE](https://github.com/a985987819/stardewUi/blob/main/LICENSE).
+
+> **⚠️ Older versions on npm (0.1.0 – 0.4.0) shipped under different terms.**
+> They were published as non-commercial, and `0.1.0` / `0.2.0` additionally
+> declared a `license` value npm could not parse — which npm resolves to MIT.
+> The code was MIT-labelled on the registry the whole time while `LICENSE`
+> forbade commercial use. From **0.5.0** the field is a plain `"MIT"` and the
+> terms match. If you pinned an old version and need the historical terms, read
+> the `LICENSE` file in that version's tag.
+
+Donations are voluntary and change nothing: the MIT terms above apply whether you
+support the project or not.
 
 ---
 
 ## Say something — honestly, anything
 
-What this library has gained since day one is not the 27 components. It's the
+What this library has gained since day one is not the 32 components. It's the
 bugs **you** ran into. **Every piece of feedback gets read**, including
 "I don't really like this design."
 
 👉 **[Open an issue](https://github.com/a985987819/stardewUi/issues/new/choose)** —
-any of these, no forms required:
-
-- **It doesn't work** — "styles didn't apply after install", "focus jumps when I open the dialog"
-- **It's hard to use** — "six lines to pop a dialog", "why both `open` and `visible`?"
-- **It doesn't look right** — "this blue isn't the game's blue", "the border is a touch heavy"
-- **Why is it built this way?** — "why nine-slice buttons instead of rounded corners?", "was the motion curve picked at random?"
-
-The last category is my favourite. The trade-offs behind the implementation are
-written down in the [migration guide](docs/migration-0.3.md) and in code comments
-— but that's *my* view. Your use case is different, so what trips you up is
-different too. **Where something feels wrong to you is very likely exactly what
-I never considered.**
+"it doesn't work", "it's hard to use", "it doesn't look right", and especially
+"why is it built this way?" are all welcome. The trade-offs behind the
+implementation are written down in the [migration guide](docs/migration-0.3.md)
+and in code comments — but that's *my* view, and your use case is different.
+**Where something feels wrong to you is very likely exactly what I never
+considered.**
 
 > Not sure if it counts as a bug? File it as one. A lot of the design here has
 > only ever been used by me, which makes me the last person qualified to notice.
@@ -383,65 +357,35 @@ I never considered.**
 
 ## Buy me a coffee ☕
 
-> **First, the important part: a donation is not a licence purchase.**
-> Using the library is free, and stays free. Support is voluntary: it does not
-> affect free use, and it does not change the licence — this project stays
-> non-commercial whether you support it, and how much. Money goes only to
-> maintenance: component development, bug fixes, documentation and artwork.
+> **First, the important part: a donation is not a licence purchase — and it
+> never could be.** This is an MIT-licensed project, which means anyone may use
+> it commercially without paying and without asking. Support is entirely
+> voluntary, and it buys the maintainer time, not a licence.
+>
+> That is the deal: use it however you want, including in paid products, and
+> tip if it saved you time. Money goes only to maintenance — component
+> development, bug fixes, documentation and artwork.
 
-Nobody assigns the work of maintaining a component library to me. Coffee doesn't
-solve the problem, but it makes the typing slightly faster.
-
-**→ [Open the donation page](https://a985987819.github.io/stardewUi/support)**
+**→ [Open the donation page](https://a985987819.github.io/stardewUi/support?lang=en)**
 WeChat Pay and Alipay codes, and an itemised list of what the money is for.
+Any amount works — one coffee is plenty.
 
-Any amount works — one coffee is plenty. No need to round up or come back.
-Other channels:
+Other channels: **Afdian** — <https://afdian.com/malatang1>
 
-- **Afdian** — <https://afdian.com/malatang1> (monthly support, or one-off)
-- **GitHub Sponsors** — a **Sponsor** button appears on the repo once enabled
+**Not accepted**: paid feature work and "open source partnership" in name only —
+those are about my time, not the licence. See [docs/sponsoring.md](docs/sponsoring.md).
 
-**Not accepted**: paid feature work, commercial licensing, "open source partnership"
-in name only. Those are licensing-boundary questions, not money questions. See
-[docs/sponsoring.md](https://github.com/a985987819/stardewUi/blob/main/docs/sponsoring.md).
-
----
-
-## License
-
-This project uses a **non-commercial license**: personal learning, research,
-portfolio display, non-profit open-source experiments, and internal prototypes
-that are not offered, sold, or operated commercially. You may not use this
-project or its derivatives for sale, paid services, commercial websites,
-advertising, marketing, lead generation, client work, or any activity that
-directly or indirectly generates revenue.
-
-You must keep the license and attribution intact, and must not imply this is an
-official Stardew Valley product, collaboration, or endorsement. This project
-**does not ship any official Stardew Valley assets**; the names, marks and game
-artwork remain the property of their respective owners.
-
-The full terms live in [LICENSE](https://github.com/a985987819/stardewUi/blob/main/LICENSE).
-If your use involves commercial or legal judgement, do not use this project and
-consult a qualified professional.
-
-> **⚠️ About the licence label on 0.1.0 / 0.2.0**: those two versions declared a
-> `license` of `SEE LICENSE IN LICENSE`, which npm cannot parse — and npm
-> **silently falls back to MIT** for any expression it cannot parse. So the
-> registry labels them MIT. The actual terms were always the `LICENSE` file:
-> **those versions are non-commercial too, and the MIT label is wrong.**
-> From **0.3.0** the field is a valid SPDX expression,
-> `LicenseRef-StardewValleyUI-NonCommercial`, and npm shows it verbatim;
-> `bun run verify:package` now blocks that field from regressing.
-
-Donations, if you make one, do not change any of the above.
+> On licensing specifically: I cannot and will not sell you an exception. MIT has
+> no exception to sell. If you need something the licence does not give you —
+> indemnification, a private SLA, your own fork under your own terms — that is a
+> conversation about paid work, not a licence amendment.
 
 ## Acknowledgements
 
 The welcome page's interaction rhythm and visual feel were inspired by
 [Animal Island UI](https://github.com/guokaigdg/animal-island-ui). Details in
-[docs/acknowledgements.md](https://github.com/a985987819/stardewUi/blob/main/docs/acknowledgements.md).
-No code or assets were copied from it.
+[docs/acknowledgements.md](docs/acknowledgements.md). No code or assets were
+copied from it.
 
 ## Contributing
 

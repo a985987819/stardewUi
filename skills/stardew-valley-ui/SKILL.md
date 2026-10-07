@@ -10,10 +10,15 @@ description: >
 # Stardew Valley UI
 
 Use this skill to make the library usable in a real React project, rather than merely
-recreating its visual style. The package supports React 18+ and TypeScript and is limited
-to personal learning, research, portfolio display, non-profit open-source experiments, and
-non-commercial internal prototypes. Preserve attribution and the project's license; do not
-approve or implement commercial use.
+recreating its visual style. The package supports React 18+ and TypeScript and is MIT
+licensed, so it may be used commercially and inside closed-source products. Preserve the
+copyright notice and the license text when redistributing it.
+
+One thing the license does not cover: this library is an original, independent project and
+is not affiliated with or endorsed by the makers of Stardew Valley. No game assets are
+shiped with it. Do not present it as an official Stardew Valley product, and do not pull
+in game artwork, music, or fonts from elsewhere — that is a trademark and asset-rights
+matter, and the MIT license says nothing about it.
 
 Canonical source: https://github.com/a985987819/stardewUi
 

@@ -1,17 +1,17 @@
 # 接入指南
 
-> [返回 README 目录](../README.md#目录)
+> [返回 README 目录](../README_ZH.md#目录)
 
-`stardew-valley-ui` 是面向 React 18+ 的组件库。公开入口有四个：
+`stardew-valley-ui` 面向 React 18+。公开入口只有三个：
 
 | 子路径 | 内容 |
 | --- | --- |
 | `stardew-valley-ui` | 组件、Hooks、工具函数与类型（不含样式） |
 | `stardew-valley-ui/style.css` | 聚合样式表 |
 | `stardew-valley-ui/auto` | 与根入口等价的导出，**并在加载时自动注入样式** |
-| `stardew-valley-ui/style.css` 之外的类型 | 所有 Props 类型均可从根入口 `import type` |
 
-## 安装
+所有 Props 类型均可从根入口 `import type` 引入。**不要深导入内部路径**——
+`dist/` 的目录结构不在兼容承诺内。
 
 ```bash
 npm install stardew-valley-ui
@@ -22,28 +22,16 @@ React 与 ReactDOM 是 peer dependency，需由业务项目安装。
 
 ## 样式引入方式
 
-两种方式**任选其一**，不要都写：
-
-### 方式一：显式引入样式（推荐）
+两种方式**任选其一**：
 
 ```tsx
-// main.tsx / app/layout.tsx
+// 方式一（推荐）：显式引入样式
 import 'stardew-valley-ui/style.css'
 import { StarCard } from 'stardew-valley-ui'
-```
 
-- 样式进入宿主项目的构建产物，服务端渲染的首屏就有样式，不会闪烁
-- 不依赖 `style-src 'unsafe-inline'`，对严格 CSP 友好
-- 支持把样式单独抽成文件、按需延迟加载或做资源指纹
-
-### 方式二：自动注入入口
-
-```tsx
+// 方式二：自动注入，组件导入写法完全一致
 import { StarCard } from 'stardew-valley-ui/auto'
 ```
-
-导入 `stardew-valley-ui/auto` 即等价于「导入根入口 + 注入样式」：模块加载时会创建
-`<style id="stardew-valley-ui-styles" data-stardew-valley-ui="styles">` 并写入聚合样式表。
 
 取舍：
 
@@ -61,7 +49,8 @@ import { StarCard } from 'stardew-valley-ui/auto'
 >
 > SSR 环境（没有 `document`）下 `/auto` 会静默跳过注入，不会抛错。
 
-无论用哪种方式，组件内部类名都使用 CSS Modules，**不会**向宿主项目写入全局组件选择器。
+无论用哪种方式，组件内部类名都使用 CSS Modules，**不会**向宿主项目写入全局组件选择器，
+可以与 Ant Design、Element Plus 等现有设计体系共存。
 
 ## 素材与部署
 

@@ -9,10 +9,12 @@ import styles from './Support.module.scss'
  *
  * Two rules shaped this page, and both are load-bearing rather than stylistic:
  *
- *   1. **A donation is not a licence purchase.** The project is non-commercial
- *      and stays that way regardless of what anyone pays. The most expensive
- *      failure mode here is a reader inferring that money unlocks something, so
- *      that sentence leads — before the QR codes, not in a footnote.
+ *   1. **A donation is not a licence purchase — and under MIT it cannot be.**
+ *      The code is MIT licensed, so anyone may use it commercially without
+ *      paying and without asking. Money buys the maintainer's time, not access.
+ *      The most expensive failure mode here is a reader inferring that money
+ *      unlocks something, so that sentence leads — before the QR codes, not in a
+ *      footnote.
  *   2. **The library stays free.** No feature is gated, no prop is paid for, no
  *      tier exists. That is stated plainly next to the codes, because "support
  *      me" pages tend to imply the opposite.
@@ -29,7 +31,7 @@ const copy = {
       '维护一个组件库的开销是看不见的：打磨像素、追查只在特定环境复现的 bug、把文档写到有人愿意读完。这些活儿没人派工，咖啡钱不解决问题，但能让搬砖的手速快一点。',
     freeTitle: '先说清楚三件事',
     freeBody:
-      '组件库的使用本身不收取任何费用。支持是自愿的，不影响项目的免费使用，也不会改变许可证——无论是否支持、金额多少，本项目都保持非商业许可。费用仅用于项目维护：组件开发、缺陷修复、文档完善与素材制作。',
+      '组件库的使用本身不收取任何费用。支持是自愿的，它买到的是维护时间，不是授权——MIT 协议允许任何人免费商用。费用仅用于项目维护：组件开发、缺陷修复、文档完善与素材制作。',
     methodsTitle: '微信与支付宝',
     methodsLede: '任选其一，扫一扫就行。金额随意，不必凑整。',
     wechat: '微信支付',
@@ -57,7 +59,7 @@ const copy = {
       'Maintaining a component library has costs you never see: polishing pixels, chasing bugs that only reproduce in one environment, writing docs someone actually finishes. Nobody assigns that work to me. Coffee does not solve the problem, but it makes the typing slightly faster.',
     freeTitle: 'Three things first',
     freeBody:
-      'Using the component library itself is free, always. Support is voluntary: it does not affect free use of the project, and it does not change the licence — this project stays non-commercial regardless of whether you support it, and how much. Money goes only to maintenance: component development, bug fixes, documentation and artwork.',
+      'Using the component library itself is free, always. Support is voluntary, and it buys the maintainer time rather than access — MIT lets anyone use it commercially without paying. Money goes only to maintenance: component development, bug fixes, documentation and artwork.',
     methodsTitle: 'WeChat and Alipay',
     methodsLede: 'Pick either one and scan. Any amount works — no need to round up.',
     wechat: 'WeChat Pay',

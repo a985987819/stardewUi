@@ -1,6 +1,6 @@
 # 发布到 npm
 
-> [返回 README 目录](../README.md#目录)
+> [返回 README 目录](../README_ZH.md#目录)
 
 包名 **`stardew-valley-ui`**，发布目标是 **npm 官方源**（`https://registry.npmjs.org/`）。
 
@@ -174,17 +174,22 @@ bun run verify:package
 - 内置视觉资源已内联或已作为资产发出
 - `license` 是 npm 能解析的 SPDX 表达式
 
-### 关于 license 字段（0.3.0 修复）
+### 关于 license 字段
 
-**0.1.0 / 0.2.0 在 npm 上被显示为 `MIT`，这是错的。**
+**`license` 必须与 `LICENSE` 一致——这个仓库踩过两次坑。**
 
-当时 `package.json` 写的是 `"license": "SEE LICENSE IN LICENSE"`。这不是合法的 SPDX
-表达式，而 **npm 对无法解析的 license 值会静默回退为 `MIT`** —— 于是非商业许可的包
-在 registry 上被标成了 MIT，商业用户看到会以为可以商用。实际条款始终以仓库根目录的
-`LICENSE` 为准。
+`0.1.0` / `0.2.0` 写的是 `"license": "SEE LICENSE IN LICENSE"`，这不是合法的 SPDX
+表达式，而 **npm 对无法解析的 `license` 值会静默回退为 `MIT`**。于是当时实际
+禁止商用的包，在 registry 上被标成了 MIT。
 
-0.3.0 起改为合规的 `LicenseRef-StardewValleyUI-NonCommercial`（SPDX 对自定义许可的
-标准写法），npm 会原样显示。`verify:package` 现在会拦截这个字段，防止它再退化。
+`0.3.0` 改为合规的 `LicenseRef-StardewValleyUI-NonCommercial`，npm 能原样显示。
+
+`0.5.0` 协议正式改为 **MIT**（`"license": "MIT"`），与 `LICENSE` 文件一致。
+
+**这里现在没有坑了，但守卫要留着**：`verify:package` 会校验该字段是可解析的 SPDX
+表达式。一次改名或手误，npm 会静默地把你贴上另一个协议，而这个问题在本地永远看不出来
+——只有在商业用户已经据此做过决定之后才会浮现。**改协议时，`package.json` 与
+`LICENSE` 必须一起改。**
 
 ## 第五步：发布与核验
 

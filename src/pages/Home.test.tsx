@@ -23,6 +23,6 @@ describe('Home', () => {
     expect(screen.getByRole('link', { name: /从使用指南开始/ })).toHaveAttribute('href', '/guide/self-use')
     expect(screen.getByRole('link', { name: /Agent 帮我使用/ })).toHaveAttribute('href', '/guide/agent-use')
     expect(screen.getByRole('link', { name: /查看版权相关/ })).toHaveAttribute('href', '/guide/license')
-    expect(screen.getByText('许可提醒：本项目仅供非商业学习、研究与原型使用。')).toBeInTheDocument()
+    expect(screen.getByText(/MIT 协议开源，可商用/)).toBeInTheDocument()
   })
 })

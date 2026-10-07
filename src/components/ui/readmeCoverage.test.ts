@@ -4,158 +4,211 @@ import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * Keeps the README honest about the props the components actually accept.
+ * Keeps both READMEs honest about the arrangement they now have.
  *
- * The demo pages were already covered by `demoApiCoverage.test.ts`, but the
- * README was not, and it drifted in ways that actively misled:
+ * **What changed and why.** The Chinese README used to carry a hand-written
+ * `### StarXxx` section per component plus a Props table per section — about
+ * 1500 of its 2063 lines. It had its own guard suite for exactly that content:
+ * `Message.position` listed 3 of 9 values, `StarCalendar`'s table was missing
+ * `locale`, `StarRating` and `StarProgress` were listed but had no section at
+ * all. Every one of those was a real drift that a user filed as a bug.
  *
- *   - `Message.position` listed 3 of its 9 values, so `center` looked unsupported
- *   - `StarCalendar`'s table was missing `locale` entirely, even though the
- *     prop carries the whole i18n story for month names and weekday headers
- *   - `StarRating` and `StarProgress` appeared in the component list but had no
- *     section at all — and `allowHalf` needs a *precise double-click*, which is
- *     undiscoverable without documentation
+ * The fix was not to maintain those tables better. It was to delete them: the
+ * demo pages already render an API table per component, `demoApiCoverage.test.ts`
+ * already validates those tables against the real prop declarations, and the
+ * published `.d.ts` is the only thing that is actually authoritative. A second
+ * hand-maintained copy can only ever lag behind it.
  *
- * This is a documentation test rather than a code test, but the cost of the
- * drift it prevents is a user filing "the docs say X" bug reports.
+ * **So this file no longer checks table *content*** — that job belongs to the
+ * suite that owns the tables. What it protects is the shape of the new
+ * arrangement, because the failure mode of deleting documentation is silent: the
+ * README gets shorter, every test still passes, and an English reader quietly has
+ * nowhere to look. Each test below names the dead end it prevents.
  */
 
-/** Always `join` an already-resolved directory: on Windows `resolve` emits backslashes,
- *  and mixing those with `/` in a template literal produces a path that looks right
- *  and silently does not exist. */
+/** Always `join` an already-resolved directory: on Windows `resolve` emits
+ *  backslashes, and mixing those with `/` in a template literal produces a path
+ *  that looks right and silently does not exist. */
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
 
-/**
- * Read a component source file.
- *
- * Every read goes through here. Three earlier revisions each built the path
- * slightly differently — `read(`${uiDir}/X.tsx`)`, `readFileSync(join(...))`,
- * a template literal mixing `resolve`'s backslashes with `/` — and each failed
- * in its own way, most of them as an ENOENT swallowed by a `catch` that turned
- * a real check into a vacuous pass. One helper, one way to be wrong.
- */
-function readComponent(name: string) {
-  // README headings carry the `Star` prefix; component files do not.
-  const file = name.replace(/^Star/, '')
-  // `unionValues` passes real filenames (`messageConfig.ts`), which must not
-  // get a second extension appended — that read ENOENT'd and, worse, would
-  // have been easy to miss behind a `catch`.
-  const path = file.endsWith('.ts') || file.endsWith('.tsx') ? file : `${file}.tsx`
-  return readFileSync(join(uiDir, path), 'utf8')
+const english = read('README.md')
+const chinese = read('README_ZH.md')
+const docsDir = resolve(process.cwd(), 'docs')
+
+/** Per-component headings, in either README. The trimmed shape has none. */
+function componentSections(markdown: string): string[] {
+  return [...markdown.matchAll(/^### (Star\w+)\s*[-—]/gm)].map((m) => m[1])
 }
 
-// The prop tables and TOC live in the Chinese README: it is the hand-maintained
-// document with one section per component, and this suite validates it against
-// the TypeScript declarations. `README.md` is the English one and gets its
-// tables generated from the demo sources by `scripts/gen-api-tables.mjs`.
-const readme = read('README_ZH.md')
-const uiDir = resolve(process.cwd(), 'src/components/ui')
-
-/** Every `### StarXxx` heading in the README. */
-function readmeSections(): string[] {
-  return [...readme.matchAll(/^### (Star\w+)/gm)].map((m) => m[1])
+/** Markdown table rows whose first cell is `| prop |`, i.e. a Props table. */
+function propTableRows(markdown: string): string[] {
+  return markdown
+    .split('\n')
+    .filter((line) => /^\|\s*`?\w+`?\s*\|\s*`?[^|]*`?\s*\|/.test(line) && /\|/.test(line))
 }
 
-/** Table rows for one component's section, as raw markdown lines. */
-function sectionRows(component: string): string[] {
-  const start = readme.indexOf(`### ${component}`)
-  if (start === -1) return []
+describe('READMEs delegate the API reference instead of inlining it', () => {
+  it.each([
+    ['README.md', english],
+    ['README_ZH.md', chinese],
+  ])('%s has no per-component sections', (_name, markdown) => {
+    // One `### StarXxx - …` heading per component is what the old shape looked
+    // like. If these come back, the API reference has moved back into the README
+    // and will start drifting from the declarations again.
+    const sections = componentSections(markdown)
 
-  const rest = readme.slice(start + 3)
-  // Section ends at the next `###` or `##`.
-  const end = rest.search(/^#{2,3} /m)
-  const body = end === -1 ? rest : rest.slice(0, end)
-
-  return body.split('\n').filter((line) => /^\|\s*[\w'`]/.test(line.trim()))
-}
-
-function propsInterface(component: string): string {
-  const text = readComponent(component)
-  const iface = text.match(/export interface Star\w+Props[^{]*\{([\s\S]*?)\n\}/)
-  const alias = text.match(/export type Star\w+Props\s*=\s*\{([\s\S]*?)\n\}/)
-  return iface?.[1] ?? alias?.[1] ?? ''
-}
-
-function propNames(component: string): string[] {
-  const found = new Set<string>()
-
-  for (const line of propsInterface(component).split('\n')) {
-    // Two-space indent marks a top-level member; nested object literals are
-    // indented further and are not props of this component.
-    const member = line.match(/^ {2}(\w+)\??:/)
-    if (member) found.add(member[1])
-  }
-
-  return [...found]
-}
-
-/**
- * Read the members of a string-union type alias.
- *
- * Line-based rather than regex-based because these files are CRLF: any pattern
- * that assumes `\n\n` as a block separator silently fails to match, and a
- * pattern loose enough to tolerate that happily runs past the end of the union
- * and swallows the next `export`.
- */
-function unionValues(file: string, typeName: string): string[] {
-  const lines = readComponent(file).split(/\r?\n/)
-  const start = lines.findIndex((line) => new RegExp(`export type ${typeName}\\s*=`).test(line))
-  if (start === -1) return []
-
-  const values: string[] = []
-  for (const line of lines.slice(start + 1)) {
-    // The union ends at the first line that is not a `| 'value'` member.
-    const member = line.match(/^\s*\|\s*'([^']+)'\s*$/)
-    if (!member) break
-    values.push(member[1])
-  }
-
-  return values
-}
-
-/** Props that are documented on the demo page rather than the README table. */
-const README_OMISSIONS: Record<string, string[]> = {
-  // The README documents these in prose or on the demo site; a table row would
-  // only restate the prop's own name.
-  StarMessage: ['MessageOptions', 'MessagePosition', 'MessageType', 'MessageAction'],
-}
-
-describe('README component sections', () => {
-  it('has a section for every component in the component list', () => {
-    // The list at the top of the README promises these; a listed component with
-    // no section is a dead end for anyone reading it.
-    // The component list is a markdown table of `Star*` backticks, one row per
-    // category — not a bullet list. Restricted to the table itself: later prose
-    // mentions removed components (`StarGapBorder` and friends, which the README
-    // explicitly documents as gone) and those must not count as listed.
-    const table = readme.slice(readme.indexOf('| 容器与展示'), readme.indexOf('完整 Props 类型'))
-    const listed = [...new Set([...table.matchAll(/`(Star\w+)`/g)].map((m) => m[1]))]
-    expect(listed.length).toBeGreaterThan(20)
-
-    const sections = new Set(readmeSections())
-    const missing = listed.filter((name) => !sections.has(name))
-
-    expect(missing, `listed in the README but with no section: ${missing.join(', ')}`).toEqual([])
+    expect(
+      sections,
+      `${_name} has ${sections.length} per-component sections (${sections.slice(0, 5).join(', ')}…); ` +
+        'the demo pages own that surface.',
+    ).toEqual([])
   })
 
-  it.each(['StarProgress', 'StarRating'])('%s has a section', (component) => {
-    // Both were listed in the component list with no section at all. `allowHalf`
-    // in particular needs a documented double-click.
-    expect(readmeSections()).toContain(component)
+  it.each([
+    ['README.md', english],
+    ['README_ZH.md', chinese],
+  ])('%s keeps no Props table', (_name, markdown) => {
+    // Belt to the braces above: a component section could come back in a shape
+    // the heading matcher misses, and an inline table is the actual harm — it
+    // reads as authoritative and is not.
+    const suspicious = propTableRows(markdown).filter((line) =>
+      /^\|\s*`(variant|open|color|size|value|on[A-Z]\w+)`\s*\|/.test(line.trim()),
+    )
+
+    expect(
+      suspicious,
+      `${_name} inlines what look like Props rows:\n${suspicious.join('\n')}`,
+    ).toEqual([])
+  })
+
+  it.each([
+    ['README.md', english],
+    ['README_ZH.md', chinese],
+  ])('%s still indexes the component catalogue', (_name, markdown) => {
+    // A name index is not a Props table: it costs three lines, cannot drift in
+    // any way a reader would act on, and it is the only way to answer "does this
+    // library have a date picker?" without opening the demo site.
+    expect(markdown, `${_name} lost its component index`).toMatch(/StarNineSliceButton/)
+    expect(markdown, `${_name} lost its component index`).toMatch(/StarDatePicker/)
+    expect(markdown, `${_name} lost its component index`).toMatch(/StarDialog/)
   })
 })
 
-/**
- * The table of contents is the only navigation a 1800-line README has, so a
- * stale entry is worse than no entry: a reader clicks through to a component
- * that moved and concludes the component is gone.
- *
- * GitHub derives heading anchors by lowercasing, dropping most punctuation, and
- * replacing spaces with hyphens. `### StarCard - 卡片` therefore becomes
- * `starcard---卡片`: the hyphen before the space, the space, and the hyphen after
- * it all collapse into three hyphens. `message - 消息提示` and
- * `createGapBorderCorners - …` are the same shape.
- */
+describe('the trimmed READMEs are not dead ends', () => {
+  it('point at the demo pages that carry the full API', () => {
+    // The specific failure this trim risks: an English reader copies the props
+    // from nowhere, or concludes the library is undocumented. Both READMEs must
+    // name the demo and link into its component section.
+    //
+    // The catalogue, not a per-component page: a direct `/components/<name>` link
+    // is a dead end today. Deep links bounce to the home page when the splash
+    // hands over to the router (the route table's catch-all matches while the
+    // matched route's lazy chunk is still suspended), so the READMEs point at
+    // `/components` and let the reader click through. Fixing the deep link is
+    // tracked separately; until then, a link that lands on the catalogue and works
+    // beats one that silently drops them on the home page.
+    for (const [name, markdown] of [
+      ['README.md', english],
+      ['README_ZH.md', chinese],
+    ] as const) {
+      expect(markdown, `${name} does not link the demo site`).toMatch(/a985987819\.github\.io/)
+      expect(
+        markdown,
+        `${name} does not link the demo's component section, so the API tables are out of reach`,
+      ).toMatch(/github\.io\/stardewUi\/components/)
+    }
+  })
+
+  it('does not link a per-component page the site cannot open', () => {
+    // Regression guard for the decision above, in the form that would bite: a
+    // per-component link looks more helpful and works nowhere. If the deep-link
+    // fix lands, this test is what should be revisited — deliberately, not
+    // forgotten.
+    for (const [name, markdown] of [
+      ['README.md', english],
+      ['README_ZH.md', chinese],
+    ] as const) {
+      const deep = [...markdown.matchAll(/github\.io\/stardewUi\/components\/\w+/g)].map((m) => m[0])
+
+      expect(
+        deep,
+        `${name} links straight to a component page (${deep.join(', ')}). ` +
+          'Deep links currently redirect to the home page — link the catalogue instead, ' +
+          'or drop this test once that is fixed.',
+      ).toEqual([])
+    }
+  })
+
+  it('carry the language parameter on every demo link', () => {
+    // Each README is written in one language, so a bare demo link drops the
+    // reader into whichever language their browser last used — which is how a
+    // Chinese reader ends up staring at an English component page. The parameter
+    // is what makes a link from this document mean what it says.
+    for (const [name, markdown] of [
+      ['README.md', english],
+      ['README_ZH.md', chinese],
+    ] as const) {
+      const links = [...markdown.matchAll(/https:\/\/a985987819\.github\.io\/stardewUi[^)\s>"]*/g)].map(
+        (m) => m[0],
+      )
+
+      expect(links.length, `${name} has no demo links to check`).toBeGreaterThan(0)
+
+      const bare = links.filter((link) => !link.includes('lang='))
+      expect(
+        bare,
+        `${name} links to the demo without ?lang=, so the reader may land in the other language:\n` +
+          bare.join('\n'),
+      ).toEqual([])
+    }
+  })
+
+  it('point each language at the other within the first screen', () => {
+    // npm and GitHub both render README.md. A reader who cannot find the other
+    // language concludes the project only ships one.
+    expect(english.slice(0, 2000)).toMatch(/README_ZH\.md/)
+    expect(chinese.slice(0, 2000)).toMatch(/README\.md/)
+  })
+
+  it.each([
+    ['README.md', english, ['## License', '## Acknowledgements', '## Buy me a coffee']],
+    ['README_ZH.md', chinese, ['## 版权说明', '## 致谢', '## 请我喝杯咖啡']],
+  ])('%s keeps the licence and donation reachable', (name, markdown, headings) => {
+    // What the trim was originally for: a reader deciding whether to trust the
+    // project should not have to scroll past an API reference to find out
+    // whether it is safe to use.
+    for (const heading of headings) {
+      expect(markdown, `${heading} went missing from ${name}`).toContain(heading)
+    }
+  })
+
+  it('keeps the licence section in the first 80% of the English README', () => {
+    // Measured as a fraction rather than an absolute line count so the check
+    // survives ordinary editing. 0.95 before the trim, when the generated tables
+    // made up most of the file.
+    const lines = english.split('\n')
+    const at = lines.findIndex((l) => l.startsWith('## License'))
+
+    expect(at, '## License not found').toBeGreaterThan(-1)
+    expect(
+      at / lines.length,
+      'the licence should be reachable without scrolling through the whole file',
+    ).toBeLessThan(0.8)
+  })
+
+  it('explains the non-obvious gestures somewhere a reader will meet them', () => {
+    // `allowHalf` needs a *double-click*, which is undiscoverable without being
+    // written down. It moved out of the README with the rest of the Props
+    // material, so the guard follows it to the page that now owns it — and would
+    // fail if a future trim deleted the sentence instead of relocating it.
+    const ratingDemo = read(join(resolve(process.cwd(), 'src/pages'), 'RatingDemo.tsx'))
+    expect(
+      ratingDemo,
+      'RatingDemo no longer explains the double-click that allowHalf depends on',
+    ).toMatch(/double.?click|双击|second time|second click/i)
+  })
+})
+
 describe('README table of contents', () => {
   /** GitHub's anchor slug for a heading. */
   const slug = (heading: string) =>
@@ -165,170 +218,95 @@ describe('README table of contents', () => {
       .replace(/[^\p{L}\p{N}\s-]/gu, '')
       .replace(/\s/g, '-')
 
-  const tocLinks = (): string[] => {
-    const toc = readme.slice(readme.indexOf('## 目录'), readme.indexOf('## 组件列表'))
-    return [...toc.matchAll(/\]\(#([^)]+)\)/g)].map((m) => m[1])
+  const tocLinks = (markdown: string): string[] => {
+    const start = markdown.search(/^## (目录|Table of contents)$/m)
+    if (start === -1) return []
+
+    const rest = markdown.slice(start)
+    const end = rest.slice(1).search(/^## /m)
+    const body = end === -1 ? rest : rest.slice(0, end + 1)
+
+    return [...body.matchAll(/\]\(#([^)]+)\)/g)].map((m) => m[1])
   }
 
-  it('exists', () => {
-    expect(tocLinks().length).toBeGreaterThan(30)
+  it.each([
+    ['README.md', english],
+    ['README_ZH.md', chinese],
+  ])('%s has a table of contents', (_name, markdown) => {
+    expect(tocLinks(markdown).length, `${_name} has no table of contents`).toBeGreaterThan(5)
   })
 
-  it('only links to headings that exist', () => {
-    const headings = new Set(
-      [...readme.matchAll(/^#{2,4}\s+(.+)$/gm)].map((m) => slug(m[1])),
-    )
+  it.each([
+    ['README.md', english],
+    ['README_ZH.md', chinese],
+  ])('%s only links to headings that exist', (_name, markdown) => {
+    // A stale TOC entry is worse than none: the reader clicks through to a
+    // section that moved and concludes the topic was deleted.
+    const headings = new Set([...markdown.matchAll(/^#{2,4}\s+(.+)$/gm)].map((m) => slug(m[1])))
+    const broken = tocLinks(markdown).filter((link) => !headings.has(link))
 
-    const broken = tocLinks().filter((link) => !headings.has(link))
-
-    expect(broken, `目录里的锚点指向不存在的标题：${broken.join(', ')}`).toEqual([])
-  })
-
-  it('links to every component section', () => {
-    const links = new Set(tocLinks())
-    const missing = readmeSections().filter((name) => {
-      const heading = new RegExp(`^### ${name} - .*$`, 'm').exec(readme)
-      return heading ? !links.has(slug(heading[0].replace(/^### /, ''))) : true
-    })
-
-    expect(missing, `组件有章节但目录里没有链接：${missing.join(', ')}`).toEqual([])
+    expect(broken, `${_name} 目录里的锚点指向不存在的标题：${broken.join(', ')}`).toEqual([])
   })
 
   it('indexes every file under docs/', () => {
-    // A doc nobody links to is a doc nobody finds. The README already links
-    // three of them from the body; this catches the ones added without an index
-    // entry, which is how `publishing.md` and `acknowledgements.md` drifted.
-    const listed = [...readme.matchAll(/\]\((docs\/[^)]+\.md)\)/g)].map((m) => m[1])
-    expect(listed.length).toBeGreaterThan(0)
-
-    const onDisk = readdirSync(resolve(process.cwd(), 'docs'))
+    // A doc nobody links to is a doc nobody finds. This catches the ones added
+    // without an index entry, which is how `publishing.md` and
+    // `acknowledgements.md` drifted.
+    const onDisk = readdirSync(docsDir)
       .filter((name) => name.endsWith('.md'))
       .map((name) => `docs/${name}`)
 
-    const missing = onDisk.filter((path) => !listed.includes(path))
-    expect(missing, `docs/ 下有文件未被 README 索引：${missing.join(', ')}`).toEqual([])
+    const listed = new Set(
+      [...chinese.matchAll(/\]\((docs\/[^)]+\.md)\)/g)].map((m) => m[1]),
+    )
+    const missing = onDisk.filter((path) => !listed.has(path))
+
+    expect(missing, `docs/ 下有文件未被 README 索引：${missing.join('、')}`).toEqual([])
   })
 
-  it('gives every doc a link back to the README', () => {
+  it('gives every doc a link back to a README near its top', () => {
     // The docs are written in Chinese, so they link back to the Chinese README.
-    // Accept either file: a doc that links only to the English one is still
-    // navigable, and rejecting it would push contributors toward dead links.
-    const onDisk = readdirSync(resolve(process.cwd(), 'docs')).filter((name) => name.endsWith('.md'))
+    // Either file is accepted — what must not happen is a doc with no way back,
+    // which is how the previous anchors rotted unnoticed: they pointed at
+    // `README.md#目录`, an anchor that stopped existing when the English README
+    // became the default, and nothing failed.
+    const onDisk = readdirSync(docsDir).filter((name) => name.endsWith('.md'))
 
     const orphans = onDisk.filter((name) => {
-      const text = read(`docs/${name}`)
       // Within the first few lines: a breadcrumb belongs at the top, not buried
       // in a paragraph halfway down.
-      const head = text.slice(0, 400)
+      const head = read(`docs/${name}`).slice(0, 400)
       return !head.includes('../README.md') && !head.includes('../README_ZH.md')
     })
 
-    expect(orphans, `docs/ 下有文件没有回到 README 的链接：${orphans.join(', ')}`).toEqual([])
+    expect(orphans, `docs/ 下有文件没有回到 README 的链接：orphans.join('、')`).toEqual([])
   })
-})
 
-describe('README prop tables match the components', () => {
-  // Only sections backed by a component file: `### 主题与许可` and friends are
-  // not components and have no props to check.
-  //
-  // The two names differ: the README heading is `### StarCard` while the file is
-  // `Card.tsx`. Dropping the prefix is what makes the lookup land on a real
-  // file — an earlier revision looked for `StarCard.tsx`, every read threw
-  // ENOENT, and the `it.each` below silently reported success on an empty list.
-  const documented = readmeSections().filter((name) => {
-    try {
-      return readComponent(name).includes(`export interface ${name}Props`)
-    } catch {
-      return false
+  it('resolves each doc backlink to a heading that actually exists', () => {
+    // The orphan check above only proves the string is present. This proves the
+    // anchor lands: `README.md#目录` is a well-formed link to nothing at all,
+    // and it is exactly what five docs pointed at before.
+    const broken: string[] = []
+
+    for (const name of readdirSync(docsDir).filter((n) => n.endsWith('.md'))) {
+      const text = read(`docs/${name}`)
+      const link = /\]\(\.\.\/(README(?:_ZH)?\.md)#([^)]+)\)/.exec(text)
+      if (!link) continue
+
+      const target = link[1] === 'README.md' ? english : chinese
+      if (!new Set([...target.matchAll(/^#{2,4}\s+(.+)$/gm)].map((m) => slug(m[1]))).has(slug(link[2]))) {
+        broken.push(`${name} -> ${link[1]}#${link[2]}`)
+      }
     }
-  })
 
-  it('found component sections to check', () => {
-    // Guards the `it.each` below from passing vacuously on an empty list, which
-    // is exactly what happened in an earlier revision of this file.
-    expect(documented.length).toBeGreaterThan(10)
-  })
-
-  it.each(documented)('%s documents every public prop', (component) => {
-    const rows = sectionRows(component)
-    // Components whose README section carries prose instead of a table.
-    if (rows.length === 0) return
-
-    const documentedProps = new Set(
-      rows
-        .map((line) => line.trim().replace(/^\|\s*/, '').split('|')[0].trim())
-        // `value / defaultValue` documents two props in one row.
-        .flatMap((cell) => cell.split('/').map((part) => part.replace(/`/g, '').trim()))
-        .filter(Boolean),
-    )
-
-    const omitted = new Set(README_OMISSIONS[component] ?? [])
-    const missing = propNames(component).filter(
-      (name) => !omitted.has(name) && !documentedProps.has(name),
-    )
-
-    expect(
-      missing,
-      `${component}: props missing from the README table — add a row, or list them in README_OMISSIONS with a reason`,
-    ).toEqual([])
+    expect(broken, `docs/ 的回链指向不存在的锚点：\n${broken.join('\n')}`).toEqual([])
   })
 })
 
-describe('README enum values match the components', () => {
-  it('lists every MessagePosition value', () => {
-    const declared = unionValues('messageConfig.ts', 'MessagePosition')
-    expect(declared.length).toBeGreaterThan(3)
-
-    const row = readme
-      .split('\n')
-      .find((line) => /^\|\s*position\s*\|/.test(line.trim()))
-
-    expect(row, 'the Message position row vanished from the README').toBeDefined()
-    for (const value of declared) {
-      expect(row, `MessagePosition '${value}' is missing from the README`).toContain(value)
-    }
-  })
-
-  it('lists every NineSliceButton variant', () => {
-    const declared = unionValues('NineSliceButton.tsx', 'NineSliceButtonVariant')
-
-    const row = readme
-      .split('\n')
-      .find((line) => /^\|\s*variant\s*\|/.test(line.trim()) && line.includes('danger'))
-
-    expect(row, 'the variant row vanished from the README').toBeDefined()
-    for (const value of declared) {
-      expect(row, `variant '${value}' is missing from the README`).toContain(value)
-    }
-  })
-})
-
-describe('README documents the non-obvious gestures', () => {
-  it('explains that allowHalf needs a double-click', () => {
-    // A hidden gesture that is not written down is the same as a feature that
-    // does not exist. This is the single most surprising interaction in the kit.
-    const section = readme.slice(readme.indexOf('### StarRating'))
-    expect(section).toMatch(/双击|double-click/i)
-  })
-
-  it('warns that color props only accept hex', () => {
-    // The palette derives borders and shadows by mixing channels, which needs
-    // parsed RGB. `red` and `var(--brand)` now warn in development, and the
-    // README should say so before someone hits the warning.
-    expect(readme).toMatch(/只接受|hex/i)
-  })
-})
 /**
- * The prop tables are generated against the declarations, so they cannot drift.
- * The `code` samples inside them can — they are hand-written prose-shaped
- * strings, and nothing compared them against the API until a reader copied
- * `<StarTag color="green">` from the 0.3.0 README into a project where
- * `color` now means a CSS color and preset names live on `tone`.
- *
- * Checking every prop name in every sample would be brittle (samples use
- * abbreviations and omit props deliberately). What must never appear is a
- * *removed* prop, because copying one produces code that silently does the
- * wrong thing rather than failing to compile.
+ * The samples in both READMEs get copied verbatim into a real project, so a
+ * removed prop in one is not a documentation nit — it produces code that
+ * silently misbehaves instead of failing to compile.
  */
 describe('README samples avoid removed APIs', () => {
   const REMOVED = [
@@ -346,103 +324,17 @@ describe('README samples avoid removed APIs', () => {
   it.each(REMOVED)('$name is gone since $since (use $instead)', (removed) => {
     // The FAQ deliberately shows the old spelling to explain the migration, so
     // prose is exempt — only fenced code samples are checked.
-    const codeBlocks = [...readme.matchAll(/```[\s\S]*?```/g)].map((m) => m[0])
-
-    const offenders = codeBlocks.filter((block) => block.includes(removed.name))
+    const offenders = [english, chinese].flatMap((markdown, index) =>
+      [...markdown.matchAll(/```[\s\S]*?```/g)]
+        .map((m) => m[0])
+        .filter((block) => block.includes(removed.name))
+        .map((block) => `${index === 0 ? 'README.md' : 'README_ZH.md'}: ${block.split('\n')[0]}`),
+    )
 
     expect(
       offenders,
       `README code samples still use ${removed.name}, removed in ${removed.since}. ` +
         `Readers copy these verbatim and get code that silently misbehaves. Use ${removed.instead}.`,
     ).toEqual([])
-  })
-})
-
-/**
- * Keeps the English README short and pointing at the real documentation.
- *
- * It used to inline generated prop tables for all 27 components — roughly
- * 31kB, 60% of the file. That put the licence, the acknowledgements and the
- * donation section about four screens down, which is the opposite of what a
- * README is for: a reader deciding whether to trust a project should not have
- * to scroll past every prop table to find out whether it is safe to use.
- *
- * The full API now lives in the Chinese README (hand-checked against the
- * declarations by the suite above) and on the demo site. What this suite
- * protects is the shape of that arrangement: the English README stays a
- * readable length, and it never becomes a dead end — if it drops the pointers,
- * an English reader has nowhere to look and silently concludes the library is
- * undocumented.
- */
-describe('English README stays a short pointer, not a second manual', () => {
-  const english = read('README.md')
-
-  it('stays short enough to read in one sitting', () => {
-    // Not a style preference: the whole point of trimming was that the licence
-    // and donation sections sit within reach of the first screen. 480 is the
-    // measured size after trimming; the 30-line margin absorbs small edits
-    // without letting the API reference quietly grow back in.
-    const lines = english.split('\n').length
-
-    expect(
-      lines,
-      `README.md is ${lines} lines. The full API lives in README_ZH.md and on the demo site; ` +
-        'inlining it here pushed the licence and donation sections out of reach.',
-    ).toBeLessThan(480)
-  })
-
-  it('does not inline per-component prop tables', () => {
-    // One `### StarXxx -` heading per component is what the trimmed version
-    // looks like. If these come back, the API reference moved into this file.
-    const sections = [...english.matchAll(/^### Star\w+\s*[-—]/gm)]
-
-    expect(
-      sections.length,
-      `README.md has ${sections.length} per-component sections; it should link out instead.`,
-    ).toBe(0)
-  })
-
-  it('points readers at the complete API reference', () => {
-    // A trimmed README is only useful if what it removed is still reachable.
-    expect(english).toMatch(/README_ZH\.md/)
-    expect(english).toMatch(/live demo|github\.io/i)
-    // And the Chinese document has to actually contain it.
-    expect(read('README_ZH.md')).toMatch(/^## Hooks$/m)
-  })
-
-  it('keeps the licence, acknowledgements and donation reachable', () => {
-    for (const heading of ['## License', '## Acknowledgements', '## Buy me a coffee']) {
-      expect(english, `${heading} went missing from the English README`).toContain(heading)
-    }
-  })
-
-  it('puts the licence and donation sections within reach of the first screen', () => {
-    // The specific regression this trim existed to fix: a reader deciding
-    // whether to trust the project had to scroll past every prop table to find
-    // out whether it was free to use. Measured as a fraction of the file rather
-    // than an absolute line count so the check survives ordinary editing.
-    const lines = english.split('\n')
-    const fraction = (heading: string) => {
-      const at = lines.findIndex((l) => l.startsWith(heading))
-      expect(at, `${heading} not found`).toBeGreaterThan(-1)
-      return at / lines.length
-    }
-
-    expect(
-      fraction('## Buy me a coffee'),
-      'the donation section should sit well before the end of the file',
-    ).toBeLessThan(0.9)
-
-    expect(
-      fraction('## License'),
-      'the licence should be reachable without scrolling through the whole file',
-    ).toBeLessThan(0.95)
-  })
-
-  it('documents the language switch on both READMEs', () => {
-    // npm and GitHub both render README.md, so the Chinese one has to be one
-    // click away from the first screen — not buried at the bottom.
-    expect(english.slice(0, 2000)).toMatch(/README_ZH\.md/)
-    expect(read('README_ZH.md').slice(0, 2000)).toMatch(/README\.md/)
   })
 })
