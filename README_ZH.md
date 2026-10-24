@@ -128,6 +128,38 @@ function App() {
 
 ---
 
+## 日/夜模式
+
+组件库的全部颜色走 `:root` 上的语义令牌，夜间配色由 `<html data-theme="dark">` 驱动整体翻转。
+
+- **默认跟随系统**：不包裹 Provider 时，样式表里的 `prefers-color-scheme` 回退会让页面自动跟随操作系统的深浅色。
+- **手动控制**：用 `ThemeProvider` 包裹应用即可获得可切换、可持久化的日夜模式（档位存 localStorage，`system` 档实时跟随系统切换）：
+
+```tsx
+import { ThemeProvider, useTheme } from 'stardew-valley-ui'
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ThemeToggleButton />
+    </ThemeProvider>
+  )
+}
+
+function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme()
+  return (
+    <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+      {resolvedTheme === 'dark' ? '切换到白天' : '切换到夜晚'}
+    </button>
+  )
+}
+```
+
+`setTheme` 接受 `'light' | 'dark' | 'system'`；`resolvedTheme` 是解析后的实际主题。夜间模式下 `StarCard` 会把表面色沉到同色相的深色胡桃再推导光照，保证奶油文字可读；羊皮纸按钮、金色展示框等「自发光」材质保持日间外观，像夜幕上的一盏盏灯。文档站顶栏的太阳/月亮按钮就是这套机制的现场演示。
+
+---
+
 ## 在其他前端项目中使用
 
 库内部类名使用 CSS Modules，不会向宿主项目写入全局组件样式，所以可以放心地和

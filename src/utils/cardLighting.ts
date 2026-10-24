@@ -374,6 +374,31 @@ export function resolveCardSurfaceColor(surfaceColor?: string): string {
 }
 
 /**
+ * Night-mode surface transform: the card keeps
+ * its hue but sinks to a dark walnut band, so the palette derivation's
+ * dark-surface branch takes over and text comes out cream. Light materials
+ * (DisplayFrame's golden bands) never call this — they stay self-lit.
+ */
+export function toNightSurface(surfaceColor: string): string {
+  const background = resolveCardSurfaceColor(surfaceColor)
+  const hsl = rgbToHsl(hexToRgb(background))
+
+  // Already-dark swatches pass through untouched; their own dark branch is
+  // what the derivation would pick anyway.
+  if (hsl.l <= 0.34) {
+    return background
+  }
+
+  return rgbToHex(
+    hslToRgb({
+      h: hsl.h,
+      s: clamp(hsl.s * 0.72),
+      l: 0.28,
+    })
+  )
+}
+
+/**
  * Theme color -> lighting helper. Everything the card needs to fake a light
  * source is computed here from the theme color's HSL triplet, so callers only
  * ever pass one color in.

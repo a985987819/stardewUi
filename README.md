@@ -137,6 +137,47 @@ React's render phase.
 
 ---
 
+## Day & night theme
+
+Every color in the library is a semantic token on `:root`; the night palette
+flips wholesale via `<html data-theme="dark">`.
+
+- **System by default**: without a provider, the stylesheet's
+  `prefers-color-scheme` fallback follows the OS setting automatically.
+- **Manual control**: wrap your app in `ThemeProvider` for a switchable,
+  persisted day/night mode (stored in localStorage; the `system` mode tracks
+  OS changes live):
+
+```tsx
+import { ThemeProvider, useTheme } from 'stardew-valley-ui'
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ThemeToggleButton />
+    </ThemeProvider>
+  )
+}
+
+function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme()
+  return (
+    <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+      {resolvedTheme === 'dark' ? 'Switch to day' : 'Switch to night'}
+    </button>
+  )
+}
+```
+
+`setTheme` accepts `'light' | 'dark' | 'system'`; `resolvedTheme` is the
+effective theme. In night mode `StarCard` sinks its surface to a same-hue dark
+walnut before deriving lighting, so cream text stays readable; self-lit
+materials (parchment buttons, the golden DisplayFrame bands) keep their day
+look and read as lanterns on the night ground. The sun/moon button in the
+doc-site header is a live demo.
+
+---
+
 ## Using it inside another frontend project
 
 Class names inside the library are CSS Modules, so nothing leaks into your global

@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Coffee, ExternalLink, Menu } from 'lucide-react'
+import { Coffee, ExternalLink, Menu, Moon, Sun } from 'lucide-react'
 import { classNames } from '../../utils/classNames'
 import { GITHUB_REPO_URL } from '../../utils/githubIssues'
 import { useI18n } from '../../i18n'
+import { useTheme } from '../../theme'
 import StarLangSwitch from './LangSwitch'
 import styles from './Header.module.scss'
 
 function StarHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useI18n()
+  const { resolvedTheme, setTheme } = useTheme()
+  const isNight = resolvedTheme === 'dark'
+  const themeLabel = t('header.theme')
 
   // Only routes that exist. `/api` used to sit here, but there has never been an
   // API index page: clicking it fell through to the `*` catch-all and bounced
@@ -54,6 +58,15 @@ function StarHeader() {
           >
             <Coffee size={20} />
           </Link>
+          <button
+            type="button"
+            className={styles['doc-header-github']}
+            aria-label={themeLabel}
+            title={themeLabel}
+            onClick={() => setTheme(isNight ? 'light' : 'dark')}
+          >
+            {isNight ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
           <a
             // From the shared constant, not a literal: the launcher, the footer and
             // this header all point at the same repository, and three copies of the
