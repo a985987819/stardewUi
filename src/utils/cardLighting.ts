@@ -392,8 +392,8 @@ export function toNightSurface(surfaceColor: string): string {
   return rgbToHex(
     hslToRgb({
       h: hsl.h,
-      s: clamp(hsl.s * 0.72),
-      l: 0.28,
+      s: clamp(hsl.s * 0.5),
+      l: 0.26,
     })
   )
 }
