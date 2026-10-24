@@ -180,7 +180,7 @@ describe('DatePicker', () => {
     const initialGridLabel = getGrid().getAttribute('aria-label')
     expect(initialGridLabel).toBeTruthy()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+    fireEvent.click(screen.getByRole('button', { name: '下个月' }))
 
     const navigatedGridLabel = getGrid().getAttribute('aria-label')
     expect(navigatedGridLabel).toBeTruthy()
@@ -255,7 +255,7 @@ describe('DatePicker', () => {
       render(<DatePicker defaultValue={normalizeToDayTimestamp('2024-05-13')} />)
 
       fireEvent.click(
-        screen.getByRole('button', { name: formatMonthLabel(getMonthStartTimestamp('2024-05-01')) }),
+        screen.getByRole('button', { name: formatMonthLabel('zh-CN', getMonthStartTimestamp('2024-05-01')) }),
       )
 
       const panel = screen.getByRole('dialog', { name: '选择年月' })
@@ -264,7 +264,7 @@ describe('DatePicker', () => {
 
       expect(getGrid()).toHaveAttribute(
         'aria-label',
-        formatMonthLabel(getMonthStartTimestamp('2024-11-01')),
+        formatMonthLabel('zh-CN', getMonthStartTimestamp('2024-11-01')),
       )
     })
 
@@ -284,7 +284,7 @@ describe('DatePicker', () => {
 
       expect(getGrid()).toHaveAttribute(
         'aria-label',
-        formatMonthLabel(getMonthStartTimestamp('2026-09-01')),
+        formatMonthLabel('zh-CN', getMonthStartTimestamp('2026-09-01')),
       )
       expect(handleChange).not.toHaveBeenCalled()
     })

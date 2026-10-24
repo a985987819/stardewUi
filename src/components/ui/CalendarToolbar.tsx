@@ -1,24 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { addMonths, getMonthStartTimestamp } from '../../utils/calendar'
 import { classNames } from '../../utils/classNames'
-import { formatMonthLabel, formatYearLabel } from './calendarLabels'
+import { formatMonthLabel, formatMonthShortLabel, formatYearLabel } from './calendarLabels'
 import StarNineSliceButton from './NineSliceButton'
 import styles from './CalendarToolbar.module.scss'
-
-const MONTH_LABELS = [
-  '1月',
-  '2月',
-  '3月',
-  '4月',
-  '5月',
-  '6月',
-  '7月',
-  '8月',
-  '9月',
-  '10月',
-  '11月',
-  '12月',
-] as const
 
 const YEARS_PER_PAGE = 12
 
@@ -27,6 +12,8 @@ export interface CalendarToolbarProps {
   todayTimestamp: number
   todayLabel: string
   showToday?: boolean
+  /** BCP-47 locale for month/year labels and aria text; defaults to `'zh-CN'`. */
+  locale?: string
   onSelectMonth: (monthTimestamp: number) => void
 }
 
@@ -41,10 +28,25 @@ function CalendarToolbar({
   todayTimestamp,
   todayLabel,
   showToday = true,
+  locale = 'zh-CN',
   onSelectMonth,
 }: CalendarToolbarProps) {
+  const isZh = locale.toLowerCase().startsWith('zh')
+  const monthLabels = Array.from({ length: 12 }, (_, monthIndex) =>
+    formatMonthShortLabel(locale, monthIndex)
+  )
+  const previousMonthLabel = isZh ? '上个月' : 'Previous month'
+  const nextMonthLabel = isZh ? '下个月' : 'Next month'
+  const panelLabel = isZh ? '选择年月' : 'Select month and year'
   const [isOpen, setIsOpen] = useState(false)
   const [isYearView, setIsYearView] = useState(false)
+  // 年/月两档视图的步进 aria 文案依赖 isYearView，必须在 state 之后取值。
+  const previousStepLabel = isZh
+    ? (isYearView ? '上一组年份' : '上一年')
+    : (isYearView ? 'Previous years' : 'Previous year')
+  const nextStepLabel = isZh
+    ? (isYearView ? '下一组年份' : '下一年')
+    : (isYearView ? 'Next years' : 'Next year')
   const [visibleYear, setVisibleYear] = useState(() => new Date(monthTimestamp).getFullYear())
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -140,7 +142,7 @@ function CalendarToolbar({
           type="button"
           variant="concise"
           size="small"
-          aria-label="Previous month"
+          aria-label={previousMonthLabel}
           onClick={() => onSelectMonth(addMonths(monthTimestamp, -1))}
         >
           &lt;
@@ -154,7 +156,7 @@ function CalendarToolbar({
           aria-expanded={isOpen}
           onClick={handleToggle}
         >
-          {formatMonthLabel(monthTimestamp)}
+          {formatMonthLabel(locale, monthTimestamp)}
           <span className={styles['calendar-toolbar__caret']} aria-hidden="true" />
         </button>
 
@@ -162,7 +164,7 @@ function CalendarToolbar({
           type="button"
           variant="concise"
           size="small"
-          aria-label="Next month"
+          aria-label={nextMonthLabel}
           onClick={() => onSelectMonth(addMonths(monthTimestamp, 1))}
         >
           &gt;
@@ -184,13 +186,13 @@ function CalendarToolbar({
       ) : null}
 
       {isOpen ? (
-        <div className={styles['calendar-toolbar__panel']} role="dialog" aria-label="选择年月">
+        <div className={styles['calendar-toolbar__panel']} role="dialog" aria-label={panelLabel}>
           <div className={styles['calendar-toolbar__panel-header']}>
             <StarNineSliceButton
               type="button"
               variant="concise"
               size="small"
-              aria-label={isYearView ? 'Previous years' : 'Previous year'}
+              aria-label={previousStepLabel}
               onClick={() => handleStep(-1)}
             >
               &lt;
@@ -203,14 +205,14 @@ function CalendarToolbar({
             >
               {isYearView
                 ? `${pageStartYear} - ${pageStartYear + YEARS_PER_PAGE - 1}`
-                : formatYearLabel(visibleYear)}
+                : formatYearLabel(locale, visibleYear)}
             </button>
 
             <StarNineSliceButton
               type="button"
               variant="concise"
               size="small"
-              aria-label={isYearView ? 'Next years' : 'Next year'}
+              aria-label={nextStepLabel}
               onClick={() => handleStep(1)}
             >
               &gt;
@@ -231,13 +233,13 @@ function CalendarToolbar({
                   aria-current={year === currentYear ? 'date' : undefined}
                   onClick={() => handleSelectYear(year)}
                 >
-                  {formatYearLabel(year)}
+                  {formatYearLabel(locale, year)}
                 </button>
               ))}
             </div>
           ) : (
             <div className={styles['calendar-toolbar__grid']}>
-              {MONTH_LABELS.map((label, monthIndex) => (
+              {monthLabels.map((label, monthIndex) => (
                 <button
                   key={label}
                   type="button"
@@ -253,7 +255,10 @@ function CalendarToolbar({
                   aria-current={
                     visibleYear === currentYear && monthIndex === currentMonth ? 'date' : undefined
                   }
-                  aria-label={`${formatYearLabel(visibleYear)}${monthIndex + 1}月`}
+                  aria-label={formatMonthLabel(
+                    locale,
+                    new Date(visibleYear, monthIndex, 1).getTime()
+                  )}
                   onClick={() => handleSelectMonth(monthIndex)}
                 >
                   {label}

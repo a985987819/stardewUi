@@ -43,6 +43,8 @@ export interface StarDatePickerProps {
   showToday?: boolean
   /** 计算「今日」所用的时区偏移（分钟），默认 480 即东八区 */
   todayOffsetMinutes?: number
+  /** 月份/星期标签与工具栏 aria 使用的 BCP-47 语言，默认 `'zh-CN'` */
+  locale?: string
   className?: string
 }
 
@@ -134,6 +136,7 @@ function DatePicker({
   todayLabel = DEFAULT_TODAY_LABEL,
   showToday = true,
   todayOffsetMinutes,
+  locale = 'zh-CN',
   className,
 }: StarDatePickerProps) {
   const isControlled = value !== undefined
@@ -387,12 +390,14 @@ function DatePicker({
         todayTimestamp={todayTimestamp}
         todayLabel={todayLabel}
         showToday={showToday}
+        locale={locale}
         onSelectMonth={changeMonth}
       />
 
       <CalendarGrid
-        monthLabel={formatMonthLabel(monthTimestamp)}
+        monthLabel={formatMonthLabel(locale, monthTimestamp)}
         cells={cells}
+        locale={locale}
         showOutsideDays={showOutsideDays}
         onSelectDay={handleSelectDay}
         isDisabled={isDisabled}

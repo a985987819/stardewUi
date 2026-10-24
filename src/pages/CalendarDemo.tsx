@@ -68,6 +68,7 @@ const apiData = {
     { property: 'todayLabel', description: '「回到今日」按钮文案', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: '是否显示「回到今日」按钮', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: '计算「今日」所用的时区偏移（分钟），480 即东八区', type: 'number', default: '480' },
+    { property: 'locale', description: '月份/星期标签与工具栏 aria 的 BCP-47 语言', type: 'string', default: "'zh-CN'" },
   ],
   en: [
     { property: 'value', description: 'Controlled month timestamp.', type: 'number', default: '-' },
@@ -77,6 +78,7 @@ const apiData = {
     { property: 'todayLabel', description: 'Label of the today button.', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: 'Whether the today button is rendered.', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: 'Timezone offset in minutes used to resolve today; 480 is UTC+8.', type: 'number', default: '480' },
+    { property: 'locale', description: 'BCP-47 locale for month/weekday labels and toolbar aria text.', type: 'string', default: "'zh-CN'" },
   ],
 }
 
@@ -108,19 +110,20 @@ export function ControlledCalendar() {
 function StarCalendarDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
+  const demoLocale = lang === 'en' ? 'en-US' : 'zh-CN'
   const toc = t.toc.map((title, index) => ({ id: ['basic', 'events', 'navigation', 'icons', 'api'][index], title, level: 1 }))
   const [month, setMonth] = useState(DEMO_MONTH)
 
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
-      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]} code={'<StarCalendar defaultValue={new Date(2024, 4, 1).getTime()} todayLabel="Today" />'}><StarCalendar defaultValue={DEMO_MONTH} todayLabel={t.today} /></StarComponentDemo>
-      <StarComponentDemo id="events" title={t.events[0]} description={t.events[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${items[lang].length} events` }, { label: 'event dates', value: items[lang].map((item) => item.date).join(', ') }]}><StarCalendar defaultValue={DEMO_MONTH} items={items[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
+      <StarComponentDemo id="basic" title={t.basic[0]} description={t.basic[1]} code={'<StarCalendar defaultValue={new Date(2024, 4, 1).getTime()} todayLabel="Today" />'}><StarCalendar defaultValue={DEMO_MONTH} todayLabel={t.today} locale={demoLocale} /></StarComponentDemo>
+      <StarComponentDemo id="events" title={t.events[0]} description={t.events[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${items[lang].length} events` }, { label: 'event dates', value: items[lang].map((item) => item.date).join(', ') }]}><StarCalendar defaultValue={DEMO_MONTH} items={items[lang]} iconMap={iconMap} todayLabel={t.today} locale={demoLocale} /></StarComponentDemo>
       <StarComponentDemo id="navigation" title={t.navigation[0]} description={t.navigation[1]} code={navigationCode} data={[{ label: 'month timestamp', value: String(month) }]}>
         <div style={{ width: '100%' }}>
-          <StarCalendar value={month} onMonthChange={setMonth} items={items[lang]} iconMap={iconMap} todayLabel={t.today} />
+          <StarCalendar value={month} onMonthChange={setMonth} items={items[lang]} iconMap={iconMap} todayLabel={t.today} locale={demoLocale} />
         </div>
       </StarComponentDemo>
-      <StarComponentDemo id="icons" title={t.icons[0]} description={t.icons[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${customIconItems[lang].length} events` }, { label: 'icon sources', value: 'iconNode, iconKey' }]}><StarCalendar defaultValue={DEMO_MONTH} items={customIconItems[lang]} iconMap={iconMap} todayLabel={t.today} /></StarComponentDemo>
+      <StarComponentDemo id="icons" title={t.icons[0]} description={t.icons[1]} code={eventCalendarCode} data={[{ label: 'items', value: `${customIconItems[lang].length} events` }, { label: 'icon sources', value: 'iconNode, iconKey' }]}><StarCalendar defaultValue={DEMO_MONTH} items={customIconItems[lang]} iconMap={iconMap} todayLabel={t.today} locale={demoLocale} /></StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="Calendar API" data={apiData[lang]} /></div>
     </StarComponentPage>
   )

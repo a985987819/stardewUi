@@ -6,7 +6,7 @@ import { formatMonthLabel } from './calendarLabels'
 
 const MAY_2024 = new Date(2024, 4, 1).getTime()
 // 直接复用组件里的格式化实现，避免把 Intl 的“2024年5月”写死在断言里。
-const MAY_2024_LABEL = formatMonthLabel(MAY_2024)
+const MAY_2024_LABEL = formatMonthLabel('zh-CN', MAY_2024)
 
 function getDayButton(label: string) {
   return screen.getByRole('button', { name: label })
@@ -30,6 +30,27 @@ describe('Calendar', () => {
     const dayButton = getDayButton('2024-05-13')
 
     expect(within(dayButton).getByLabelText('Egg Festival')).toBeInTheDocument()
+  })
+
+  it('localizes the toolbar and weekday header for an English locale', () => {
+    render(<Calendar value={MAY_2024} locale="en-US" />)
+
+    // 工具栏标题走 Intl 长月名；星期表头走英文短名（周一起始）。
+    expect(screen.getByText(formatMonthLabel('en-US', MAY_2024))).toBeInTheDocument()
+    const grid = screen.getByRole('grid')
+    expect(within(grid).getByRole('columnheader', { name: 'Mon' })).toBeInTheDocument()
+    expect(within(grid).queryByRole('columnheader', { name: '一' })).not.toBeInTheDocument()
+    // 工具栏 aria 跟随语言：英文环境出现英文标签，中文标签不再存在。
+    expect(screen.getByRole('button', { name: 'Previous month' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '上个月' })).not.toBeInTheDocument()
+  })
+
+  it('keeps the zh-CN labels by default', () => {
+    render(<Calendar value={MAY_2024} />)
+
+    const grid = screen.getByRole('grid')
+    expect(within(grid).getByRole('columnheader', { name: '一' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '上个月' })).toBeInTheDocument()
   })
 
   it('uses icon priority node over src over key', () => {
@@ -216,7 +237,7 @@ describe('Calendar', () => {
       />,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next month' }))
+    fireEvent.click(screen.getByRole('button', { name: '下个月' }))
 
     expect(handleMonthChange).toHaveBeenCalledWith(getMonthStartTimestamp('2024-06-01'))
   })
@@ -270,12 +291,12 @@ describe('Calendar', () => {
       // 2024 落在 2016-2027 这一页。
       expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Next years' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '下一组年份' }))
 
       expect(within(panel).queryByRole('button', { name: '2016年' })).toBeNull()
       expect(within(panel).getByRole('button', { name: '2028年' })).toBeInTheDocument()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Previous years' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '上一组年份' }))
 
       expect(within(panel).getByRole('button', { name: '2016年' })).toBeInTheDocument()
     })
@@ -285,7 +306,7 @@ describe('Calendar', () => {
 
       const panel = openMonthPanel()
 
-      fireEvent.click(within(panel).getByRole('button', { name: 'Next year' }))
+      fireEvent.click(within(panel).getByRole('button', { name: '下一年' }))
 
       expect(within(panel).getByRole('button', { name: '2025年' })).toBeInTheDocument()
       expect(within(panel).getByRole('button', { name: '2025年5月' })).toBeInTheDocument()

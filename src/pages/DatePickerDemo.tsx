@@ -46,6 +46,7 @@ const apiData = {
     { property: 'todayLabel', description: '「回到今日」按钮文案', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: '是否显示「回到今日」按钮', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: '计算「今日」所用的时区偏移（分钟），480 即东八区', type: 'number', default: '480' },
+    { property: 'locale', description: '月份/星期标签与工具栏 aria 的 BCP-47 语言', type: 'string', default: "'zh-CN'" },
   ],
   en: [
     { property: 'mode', description: 'Selection mode.', type: "'single' | 'range'", default: "'single'" },
@@ -56,6 +57,7 @@ const apiData = {
     { property: 'todayLabel', description: 'Label of the today button.', type: 'string', default: "'回到今日'" },
     { property: 'showToday', description: 'Whether the today button is rendered.', type: 'boolean', default: 'true' },
     { property: 'todayOffsetMinutes', description: 'Timezone offset in minutes used to resolve today; 480 is UTC+8.', type: 'number', default: '480' },
+    { property: 'locale', description: 'BCP-47 locale for month/weekday labels and toolbar aria text.', type: 'string', default: "'zh-CN'" },
   ],
 }
 
@@ -108,6 +110,7 @@ export function AvailableDates() {
 function StarDatePickerDemoPage() {
   const { lang } = useI18n()
   const t = copy[lang]
+  const demoLocale = lang === 'en' ? 'en-US' : 'zh-CN'
   const [singleValue, setSingleValue] = useState(initialSingleValue)
   const [rangeValue, setRangeValue] = useState<{ startTimestamp: number | null; endTimestamp: number | null }>({ startTimestamp: normalizeToDayTimestamp('2024-05-11'), endTimestamp: normalizeToDayTimestamp('2024-05-15') })
   const toc = t.toc.map((title, index) => ({ id: ['single', 'range', 'limits', 'api'][index], title, level: 1 }))
@@ -115,13 +118,13 @@ function StarDatePickerDemoPage() {
   return (
     <StarComponentPage title={t.title} description={t.desc} toc={toc}>
       <StarComponentDemo id="single" title={t.single[0]} description={t.single[1]} code={singlePickerCode} data={[{ label: 'dateTimestamp', value: String(singleValue) }]}>
-        <div style={{ width: '100%' }}><StarDatePicker value={singleValue} todayLabel={t.today} onChange={(next) => { if ('dateTimestamp' in next) setSingleValue(next.dateTimestamp) }} /></div>
+        <div style={{ width: '100%' }}><StarDatePicker value={singleValue} todayLabel={t.today} locale={demoLocale} onChange={(next) => { if ('dateTimestamp' in next) setSingleValue(next.dateTimestamp) }} /></div>
       </StarComponentDemo>
       <StarComponentDemo id="range" title={t.range[0]} description={t.range[1]} code={rangePickerCode} data={[{ label: 'startTimestamp', value: String(rangeValue.startTimestamp) }, { label: 'endTimestamp', value: String(rangeValue.endTimestamp) }]}>
-        <div style={{ width: '100%' }}><StarDatePicker mode="range" value={rangeValue} todayLabel={t.today} onChange={(next) => { if ('startTimestamp' in next) setRangeValue(next) }} /></div>
+        <div style={{ width: '100%' }}><StarDatePicker mode="range" value={rangeValue} todayLabel={t.today} locale={demoLocale} onChange={(next) => { if ('startTimestamp' in next) setRangeValue(next) }} /></div>
       </StarComponentDemo>
       <StarComponentDemo id="limits" title={t.limits[0]} description={t.limits[1]} code={limitsPickerCode} data={[{ label: 'minDate', value: String(minDate) }, { label: 'maxDate', value: String(maxDate) }, { label: 'disabledDates', value: JSON.stringify([disabledDate]) }]}>
-        <div style={{ width: '100%' }}><StarDatePicker defaultValue={normalizeToDayTimestamp('2024-05-15')} minDate={minDate} maxDate={maxDate} disabledDates={[disabledDate]} todayLabel={t.today} /></div>
+        <div style={{ width: '100%' }}><StarDatePicker defaultValue={normalizeToDayTimestamp('2024-05-15')} minDate={minDate} maxDate={maxDate} disabledDates={[disabledDate]} todayLabel={t.today} locale={demoLocale} /></div>
       </StarComponentDemo>
       <div id="api" className="component-page-api"><StarApiTable title="DatePicker API" data={apiData[lang]} /></div>
     </StarComponentPage>

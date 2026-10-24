@@ -1,10 +1,16 @@
-import { useCallback, type ReactNode } from 'react'
+import { useCallback, useEffect, type ReactNode } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { dictionaries } from './dictionaries'
 import { I18nContext } from './context'
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useLocalStorage<'zh' | 'en'>('star-ui-lang', 'zh')
+
+  // Keep <html lang> in sync so screen readers and translation tools follow the
+  // UI language instead of whatever the static index.html shipped.
+  useEffect(() => {
+    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
+  }, [lang])
 
   const t = useCallback(
     (key: string) => {

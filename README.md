@@ -4,6 +4,8 @@
 [![npm downloads](https://img.shields.io/npm/dm/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
 [![license](https://img.shields.io/npm/l/stardew-valley-ui.svg)](https://www.npmjs.com/package/stardew-valley-ui)
 
+简体中文 | **[English](README.en.md)**
+
 一个 **星露谷风格、像素化的 React 组件库**，基于 React、TypeScript 与 Vite 构建。它既包含可组合的 UI 组件，也提供日期、画布九宫格和像素形状等工具函数。
 
 面向个人学习、研究和非商业原型：提供 ESM、CommonJS、类型声明与单独的样式入口；库自带的像素素材会被打进产物，无需在宿主项目的 `public/` 目录额外复制文件。商业用途不被允许，详见下方版权说明与根目录 [LICENSE](LICENSE)。
@@ -530,6 +532,7 @@ import { StarCalendar } from 'stardew-valley-ui'
 | todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
 | showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
 | todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区 |
+| locale | `string` | `'zh-CN'` | 月份/星期标签与工具栏 aria 的 BCP-47 语言（如 `en-US` 可整体切到英文） |
 
 > 翻月、「回到今日」和下拉选月都会走 `onMonthChange`；目标月份和当前一致时不会重复触发。
 
@@ -588,6 +591,7 @@ import { StarDatePicker } from 'stardew-valley-ui'
 | todayLabel | `string` | `'回到今日'` | 「回到今日」按钮文案 |
 | showToday | `boolean` | `true` | 是否显示「回到今日」按钮 |
 | todayOffsetMinutes | `number` | `480` | 计算「今日」所用的时区偏移（分钟），480 即东八区；仅影响「今日」的判断与按钮落点，不会改动选中值 |
+| locale | `string` | `'zh-CN'` | 月份/星期标签与工具栏 aria 的 BCP-47 语言（如 `en-US` 可整体切到英文） |
 
 ---
 

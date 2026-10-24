@@ -1,9 +1,9 @@
 ﻿import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import type { CalendarCell } from '../../utils/calendar'
 import { classNames } from '../../utils/classNames'
+import { formatWeekdayLabels } from './calendarLabels'
 import styles from './CalendarGrid.module.scss'
 
-const WEEKDAY_LABELS = ['一', '二', '三', '四', '五', '六', '日'] as const
 const DAYS_PER_WEEK = 7
 
 export type CalendarGridCellButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'type' | 'disabled' | 'onClick'>
@@ -11,6 +11,8 @@ export type CalendarGridCellButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonEl
 export interface CalendarGridProps {
   cells: CalendarCell[]
   monthLabel?: string
+  /** BCP-47 locale for the weekday header row; defaults to `'zh-CN'`. */
+  locale?: string
   showOutsideDays?: boolean
   onSelectDay?: (dayTimestamp: number) => void
   renderCellContent?: (cell: CalendarCell) => ReactNode
@@ -25,8 +27,9 @@ function chunkCells(cells: CalendarCell[]): CalendarCell[][] {
   return weeks
 }
 
-function CalendarGrid({ cells, monthLabel, showOutsideDays = true, onSelectDay, renderCellContent, isDisabled, getCellStateClassName, getCellButtonProps }: CalendarGridProps) {
+function CalendarGrid({ cells, monthLabel, locale = 'zh-CN', showOutsideDays = true, onSelectDay, renderCellContent, isDisabled, getCellStateClassName, getCellButtonProps }: CalendarGridProps) {
   const weeks = chunkCells(cells)
+  const weekdayLabels = formatWeekdayLabels(locale)
 
   return (
     <div className={styles['calendar-grid']}>
@@ -37,7 +40,7 @@ function CalendarGrid({ cells, monthLabel, showOutsideDays = true, onSelectDay, 
       <div className={styles['calendar-grid__grid']} role="grid" aria-label={monthLabel}>
         <div className={styles['calendar-grid__rowgroup']} role="rowgroup">
           <div className={styles['calendar-grid__row']} role="row">
-            {WEEKDAY_LABELS.map((label) => <div key={label} className={styles['calendar-grid__weekday']} role="columnheader">{label}</div>)}
+            {weekdayLabels.map((label) => <div key={label} className={styles['calendar-grid__weekday']} role="columnheader">{label}</div>)}
           </div>
         </div>
         <div className={styles['calendar-grid__rowgroup']} role="rowgroup">
