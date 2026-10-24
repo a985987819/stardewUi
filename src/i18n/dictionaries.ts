@@ -6,6 +6,7 @@ export const zhDict: Record<string, string> = {
   'nav.api': 'API',
   'nav.backToTop': '回到顶部',
   'header.github': '查看 GitHub',
+  'header.theme': '切换日/夜模式',
   'home.badge': '像素农场 UI Kit',
   'home.desc':
     '一套带着星露谷泥土香气的 React 组件库。按钮像工具箱里的铜锤，卡片像镇长公告栏，日历会提醒你别错过花舞节。',
@@ -71,6 +72,7 @@ export const enDict: Record<string, string> = {
   'nav.api': 'API',
   'nav.backToTop': 'Back to top',
   'header.github': 'GitHub',
+  'header.theme': 'Toggle day/night theme',
   'home.badge': 'Pixel Farm UI Kit',
   'home.desc':
     'A React component kit with Stardew-like soil under its boots. Buttons feel like copper tools, cards like town notices, and calendars remind players not to miss the Flower Dance.',

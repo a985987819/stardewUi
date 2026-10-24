@@ -87,6 +87,36 @@ function App() {
 }
 ```
 
+## Day / night theme
+
+Every color in the library is a semantic token on `:root`; the night palette flips wholesale via `<html data-theme="dark">`.
+
+- **System by default**: without a provider, the stylesheet's `prefers-color-scheme` fallback follows the OS setting automatically.
+- **Manual control**: wrap your app in `ThemeProvider` for a switchable, persisted day/night mode (stored in localStorage; the `system` mode tracks OS changes live):
+
+```tsx
+import { ThemeProvider, useTheme } from 'stardew-valley-ui'
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ThemeToggleButton />
+    </ThemeProvider>
+  )
+}
+
+function ThemeToggleButton() {
+  const { resolvedTheme, setTheme } = useTheme()
+  return (
+    <button onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+      {resolvedTheme === 'dark' ? 'Switch to day' : 'Switch to night'}
+    </button>
+  )
+}
+```
+
+`setTheme` accepts `'light' | 'dark' | 'system'`; `resolvedTheme` is the effective theme. Both palettes are contrast-verified (body text ≥ 4.5:1, UI strokes ≥ 3:1). In night mode `StarCard` sinks its surface to a same-hue dark walnut before deriving lighting, so cream text stays readable; self-lit materials (parchment buttons, the golden DisplayFrame bands) keep their day look — their text is a baked dark ink constant, so they read as lanterns on the night ground. The sun/moon button in the doc-site header is a live demo.
+
 ## Components
 
 Every prop type is importable from the root entry via `import type`; all components accept `className`, and container components also forward native `style` and DOM props.

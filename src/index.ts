@@ -1,6 +1,9 @@
 import './styles/global.module.scss'
 import './styles/motion.scss'
 
+export { ThemeProvider, useTheme, THEME_STORAGE_KEY } from './theme'
+export type { ThemeMode, ResolvedTheme, ThemeContextValue } from './theme'
+export { toNightSurface } from './utils/cardLighting'
 export { BUTTON_VARIANT_COLORS, STAR_COLORS } from './styles/colorTokens'
 export * from './components/ui'
 export * from './hooks'

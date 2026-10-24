@@ -3,7 +3,9 @@ import { classNames } from '../../utils/classNames'
 import {
   CARD_DEFAULT_SURFACE_COLOR,
   deriveCardLightingFromSurface,
+  toNightSurface,
 } from '../../utils/cardLighting'
+import { useTheme } from '../../theme'
 import styles from './Card.module.scss'
 
 /**
@@ -60,9 +62,14 @@ function StarCard({
 }: StarCardProps) {
   const hasTitle = showTitle && Boolean(title)
   // `color` is the visible card body; the reusable lighting function derives the
-  // framing, stripe bands and directional light from that one swatch.
+  // framing, stripe bands and directional light from that one swatch. In night
+  // mode the surface sinks to a dark walnut of the same hue first, so the
+  // derivation's dark-surface branch produces cream text on its own.
+  const { resolvedTheme } = useTheme()
   const surfaceColor = isPresetCardColor(color) ? CARD_SURFACE_COLORS[color] : color ?? CARD_DEFAULT_SURFACE_COLOR
-  const palette = deriveCardLightingFromSurface(surfaceColor)
+  const palette = deriveCardLightingFromSurface(
+    resolvedTheme === 'dark' ? toNightSurface(surfaceColor) : surfaceColor
+  )
   const cardStyle = {
     ...style,
     '--card-bg': palette.background,

@@ -15,7 +15,7 @@ $calendar-padding: 18px;
 $toolbar-gap: 12px;
 $month-font-size: 18px;
 $month-font-weight: 700;
-$month-color: var(--star-raw-hex-4e342e);
+$month-color: var(--color-text);
 
 // ---------------------------------------------------------------- 日期格子
 /**
@@ -26,7 +26,7 @@ $month-color: var(--star-raw-hex-4e342e);
 $cell-height: 60px;
 $cell-padding: 4px;
 $day-font-size: 15px;
-$day-color: var(--star-raw-hex-6d4c41);
+$day-color: var(--color-text-secondary);
 $outside-day-opacity: 0.55;
 $weekday-font-size: 14px;
 $weekday-height: 32px;
@@ -120,5 +120,5 @@ $marker-color: var(--star-raw-hex-4e342e);
 @mixin calendar-marker-summary {
   font-size: $marker-font-size;
   font-weight: 700;
-  color: var(--star-raw-hex-6d4c41);
+  color: var(--color-text-secondary);
 }
