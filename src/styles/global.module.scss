@@ -67,24 +67,25 @@
   --shadow-inset: inset 2px 2px 0 rgba(255, 255, 255, 0.3), inset -2px -2px 0 rgba(0, 0, 0, 0.1);
 }
 
-// The night palette keeps the project's original dark values: deep pine-green
-// chrome, cream ink and warm gold borders. Saturated fills need no override —
-// they were always tuned to read on both ground colors.
+// The night palette keeps the project's original dark scheme in spirit — deep
+// pine-green chrome, cream ink — but tunes it for long night sessions: the
+// ground and panels sink a step lower for hierarchy, the loud gold borders
+// quiet down to matte brass, and saturated fills keep the cream-text pairing.
 @mixin night-tokens {
-  --color-bg: #23332c;
-  --color-bg-secondary: #31463a;
-  --color-bg-header: rgba(35, 51, 44, 0.95);
-  --color-bg-sidebar: #294034;
-  --color-bg-card: #3e5948;
-  --color-bg-hover: #547360;
-  --color-bg-code: #17231e;
-  --color-bg-code-header: #23332c;
-  --color-bg-code-lines: #1d2b24;
+  --color-bg: #1e2a23;
+  --color-bg-secondary: #283830;
+  --color-bg-header: rgba(26, 38, 31, 0.95);
+  --color-bg-sidebar: #24352b;
+  --color-bg-card: #2f4136;
+  --color-bg-hover: #3c5044;
+  --color-bg-code: #18221d;
+  --color-bg-code-header: #1e2a23;
+  --color-bg-code-lines: #222f27;
   --color-text: #fff5df;
   --color-text-secondary: #e7d6b6;
-  --color-text-tertiary: #c8b992;
-  --color-border: #d7a957;
-  --color-border-dark: #f0d08e;
+  --color-text-tertiary: #cdbfa2;
+  --color-border: #a8895f;
+  --color-border-dark: #cdb37a;
   --color-border-light: #4d705a;
   --shadow-pixel: 4px 4px 0 rgba(0, 0, 0, 0.4);
   --shadow-pixel-sm: 2px 2px 0 rgba(0, 0, 0, 0.3);
@@ -98,22 +99,23 @@
   // toasts, the divider fence) intentionally keep their day values: their text
   // is a baked dark constant, so they read as lit objects on the night ground.
   --star-raw-hex-5c4526: #b3a488; // Input label / hint text on the page band
-  --star-raw-hex-a9752a: #d3ab6b; // Input warning message
-  --star-raw-hex-a35149: #dd9a8f; // Input error message
-  --star-raw-hex-5d7a3d: #a4c98f; // Input success message
-  --star-raw-hex-a8895f: #8f7a55; // Input ring against the dark band
-  --star-raw-hex-7a3514: #c98f5f; // ComponentDemo / Sidebar section titles
+  --star-raw-hex-a9752a: #d8b276; // Input warning message
+  --star-raw-hex-a35149: #e0a094; // Input error message
+  --star-raw-hex-5d7a3d: #a9cd94; // Input success message
+  --star-raw-hex-a8895f: #96805a; // Input ring against the dark band
+  --star-raw-hex-7a3514: #c9a878; // ComponentDemo / Sidebar section titles
+  --star-raw-hex-308be2: #4a86c0; // focus rings and tag accents, one step calmer
 
   // Cream washes that act as *surfaces* become dark panels; low-alpha ones act
   // as sheen and become white.
-  --star-raw-rgba-255-240-210-0-84: rgba(56, 72, 62, 0.92);
-  --star-raw-rgba-255-240-210-0-76: rgba(56, 72, 62, 0.85);
-  --star-raw-rgba-255-240-210-0-7: rgba(56, 72, 62, 0.8);
-  --star-raw-rgba-255-248-235-0-85: rgba(48, 63, 54, 0.94);
+  --star-raw-rgba-255-240-210-0-84: rgba(50, 68, 57, 0.92);
+  --star-raw-rgba-255-240-210-0-76: rgba(50, 68, 57, 0.85);
+  --star-raw-rgba-255-240-210-0-7: rgba(50, 68, 57, 0.8);
+  --star-raw-rgba-255-248-235-0-85: rgba(44, 60, 51, 0.94);
   --star-raw-rgba-255-248-235-0-18: rgba(255, 255, 255, 0.08);
   --star-raw-rgba-255-248-235-0-5: rgba(255, 255, 255, 0.14);
   --star-raw-rgba-255-248-235-0-3: rgba(255, 255, 255, 0.08);
-  --star-raw-rgba-255-245-220-0-72: rgba(62, 78, 68, 0.85);
+  --star-raw-rgba-255-245-220-0-72: rgba(56, 74, 63, 0.85);
   --star-raw-rgba-255-245-220-0-5: rgba(255, 255, 255, 0.12);
   --star-raw-rgba-255-245-220-0-32: rgba(255, 255, 255, 0.08);
   --star-raw-rgba-245-207-143-0-5: rgba(255, 255, 255, 0.1);
