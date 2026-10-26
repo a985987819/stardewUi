@@ -28,6 +28,7 @@
     @apply flex items-center gap-2 py-2 px-6 no-underline text-sm cursor-pointer;
     color: var(--color-text-secondary);
     border-left: 4px solid transparent;
+    transition: color var(--star-motion-fast) var(--star-ease-standard), background-color var(--star-motion-fast) var(--star-ease-standard), border-color var(--star-motion-fast) var(--star-ease-standard);
 
     &:hover {
       color: var(--color-text);
@@ -56,6 +57,7 @@
     border-right: 0;
     border-bottom: 0;
     border-left: 4px solid transparent;
+    transition: color var(--star-motion-fast) var(--star-ease-standard), background-color var(--star-motion-fast) var(--star-ease-standard), border-color var(--star-motion-fast) var(--star-ease-standard);
     font: inherit;
     text-align: left;
 

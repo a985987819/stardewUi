@@ -3,6 +3,21 @@
   gap: 26px;
   padding-bottom: 20px;
 
+  // Scroll reveal for the below-the-fold sections. Same grammar as the demo
+  // slots: pending sections sit low and invisible, then rise once on entry.
+  .is-reveal-pending {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--star-motion-slow) var(--star-ease-entrance),
+      transform var(--star-motion-slow) var(--star-ease-entrance);
+  }
+
   &-hero {
     position: relative;
     display: grid;
@@ -86,7 +101,7 @@
     box-shadow: var(--shadow-pixel-sm);
     font-size: 14px;
     line-height: 1;
-    transition: transform 0.14s steps(2), box-shadow 0.14s steps(2);
+    transition: transform 0.14s var(--star-ease-standard), box-shadow 0.14s var(--star-ease-standard);
 
     &:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-pixel-lg); }
     &:active { transform: translate(2px, 2px); box-shadow: none; }

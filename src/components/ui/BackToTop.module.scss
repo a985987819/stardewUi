@@ -40,8 +40,8 @@ $flight-ease: cubic-bezier(0.4, 0, 0.7, 0.2);
   // `steps()` rather than an ease: the plane should teleport in whole pixels,
   // like every other transition in the kit.
   transition:
-    opacity 0.2s steps(5),
-    transform 0.2s steps(5);
+    opacity 0.2s var(--star-ease-standard),
+    transform 0.2s var(--star-ease-standard);
 
   &--visible {
     opacity: 1;
@@ -67,7 +67,7 @@ $flight-ease: cubic-bezier(0.4, 0, 0.7, 0.2);
     // One level deeper than the root on purpose: the root owns the show/hide
     // transform, this owns the hover/press nudge, so neither can overwrite the
     // other halfway through an animation.
-    transition: transform 0.12s steps(2);
+    transition: transform 0.12s var(--star-ease-standard);
   }
 
   &__plane {

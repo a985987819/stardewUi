@@ -124,7 +124,7 @@
     height: 100%;
     min-width: 4px;
     background: repeating-linear-gradient(90deg, var(--color-success) 0 10px, var(--color-primary-light) 10px 14px);
-    transition: width 0.16s steps(4, jump-end);
+    transition: width 0.16s var(--star-ease-standard);
   }
 
   &__progress p {

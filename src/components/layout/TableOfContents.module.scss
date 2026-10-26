@@ -68,7 +68,7 @@
     font-family: var(--font-pixel);
     font-size: 13px;
     cursor: pointer;
-    transition: all 0.1s steps(2);
+    transition: background-color 0.1s var(--star-ease-standard), color 0.1s var(--star-ease-standard), border-color 0.1s var(--star-ease-standard);
 
     &:hover {
       background: var(--color-bg-hover);

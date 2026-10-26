@@ -12,7 +12,7 @@
   // frame; the default `end` position holds the start pose for half the
   // duration, which reads as lag.
   transition:
-    transform 0.08s steps(2, jump-start),
+    transform 0.08s var(--star-ease-standard),
     color 0.12s ease;
 
   &__bg {

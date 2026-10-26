@@ -144,7 +144,7 @@ $input-hint: var(--star-raw-hex-5c4526);
 
   pointer-events: none;
   opacity: 0;
-  transition: opacity 90ms steps(2, end);
+  transition: opacity 90ms var(--star-ease-standard);
 }
 
 .star-input__plate {
@@ -240,6 +240,7 @@ $input-hint: var(--star-raw-hex-5c4526);
   background: var(--star-input-bevel-dark);
   color: $input-text;
   cursor: pointer;
+  transition: background-color var(--star-motion-fast) var(--star-ease-standard), color var(--star-motion-fast) var(--star-ease-standard);
 
   &:hover {
     background: var(--star-input-accent);

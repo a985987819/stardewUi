@@ -109,7 +109,7 @@
     border-radius: 3px;
     background: var(--star-raw-rgba-255-240-210-0-7);
     border: 1px solid var(--star-raw-rgba-157-65-0-0-18);
-    transition: all 0.1s ease;
+    transition: border-color var(--star-motion-fast) var(--star-ease-standard), background-color var(--star-motion-fast) var(--star-ease-standard), color var(--star-motion-fast) var(--star-ease-standard);
 
     &:hover {
       background: var(--color-primary-bg);
@@ -126,7 +126,7 @@
   &-copied {
     @apply ml-2 text-xs;
     color: var(--color-success);
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn var(--star-motion-base) var(--star-ease-standard);
     font-family: inherit;
   }
 }

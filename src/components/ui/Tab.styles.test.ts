@@ -32,7 +32,7 @@ describe('tab external navigation styles', () => {
   })
 
   it('animates external tab travel and lets bottom tabs paint over their panel seam', () => {
-    expect(tab).toMatch(/\.star-tab__item\s*\{[\s\S]*?transform 0\.18s steps\(3, jump-start\)/)
+    expect(tab).toMatch(/\.star-tab__item\s*\{[\s\S]*?transform 0\.18s var\(--star-ease-standard\)/)
     expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav-wrapper\s*\{[^}]*z-index:\s*3/s)
     expect(tab).toMatch(/&--external\.star-tab--bottom\s*\{[\s\S]*?\.star-tab__nav\s*\{[^}]*padding-bottom:\s*4px/s)
   })

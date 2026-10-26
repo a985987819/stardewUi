@@ -1,6 +1,23 @@
 .component-demo {
   @apply mb-8;
 
+  // Scroll reveal: pending slots sit invisible and slightly low; on first
+  // intersection they rise in. Both classes are dropped once the transition
+  // settles so no transform ever lingers on the card (it would trap the
+  // calendar's fixed-position hover tooltip).
+  &.is-reveal-pending {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  &.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity var(--star-motion-slow) var(--star-ease-entrance),
+      transform var(--star-motion-slow) var(--star-ease-entrance);
+  }
+
   &-desc {
     @apply mb-4 text-sm;
     color: var(--color-text-secondary);
@@ -31,6 +48,7 @@
     color: var(--color-text);
     border: 3px solid var(--star-raw-rgba-157-65-0-0-38);
     box-shadow: 2px 2px 0 var(--star-raw-rgba-77-38-8-0-12);
+    transition: transform var(--star-motion-fast) var(--star-ease-standard), box-shadow var(--star-motion-fast) var(--star-ease-standard), background-color var(--star-motion-fast) var(--star-ease-standard), border-color var(--star-motion-fast) var(--star-ease-standard);
 
     &:hover {
       transform: translate(-1px, -1px);

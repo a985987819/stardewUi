@@ -3,8 +3,8 @@
   opacity: 0;
   transform: translateY(-20px);
   transition:
-    opacity 0.2s steps(3),
-    transform 0.2s steps(3);
+    opacity 0.2s var(--star-ease-standard),
+    transform 0.2s var(--star-ease-standard);
   font-family: var(--font-pixel, "Stardew", monospace);
   font-size: 14px;
 
@@ -161,8 +161,8 @@
     font-size: 18px;
     line-height: 1;
     transition:
-      background 0.1s steps(2),
-      transform 0.1s steps(2);
+      background 0.1s var(--star-ease-standard),
+      transform 0.1s var(--star-ease-standard);
 
     &:hover {
       background: var(--star-raw-rgba-47-52-64-0-08);
@@ -188,8 +188,8 @@
     line-height: 1;
     text-shadow: 1px 1px 0 var(--star-raw-rgba-0-0-0-0-18);
     transition:
-      transform 0.1s steps(2),
-      filter 0.1s steps(2);
+      transform 0.1s var(--star-ease-standard),
+      filter 0.1s var(--star-ease-standard);
 
     &:hover {
       filter: brightness(1.08);

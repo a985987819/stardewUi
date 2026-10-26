@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react'
 import { StarCard } from '../ui/Card'
 import StarCodeBlock from './CodeBlock'
 import { useI18n } from '../../i18n'
+import { useRevealOnScroll } from '../../hooks/useRevealOnScroll'
 import styles from './ComponentDemo.module.scss'
 
 interface ComponentDemoDataItem {
@@ -83,11 +84,22 @@ function StarComponentDemo({
   const [showCode, setShowCode] = useState(defaultShowCode)
   const { t } = useI18n()
   const copyableCode = code ? createCopyableDemoCode(code) : undefined
+  // Every demo slot on every component page fades-and-rises in the first time
+  // it scrolls into view. Once the reveal transition settles, its classes are
+  // dropped so the lingering transform never traps fixed-positioned children
+  // (the calendar hover tooltip).
+  const reveal = useRevealOnScroll<HTMLElement>()
+  const revealClassNames = [
+    styles['component-demo'],
+    code ? styles['has-code'] : '',
+    !reveal.settled ? (reveal.revealed ? styles['is-revealed'] : styles['is-reveal-pending']) : '',
+  ].filter(Boolean).join(' ')
 
   return (
     <StarCard
       id={id}
-      className={code ? `${styles['component-demo']} ${styles['has-code']}` : styles['component-demo']}
+      className={revealClassNames}
+      onTransitionEnd={reveal.onTransitionEnd}
       showTitle
       title={title}
     >

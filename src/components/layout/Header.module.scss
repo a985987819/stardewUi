@@ -49,6 +49,7 @@
     padding: 4px 8px;
     color: var(--color-text-secondary);
     border: 2px solid transparent;
+    transition: color var(--star-motion-fast) var(--star-ease-standard), background-color var(--star-motion-fast) var(--star-ease-standard), border-color var(--star-motion-fast) var(--star-ease-standard);
 
     &:hover {
       color: var(--color-text);

@@ -36,7 +36,7 @@
   cursor: pointer;
   color: inherit;
   font: inherit;
-  transition: transform 90ms steps(2);
+  transition: transform 90ms var(--star-ease-standard);
 
   &:focus-visible {
     outline: 2px solid var(--switch-highlight);
@@ -141,7 +141,7 @@
       0 var(--switch-notch)
     );
     transform: translateY(-50%) translateX(var(--switch-thumb-translate));
-    transition: transform 180ms steps(5), background 120ms steps(3), border-color 120ms steps(3);
+    transition: transform 180ms var(--star-ease-standard), background 120ms var(--star-ease-standard), border-color 120ms var(--star-ease-standard);
 
     &::before {
       content: '';
@@ -162,7 +162,7 @@
     inset: 0;
     z-index: 1;
     background: var(--switch-empty);
-    transition: opacity 100ms steps(2);
+    transition: opacity 100ms var(--star-ease-standard);
   }
 
   &--checked &__thumb-surface {

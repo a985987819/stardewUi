@@ -10,8 +10,8 @@ $inner-glow: var(--star-raw-rgba-255-255-255-0-18);
   border: 6px solid var(--card-border-dark);
   border-radius: 8px;
   transition:
-    transform 0.1s steps(2),
-    box-shadow 0.1s steps(2);
+    transform 0.1s var(--star-ease-standard),
+    box-shadow 0.1s var(--star-ease-standard);
 
   &__frame,
   &__outline {

@@ -13,6 +13,42 @@
   // Rating's former 540ms removal is deliberately halved. Checkbox uses this
   // same exit sequence, so its red check now leaves at the matching tempo.
   --star-motion-loss-duration: 270ms;
+
+  // Shared easing curves and durations for the whole library. Every
+  // hover/press/reveal transition reads these instead of hand-rolled values,
+  // so the whole UI breathes on one tempo. All curves only animate
+  // transform/opacity/filter-friendly properties and stay in the 90-360ms
+  // band: fast enough to feel snappy, long enough to read as smooth.
+  --star-ease-standard: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --star-ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+  --star-ease-exit: cubic-bezier(0.4, 0, 0.7, 0.2);
+  --star-motion-fast: 140ms;
+  --star-motion-base: 220ms;
+  --star-motion-slow: 320ms;
+}
+
+// Anchor jumps and programmatic scrolls glide instead of teleporting; the
+// reduced-motion guard below turns this back off for users who opt out.
+html {
+  scroll-behavior: smooth;
+}
+
+// Users who ask the OS for less motion get an effectively static UI: every
+// animation and transition collapses to a single frame, and scrolling stops
+// gliding. The per-component `animation: none` blocks stay as belt-and-
+// suspenders for specificity conflicts.
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 // Checkbox entrance: a literal left-to-right mask which holds back most of the

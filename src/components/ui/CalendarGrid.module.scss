@@ -74,6 +74,7 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+  transition: background-color var(--star-motion-fast) var(--star-ease-standard), color var(--star-motion-fast) var(--star-ease-standard);
 }
 
 .calendar-grid__button--placeholder {

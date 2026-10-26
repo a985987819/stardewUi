@@ -44,7 +44,7 @@ $toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
   background: transparent;
   font-family: var(--font-pixel);
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background 0.12s var(--star-ease-standard);
 
   &:hover {
     border-color: $toolbar-panel-border;
@@ -95,6 +95,21 @@ $toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
   color: $toolbar-text;
   box-shadow: 2px 2px 8px $toolbar-panel-shadow;
   transform: translateX(-50%);
+  animation: calendar-toolbar-panel-in var(--star-motion-base) var(--star-ease-entrance);
+}
+
+// The panel is centered with translateX(-50%), so the entrance keeps that
+// offset baked into every frame. It unmounts on close, so `both` fill is safe.
+@keyframes calendar-toolbar-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 .calendar-toolbar__panel-header {
@@ -137,7 +152,7 @@ $toolbar-panel-shadow: var(--star-raw-rgba-0-0-0-0-15);
   font-family: var(--font-pixel);
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.12s steps(2, jump-start);
+  transition: background 0.12s var(--star-ease-standard);
 
   &:hover {
     border-color: $toolbar-panel-border;

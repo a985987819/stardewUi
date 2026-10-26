@@ -5,6 +5,7 @@ import heroImage from '../assets/hero.png'
 import { COMPONENT_ROUTES } from '../router/componentRegistry'
 import { classNames } from '../utils/classNames'
 import { useI18n } from '../i18n'
+import { useRevealOnScroll } from '../hooks/useRevealOnScroll'
 import styles from './Home.module.scss'
 
 const copy = {
@@ -57,6 +58,10 @@ const guidePaths = ['/guide/self-use', '/guide/agent-use', '/guide/design-system
 function StarHomePage() {
   const { lang } = useI18n()
   const text = copy[lang]
+  // Below-the-fold sections rise in the first time they scroll into view.
+  const highlightsReveal = useRevealOnScroll<HTMLElement>()
+  const installReveal = useRevealOnScroll<HTMLElement>()
+  const routesReveal = useRevealOnScroll<HTMLElement>()
 
   const highlights = [
     { icon: <Blocks size={21} />, value: COMPONENT_ROUTES.length, label: text.componentCount },
@@ -91,7 +96,15 @@ function StarHomePage() {
         </div>
       </section>
 
-      <section className={styles['home-highlights']} aria-label="Library highlights">
+      <section
+        className={classNames(
+          styles['home-highlights'],
+          !highlightsReveal.revealed && styles['is-reveal-pending'],
+          highlightsReveal.revealed && styles['is-revealed'],
+        )}
+        onTransitionEnd={highlightsReveal.onTransitionEnd}
+        aria-label="Library highlights"
+      >
         {highlights.map((highlight) => (
           <div key={highlight.label} className={styles['home-highlight']}>
             <span>{highlight.icon}</span>
@@ -101,7 +114,14 @@ function StarHomePage() {
         ))}
       </section>
 
-      <section className={styles['home-install']}>
+      <section
+        className={classNames(
+          styles['home-install'],
+          !installReveal.revealed && styles['is-reveal-pending'],
+          installReveal.revealed && styles['is-revealed'],
+        )}
+        onTransitionEnd={installReveal.onTransitionEnd}
+      >
         <div>
           <span className={styles['home-section-kicker']}>QUICK START</span>
           <h2>{text.install}</h2>
@@ -110,7 +130,14 @@ function StarHomePage() {
         <code>npm install stardew-valley-ui</code>
       </section>
 
-      <section className={styles['home-routes']}>
+      <section
+        className={classNames(
+          styles['home-routes'],
+          !routesReveal.revealed && styles['is-reveal-pending'],
+          routesReveal.revealed && styles['is-revealed'],
+        )}
+        onTransitionEnd={routesReveal.onTransitionEnd}
+      >
         <header>
           <span className={styles['home-section-kicker']}>TRAIL MAP</span>
           <h2>{text.routesTitle}</h2>
