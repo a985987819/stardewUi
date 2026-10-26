@@ -4,9 +4,9 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 // Type-only, so it contributes nothing at runtime: the snippets are parsed as
 // text and must not pull the demo pages into the module graph.
-import type * as ts from 'typescript'
+import * as ts from 'typescript'
 
-const tsc: typeof ts = require('typescript')
+const tsc: typeof ts = ts
 
 /**
  * Every `code` string on a demo page is a copy-paste target, so it has to be

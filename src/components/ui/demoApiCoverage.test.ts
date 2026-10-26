@@ -4,9 +4,9 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 // Type-only, so it contributes nothing at runtime: the helpers below parse page
 // sources as text and must not pull the pages into the module graph.
-import type * as ts from 'typescript'
+import * as ts from 'typescript'
 
-const tsc: typeof ts = require('typescript')
+const tsc: typeof ts = ts
 
 /**
  * Keeps each demo page's API table honest about the component it documents.

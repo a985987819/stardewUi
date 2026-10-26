@@ -126,6 +126,7 @@
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",
     "sass": "^1.99.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",

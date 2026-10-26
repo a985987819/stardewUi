@@ -63,9 +63,12 @@ if (bundle.includes('/stardewUi/assets/')) {
 const assetFiles = await getFiles(path.join(distDir, 'assets')).catch(() => [])
 // Vite's library mode may inline image imports. In either representation, the
 // final JS must carry the built-in visuals rather than refer to the demo's
-// public directory. The compressed module is much larger than code-only output
-// when these images are embedded.
-if (assetFiles.length === 0 && bundle.length < 1_000_000) {
+// public directory. The visuals arrive either as emitted files under
+// dist/assets or as base64 data URIs baked into the bundle — the bundle size
+// alone is not a signal, because the palette-quantized pixel art embeds to
+// well under 1 MB.
+const embedsVisuals = /data:image\/png;base64,/.test(bundle)
+if (assetFiles.length === 0 && !embedsVisuals) {
   fail('the library bundle has neither emitted nor embedded built-in visuals.')
 }
 
